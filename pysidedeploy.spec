@@ -1,28 +1,28 @@
 [app]
 
 # title of your application
-title = signal_editor
+title = signal_viewer
 
 # project directory. the general assumption is that project_dir is the parent directory
 # of input_file
-project_dir = E:\dev-home\awi-projects\signal-editor
+project_dir = E:\dev-home\awi-projects\signal-viewer
 
 # source file path
-input_file = E:\dev-home\awi-projects\signal-editor\main.py
+input_file = E:\dev-home\awi-projects\signal-viewer\main.py
 
 # directory where exec is stored
 exec_directory = .
 
 # path to .pyproject project file
-project_file = signal-editor.pyproject
+project_file = signal-viewer.pyproject
 
 # application icon
-icon = E:\dev-home\awi-projects\signal-editor\.venv\Lib\site-packages\PySide6\scripts\deploy_lib\pyside_icon.ico
+icon = E:\dev-home\awi-projects\signal-viewer\.venv\Lib\site-packages\PySide6\scripts\deploy_lib\pyside_icon.ico
 
 [python]
 
 # python path
-python_path = E:\dev-home\awi-projects\signal-editor\.venv\Scripts\python.exe
+python_path = E:\dev-home\awi-projects\signal-viewer\.venv\Scripts\python.exe
 
 # python packages to install
 packages = Nuitka==2.4.8

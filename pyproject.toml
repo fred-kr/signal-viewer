@@ -1,7 +1,7 @@
 [project]
-name = "signal-editor"
+name = "SignalViewer"
 version = "0.1.0"
-description = "Add your description here"
+description = "A GUI for working with biological signal data."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -34,3 +34,18 @@ pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph.git" }
 pyside-config = { git = "https://github.com/fred-kr/pyside-config.git" }
 pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets.git" }
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.gui-scripts]
+signal_viewer = "signal_viewer.start:gui"
+
+[tool.hatch.version]
+path = "signal_viewer/__init__.py"
+
+[tool.hatch.build]
+include = [
+    "pyproject.toml",
+    "signal_viewer/**/*",
+]

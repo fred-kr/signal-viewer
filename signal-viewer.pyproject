@@ -1,0 +1,31 @@
+{
+    "files": [
+        "resources.qrc",
+        "signal_editor/sv_app.py",
+        "signal_editor/sv_gui.py",
+        "signal_editor/start.py",
+        "signal_editor/sv_config.py",
+        "signal_editor/__init__.py",
+        "signal_editor/constants.py",
+        "signal_editor/enum_defs.py",
+        "signal_editor/type_defs.py",
+        "signal_editor/utils.py",
+        "signal_editor/sv_logic/__init__.py",
+        "signal_editor/sv_logic/data_controller.py",
+        "signal_editor/sv_logic/data_models.py",
+        "signal_editor/sv_logic/file_io.py",
+        "signal_editor/sv_logic/peak_detection.py",
+        "signal_editor/sv_logic/section.py",
+        "signal_editor/sv_logic/signal_processing.py",
+        "signal_editor/sv_plots/__init__.py",
+        "signal_editor/sv_plots/graphic_items.py",
+        "signal_editor/sv_plots/plot_controller.py",
+        "signal_editor/sv_widgets/__init__.py",
+        "signal_editor/sv_widgets/dlg_metadata.py",
+        "signal_editor/sv_widgets/dock_log_window.py",
+        "signal_editor/sv_widgets/dock_parameter_inputs.py",
+        "signal_editor/sv_widgets/dock_sections.py",
+        "rc_resources.py",
+        "signal_editor/__main__.py"
+    ]
+}
