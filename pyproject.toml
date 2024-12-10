@@ -1,0 +1,36 @@
+[project]
+name = "signal-editor"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "attrs>=24.2.0",
+    "loguru>=0.7.3",
+    "mne>=1.8.0",
+    "neurokit2>=0.2.10",
+    "numexpr>=2.10.2",
+    "numpy>=2.2.0",
+    "polars[excel]>=1.17.1",
+    "pyarrow>=18.1.0",
+    "pyjanitor>=0.30.0",
+    "pyopengl>=3.1.7",
+    "pyopengl-accelerate>=3.1.7",
+    "pyqtgraph",
+    "pyside-config",
+    "pyside-widgets",
+    "pyside6>=6.8.1",
+    "pywavelets>=1.8.0",
+    "scipy>=1.14.1",
+    "tables>=3.10.1",
+    "ts2vg>=1.2.4",
+    "wfdb>=4.1.2",
+]
+
+[tool.uv.sources]
+pyopengl = { git = "https://github.com/mcfletch/pyopengl", tag = "release-3.1.8" }
+pyopengl_accelerate = { git = "https://github.com/mcfletch/pyopengl", tag = "release-3.1.8", subdirectory = "accelerate" }
+pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph.git" }
+pyside-config = { git = "https://github.com/fred-kr/pyside-config.git" }
+pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets.git" }
+

@@ -1,0 +1,15 @@
+{
+    "files": [
+        "logic/__init__.py",
+        "main.py",
+        "ui/mainwindow.ui",
+        "resources.qrc",
+        "views/docks.py",
+        "views/graphic_items.py",
+        "ui/__init__.py",
+        "signal_editor/sv_app.py",
+        "signal_editor/sv_gui.py",
+        "signal_editor/start.py",
+        "signal_editor/sv_config.py"
+    ]
+}
