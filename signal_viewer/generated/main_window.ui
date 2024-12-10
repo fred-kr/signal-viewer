@@ -1,0 +1,1003 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1660</width>
+    <height>937</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Signal Editor</string>
+  </property>
+  <property name="dockNestingEnabled">
+   <bool>true</bool>
+  </property>
+  <property name="dockOptions">
+   <set>QMainWindow::DockOption::AllowNestedDocks|QMainWindow::DockOption::AllowTabbedDocks|QMainWindow::DockOption::AnimatedDocks|QMainWindow::DockOption::VerticalTabs</set>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <layout class="QHBoxLayout" name="h_layout_centralwidget">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QStackedWidget" name="stackedWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="stacked_page_import">
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,6">
+        <item>
+         <widget class="QWidget" name="container_file_information" native="true">
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="3" column="0" colspan="2">
+            <widget class="PushButton" name="btn_load_data">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>41</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loads the data from the columns or channels specified in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="whatsThis">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loads the data from the columns or channels specified in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Load Data</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resources/resources.qrc">
+               <normaloff>:/icons/fluent-icons/DocumentArrowRight.svg</normaloff>:/icons/fluent-icons/DocumentArrowRight.svg</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="3">
+            <widget class="QGroupBox" name="grp_box_required_info">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title">
+              <string>Required Information </string>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+             <layout class="QFormLayout" name="formLayout">
+              <item row="0" column="0">
+               <widget class="BodyLabel" name="samplingRateLabel">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>31</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate of the signal in Hz (samples/second)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Sampling Rate</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="SpinBox" name="spin_box_sampling_rate_import_page">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>31</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate of the signal values in the file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="frame">
+                 <bool>false</bool>
+                </property>
+                <property name="suffix">
+                 <string> Hz</string>
+                </property>
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+                <property name="value">
+                 <number>0</number>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="BodyLabel" name="signalColumnChannelLabel">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>31</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column or channel containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column or channel containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Signal Data</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="ComboBox" name="combo_box_signal_column_import_page">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>31</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column or channel containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column or channel containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0" colspan="2">
+               <widget class="Line" name="line">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="BodyLabel" name="infoColumnChannelLabel">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>31</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Additional Data</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="ComboBox" name="combo_box_info_column_import_page">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>31</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="1" colspan="2">
+            <widget class="LineEdit" name="line_edit_active_file">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>31</height>
+              </size>
+             </property>
+             <property name="frame">
+              <bool>false</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="PushButton" name="btn_open_file">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>41</height>
+              </size>
+             </property>
+             <property name="whatsThis">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Opens a window allowing you to choose a file to load into the app.&lt;/p&gt;&lt;p&gt;The selected file is searched for available columns or channels of data.&lt;/p&gt;&lt;p&gt;If any are found, their names are made available for selection in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Open File</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resources/resources.qrc">
+               <normaloff>:/icons/fluent-icons/FolderOpen.svg</normaloff>:/icons/fluent-icons/FolderOpen.svg</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="PushButton" name="btn_close_file">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>41</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close the current file and reset the app state.&lt;/p&gt;&lt;p&gt;Make sure to export any existing results first, as they will be lost on reset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="whatsThis">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close the current file and reset the app state.&lt;/p&gt;&lt;p&gt;Make sure to export any existing results first, as they will be lost on reset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Close File</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resources/resources.qrc">
+               <normaloff>:/icons/fluent-icons/DocumentDismiss.svg</normaloff>:/icons/fluent-icons/DocumentDismiss.svg</iconset>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="3">
+            <widget class="SubtitleLabel" name="label_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Data Import</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" colspan="3">
+            <widget class="QWidget" name="container_recent_files" native="true">
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <property name="leftMargin">
+               <number>3</number>
+              </property>
+              <property name="topMargin">
+               <number>3</number>
+              </property>
+              <property name="rightMargin">
+               <number>3</number>
+              </property>
+              <property name="bottomMargin">
+               <number>3</number>
+              </property>
+              <item>
+               <widget class="StrongBodyLabel" name="label_3">
+                <property name="text">
+                 <string>Recent Files</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="ListView" name="list_view_recent_files">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double-click on a filename to open it&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="textElideMode">
+                 <enum>Qt::TextElideMode::ElideMiddle</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="container_loaded_data_table" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_7">
+           <item row="0" column="0">
+            <widget class="SubtitleLabel" name="label">
+             <property name="text">
+              <string>Data View</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="StrongBodyLabel" name="label_showing_data_table">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Showing: -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="2">
+            <widget class="TableView" name="table_view_import_data">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A table showing the current section's data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+             </property>
+             <property name="showDropIndicator" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="dragDropOverwriteMode">
+              <bool>false</bool>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+             </property>
+             <property name="cornerButtonEnabled">
+              <bool>false</bool>
+             </property>
+             <attribute name="horizontalHeaderCascadingSectionResizes">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderHighlightSections">
+              <bool>false</bool>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="stacked_page_edit">
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QWidget" name="plot_container" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="stacked_page_export">
+       <layout class="QGridLayout" name="gridLayout_3" columnstretch="2,1,1">
+        <item row="0" column="0">
+         <widget class="SubtitleLabel" name="label_4">
+          <property name="text">
+           <string>Section Data and Results</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="PushButton" name="btn_export_all_results">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Export all results to HDF5</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="3">
+         <widget class="QTabWidget" name="tab_widget_result_views">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tab_result_peaks_info">
+           <attribute name="title">
+            <string>Peak Indices</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="TableView" name="table_view_result_peaks">
+              <property name="editTriggers">
+               <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+              </property>
+              <property name="cornerButtonEnabled">
+               <bool>false</bool>
+              </property>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_result_rate_info">
+           <attribute name="title">
+            <string>Calculated Rate / Summary Statistics</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="TableView" name="table_view_result_rate">
+              <property name="editTriggers">
+               <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+              </property>
+              <property name="cornerButtonEnabled">
+               <bool>false</bool>
+              </property>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_result_mpl_widget">
+           <attribute name="title">
+            <string>Plot View</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <widget class="MatplotlibWidget" name="mpl_widget" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>500</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_result_metadata">
+           <attribute name="title">
+            <string>Metadata</string>
+           </attribute>
+           <attribute name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shows the methods and parameters used to produce the current results.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0">
+             <widget class="TreeView" name="tree_view_result_metadata"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="StrongBodyLabel" name="label_showing_section_result">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1660</width>
+     <height>33</height>
+    </rect>
+   </property>
+   <widget class="RoundMenu" name="menu_file">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="action_open_file"/>
+    <addaction name="action_close_file"/>
+    <addaction name="separator"/>
+    <addaction name="action_edit_metadata"/>
+   </widget>
+   <widget class="RoundMenu" name="menu_settings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="action_show_settings"/>
+   </widget>
+   <widget class="RoundMenu" name="menu_view">
+    <property name="title">
+     <string>View</string>
+    </property>
+   </widget>
+   <widget class="RoundMenu" name="menu_plot">
+    <property name="title">
+     <string>Plot</string>
+    </property>
+    <addaction name="action_remove_peaks_in_selection"/>
+    <addaction name="action_find_peaks_in_selection"/>
+    <addaction name="separator"/>
+    <addaction name="action_show_section_overview"/>
+    <addaction name="action_toggle_auto_scaling"/>
+   </widget>
+   <widget class="RoundMenu" name="menu_help">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="action_show_user_guide"/>
+    <addaction name="separator"/>
+    <addaction name="action_about_app"/>
+    <addaction name="action_about_qt"/>
+   </widget>
+   <addaction name="menu_file"/>
+   <addaction name="menu_view"/>
+   <addaction name="menu_plot"/>
+   <addaction name="menu_settings"/>
+   <addaction name="menu_help"/>
+  </widget>
+  <widget class="QToolBar" name="tool_bar_file_actions">
+   <property name="windowTitle">
+    <string>Editing Toolbar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::ToolBarArea::TopToolBarArea</set>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_open_file"/>
+   <addaction name="action_close_file"/>
+   <addaction name="action_edit_metadata"/>
+  </widget>
+  <action name="action_open_file">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/FolderOpen.svg</normaloff>:/icons/fluent-icons/FolderOpen.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Open File</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_show_settings">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/Settings.svg</normaloff>:/icons/fluent-icons/Settings.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+   <property name="toolTip">
+    <string>Modify various settings</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+,</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::PreferencesRole</enum>
+   </property>
+  </action>
+  <action name="action_edit_metadata">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/DocumentEndnote.svg</normaloff>:/icons/fluent-icons/DocumentEndnote.svg</iconset>
+   </property>
+   <property name="text">
+    <string>File Metadata</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open a more detailed view of the current file's metadata.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="whatsThis">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shows a dialog window with fields for setting the sampling rate, data source and info source to be used for the current file.&lt;/p&gt;&lt;p&gt;If any additional metadata exists in the file (and if the app is able to read it and parse it into a python dictionary) it will be displayed as a read-only tree structure.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;For EDF files, shows the information from the &lt;a href=&quot;https://mne.tools/stable/generated/mne.Info.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ff8c00;&quot;&gt;Info&lt;/span&gt;&lt;/a&gt; object created by the &lt;a href=&quot;https://mne.tools/stable/index.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ff8c00;&quot;&gt;mne&lt;/span&gt;&lt;/a&gt; library.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_close_file">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/DocumentDismiss.svg</normaloff>:/icons/fluent-icons/DocumentDismiss.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Close File</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close the current file and reset the app state.&lt;/p&gt;&lt;p&gt;Make sure to export any existing results first, as they will be lost on reset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_mark_section_done">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/CheckmarkCircle.svg</normaloff>:/icons/fluent-icons/CheckmarkCircle.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Mark as Done</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save the current section's data and lock it to prevent further edits.&lt;/p&gt;&lt;p&gt;To view or export the data, go to the &amp;quot;Results&amp;quot; page.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="whatsThis">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save the current section's data and lock it to prevent further edits.&lt;/p&gt;&lt;p&gt;To view or export the data, go to the &amp;quot;Results&amp;quot; page.&lt;/p&gt;&lt;p&gt;To unlock a section, right-click it's name in the section list and select &amp;quot;Unlock Section&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_create_new_section">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/AddCircle.svg</normaloff>:/icons/fluent-icons/AddCircle.svg</iconset>
+   </property>
+   <property name="text">
+    <string>New Section</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new section</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_toggle_auto_scaling">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/AutoFitHeight.svg</normaloff>:/icons/fluent-icons/AutoFitHeight.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Auto-Scaling</string>
+   </property>
+   <property name="toolTip">
+    <string>Automatically adjust the y-axis limits to the visible data range</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_confirm_section">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/Checkmark.svg</normaloff>:/icons/fluent-icons/Checkmark.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Confirm Section</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new section with the data of the selected region</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_cancel_section">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/Dismiss.svg</normaloff>:/icons/fluent-icons/Dismiss.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Cancel Section</string>
+   </property>
+   <property name="toolTip">
+    <string>Cancel the section creation process</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_show_section_overview">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/EyeHide.svg</normaloff>
+     <normalon>:/icons/fluent-icons/EyeShow.svg</normalon>:/icons/fluent-icons/EyeHide.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Section Overview</string>
+   </property>
+   <property name="toolTip">
+    <string>Shows the current sections as colored regions in the plot</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_remove_peaks_in_selection">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/Eraser.svg</normaloff>:/icons/fluent-icons/Eraser.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Peaks in Selection</string>
+   </property>
+   <property name="toolTip">
+    <string>Deletes all peaks inside the selected area</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_find_peaks_in_selection">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/SearchSquare.svg</normaloff>:/icons/fluent-icons/SearchSquare.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Find Peaks in Selection</string>
+   </property>
+   <property name="toolTip">
+    <string>Detect peaks in just the selected area instead of the entire signal</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_show_user_guide">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/BookQuestionMark.svg</normaloff>:/icons/fluent-icons/BookQuestionMark.svg</iconset>
+   </property>
+   <property name="text">
+    <string>User Guide</string>
+   </property>
+   <property name="toolTip">
+    <string>User Guide</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_about_qt">
+   <property name="text">
+    <string>About Qt</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::AboutQtRole</enum>
+   </property>
+  </action>
+  <action name="action_about_app">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/BookInformation.svg</normaloff>:/icons/fluent-icons/BookInformation.svg</iconset>
+   </property>
+   <property name="text">
+    <string>About App</string>
+   </property>
+   <property name="toolTip">
+    <string>About this Application</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::AboutRole</enum>
+   </property>
+  </action>
+  <action name="action_remove_section">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/SubtractCircle.svg</normaloff>:/icons/fluent-icons/SubtractCircle.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Section</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes the selected section</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_clear_recent_files">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/Dismiss.svg</normaloff>:/icons/fluent-icons/Dismiss.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Clear Recent Files</string>
+   </property>
+  </action>
+  <action name="action_unlock_section">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fluent-icons/LockOpen.svg</normaloff>:/icons/fluent-icons/LockOpen.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Unlock Section</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make a section marked as &amp;quot;Done&amp;quot; editable again.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>SpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QPushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>PushButton</class>
+   <extends>QPushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>SubtitleLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>MatplotlibWidget</class>
+   <extends>QWidget</extends>
+   <header>pyqtgraph.widgets.MatplotlibWidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TableView</class>
+   <extends>QTableView</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>RoundMenu</class>
+   <extends>QMenu</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>StrongBodyLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>TreeView</class>
+   <extends>QTreeView</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>ListView</class>
+   <extends>QListView</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>btn_open_file</tabstop>
+  <tabstop>line_edit_active_file</tabstop>
+  <tabstop>spin_box_sampling_rate_import_page</tabstop>
+  <tabstop>combo_box_signal_column_import_page</tabstop>
+  <tabstop>combo_box_info_column_import_page</tabstop>
+  <tabstop>btn_load_data</tabstop>
+  <tabstop>btn_close_file</tabstop>
+  <tabstop>container_recent_files</tabstop>
+  <tabstop>list_view_recent_files</tabstop>
+  <tabstop>table_view_import_data</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>line_edit_active_file</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>setWindowTitle(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>363</x>
+     <y>152</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>187</x>
+     <y>-11</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

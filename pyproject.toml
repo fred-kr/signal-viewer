@@ -1,6 +1,6 @@
 [project]
-name = "SignalViewer"
-version = "0.1.0"
+name = "signal-viewer"
+version = "0.1.0.dev0"
 description = "A GUI for working with biological signal data."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -25,6 +25,7 @@ dependencies = [
     "tables>=3.10.1",
     "ts2vg>=1.2.4",
     "wfdb>=4.1.2",
+    "pyside6-fluent-widgets>=1.7.2",
 ]
 
 [tool.uv.sources]
@@ -38,11 +39,8 @@ pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets.git" }
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[project.gui-scripts]
-signal_viewer = "signal_viewer.start:gui"
-
-[tool.hatch.version]
-path = "signal_viewer/__init__.py"
+[project.scripts]
+signal-viewer = "signal_viewer.start:gui"
 
 [tool.hatch.build]
 include = [
