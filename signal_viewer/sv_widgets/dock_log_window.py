@@ -28,7 +28,7 @@ class LoggingWindow(qfw.TextEdit):
         self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_context_menu)
         self.sig_log_message.connect(self.append)
-        self.action_clear_log = qfw.Action("Clear Log", parent=self)
+        self.action_clear_log = QtGui.QAction("Clear Log", parent=self)
         self.action_clear_log.triggered.connect(self.clear)
 
     @QtCore.Slot(QtCore.QPoint)

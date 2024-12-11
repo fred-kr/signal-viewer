@@ -1,37 +1,52 @@
 # This Python file uses the following encoding: utf-8
 
-import sys
-
-# import traceback
-# from types import TracebackType
-#
-# from loguru import logger
-from PySide6 import QtWidgets
-
-
-# def _uncaught_exception_hook(exc_type: type, exc_value: Exception, exc_traceback: TracebackType | None) -> None:
-#     logger.error("".join(traceback.format_tb(exc_traceback)) + str(exc_value))
-#     sys.__excepthook__(exc_type, exc_value, exc_traceback)
-
-
-# sys.excepthook = _uncaught_exception_hook
-
-
-def _set_credentials(app: QtWidgets.QApplication) -> None:
-    app.setOrganizationDomain("https://fred-kr.github.io/signal-viewer-v2/")
-    app.setOrganizationName("QuackTech")
-    app.setApplicationName("SignalViewer")
-    # app.setApplicationVersion(sv_config.get_version())
-
 
 def gui() -> None:
-    QtWidgets.QApplication.setOrganizationDomain("https://fred-kr.github.io/signal-viewer-v2/")
-    QtWidgets.QApplication.setOrganizationName("QuackTech")
-    QtWidgets.QApplication.setApplicationName("SignalViewer")
-    from signal_viewer.sv_app import SVApp
-    app = QtWidgets.QApplication(sys.argv)
+    import multiprocessing
 
-    # _set_credentials(app)
+    multiprocessing.freeze_support()
+    import argparse
+    import os
+    import sys
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+    parser.add_argument("--no-opengl", action="store_false", help="Don't use OpenGL for rendering")
+    parser.add_argument("-c", "--console", action="store_true", help="Enable Jupyter console")
+    args = parser.parse_args()
+
+    from loguru import logger
+
+    logger.remove()
+
+    if args.debug:
+        logger.add(sys.stderr, colorize=True, backtrace=True, diagnose=True)
+        logger.add("debug.log")
+        app_name = "SignalViewer - Debug"
+    else:
+        app_name = "SignalViewer"
+    org_name = "QuackTech"
+    from PySide6 import QtWidgets
+
+    QtWidgets.QApplication.setOrganizationName(org_name)
+    QtWidgets.QApplication.setApplicationName(app_name)
+    use_opengl = args.no_opengl
+    if use_opengl:
+        os.environ["QSG_RHI_BACKEND"] = "opengl"
+
+    if args.console:
+        os.environ["DEV"] = "1"
+
+    import pyqtgraph as pg
+
+    pg.setConfigOptions(
+        useOpenGL=use_opengl,
+        enableExperimental=use_opengl,
+        segmentedLineMode="on",
+    )
+    from signal_viewer.sv_app import SVApp
+
+    app = QtWidgets.QApplication(sys.argv)
 
     sv_app = SVApp()
     sv_app.gui.show()

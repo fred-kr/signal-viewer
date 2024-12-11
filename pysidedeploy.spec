@@ -8,7 +8,7 @@ title = signal_viewer
 project_dir = E:\dev-home\awi-projects\signal-viewer\signal_viewer
 
 # source file path
-input_file = E:\dev-home\awi-projects\signal-viewer\signal_viewer\__main__.py
+input_file = E:\dev-home\awi-projects\signal-viewer\main.py
 
 # directory where exec is stored
 exec_directory = .
@@ -25,7 +25,7 @@ icon = E:\dev-home\awi-projects\signal-viewer\.venv\Lib\site-packages\PySide6\sc
 python_path = E:\dev-home\awi-projects\signal-viewer\.venv\Scripts\python.exe
 
 # python packages to install
-packages = Nuitka==2.4.8
+packages = Nuitka==2.5.6
 
 # buildozer = for deploying Android application
 android_packages = buildozer==1.5.0,cython==0.29.33
@@ -40,10 +40,10 @@ qml_files =
 excluded_qml_plugins = 
 
 # qt modules used. comma separated
-modules = Core,Widgets
+modules = Gui,Core,Widgets
 
 # qt plugins used by the application
-plugins = iconengines,styles,xcbglintegrations,generic,platformthemes,imageformats,platforms,platforms/darwin,platforminputcontexts,accessiblebridge,egldeviceintegrations
+plugins = iconengines,styles,xcbglintegrations,generic,platformthemes,imageformats,platforms,platforminputcontexts,egldeviceintegrations
 
 [android]
 
@@ -64,10 +64,10 @@ plugins =
 macos.permissions = 
 
 # mode of using nuitka. accepts standalone or onefile. default is onefile.
-mode = onefile
+mode = standalone
 
 # (str) specify any extra nuitka arguments
-extra_args = --quiet --noinclude-qt-translations
+extra_args = --noinclude-qt-translations
 
 [buildozer]
 

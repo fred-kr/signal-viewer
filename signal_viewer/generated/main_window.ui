@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Signal Editor</string>
+   <string>Signal Viewer</string>
   </property>
   <property name="dockNestingEnabled">
    <bool>true</bool>
@@ -73,7 +73,7 @@
               <string>Load Data</string>
              </property>
              <property name="icon">
-              <iconset resource="../resources/resources.qrc">
+              <iconset>
                <normaloff>://icons/DocumentArrowRight.svg</normaloff>://icons/DocumentArrowRight.svg</iconset>
              </property>
             </widget>
@@ -257,7 +257,7 @@
               <string>Open File</string>
              </property>
              <property name="icon">
-              <iconset resource="../resources/resources.qrc">
+              <iconset>
                <normaloff>://icons/FolderOpen.svg</normaloff>://icons/FolderOpen.svg</iconset>
              </property>
             </widget>
@@ -289,7 +289,7 @@
               <string>Close File</string>
              </property>
              <property name="icon">
-              <iconset resource="../resources/resources.qrc">
+              <iconset>
                <normaloff>://icons/DocumentDismiss.svg</normaloff>://icons/DocumentDismiss.svg</iconset>
              </property>
             </widget>
@@ -415,15 +415,8 @@
        </layout>
       </widget>
       <widget class="QWidget" name="stacked_page_export">
-       <layout class="QGridLayout" name="gridLayout_3" columnstretch="2,1,1">
-        <item row="0" column="0">
-         <widget class="SubtitleLabel" name="label_4">
-          <property name="text">
-           <string>Section Data and Results</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
+       <layout class="QGridLayout" name="gridLayout_3" columnstretch="2,1,1,0">
+        <item row="0" column="3">
          <widget class="PushButton" name="btn_export_all_results">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -432,11 +425,18 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Export all results to HDF5</string>
+           <string>Save to HDF5 (detailed)</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0" colspan="3">
+        <item row="0" column="0">
+         <widget class="SubtitleLabel" name="label_4">
+          <property name="text">
+           <string>Section Data and Results</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="4">
          <widget class="QTabWidget" name="tab_widget_result_views">
           <property name="currentIndex">
            <number>0</number>
@@ -526,6 +526,19 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="2">
+         <widget class="PushButton" name="btn_export_to_excel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Save to Excel</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </widget>
@@ -611,7 +624,7 @@
   </widget>
   <action name="action_open_file">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/FolderOpen.svg</normaloff>://icons/FolderOpen.svg</iconset>
    </property>
    <property name="text">
@@ -623,7 +636,7 @@
   </action>
   <action name="action_show_settings">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/Settings.svg</normaloff>://icons/Settings.svg</iconset>
    </property>
    <property name="text">
@@ -644,7 +657,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/DocumentEndnote.svg</normaloff>://icons/DocumentEndnote.svg</iconset>
    </property>
    <property name="text">
@@ -665,7 +678,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/DocumentDismiss.svg</normaloff>://icons/DocumentDismiss.svg</iconset>
    </property>
    <property name="text">
@@ -683,7 +696,7 @@
   </action>
   <action name="action_mark_section_done">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/CheckmarkCircle.svg</normaloff>://icons/CheckmarkCircle.svg</iconset>
    </property>
    <property name="text">
@@ -704,7 +717,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/AddCircle.svg</normaloff>://icons/AddCircle.svg</iconset>
    </property>
    <property name="text">
@@ -722,7 +735,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/AutoFitHeight.svg</normaloff>://icons/AutoFitHeight.svg</iconset>
    </property>
    <property name="text">
@@ -737,7 +750,7 @@
   </action>
   <action name="action_confirm_section">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/Checkmark.svg</normaloff>://icons/Checkmark.svg</iconset>
    </property>
    <property name="text">
@@ -752,7 +765,7 @@
   </action>
   <action name="action_cancel_section">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/Dismiss.svg</normaloff>://icons/Dismiss.svg</iconset>
    </property>
    <property name="text">
@@ -773,7 +786,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/EyeHide.svg</normaloff>
      <normalon>://icons/EyeShow.svg</normalon>://icons/EyeHide.svg</iconset>
    </property>
@@ -789,7 +802,7 @@
   </action>
   <action name="action_remove_peaks_in_selection">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/Eraser.svg</normaloff>://icons/Eraser.svg</iconset>
    </property>
    <property name="text">
@@ -807,7 +820,7 @@
   </action>
   <action name="action_find_peaks_in_selection">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/SearchSquare.svg</normaloff>://icons/SearchSquare.svg</iconset>
    </property>
    <property name="text">
@@ -825,7 +838,7 @@
   </action>
   <action name="action_show_user_guide">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/BookQuestionMark.svg</normaloff>://icons/BookQuestionMark.svg</iconset>
    </property>
    <property name="text">
@@ -851,7 +864,7 @@
   </action>
   <action name="action_about_app">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/BookInformation.svg</normaloff>://icons/BookInformation.svg</iconset>
    </property>
    <property name="text">
@@ -866,7 +879,7 @@
   </action>
   <action name="action_remove_section">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/SubtractCircle.svg</normaloff>://icons/SubtractCircle.svg</iconset>
    </property>
    <property name="text">
@@ -881,7 +894,7 @@
   </action>
   <action name="action_clear_recent_files">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/Dismiss.svg</normaloff>://icons/Dismiss.svg</iconset>
    </property>
    <property name="text">
@@ -890,7 +903,7 @@
   </action>
   <action name="action_unlock_section">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/LockOpen.svg</normaloff>://icons/LockOpen.svg</iconset>
    </property>
    <property name="text">
@@ -979,9 +992,7 @@
   <tabstop>list_view_recent_files</tabstop>
   <tabstop>table_view_import_data</tabstop>
  </tabstops>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>line_edit_active_file</sender>

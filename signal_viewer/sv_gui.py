@@ -1,8 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
-# if __name__ == "__main__":
-#     pass
 import os
+from typing import TYPE_CHECKING
 
 import pyside_config as qconfig
 import qfluentwidgets as qfw
@@ -21,6 +20,8 @@ from signal_viewer.sv_widgets.dock_log_window import StatusMessageDock
 from signal_viewer.sv_widgets.dock_parameter_inputs import ParameterInputsDock
 from signal_viewer.sv_widgets.dock_sections import SectionListDock
 
+if TYPE_CHECKING:
+    from signal_viewer.sv_app import SVApp
 # class SVGui(QtWidgets.QMainWindow):
 #     def __init__(self, sv_app: QtCore.QObject, version: str) -> None:
 #         super().__init__()
@@ -33,23 +34,18 @@ from signal_viewer.sv_widgets.dock_sections import SectionListDock
 #         self.setCentralWidget(self.central_widget)
 
 
-class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
+class SVGui(QtWidgets.QMainWindow):
     sig_metadata_changed = QtCore.Signal(dict)
     sig_table_refresh_requested = QtCore.Signal()
     sig_export_requested = QtCore.Signal(str)
 
-    def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
-        super().__init__(parent)
-        self.setupUi(self)
-        # self._msg_box_icons = {
-        #     LogLevel.DEBUG: QtGui.QIcon("://icons/Wrench"),
-        #     LogLevel.INFO: QtGui.QIcon("://icons/Info"),
-        #     LogLevel.WARNING: QtGui.QIcon("://icons/Warning"),
-        #     LogLevel.ERROR: QtGui.QIcon("://icons/ErrorCircle"),
-        #     LogLevel.CRITICAL: QtGui.QIcon("://icons/Important"),
-        #     LogLevel.SUCCESS: QtGui.QIcon("://icons/CheckmarkCircle"),
-        # }
-        # self.setWindowIcon(QtGui.QIcon("://icons/SignalEditor"))
+    def __init__(self, sv_app: "SVApp", version: str = "0.0.0") -> None:
+        super().__init__(None)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
+        self.sv_app = sv_app
 
         self.new_central_widget = QtWidgets.QWidget()
         self._h_layout = QtWidgets.QHBoxLayout(self.new_central_widget)
@@ -74,7 +70,7 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
             self._add_console_dock()
 
     def _setup_window(self) -> None:
-        self.setWindowTitle("Signal Editor")
+        self.setWindowTitle("Signal Viewer")
 
         desktop = QtWidgets.QApplication.primaryScreen().availableGeometry()
         w, h = desktop.width(), desktop.height()
@@ -84,20 +80,20 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         self._h_layout.setSpacing(0)
         self._h_layout.setContentsMargins(0, 0, 0, 0)
         self._h_layout.addWidget(self.navigation_interface)
-        self._h_layout.addWidget(self.stackedWidget)
-        self._h_layout.setStretchFactor(self.stackedWidget, 1)
+        self._h_layout.addWidget(self.ui.stackedWidget)
+        self._h_layout.setStretchFactor(self.ui.stackedWidget, 1)
 
     def _setup_navigation(self) -> None:
-        self.add_sub_interface(self.stacked_page_import, QtGui.QIcon("://icons/DocumentArrowLeft.svg"), "Input Data")
-        self.add_sub_interface(self.stacked_page_edit, QtGui.QIcon("://icons/Edit.svg"), "View & Edit")
-        self.add_sub_interface(self.stacked_page_export, QtGui.QIcon("://icons/DocumentArrowRight.svg"), "Results")
+        self.add_sub_interface(self.ui.stacked_page_import, QtGui.QIcon("://icons/DocumentArrowLeft.svg"), "Input Data")
+        self.add_sub_interface(self.ui.stacked_page_edit, QtGui.QIcon("://icons/Edit.svg"), "View & Edit")
+        self.add_sub_interface(self.ui.stacked_page_export, QtGui.QIcon("://icons/DocumentArrowRight.svg"), "Results")
 
-        qrouter.setDefaultRouteKey(self.stackedWidget, self.stacked_page_import.objectName())
+        qrouter.setDefaultRouteKey(self.ui.stackedWidget, self.ui.stacked_page_import.objectName())
         self.navigation_interface.setExpandWidth(250)
 
-        self.stackedWidget.currentChanged.connect(self._on_current_interface_changed)
-        self.stackedWidget.setCurrentIndex(0)
-        self.navigation_interface.setCurrentItem(self.stackedWidget.currentWidget().objectName())
+        self.ui.stackedWidget.currentChanged.connect(self._on_current_interface_changed)
+        self.ui.stackedWidget.setCurrentIndex(0)
+        self.navigation_interface.setCurrentItem(self.ui.stackedWidget.currentWidget().objectName())
 
     def add_sub_interface(
         self,
@@ -106,8 +102,8 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         text: str,
         position: NavigationItemPosition = NavigationItemPosition.TOP,
     ) -> None:
-        if self.stackedWidget.indexOf(widget) == -1:
-            self.stackedWidget.addWidget(widget)
+        if self.ui.stackedWidget.indexOf(widget) == -1:
+            self.ui.stackedWidget.addWidget(widget)
         self.navigation_interface.addItem(
             routeKey=widget.objectName(),
             icon=icon,
@@ -118,37 +114,39 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         )
 
     def switch_to(self, widget: QtWidgets.QWidget) -> None:
-        self.stackedWidget.setCurrentWidget(widget)
+        self.ui.stackedWidget.setCurrentWidget(widget)
 
     @QtCore.Slot(int)
     def _on_current_interface_changed(self, index: int) -> None:
-        widget = self.stackedWidget.widget(index)
+        widget = self.ui.stackedWidget.widget(index)
         self.navigation_interface.setCurrentItem(widget.objectName())
-        qrouter.push(self.stackedWidget, widget.objectName())
+        qrouter.push(self.ui.stackedWidget, widget.objectName())
 
     def _setup_widgets(self) -> None:
         self.dialog_meta = MetadataDialog(self)
 
-        self.table_view_import_data.horizontalHeader().setDefaultAlignment(
+        self.ui.table_view_import_data.horizontalHeader().setDefaultAlignment(
             QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
         )
-        self.table_view_import_data.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.table_view_import_data.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        self.table_view_import_data.customContextMenuRequested.connect(self.show_data_view_context_menu)
+        self.ui.table_view_import_data.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.ui.table_view_import_data.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.table_view_import_data.customContextMenuRequested.connect(self.show_data_view_context_menu)
 
-        self.table_view_result_peaks.horizontalHeader().setDefaultAlignment(
+        self.ui.table_view_result_peaks.horizontalHeader().setDefaultAlignment(
             QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
         )
-        self.table_view_result_peaks.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.table_view_result_peaks.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        self.table_view_result_peaks.customContextMenuRequested.connect(self.show_result_view_context_menu)
+        self.ui.table_view_result_peaks.horizontalHeader().setSectionResizeMode(
+            QtWidgets.QHeaderView.ResizeMode.Stretch
+        )
+        self.ui.table_view_result_peaks.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.table_view_result_peaks.customContextMenuRequested.connect(self.show_result_view_context_menu)
 
-        self.table_view_result_rate.horizontalHeader().setDefaultAlignment(
+        self.ui.table_view_result_rate.horizontalHeader().setDefaultAlignment(
             QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
         )
-        self.table_view_result_rate.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.table_view_result_rate.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        self.table_view_result_rate.customContextMenuRequested.connect(self.show_result_view_context_menu)
+        self.ui.table_view_result_rate.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.ui.table_view_result_rate.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.table_view_result_rate.customContextMenuRequested.connect(self.show_result_view_context_menu)
 
         layout = QtWidgets.QVBoxLayout()
         data_tree_widget = SearchableDataTreeWidget()
@@ -158,9 +156,9 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         self.data_tree_widget_additional_metadata = data_tree_widget
 
         # self.btn_export_all_results.setIcon(QtGui.QIcon("://icons/ArrowExportLtr"))
-        self.btn_export_all_results.clicked.connect(lambda: self.sig_export_requested.emit("hdf5"))
+        self.ui.btn_export_all_results.clicked.connect(lambda: self.sig_export_requested.emit("hdf5"))
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.ui.stackedWidget.setCurrentIndex(0)
 
     def _setup_docks(self) -> None:  # sourcery skip: extract-duplicate-method
         dwa = QtCore.Qt.DockWidgetArea
@@ -189,8 +187,8 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         console_window = JupyterConsoleWindow()
         console_window.setVisible(False)
 
-        self.menu_view.addSeparator()
-        self.menu_view.addAction(console_window.toggle_view_action)
+        self.ui.menu_view.addSeparator()
+        self.ui.menu_view.addAction(console_window.toggle_view_action)
         self.console_window = console_window
 
     def _setup_actions(self) -> None:
@@ -199,31 +197,31 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         self.action_toggle_whats_this_mode = QtWidgets.QWhatsThis().createAction(self)
         self.action_toggle_whats_this_mode.setIcon(QtGui.QIcon("://icons/Question"))
 
-        self.action_export_to_csv = qfw.Action(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to CSV")
-        self.action_export_to_xlsx = qfw.Action(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to XLSX")
-        self.action_export_to_hdf5 = qfw.Action(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to HDF5")
+        self.action_export_to_csv = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to CSV")
+        self.action_export_to_xlsx = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to XLSX")
+        self.action_export_to_hdf5 = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to HDF5")
 
-        self.action_toggle_auto_scaling.setChecked(True)
+        self.ui.action_toggle_auto_scaling.setChecked(True)
 
     def _setup_toolbars(self) -> None:
         self.tool_bar_editing = self._setup_toolbar(
-            "tool_bar_editing", [self.action_toggle_auto_scaling, self.action_show_section_overview]
+            "tool_bar_editing", [self.ui.action_toggle_auto_scaling, self.ui.action_show_section_overview]
         )
 
         self.tool_bar_help = self._setup_toolbar(
-            "tool_bar_help", [self.action_show_user_guide, self.action_toggle_whats_this_mode]
+            "tool_bar_help", [self.ui.action_show_user_guide, self.action_toggle_whats_this_mode]
         )
 
         self.dock_sections.command_bar.addActions(
-            [self.action_create_new_section, self.action_remove_section, self.action_mark_section_done]
+            [self.ui.action_create_new_section, self.ui.action_remove_section, self.ui.action_mark_section_done]
         )
         self.dock_sections.command_bar.addHiddenActions(
-            [self.action_unlock_section, self.action_show_section_summary, self.action_show_section_overview]
+            [self.ui.action_unlock_section, self.action_show_section_summary, self.ui.action_show_section_overview]
         )
 
         self.command_bar_section_list = self.dock_sections.command_bar
 
-        self.action_remove_section.triggered.connect(self.dock_sections.list_view.emit_delete_current_request)
+        self.ui.action_remove_section.triggered.connect(self.dock_sections.list_view.emit_delete_current_request)
         self.action_show_section_summary.triggered.connect(self.dock_sections.list_view.emit_show_summary_request)
         self.dock_sections.list_view.customContextMenuRequested.connect(self.show_section_list_context_menu)
 
@@ -239,12 +237,12 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
     @QtCore.Slot(QtCore.QPoint)
     def show_section_list_context_menu(self, pos: QtCore.QPoint) -> None:
         menu = qfw.RoundMenu(parent=self.dock_sections.list_view)
-        menu.addAction(self.action_remove_section)
+        menu.addAction(self.ui.action_remove_section)
         menu.addAction(self.action_show_section_summary)
         menu.exec(QtGui.QCursor.pos())
 
     def _setup_menus(self) -> None:
-        self.menu_view.addActions(
+        self.ui.menu_view.addActions(
             [
                 self.dock_sections.toggleViewAction(),
                 self.dock_status_log.toggleViewAction(),
@@ -252,11 +250,11 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
             ]
         )
 
-        self.menu_plot.insertSeparator(self.action_show_section_overview)
+        self.ui.menu_plot.insertSeparator(self.ui.action_show_section_overview)
 
-        self.menu_help.addSeparator()
-        self.menu_help.addAction(self.dock_status_log.toggleViewAction())
-        self.menu_help.insertAction(self.action_show_user_guide, self.action_toggle_whats_this_mode)
+        self.ui.menu_help.addSeparator()
+        self.ui.menu_help.addAction(self.dock_status_log.toggleViewAction())
+        self.ui.menu_help.insertAction(self.ui.action_show_user_guide, self.action_toggle_whats_this_mode)
 
         self.menu_export = qfw.RoundMenu()
         self.menu_export.addActions([self.action_export_to_csv, self.action_export_to_xlsx, self.action_export_to_hdf5])
@@ -274,27 +272,30 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         self._on_page_changed(0)
 
     def _connect_signals(self) -> None:
-        self.stackedWidget.currentChanged.connect(self._on_page_changed)
+        self.ui.stackedWidget.currentChanged.connect(self._on_page_changed)
 
-        self.spin_box_sampling_rate_import_page.valueChanged.connect(self.dialog_meta.spin_box_sampling_rate.setValue)
-        self.combo_box_info_column_import_page.currentTextChanged.connect(
+        self.ui.spin_box_sampling_rate_import_page.valueChanged.connect(
+            self.dialog_meta.spin_box_sampling_rate.setValue
+        )
+        self.ui.combo_box_info_column_import_page.currentTextChanged.connect(
             self.dialog_meta.combo_box_info_column.setCurrentText
         )
-        self.combo_box_signal_column_import_page.currentTextChanged.connect(
+        self.ui.combo_box_signal_column_import_page.currentTextChanged.connect(
             self.dialog_meta.combo_box_signal_column.setCurrentText
         )
         self.dialog_meta.spin_box_sampling_rate.valueChanged.connect(self._on_dialog_sampling_rate_changed)
         self.dialog_meta.combo_box_info_column.currentTextChanged.connect(
-            self.combo_box_info_column_import_page.setCurrentText
+            self.ui.combo_box_info_column_import_page.setCurrentText
         )
         self.dialog_meta.combo_box_signal_column.currentTextChanged.connect(self._on_dialog_signal_column_changed)
 
         self.dock_status_log.log_text_box.sig_log_message.connect(self.maybe_show_error_dialog)
-        self.dock_sections.btn_confirm.clicked.connect(self.action_confirm_section.trigger)
-        self.dock_sections.btn_cancel.clicked.connect(self.action_cancel_section.trigger)
+        self.dock_sections.btn_confirm.clicked.connect(self.ui.action_confirm_section.trigger)
+        self.dock_sections.btn_cancel.clicked.connect(self.ui.action_cancel_section.trigger)
 
         self.action_export_to_csv.triggered.connect(lambda: self.sig_export_requested.emit("csv"))
         self.action_export_to_xlsx.triggered.connect(lambda: self.sig_export_requested.emit("xlsx"))
+        self.ui.btn_export_to_excel.clicked.connect(lambda: self.sig_export_requested.emit("xlsx"))
         self.action_export_to_hdf5.triggered.connect(lambda: self.sig_export_requested.emit("hdf5"))
 
     @QtCore.Slot(int)
@@ -307,7 +308,7 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         self.dialog_meta.spin_box_sampling_rate.style().polish(self.dialog_meta.spin_box_sampling_rate)
         self.dialog_meta.spin_box_sampling_rate.update()
 
-        self.spin_box_sampling_rate_import_page.setValue(value)
+        self.ui.spin_box_sampling_rate_import_page.setValue(value)
 
     @QtCore.Slot(str)
     def _on_dialog_signal_column_changed(self, value: str) -> None:
@@ -318,27 +319,27 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         self.dialog_meta.combo_box_signal_column.style().unpolish(self.dialog_meta.combo_box_signal_column)
         self.dialog_meta.combo_box_signal_column.style().polish(self.dialog_meta.combo_box_signal_column)
         self.dialog_meta.combo_box_signal_column.update()
-        self.combo_box_signal_column_import_page.setCurrentText(value)
+        self.ui.combo_box_signal_column_import_page.setCurrentText(value)
 
     @QtCore.Slot(QtCore.QPoint)
     def show_data_view_context_menu(self, pos: QtCore.QPoint) -> None:
-        menu = qfw.RoundMenu(parent=self.table_view_import_data)
-        action = QtGui.QAction(QtGui.QIcon("://icons/ArrowSync"), "Refresh", self.table_view_import_data)
+        menu = qfw.RoundMenu(parent=self.ui.table_view_import_data)
+        action = QtGui.QAction(QtGui.QIcon("://icons/ArrowSync"), "Refresh", self.ui.table_view_import_data)
         action.triggered.connect(self.sig_table_refresh_requested.emit)
         menu.addAction(action)
         menu.exec(QtGui.QCursor.pos())
 
     @QtCore.Slot(QtCore.QPoint)
     def show_result_view_context_menu(self, pos: QtCore.QPoint) -> None:
-        current_result_tab = self.tab_widget_result_views.currentIndex()
+        current_result_tab = self.ui.tab_widget_result_views.currentIndex()
         if current_result_tab == 0:
-            table_view = self.table_view_result_peaks
+            table_view = self.ui.table_view_result_peaks
         elif current_result_tab == 1:
-            table_view = self.table_view_result_rate
+            table_view = self.ui.table_view_result_rate
         else:
             return
         menu = qfw.RoundMenu(parent=table_view)
-        action_copy_table = qfw.Action(
+        action_copy_table = QtGui.QAction(
             QtGui.QIcon("://icons/Copy"),
             "Copy to Clipboard",
             triggered=lambda: table_view.model().df.write_clipboard(),  # type: ignore
@@ -443,5 +444,5 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def set_active_section_label(self, label_text: str) -> None:
         self.dock_sections.label_active_section.setText(f"Active Section: {label_text}")
-        self.label_showing_section_result.setText(label_text)
-        self.label_showing_data_table.setText(f"Showing: {label_text}")
+        self.ui.label_showing_section_result.setText(label_text)
+        self.ui.label_showing_data_table.setText(f"Showing: {label_text}")

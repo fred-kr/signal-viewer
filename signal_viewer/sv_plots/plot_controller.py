@@ -24,11 +24,11 @@ class PlotController(QtCore.QObject):
     def __init__(
         self,
         parent: QtCore.QObject | None,
-        main_window: "SVGui",
+        gui: "SVGui",
     ) -> None:
         super().__init__(parent)
 
-        self._mw_ref = main_window
+        self._gui = gui
         self.regions: list[ClickableRegionItem] = []
         self._show_regions = False
 
@@ -47,10 +47,10 @@ class PlotController(QtCore.QObject):
 
         widget_layout.addWidget(main_plot_widget)
         widget_layout.addWidget(rate_plot_widget)
-        self._mw_ref.plot_container.setLayout(widget_layout)
+        self._gui.ui.plot_container.setLayout(widget_layout)
         self.pw_main = main_plot_widget
         self.pw_rate = rate_plot_widget
-        self.mpw_result = self._mw_ref.mpl_widget
+        self.mpw_result = self._gui.ui.mpl_widget
 
     def _setup_plot_items(self) -> None:
         for plt_item in (self.pw_main.getPlotItem(), self.pw_rate.getPlotItem()):

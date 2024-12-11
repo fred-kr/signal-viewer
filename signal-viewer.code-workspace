@@ -4,5 +4,9 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"python.analysis.ignore": [
+			"signal_viewer/generated/*.py"
+		]
+	}
 }

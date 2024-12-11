@@ -28,7 +28,7 @@ def rolling_standardize(sig: pl.Series, window_size: int) -> pl.Series:
 def calculate_mad(sig: pl.Series, constant: float = 1.4826) -> np.float64:
     sig_median = sig.median()
     mad = np.median(np.abs(sig - sig_median))
-    return constant * mad
+    return np.float64(constant * mad)
 
 
 def standardize_signal(sig: pl.Series, robust: bool = False, window_size: int | None = None) -> pl.Series:

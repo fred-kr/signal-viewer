@@ -98,13 +98,16 @@ class FileListModel(QtCore.QAbstractListModel):
     sig_files_changed = QtCore.Signal()
 
     def __init__(
-        self, recent_files: list[str] | None = None, max_files: int = 10, parent: QtCore.QObject | None = None
+        self, recent_files: list[str] | None = None, validate_files: bool = True, max_files: int = 10, parent: QtCore.QObject | None = None
     ) -> None:
         super().__init__(parent)
         self._recent_files = recent_files or []
         self._max_files = max_files
 
         self.sig_files_changed.connect(self.update_config)
+
+        if validate_files:
+            self.validate_files()
 
     def rowCount(self, parent: ModelIndex | None = None) -> int:
         return len(self._recent_files)

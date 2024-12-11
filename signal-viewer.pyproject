@@ -26,6 +26,12 @@
         "signal_viewer/sv_widgets/dock_sections.py",
         "signal_viewer/__main__.py",
         "main.py",
-        "signal_viewer/resources.qrc"
+        "signal_viewer/resources.qrc",
+        "signal_viewer/generated/dialog_metadata.ui",
+        "signal_viewer/generated/main_window.ui",
+        "signal_viewer/generated/parameter_inputs.ui",
+        "signal_viewer/generated/ui_dialog_metadata.py",
+        "signal_viewer/generated/ui_main_window.py",
+        "signal_viewer/generated/ui_parameter_inputs.py"
     ]
 }
