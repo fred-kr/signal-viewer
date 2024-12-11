@@ -6,9 +6,14 @@ import polars as pl
 import pyqtgraph as pg
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from signal_viewer.sv_config import Config
 from signal_viewer.enum_defs import PointSymbols, SVGColors
-from signal_viewer.sv_plots.graphic_items import ClickableRegionItem, CustomScatterPlotItem, EditingViewBox, TimeAxisItem
+from signal_viewer.sv_config import Config
+from signal_viewer.sv_plots.graphic_items import (
+    ClickableRegionItem,
+    CustomScatterPlotItem,
+    EditingViewBox,
+    TimeAxisItem,
+)
 from signal_viewer.utils import make_qbrush, make_qcolor, make_qpen, safe_disconnect
 
 if t.TYPE_CHECKING:
