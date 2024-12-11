@@ -1,6 +1,5 @@
 {
     "files": [
-        "resources.qrc",
         "signal_viewer/sv_app.py",
         "signal_viewer/sv_gui.py",
         "signal_viewer/start.py",
@@ -25,8 +24,8 @@
         "signal_viewer/sv_widgets/dock_log_window.py",
         "signal_viewer/sv_widgets/dock_parameter_inputs.py",
         "signal_viewer/sv_widgets/dock_sections.py",
-        "rc_resources.py",
         "signal_viewer/__main__.py",
-        "main.py"
+        "main.py",
+        "signal_viewer/resources.qrc"
     ]
 }

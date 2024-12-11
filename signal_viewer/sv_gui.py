@@ -2,6 +2,8 @@
 
 # if __name__ == "__main__":
 #     pass
+import os
+
 import pyside_config as qconfig
 import qfluentwidgets as qfw
 from loguru import logger
@@ -9,14 +11,15 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from pyside_widgets import OverlayWidget, SearchableDataTreeWidget
 from qfluentwidgets import NavigationInterface, NavigationItemPosition, qrouter
 
-from signal_viewer.generated.ui_main_window import Ui_MainWindow
-from signal_viewer.sv_widgets.dlg_metadata import MetadataDialog
-from signal_viewer.sv_widgets.dock_log_window import StatusMessageDock
 import signal_viewer.type_defs as _t
-from signal_viewer.sv_config import Config
 from signal_viewer.constants import INDEX_COL
 from signal_viewer.enum_defs import LogLevel
-
+from signal_viewer.generated.ui_main_window import Ui_MainWindow
+from signal_viewer.sv_config import Config
+from signal_viewer.sv_widgets.dlg_metadata import MetadataDialog
+from signal_viewer.sv_widgets.dock_log_window import StatusMessageDock
+from signal_viewer.sv_widgets.dock_parameter_inputs import ParameterInputsDock
+from signal_viewer.sv_widgets.dock_sections import SectionListDock
 
 # class SVGui(QtWidgets.QMainWindow):
 #     def __init__(self, sv_app: QtCore.QObject, version: str) -> None:
@@ -39,14 +42,14 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
         # self._msg_box_icons = {
-        #     LogLevel.DEBUG: AppIcons.Wrench.icon(),
-        #     LogLevel.INFO: AppIcons.Info.icon(),
-        #     LogLevel.WARNING: AppIcons.Warning.icon(),
-        #     LogLevel.ERROR: AppIcons.ErrorCircle.icon(),
-        #     LogLevel.CRITICAL: AppIcons.Important.icon(),
-        #     LogLevel.SUCCESS: AppIcons.CheckmarkCircle.icon(),
+        #     LogLevel.DEBUG: QtGui.QIcon("://icons/Wrench"),
+        #     LogLevel.INFO: QtGui.QIcon("://icons/Info"),
+        #     LogLevel.WARNING: QtGui.QIcon("://icons/Warning"),
+        #     LogLevel.ERROR: QtGui.QIcon("://icons/ErrorCircle"),
+        #     LogLevel.CRITICAL: QtGui.QIcon("://icons/Important"),
+        #     LogLevel.SUCCESS: QtGui.QIcon("://icons/CheckmarkCircle"),
         # }
-        # self.setWindowIcon(AppIcons.SignalEditor.icon())
+        # self.setWindowIcon(QtGui.QIcon("://icons/SignalEditor"))
 
         self.new_central_widget = QtWidgets.QWidget()
         self._h_layout = QtWidgets.QHBoxLayout(self.new_central_widget)
@@ -85,9 +88,9 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         self._h_layout.setStretchFactor(self.stackedWidget, 1)
 
     def _setup_navigation(self) -> None:
-        self.add_sub_interface(self.stacked_page_import, QtGui.QIcon(":/icons/DocumentArrowLeft.svg"), "Input Data")
-        self.add_sub_interface(self.stacked_page_edit, QtGui.QIcon(":/icons/Edit.svg"), "View & Edit")
-        self.add_sub_interface(self.stacked_page_export, QtGui.QIcon(":/icons/DocumentArrowRight.svg"), "Results")
+        self.add_sub_interface(self.stacked_page_import, QtGui.QIcon("://icons/DocumentArrowLeft.svg"), "Input Data")
+        self.add_sub_interface(self.stacked_page_edit, QtGui.QIcon("://icons/Edit.svg"), "View & Edit")
+        self.add_sub_interface(self.stacked_page_export, QtGui.QIcon("://icons/DocumentArrowRight.svg"), "Results")
 
         qrouter.setDefaultRouteKey(self.stackedWidget, self.stacked_page_import.objectName())
         self.navigation_interface.setExpandWidth(250)
@@ -154,7 +157,7 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         self.dialog_meta.container_additional_metadata.setLayout(layout)
         self.data_tree_widget_additional_metadata = data_tree_widget
 
-        # self.btn_export_all_results.setIcon(AppIcons.ArrowExportLtr.icon())
+        # self.btn_export_all_results.setIcon(QtGui.QIcon("://icons/ArrowExportLtr"))
         self.btn_export_all_results.clicked.connect(lambda: self.sig_export_requested.emit("hdf5"))
 
         self.stackedWidget.setCurrentIndex(0)
@@ -191,14 +194,14 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
         self.console_window = console_window
 
     def _setup_actions(self) -> None:
-        self.action_show_section_summary = QtGui.QAction(AppIcons.Info.icon(), "Show Section Summary", self)
+        self.action_show_section_summary = QtGui.QAction(QtGui.QIcon("://icons/Info"), "Show Section Summary", self)
 
         self.action_toggle_whats_this_mode = QtWidgets.QWhatsThis().createAction(self)
-        self.action_toggle_whats_this_mode.setIcon(AppIcons.Question.icon())
+        self.action_toggle_whats_this_mode.setIcon(QtGui.QIcon("://icons/Question"))
 
-        self.action_export_to_csv = qfw.Action(AppIcons.ArrowExportLtr.icon(), "Export to CSV")
-        self.action_export_to_xlsx = qfw.Action(AppIcons.ArrowExportLtr.icon(), "Export to XLSX")
-        self.action_export_to_hdf5 = qfw.Action(AppIcons.ArrowExportLtr.icon(), "Export to HDF5")
+        self.action_export_to_csv = qfw.Action(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to CSV")
+        self.action_export_to_xlsx = qfw.Action(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to XLSX")
+        self.action_export_to_hdf5 = qfw.Action(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to HDF5")
 
         self.action_toggle_auto_scaling.setChecked(True)
 
@@ -320,7 +323,7 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
     @QtCore.Slot(QtCore.QPoint)
     def show_data_view_context_menu(self, pos: QtCore.QPoint) -> None:
         menu = qfw.RoundMenu(parent=self.table_view_import_data)
-        action = QtGui.QAction(AppIcons.ArrowSync.icon(), "Refresh", self.table_view_import_data)
+        action = QtGui.QAction(QtGui.QIcon("://icons/ArrowSync"), "Refresh", self.table_view_import_data)
         action.triggered.connect(self.sig_table_refresh_requested.emit)
         menu.addAction(action)
         menu.exec(QtGui.QCursor.pos())
@@ -336,7 +339,7 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
             return
         menu = qfw.RoundMenu(parent=table_view)
         action_copy_table = qfw.Action(
-            AppIcons.Copy.icon(),
+            QtGui.QIcon("://icons/Copy"),
             "Copy to Clipboard",
             triggered=lambda: table_view.model().df.write_clipboard(),  # type: ignore
         )
@@ -426,7 +429,7 @@ class SVGui(QtWidgets.QMainWindow, Ui_MainWindow):
 
         msg_box = QtWidgets.QMessageBox(parent)
         msg_box.setText(record_dict["level"].name)
-        msg_box.setIconPixmap(self._msg_box_icons[msg_log_level].pixmap(48, 48))
+        # msg_box.setIconPixmap(self._msg_box_icons[msg_log_level].pixmap(48, 48))
         msg_box.setInformativeText(message)
 
         if msg_log_level >= threshold:

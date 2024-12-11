@@ -1,7 +1,5 @@
 # This Python file uses the following encoding: utf-8
 
-# if __name__ == "__main__":
-#     pass
 import sys
 
 # import traceback
@@ -10,7 +8,6 @@ import sys
 # from loguru import logger
 from PySide6 import QtWidgets
 
-from signal_viewer.sv_app import SVApp
 
 # def _uncaught_exception_hook(exc_type: type, exc_value: Exception, exc_traceback: TracebackType | None) -> None:
 #     logger.error("".join(traceback.format_tb(exc_traceback)) + str(exc_value))
@@ -28,9 +25,13 @@ def _set_credentials(app: QtWidgets.QApplication) -> None:
 
 
 def gui() -> None:
+    QtWidgets.QApplication.setOrganizationDomain("https://fred-kr.github.io/signal-viewer-v2/")
+    QtWidgets.QApplication.setOrganizationName("QuackTech")
+    QtWidgets.QApplication.setApplicationName("SignalViewer")
+    from signal_viewer.sv_app import SVApp
     app = QtWidgets.QApplication(sys.argv)
 
-    _set_credentials(app)
+    # _set_credentials(app)
 
     sv_app = SVApp()
     sv_app.gui.show()

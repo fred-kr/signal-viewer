@@ -74,7 +74,7 @@
              </property>
              <property name="icon">
               <iconset resource="../resources/resources.qrc">
-               <normaloff>:/icons/fluent-icons/DocumentArrowRight.svg</normaloff>:/icons/fluent-icons/DocumentArrowRight.svg</iconset>
+               <normaloff>://icons/DocumentArrowRight.svg</normaloff>://icons/DocumentArrowRight.svg</iconset>
              </property>
             </widget>
            </item>
@@ -258,7 +258,7 @@
              </property>
              <property name="icon">
               <iconset resource="../resources/resources.qrc">
-               <normaloff>:/icons/fluent-icons/FolderOpen.svg</normaloff>:/icons/fluent-icons/FolderOpen.svg</iconset>
+               <normaloff>://icons/FolderOpen.svg</normaloff>://icons/FolderOpen.svg</iconset>
              </property>
             </widget>
            </item>
@@ -290,7 +290,7 @@
              </property>
              <property name="icon">
               <iconset resource="../resources/resources.qrc">
-               <normaloff>:/icons/fluent-icons/DocumentDismiss.svg</normaloff>:/icons/fluent-icons/DocumentDismiss.svg</iconset>
+               <normaloff>://icons/DocumentDismiss.svg</normaloff>://icons/DocumentDismiss.svg</iconset>
              </property>
             </widget>
            </item>
@@ -612,7 +612,7 @@
   <action name="action_open_file">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/FolderOpen.svg</normaloff>:/icons/fluent-icons/FolderOpen.svg</iconset>
+     <normaloff>://icons/FolderOpen.svg</normaloff>://icons/FolderOpen.svg</iconset>
    </property>
    <property name="text">
     <string>Open File</string>
@@ -624,7 +624,7 @@
   <action name="action_show_settings">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/Settings.svg</normaloff>:/icons/fluent-icons/Settings.svg</iconset>
+     <normaloff>://icons/Settings.svg</normaloff>://icons/Settings.svg</iconset>
    </property>
    <property name="text">
     <string>Preferences</string>
@@ -645,7 +645,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/DocumentEndnote.svg</normaloff>:/icons/fluent-icons/DocumentEndnote.svg</iconset>
+     <normaloff>://icons/DocumentEndnote.svg</normaloff>://icons/DocumentEndnote.svg</iconset>
    </property>
    <property name="text">
     <string>File Metadata</string>
@@ -666,7 +666,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/DocumentDismiss.svg</normaloff>:/icons/fluent-icons/DocumentDismiss.svg</iconset>
+     <normaloff>://icons/DocumentDismiss.svg</normaloff>://icons/DocumentDismiss.svg</iconset>
    </property>
    <property name="text">
     <string>Close File</string>
@@ -684,7 +684,7 @@
   <action name="action_mark_section_done">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/CheckmarkCircle.svg</normaloff>:/icons/fluent-icons/CheckmarkCircle.svg</iconset>
+     <normaloff>://icons/CheckmarkCircle.svg</normaloff>://icons/CheckmarkCircle.svg</iconset>
    </property>
    <property name="text">
     <string>Mark as Done</string>
@@ -705,7 +705,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/AddCircle.svg</normaloff>:/icons/fluent-icons/AddCircle.svg</iconset>
+     <normaloff>://icons/AddCircle.svg</normaloff>://icons/AddCircle.svg</iconset>
    </property>
    <property name="text">
     <string>New Section</string>
@@ -723,7 +723,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/AutoFitHeight.svg</normaloff>:/icons/fluent-icons/AutoFitHeight.svg</iconset>
+     <normaloff>://icons/AutoFitHeight.svg</normaloff>://icons/AutoFitHeight.svg</iconset>
    </property>
    <property name="text">
     <string>Auto-Scaling</string>
@@ -738,7 +738,7 @@
   <action name="action_confirm_section">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/Checkmark.svg</normaloff>:/icons/fluent-icons/Checkmark.svg</iconset>
+     <normaloff>://icons/Checkmark.svg</normaloff>://icons/Checkmark.svg</iconset>
    </property>
    <property name="text">
     <string>Confirm Section</string>
@@ -753,7 +753,7 @@
   <action name="action_cancel_section">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/Dismiss.svg</normaloff>:/icons/fluent-icons/Dismiss.svg</iconset>
+     <normaloff>://icons/Dismiss.svg</normaloff>://icons/Dismiss.svg</iconset>
    </property>
    <property name="text">
     <string>Cancel Section</string>
@@ -774,8 +774,8 @@
    </property>
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/EyeHide.svg</normaloff>
-     <normalon>:/icons/fluent-icons/EyeShow.svg</normalon>:/icons/fluent-icons/EyeHide.svg</iconset>
+     <normaloff>://icons/EyeHide.svg</normaloff>
+     <normalon>://icons/EyeShow.svg</normalon>://icons/EyeHide.svg</iconset>
    </property>
    <property name="text">
     <string>Section Overview</string>
@@ -790,7 +790,7 @@
   <action name="action_remove_peaks_in_selection">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/Eraser.svg</normaloff>:/icons/fluent-icons/Eraser.svg</iconset>
+     <normaloff>://icons/Eraser.svg</normaloff>://icons/Eraser.svg</iconset>
    </property>
    <property name="text">
     <string>Remove Peaks in Selection</string>
@@ -808,7 +808,7 @@
   <action name="action_find_peaks_in_selection">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/SearchSquare.svg</normaloff>:/icons/fluent-icons/SearchSquare.svg</iconset>
+     <normaloff>://icons/SearchSquare.svg</normaloff>://icons/SearchSquare.svg</iconset>
    </property>
    <property name="text">
     <string>Find Peaks in Selection</string>
@@ -826,7 +826,7 @@
   <action name="action_show_user_guide">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/BookQuestionMark.svg</normaloff>:/icons/fluent-icons/BookQuestionMark.svg</iconset>
+     <normaloff>://icons/BookQuestionMark.svg</normaloff>://icons/BookQuestionMark.svg</iconset>
    </property>
    <property name="text">
     <string>User Guide</string>
@@ -852,7 +852,7 @@
   <action name="action_about_app">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/BookInformation.svg</normaloff>:/icons/fluent-icons/BookInformation.svg</iconset>
+     <normaloff>://icons/BookInformation.svg</normaloff>://icons/BookInformation.svg</iconset>
    </property>
    <property name="text">
     <string>About App</string>
@@ -867,7 +867,7 @@
   <action name="action_remove_section">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/SubtractCircle.svg</normaloff>:/icons/fluent-icons/SubtractCircle.svg</iconset>
+     <normaloff>://icons/SubtractCircle.svg</normaloff>://icons/SubtractCircle.svg</iconset>
    </property>
    <property name="text">
     <string>Remove Section</string>
@@ -882,7 +882,7 @@
   <action name="action_clear_recent_files">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/Dismiss.svg</normaloff>:/icons/fluent-icons/Dismiss.svg</iconset>
+     <normaloff>://icons/Dismiss.svg</normaloff>://icons/Dismiss.svg</iconset>
    </property>
    <property name="text">
     <string>Clear Recent Files</string>
@@ -891,7 +891,7 @@
   <action name="action_unlock_section">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/fluent-icons/LockOpen.svg</normaloff>:/icons/fluent-icons/LockOpen.svg</iconset>
+     <normaloff>://icons/LockOpen.svg</normaloff>://icons/LockOpen.svg</iconset>
    </property>
    <property name="text">
     <string>Unlock Section</string>

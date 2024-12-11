@@ -124,8 +124,8 @@ class ParameterInputsDock(QtWidgets.QDockWidget):
         self.setVisible(False)
         self.setObjectName("DockWidgetParameterInputs")
         self.setWindowTitle("Parameter Inputs")
-        self.toggleViewAction().setIcon(QtGui.QIcon(":/icons/Options.svg"))
-        self.setWindowIcon(QtGui.QIcon(":/icons/Options.svg"))
+        self.toggleViewAction().setIcon(QtGui.QIcon("://icons/Options.svg"))
+        self.setWindowIcon(QtGui.QIcon("://icons/Options.svg"))
         self.setAllowedAreas(QtCore.Qt.DockWidgetArea.AllDockWidgetAreas)
 
         self.ui = ParameterInputs()
@@ -169,29 +169,29 @@ class ParameterInputsDock(QtWidgets.QDockWidget):
 
     def set_pipeline_status(self, status: bool) -> None:
         self.ui.icon_pipeline_status.setIcon(
-            QtGui.QIcon(":/icons/CheckmarkCircle.svg") if status else QtGui.QIcon(":/icons/Circle.svg")
+            QtGui.QIcon("://icons/CheckmarkCircle.svg") if status else QtGui.QIcon("://icons/Circle.svg")
         )
 
     def set_filter_status(self, status: bool, times_filtered: int) -> None:
         self.ui.icon_filter_status.setIcon(
-            QtGui.QIcon(":/icons/CheckmarkCircle.svg") if status else QtGui.QIcon(":/icons/Circle.svg")
+            QtGui.QIcon("://icons/CheckmarkCircle.svg") if status else QtGui.QIcon("://icons/Circle.svg")
         )
         self.ui.icon_filter_status.setToolTip(f"Filtered {times_filtered} times")
 
     def set_standardization_status(self, status: bool) -> None:
         self.ui.icon_standardize_status.setIcon(
-            QtGui.QIcon(":/icons/CheckmarkCircle.svg") if status else QtGui.QIcon(":/icons/Circle.svg")
+            QtGui.QIcon("://icons/CheckmarkCircle.svg") if status else QtGui.QIcon("://icons/Circle.svg")
         )
 
     def reset_status_indicators(self, status: bool = False) -> None:
         self.ui.icon_pipeline_status.setIcon(
-            QtGui.QIcon(":/icons/CheckmarkCircle.svg") if status else QtGui.QIcon(":/icons/Circle.svg")
+            QtGui.QIcon("://icons/CheckmarkCircle.svg") if status else QtGui.QIcon("://icons/Circle.svg")
         )
         self.ui.icon_filter_status.setIcon(
-            QtGui.QIcon(":/icons/CheckmarkCircle.svg") if status else QtGui.QIcon(":/icons/Circle.svg")
+            QtGui.QIcon("://icons/CheckmarkCircle.svg") if status else QtGui.QIcon("://icons/Circle.svg")
         )
         self.ui.icon_standardize_status.setIcon(
-            QtGui.QIcon(":/icons/CheckmarkCircle.svg") if status else QtGui.QIcon(":/icons/Circle.svg")
+            QtGui.QIcon("://icons/CheckmarkCircle.svg") if status else QtGui.QIcon("://icons/Circle.svg")
         )
 
     def _assign_defaults(self) -> None:

@@ -48,11 +48,11 @@ class SectionListWidget(QtWidgets.QWidget):
         confirm_cancel_layout = QtWidgets.QHBoxLayout(confirm_cancel_btns)
         confirm_cancel_layout.setContentsMargins(0, 0, 0, 0)
 
-        confirm_btn = qfw.PushButton(icon=QtGui.QIcon(":/icons/CheckmarkCircle.svg"), text="Confirm")
+        confirm_btn = qfw.PushButton(icon=QtGui.QIcon("://icons/CheckmarkCircle.svg"), text="Confirm")
         confirm_cancel_layout.addWidget(confirm_btn)
         self.btn_confirm = confirm_btn
 
-        cancel_btn = qfw.PushButton(icon=QtGui.QIcon(":/icons/DismissCircle.svg"), text="Cancel")
+        cancel_btn = qfw.PushButton(icon=QtGui.QIcon("://icons/DismissCircle.svg"), text="Cancel")
         confirm_cancel_layout.addWidget(cancel_btn)
         self.btn_cancel = cancel_btn
 
@@ -71,7 +71,7 @@ class SectionListDock(QtWidgets.QDockWidget):
         self.setVisible(False)
         self.setObjectName("SectionListDock")
         self.setWindowTitle("Section List")
-        self.setWindowIcon(QtGui.QIcon(":/icons/SignalEditor.svg"))
+        self.setWindowIcon(QtGui.QIcon("://icons/SignalEditor.svg"))
 
         self._widget = SectionListWidget()
         self.list_view = self._widget.list_view

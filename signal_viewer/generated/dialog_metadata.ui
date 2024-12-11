@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../resources/resources.qrc">
-    <normaloff>:/icons/app_icon.svg</normaloff>:/icons/app_icon.svg</iconset>
+    <normaloff>://icons/app_icon.svg</normaloff>://icons/app_icon.svg</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true"/>

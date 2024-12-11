@@ -56,8 +56,8 @@ class StatusMessageDock(QtWidgets.QDockWidget):
         self.setObjectName("StatusMessageDock")
         self.setWindowTitle("Status Log")
         self.setVisible(False)
-        self.toggleViewAction().setIcon(QtGui.QIcon(":/icons/Status.svg"))
+        self.toggleViewAction().setIcon(QtGui.QIcon("://icons/Status.svg"))
 
         self.log_text_box = LoggingWindow(self)
-        self.setWindowIcon(QtGui.QIcon(":/icons/History.svg"))
+        self.setWindowIcon(QtGui.QIcon("://icons/History.svg"))
         self.setWidget(self.log_text_box)

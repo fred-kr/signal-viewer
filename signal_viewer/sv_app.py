@@ -12,4 +12,4 @@ class SVApp(QtCore.QObject):
     def __init__(self) -> None:
         super().__init__()
 
-        self.gui = SVGui(self, "0.1.0.dev0")
+        self.gui = SVGui()

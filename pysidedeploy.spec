@@ -5,10 +5,10 @@ title = signal_viewer
 
 # project directory. the general assumption is that project_dir is the parent directory
 # of input_file
-project_dir = E:\dev-home\awi-projects\signal-viewer
+project_dir = E:\dev-home\awi-projects\signal-viewer\signal_viewer
 
 # source file path
-input_file = E:\dev-home\awi-projects\signal-viewer\main.py
+input_file = E:\dev-home\awi-projects\signal-viewer\signal_viewer\__main__.py
 
 # directory where exec is stored
 exec_directory = .
