@@ -1,0 +1,4 @@
+The `SignalViewer` tool was created to speed up the visualization, cleaning and analysis process for large records of
+physiological signal data acquired from marine crabs. It is written in Python and uses PySide6 for the GUI, along with
+multiple other libraries for cleaning and analysis of signal data. More information can be found through the in-app help
+system.

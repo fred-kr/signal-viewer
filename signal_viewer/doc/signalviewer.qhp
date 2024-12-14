@@ -1,28 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
     <namespace>com.quacktech.signalviewer</namespace>
-    <virtualFolder>doc</virtualFolder>
+    <virtualFolder>signalviewer</virtualFolder>
     <filterSection>
         <toc>
-            <section title="Signal Viewer" ref="index.html">
-                <section title="Load a file" ref="loading_data.html"/>
+            <section title="User Guide" ref="index.html">
+                <section title="Getting Started" ref="getting_started.html"/>
+                <section title="Working with Sections" ref="sections.html" />
+                <section title="Preprocessing Signals" ref="preprocessing.html"/>
+                <section title="Peak Detection" ref="peak_detection.html"/>
+                <section title="View and Export Results" ref="results.html"/>
+            </section>
+            <section title="UI Components" ref="ui_components.html">
+                <section title="Main Window" ref="main_window.html">
+                    <section title="Page: Input Data" ref="page_input.html"/>
+                    <section title="Page: View &amp; Edit" ref="page_view_edit.html"/>
+                    <section title="Page: Results" ref="page_results.html"/>
+                </section>
+                <section title="Dock Windows" ref="dock_windows.html">
+                    <section title="Section List" ref="section_list.html"/>
+                    <section title="Parameter Inputs" ref="parameter_inputs.html"/>
+                    <section title="Log Window" ref="log_window.html"/>
+                </section>
+                <section title="Dialog Windows" ref="dialog_windows.html">
+                    <section title="File Metadata" ref="file_metadata.html"/>
+                    <section title="Settings" ref="settings.html"/>
+                </section>
             </section>
         </toc>
         <keywords>
-            <keyword name="Open" ref="loading_data.html"/>
-            <keyword name="Select" ref="loading_data.html"/>
+            <keyword name="Open" id="Open" ref="getting_started.html"/>
+            <keyword name="Select" id="Select" ref="getting_started.html"/>
+            <keyword name="Load" id="Load" ref="getting_started.html"/>
+            <keyword name="Import" id="Import" ref="getting_started.html"/>
+            <keyword name="Data" id="Data" ref="getting_started.html"/>
+            <keyword name="File" id="File" ref="getting_started.html"/>
+            <keyword name="Edit" id="Edit" ref="sections.html"/>
+            <keyword name="Editing" id="Editing" ref="sections.html"/>
+            <keyword name="Section" id="Section" ref="sections.html"/>
+            <keyword name="Working" id="Working" ref="sections.html"/>
+            <keyword name="Process" id="Process" ref="preprocessing.html"/>
+            <keyword name="Signal Filter" id="Signal Filter" ref="preprocessing.html"/>
+            <keyword name="Filter" id="Filter" ref="preprocessing.html"/>
+            <keyword name="Clean" id="Clean" ref="preprocessing.html"/>
+            <keyword name="Peak" id="Peak" ref="peak_detection.html"/>
+            <keyword name="Detection" id="Detection" ref="peak_detection.html"/>
+            <keyword name="Analysis" id="Analysis" ref="peak_detection.html"/>
+            <keyword name="Results" id="Results" ref="results.html"/>
+            <keyword name="View" id="View" ref="results.html"/>
+            <keyword name="Export" id="Export" ref="results.html"/>
+            <keyword name="Save" id="Save" ref="results.html"/>
+            <keyword name="Save As" id="Save As" ref="results.html"/>
+            <keyword name="UI" id="UI" ref="ui_components.html"/>
+            <keyword name="Window" id="Window" ref="ui_components.html"/>
+            <!-- TODO: Add more keywords -->
         </keywords>
         <files>
-            <file>index.html</file>
-            <file>loading_data.html</file>
-            <file>images/data_import_file_selected.png</file>
-            <file>images/data_import.png</file>
-            <file>images/file_menu.png</file>
-            <file>images/menu_bar.png</file>
-            <file>images/plot_menu.png</file>
-            <file>images/section_list.png</file>
-            <file>images/tool_bar.png</file>
-            <file>images/view_menu.png</file>
+            <file>*.html</file>
+            <file>images/*.png</file>
+            <file>about.txt</file>
         </files>
     </filterSection>
 </QtHelpProject>

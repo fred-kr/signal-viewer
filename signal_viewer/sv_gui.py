@@ -19,6 +19,7 @@ from signal_viewer.sv_widgets.dlg_metadata import MetadataDialog
 from signal_viewer.sv_widgets.dock_log_window import StatusMessageDock
 from signal_viewer.sv_widgets.dock_parameter_inputs import ParameterInputsDock
 from signal_viewer.sv_widgets.dock_sections import SectionListDock
+from signal_viewer.utils import get_app
 
 if TYPE_CHECKING:
     from signal_viewer.sv_app import SVApp
@@ -184,6 +185,17 @@ class SVGUI(QtWidgets.QMainWindow):
         self.ui.menu_view.addSeparator()
         self.ui.menu_view.addAction(console_window.toggle_view_action)
         self.console_window = console_window
+        # TODO: Update pyside_widgets implementation of JupyterConsoleWindow to allow passing a dictionary of symbols to the kernel
+        if self.console_window.console.kernel_manager.kernel is None:
+            return
+        if self.console_window.console.kernel_manager.kernel.shell is None:
+            return
+        self.console_window.console.kernel_manager.kernel.shell.push(
+            dict(
+                sv_app=get_app(),
+                sv_gui=self,
+            )
+        )
 
     def _setup_actions(self) -> None:
         self.action_show_section_summary = QtGui.QAction(QtGui.QIcon("://icons/Info"), "Show Section Summary", self)

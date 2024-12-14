@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <QHelpCollectionProject version="1.0">
     <assistant>
-        <title>Signal Viewer</title>
+        <title>SignalViewer</title>
+        <applicationIcon>images/app_icon.svg</applicationIcon>
         <cacheDirectory>QuackTech/SignalViewer</cacheDirectory>
         <startPage>qthelp://com.quacktech.signalviewer/doc/index.html</startPage>
         <aboutMenuText>
-            <text>About Signal Viewer</text>
+            <text>About SignalViewer</text>
         </aboutMenuText>
+        <aboutDialog>
+            <file>about.txt</file>
+            <icon>images/Info.svg</icon>
+        </aboutDialog>
         <enableDocumentationManager>false</enableDocumentationManager>
         <enableAddressBar>false</enableAddressBar>
         <enableFilterFunctionality>false</enableFilterFunctionality>
