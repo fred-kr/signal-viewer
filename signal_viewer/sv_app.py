@@ -12,6 +12,7 @@ import xlsxwriter
 from loguru import logger
 from PySide6 import QtCore, QtWidgets
 
+from signal_viewer.help_browser.help_controller import HelpController
 import signal_viewer.type_defs as _t
 from signal_viewer.constants import SECTION_INDEX_COL
 from signal_viewer.enum_defs import (
@@ -21,7 +22,7 @@ from signal_viewer.enum_defs import (
     StandardizationMethod,
 )
 from signal_viewer.sv_config import Config
-from signal_viewer.sv_gui import SVGui
+from signal_viewer.sv_gui import SVGUI
 from signal_viewer.sv_logic.data_controller import DataController
 from signal_viewer.sv_logic.data_models import FileListModel
 from signal_viewer.sv_logic.file_io import write_hdf5
@@ -93,9 +94,12 @@ class SVApp(QtCore.QObject):
     def __init__(self) -> None:
         super().__init__()
 
-        self.gui = SVGui(self)
+        self.setObjectName("SVApp")
+        
+        self.gui = SVGUI(self)
         self.data = DataController(self)
         self.plot = PlotController(self, self.gui)
+        self.help: HelpController | None = None
 
         self.thread_pool = QtCore.QThreadPool.globalInstance()
 
@@ -112,6 +116,7 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_edit_metadata.triggered.connect(lambda: self.show_metadata_dialog([]))
         self.gui.ui.action_about_qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self.gui.ui.action_close_file.triggered.connect(self.close_file)
+        self.gui.ui.action_show_user_guide.triggered.connect(self.show_user_guide)
 
         self.gui.dialog_meta.sig_property_has_changed.connect(self.update_metadata)
 
@@ -154,6 +159,11 @@ class SVApp(QtCore.QObject):
 
         self.plot.sig_scatter_data_changed.connect(self.handle_peak_edit)
         self.plot.sig_section_clicked.connect(self.set_active_section_from_int)
+
+    @QtCore.Slot()
+    def show_user_guide(self) -> None:
+        self.help = HelpController()
+        
 
     @QtCore.Slot()
     def _on_action_show_settings(self) -> None:

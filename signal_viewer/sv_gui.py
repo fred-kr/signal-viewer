@@ -22,28 +22,21 @@ from signal_viewer.sv_widgets.dock_sections import SectionListDock
 
 if TYPE_CHECKING:
     from signal_viewer.sv_app import SVApp
-# class SVGui(QtWidgets.QMainWindow):
-#     def __init__(self, sv_app: QtCore.QObject, version: str) -> None:
-#         super().__init__()
-#         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
-#         self._version = version
-
-#         self.sv_app = sv_app
-
-#         self.central_widget = QtWidgets.QWidget()
-#         self.setCentralWidget(self.central_widget)
 
 
-class SVGui(QtWidgets.QMainWindow):
+class SVGUI(QtWidgets.QMainWindow):
     sig_metadata_changed = QtCore.Signal(dict)
     sig_table_refresh_requested = QtCore.Signal()
     sig_export_requested = QtCore.Signal(str)
 
     def __init__(self, sv_app: "SVApp", version: str = "0.0.0") -> None:
         super().__init__(None)
+
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        self.setObjectName("SVGUI")
 
         self.sv_app = sv_app
 
@@ -71,6 +64,7 @@ class SVGui(QtWidgets.QMainWindow):
 
     def _setup_window(self) -> None:
         self.setWindowTitle("Signal Viewer")
+        self.setWindowIcon(QtGui.QIcon("://icons/app_icon.svg"))
 
         desktop = QtWidgets.QApplication.primaryScreen().availableGeometry()
         w, h = desktop.width(), desktop.height()
@@ -283,6 +277,7 @@ class SVGui(QtWidgets.QMainWindow):
         self.ui.combo_box_signal_column_import_page.currentTextChanged.connect(
             self.dialog_meta.combo_box_signal_column.setCurrentText
         )
+
         self.dialog_meta.spin_box_sampling_rate.valueChanged.connect(self._on_dialog_sampling_rate_changed)
         self.dialog_meta.combo_box_info_column.currentTextChanged.connect(
             self.ui.combo_box_info_column_import_page.setCurrentText

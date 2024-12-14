@@ -9,9 +9,9 @@ from pyside_config.helpers import make_combo_box_info, make_spin_box_info
 from pyside_widgets.enum_combo_box import EnumComboBox
 
 from signal_viewer.enum_defs import RateComputationMethod, TextFileSeparator
-from signal_viewer.utils import app_dir_posix, make_qcolor, search_enum
+from signal_viewer.utils import get_app_dir, make_qcolor, search_enum
 
-app_dir = app_dir_posix()
+app_dir = get_app_dir()
 
 
 @qconfig.config

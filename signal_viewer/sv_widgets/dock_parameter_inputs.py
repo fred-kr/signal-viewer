@@ -21,7 +21,7 @@ from signal_viewer.generated.ui_parameter_inputs import Ui_ParameterInputs
 Default values for input widgets.
 """
 
-PEAK_DETECTION: dict[str, dict[str, float | int | bool]] = {
+PEAK_DETECTION = {
     "peak_elgendi_ppg": {
         "peakwindow": 0.111,
         "beatwindow": 0.667,
@@ -70,7 +70,7 @@ PEAK_DETECTION: dict[str, dict[str, float | int | bool]] = {
 }
 
 
-PROCESSING: dict[str, int | bool] = {
+PROCESSING = {
     "dbl_sb_powerline": 50,
     "dbl_sb_lower_cutoff": 0,
     "dbl_sb_upper_cutoff": 0,

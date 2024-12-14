@@ -11,7 +11,6 @@ import polars.selectors as ps
 from loguru import logger
 
 import signal_viewer.type_defs as _t
-from signal_viewer.sv_config import Config
 from signal_viewer.constants import INDEX_COL, IS_MANUAL_COL, IS_PEAK_COL, SECTION_INDEX_COL
 from signal_viewer.enum_defs import (
     IncompleteWindowMethod,
@@ -19,9 +18,10 @@ from signal_viewer.enum_defs import (
     PreprocessPipeline,
     RateComputationMethod,
 )
-from signal_viewer.utils import format_long_sequence
+from signal_viewer.sv_config import Config
 from signal_viewer.sv_logic.peak_detection import find_peaks
 from signal_viewer.sv_logic.signal_processing import apply_cleaning_pipeline, filter_signal, standardize_signal
+from signal_viewer.utils import sequence_repr
 
 
 @attrs.define
@@ -67,7 +67,7 @@ class ManualPeakEdits:
     removed: list[int] = attrs.field(factory=list)
 
     def __repr__(self) -> str:
-        return f"Added Peaks [{len(self.added)}]: {format_long_sequence(self.added)}\nRemoved Peaks [{len(self.removed)}]: {format_long_sequence(self.removed)}"
+        return f"Added Peaks [{len(self.added)}]: {sequence_repr(self.added)}\nRemoved Peaks [{len(self.removed)}]: {sequence_repr(self.removed)}"
 
     def clear(self) -> None:
         self.added.clear()

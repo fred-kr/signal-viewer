@@ -19,7 +19,7 @@ from signal_viewer.utils import make_qbrush, make_qcolor, make_qpen, safe_discon
 if t.TYPE_CHECKING:
     from pyqtgraph.GraphicsScene import mouseEvents
 
-    from signal_viewer.sv_gui import SVGui
+    from signal_viewer.sv_gui import SVGUI
 
 
 class PlotController(QtCore.QObject):
@@ -29,7 +29,7 @@ class PlotController(QtCore.QObject):
     def __init__(
         self,
         parent: QtCore.QObject | None,
-        gui: "SVGui",
+        gui: "SVGUI",
     ) -> None:
         super().__init__(parent)
 

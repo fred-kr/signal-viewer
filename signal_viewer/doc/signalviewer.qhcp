@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<QHelpCollectionProject version="1.0">
+    <assistant>
+        <title>Signal Viewer</title>
+        <cacheDirectory>QuackTech/SignalViewer</cacheDirectory>
+        <startPage>qthelp://com.quacktech.signalviewer/doc/index.html</startPage>
+        <aboutMenuText>
+            <text>About Signal Viewer</text>
+        </aboutMenuText>
+        <enableDocumentationManager>false</enableDocumentationManager>
+        <enableAddressBar>false</enableAddressBar>
+        <enableFilterFunctionality>false</enableFilterFunctionality>
+    </assistant>
+    <docFiles>
+        <generate>
+            <file>
+                <input>signalviewer.qhp</input>
+                <output>signalviewer.qch</output>
+            </file>
+        </generate>
+        <register>
+            <file>signalviewer.qch</file>
+        </register>
+    </docFiles>
+</QHelpCollectionProject>

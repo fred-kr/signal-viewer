@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QtHelpProject version="1.0">
+    <namespace>com.quacktech.signalviewer</namespace>
+    <virtualFolder>doc</virtualFolder>
+    <filterSection>
+        <toc>
+            <section title="Signal Viewer" ref="index.html">
+                <section title="Load a file" ref="loading_data.html"/>
+            </section>
+        </toc>
+        <keywords>
+            <keyword name="Open" ref="loading_data.html"/>
+            <keyword name="Select" ref="loading_data.html"/>
+        </keywords>
+        <files>
+            <file>index.html</file>
+            <file>loading_data.html</file>
+            <file>images/data_import_file_selected.png</file>
+            <file>images/data_import.png</file>
+            <file>images/file_menu.png</file>
+            <file>images/menu_bar.png</file>
+            <file>images/plot_menu.png</file>
+            <file>images/section_list.png</file>
+            <file>images/tool_bar.png</file>
+            <file>images/view_menu.png</file>
+        </files>
+    </filterSection>
+</QtHelpProject>

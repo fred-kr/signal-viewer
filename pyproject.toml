@@ -1,7 +1,7 @@
 [project]
 name = "signal-viewer"
 version = "0.1.0.dev0"
-description = "A GUI for working with biological signal data."
+description = "A GUI for working with (biological) signal data."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
