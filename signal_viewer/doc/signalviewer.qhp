@@ -5,57 +5,59 @@
     <filterSection>
         <toc>
             <section title="User Guide" ref="index.html">
-                <section title="Getting Started" ref="getting_started.html"/>
-                <section title="Working with Sections" ref="sections.html" />
-                <section title="Preprocessing Signals" ref="preprocessing.html"/>
-                <section title="Peak Detection" ref="peak_detection.html"/>
-                <section title="View and Export Results" ref="results.html"/>
+                <section title="Getting Started" ref="user_guide/getting_started.html"/>
+                <section title="Working with Sections" ref="user_guide/sections.html" />
+                <section title="Preprocessing Signals" ref="user_guide/preprocessing.html"/>
+                <section title="Peak Detection" ref="user_guide/peak_detection.html"/>
+                <section title="View and Export Results" ref="user_guide/results.html"/>
             </section>
-            <section title="UI Components" ref="ui_components.html">
-                <section title="Main Window" ref="main_window.html">
-                    <section title="Page: Input Data" ref="page_input.html"/>
-                    <section title="Page: View &amp; Edit" ref="page_view_edit.html"/>
-                    <section title="Page: Results" ref="page_results.html"/>
+            <section title="UI Components">
+                <section title="Main Window" ref="ui_components/main_window.html">
+                    <section title="Page: Input Data" ref="ui_components/page_input.html"/>
+                    <section title="Page: View &amp; Edit" ref="ui_components/page_view_edit.html"/>
+                    <section title="Page: Results" ref="ui_components/page_results.html"/>
                 </section>
-                <section title="Dock Windows" ref="dock_windows.html">
-                    <section title="Section List" ref="section_list.html"/>
-                    <section title="Parameter Inputs" ref="parameter_inputs.html"/>
-                    <section title="Log Window" ref="log_window.html"/>
+                <section title="Dock Windows" ref="ui_components/dock_windows.html">
+                    <section title="Section List" ref="ui_components/section_list.html"/>
+                    <section title="Parameter Inputs" ref="ui_components/parameter_inputs.html"/>
+                    <section title="Log Window" ref="ui_components/log_window.html"/>
                 </section>
-                <section title="Dialog Windows" ref="dialog_windows.html">
-                    <section title="File Metadata" ref="file_metadata.html"/>
-                    <section title="Settings" ref="settings.html"/>
+                <section title="Dialog Windows" ref="ui_components/dialog_windows.html">
+                    <section title="File Metadata" ref="ui_components/file_metadata.html"/>
+                    <section title="Settings" ref="ui_components/settings.html"/>
                 </section>
             </section>
         </toc>
         <keywords>
-            <keyword name="Open" id="Open" ref="getting_started.html"/>
-            <keyword name="Select" id="Select" ref="getting_started.html"/>
-            <keyword name="Load" id="Load" ref="getting_started.html"/>
-            <keyword name="Import" id="Import" ref="getting_started.html"/>
-            <keyword name="Data" id="Data" ref="getting_started.html"/>
-            <keyword name="File" id="File" ref="getting_started.html"/>
-            <keyword name="Edit" id="Edit" ref="sections.html"/>
-            <keyword name="Editing" id="Editing" ref="sections.html"/>
-            <keyword name="Section" id="Section" ref="sections.html"/>
-            <keyword name="Working" id="Working" ref="sections.html"/>
-            <keyword name="Process" id="Process" ref="preprocessing.html"/>
-            <keyword name="Signal Filter" id="Signal Filter" ref="preprocessing.html"/>
-            <keyword name="Filter" id="Filter" ref="preprocessing.html"/>
-            <keyword name="Clean" id="Clean" ref="preprocessing.html"/>
-            <keyword name="Peak" id="Peak" ref="peak_detection.html"/>
-            <keyword name="Detection" id="Detection" ref="peak_detection.html"/>
-            <keyword name="Analysis" id="Analysis" ref="peak_detection.html"/>
-            <keyword name="Results" id="Results" ref="results.html"/>
-            <keyword name="View" id="View" ref="results.html"/>
-            <keyword name="Export" id="Export" ref="results.html"/>
-            <keyword name="Save" id="Save" ref="results.html"/>
-            <keyword name="Save As" id="Save As" ref="results.html"/>
-            <keyword name="UI" id="UI" ref="ui_components.html"/>
-            <keyword name="Window" id="Window" ref="ui_components.html"/>
+            <keyword name="Open" id="Open" ref="user_guide/getting_started.html"/>
+            <keyword name="Select" id="Select" ref="user_guide/getting_started.html"/>
+            <keyword name="Load" id="Load" ref="user_guide/getting_started.html"/>
+            <keyword name="Import" id="Import" ref="user_guide/getting_started.html"/>
+            <keyword name="Data" id="Data" ref="user_guide/getting_started.html"/>
+            <keyword name="File" id="File" ref="user_guide/getting_started.html"/>
+            <keyword name="Edit" id="Edit" ref="user_guide/sections.html"/>
+            <keyword name="Editing" id="Editing" ref="user_guide/sections.html"/>
+            <keyword name="Section" id="Section" ref="user_guide/sections.html"/>
+            <keyword name="Working" id="Working" ref="user_guide/sections.html"/>
+            <keyword name="Process" id="Process" ref="user_guide/preprocessing.html"/>
+            <keyword name="Signal Filter" id="Signal Filter" ref="user_guide/preprocessing.html"/>
+            <keyword name="Filter" id="Filter" ref="user_guide/preprocessing.html"/>
+            <keyword name="Clean" id="Clean" ref="user_guide/preprocessing.html"/>
+            <keyword name="Peak" id="Peak" ref="user_guide/peak_detection.html"/>
+            <keyword name="Detection" id="Detection" ref="user_guide/peak_detection.html"/>
+            <keyword name="Analysis" id="Analysis" ref="user_guide/peak_detection.html"/>
+            <keyword name="Results" id="Results" ref="user_guide/results.html"/>
+            <keyword name="View" id="View" ref="user_guide/results.html"/>
+            <keyword name="Export" id="Export" ref="user_guide/results.html"/>
+            <keyword name="Save" id="Save" ref="user_guide/results.html"/>
+            <keyword name="Save As" id="Save As" ref="user_guide/results.html"/>
+            <keyword name="UI" id="UI" ref="ui_components/main_window.html"/>
+            <keyword name="Window" id="Window" ref="ui_components/main_window.html"/>
             <!-- TODO: Add more keywords -->
         </keywords>
         <files>
+            <file>user_guide/*.html</file>
+            <file>ui_components/*.html</file>
             <file>*.html</file>
             <file>images/*.png</file>
         </files>

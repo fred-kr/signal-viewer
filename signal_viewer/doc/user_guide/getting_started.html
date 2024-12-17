@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>User Guide - Getting Started</title>
+    </head>
+
+    <body>
+        <h2>Loading Data</h2>
+
+        <p>
+            To start working with the tool, use the <i>Open File</i> button from the <a href="../ui_components/main_window.html#file-menu">File</a> menu or the <a href="../ui_components/main_window.html#tool-bar">Tool Bar</a>.
+            Use the dialog window that appears to select a file to open.
+            <br/>
+            The following file types are currently supported:
+            <ul>
+                <li>European Data Format (.edf)</li>
+                <li>Excel Worksheet (.xlsx, .xls)</li>
+                <li>Arrow IPC / Feather v2 (.feather)</li>
+                <li>Plain Text (.csv, .txt, .tsv)</li>
+            </ul>
+        </p>
+        
+        <p>
+            After opening a file, you need to set the signal data source (i.e. the column / channel / etc in the file
+            that contains the signal values) as well as the sampling rate of the signal.
+            <br/>
+            A supplementary data source that should be included when computing results (e.g. temperature or
+            O2-saturation recordings) can also be specified via the "Additional Data" field.
+            <br/>
+            Once valid values have been set, pressing the <i>Load Data</i> button will read the specified data from the
+            file and load it into the tool. A table of the loaded data will be displayed in the "Data View" section of
+            the <a href="../ui_components/page_input.html">Input Data</a> page.
+        </p>
+    </body>
+</html>
