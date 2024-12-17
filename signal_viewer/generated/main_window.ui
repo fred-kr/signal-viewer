@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Signal Viewer</string>
+   <string>SignalViewer</string>
   </property>
   <property name="dockNestingEnabled">
    <bool>true</bool>

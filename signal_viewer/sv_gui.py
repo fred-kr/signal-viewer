@@ -31,7 +31,7 @@ class SVGUI(QtWidgets.QMainWindow):
     sig_export_requested = QtCore.Signal(str)
 
     def __init__(self, sv_app: "SVApp", version: str = "0.0.0") -> None:
-        super().__init__(None)
+        super().__init__()
 
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.ui = Ui_MainWindow()
@@ -64,7 +64,7 @@ class SVGUI(QtWidgets.QMainWindow):
             self._add_console_dock()
 
     def _setup_window(self) -> None:
-        self.setWindowTitle("Signal Viewer")
+        self.setWindowTitle("SignalViewer")
         self.setWindowIcon(QtGui.QIcon("://icons/app_icon.svg"))
 
         desktop = QtWidgets.QApplication.primaryScreen().availableGeometry()
@@ -175,27 +175,24 @@ class SVGUI(QtWidgets.QMainWindow):
     def _add_console_dock(self) -> None:
         try:
             from pyside_widgets import JupyterConsoleWindow
+
+            import signal_viewer as sv
         except ImportError:
             logger.warning("Unable to import the console widget. Console is unavailable.")
             return
 
-        console_window = JupyterConsoleWindow()
+        console_window = JupyterConsoleWindow(
+            dict(
+                sv=sv,
+                sv_app=get_app(),
+                sv_gui=self,
+            )
+        )
         console_window.setVisible(False)
 
         self.ui.menu_view.addSeparator()
         self.ui.menu_view.addAction(console_window.toggle_view_action)
         self.console_window = console_window
-        # TODO: Update pyside_widgets implementation of JupyterConsoleWindow to allow passing a dictionary of symbols to the kernel
-        if self.console_window.console.kernel_manager.kernel is None:
-            return
-        if self.console_window.console.kernel_manager.kernel.shell is None:
-            return
-        self.console_window.console.kernel_manager.kernel.shell.push(
-            dict(
-                sv_app=get_app(),
-                sv_gui=self,
-            )
-        )
 
     def _setup_actions(self) -> None:
         self.action_show_section_summary = QtGui.QAction(QtGui.QIcon("://icons/Info"), "Show Section Summary", self)

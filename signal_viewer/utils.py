@@ -135,7 +135,7 @@ def get_app() -> "SVApp":
     Get a reference to the `SVApp` instance.
     """
     if sv_apps := [w.sv_app for w in QtWidgets.QApplication.topLevelWidgets() if w.objectName() == "SVGUI"]:  # type: ignore
-        return sv_apps[0]
+        return sv_apps[0]  # type: ignore
     else:
         # Probably never happens
         raise RuntimeError("SVApp instance not found. Ensure the GUI is running and the SVGUI widget is present.")

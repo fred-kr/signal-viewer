@@ -1,10 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_dynamic_libs
-from PyInstaller.utils.hooks import collect_all
+from PyInstaller.utils.hooks import collect_all, collect_dynamic_libs
 
-datas = []
-binaries = []
-hiddenimports = ['jupyter_client', 'qtconsole', 'jupyter_core', 'rich']
+datas = [
+    ("signal_viewer/doc/signalviewer.qch", "signal_viewer/doc"),
+    ("signal_viewer/doc/signalviewer.qhc", "signal_viewer/doc"),
+]
+
+binaries = [(".venv/Scripts/pyside6-assistant.exe", "signal_viewer/bin")]
+hiddenimports = ['jupyter_client', 'qtconsole', 'jupyter_core']
 binaries += collect_dynamic_libs('tables')
 tmp_ret = collect_all('mne')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
@@ -38,7 +41,7 @@ exe = EXE(
     a.scripts,
     [('O', None, 'OPTION'), ('O', None, 'OPTION')],
     exclude_binaries=True,
-    name='Signal Viewer',
+    name='SignalViewer',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -57,5 +60,5 @@ coll = COLLECT(
     strip=False,
     upx=False,
     upx_exclude=[],
-    name='Signal Viewer',
+    name='SignalViewer',
 )

@@ -58,7 +58,6 @@
         <files>
             <file>*.html</file>
             <file>images/*.png</file>
-            <file>about.txt</file>
         </files>
     </filterSection>
 </QtHelpProject>

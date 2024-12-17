@@ -99,7 +99,7 @@ class SVApp(QtCore.QObject):
         self.gui = SVGUI(self)
         self.data = DataController(self)
         self.plot = PlotController(self, self.gui)
-        self.help: HelpController | None = None
+        self.help = HelpController(self)
 
         self.thread_pool = QtCore.QThreadPool.globalInstance()
 
@@ -162,7 +162,8 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def show_user_guide(self) -> None:
-        self.help = HelpController()
+        
+        self.help.show_page("index.html")
         
 
     @QtCore.Slot()

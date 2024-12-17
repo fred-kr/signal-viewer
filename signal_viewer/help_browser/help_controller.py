@@ -1,44 +1,46 @@
 from pathlib import Path
 
-from PySide6 import QtCore, QtHelp
+from PySide6 import QtCore
 
-from signal_viewer.help_browser.help_gui import HelpGUI
-from signal_viewer.sv_site import DOCDIR
-from signal_viewer.utils import get_app
+from signal_viewer.sv_site import BINDIR, DOCDIR
 
 
 class HelpController(QtCore.QObject):
-    def __init__(self) -> None:
-        super().__init__()
+    sig_assistant_error = QtCore.Signal(str)
 
-        self.sv_app = get_app()
-        self.help_engine = QtHelp.QHelpEngine(Path(DOCDIR / "signalviewer.qhc").as_posix())
-        self.help_engine.contentWidget()
+    def __init__(self, parent: QtCore.QObject | None = None) -> None:
+        super().__init__(parent)
 
-        self.gui = HelpGUI(self, parent=self.sv_app.gui)
-
-        self.display_src("index.html")
-
-        self.gui.show()
+        self.setObjectName("HelpController")
+        self.help_process = QtCore.QProcess(self)
+        self.help_process.finished.connect(self.finished)
 
     @QtCore.Slot(str)
-    def display_src(self, src: str) -> None:
-        """
-        Display a html source file in the help browser window.
-        """
-        src_path = DOCDIR / src
-        url = QtCore.QUrl.fromLocalFile(src_path)
-
-        self.gui.text_browser.setSource(url)
-
-    def doc_paths(self) -> list[Path]:
-        return list(DOCDIR.glob("*.html"))
-
-    def search_keyword(self, keyword: str) -> None:
-        if documents := self.help_engine.documentsForKeyword(keyword):
-            self.display_src(documents[0].url)
+    def show_page(self, file: str) -> None:
+        if not self.start_assistant():
+            return
+        ba = QtCore.QByteArray(b"setSource qthelp://com.quacktech.signalviewer/doc/")
+        ba += file.encode("utf-8") + b"\n"
+        self.help_process.write(ba)
 
     @QtCore.Slot()
-    def exit_help(self) -> None:
-        self.sv_app.help = None
-        self.gui.close()
+    def start_assistant(self) -> bool:
+        if self.help_process.state() != QtCore.QProcess.ProcessState.Running:
+            bin_path = Path(BINDIR / "pyside6-assistant.exe").as_posix()
+            cli_flags = ["-collectionFile", Path(DOCDIR / "signalviewer.qhc").as_posix(), "-enableRemoteControl"]
+            self.help_process.start(bin_path, cli_flags)
+
+            if not self.help_process.waitForStarted(3000):
+                error_msg = f"Failed to start pyside6-assistant.exe: {self.help_process.errorString()}"
+                self.sig_assistant_error.emit(error_msg)
+                return False
+
+        return True
+
+    @QtCore.Slot(int, QtCore.QProcess.ExitStatus)
+    def finished(self, exit_code: int, status: QtCore.QProcess.ExitStatus) -> None:
+        std_err = self.help_process.readAllStandardError().data().decode("utf-8", errors="replace")
+        if status != QtCore.QProcess.ExitStatus.NormalExit:
+            self.sig_assistant_error.emit(f"pyside6-assistant.exe crashed: {std_err}")
+        elif exit_code != 0:
+            self.sig_assistant_error.emit(f"pyside6-assistant.exe exited with code {exit_code}: {std_err}")

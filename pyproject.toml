@@ -5,10 +5,9 @@ description = "A GUI for working with (biological) signal data."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "attrs>=24.2.0",
+    "attrs>=24.3.0",
     "loguru>=0.7.3",
     "mne>=1.8.0",
-    "neurokit2>=0.2.10",
     "numexpr>=2.10.2",
     "numpy>=2.2.0",
     "polars[excel]>=1.17.1",
@@ -27,6 +26,7 @@ dependencies = [
     "wfdb>=4.1.2",
     "pyside6-fluent-widgets>=1.7.3",
     "scikit-learn>=1.6.0",
+    "neurokit2>=0.2.10",
 ]
 
 [tool.uv.sources]

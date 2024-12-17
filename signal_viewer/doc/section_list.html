@@ -7,6 +7,36 @@
     <body>
         <h2>Section List</h2>
 
-        <p>TODO</p>
+        <p>The `Section List` window provides an overview of available sections and allows for quick navigation between them.</p>
+
+        <h3>Components</h3>
+        
+        <h4>Active Section</h4>
+
+        <p>
+            A text label that displays the name of the currently active section.
+        </p>
+
+        <h4>Command Bar</h4>
+
+        <p>
+            Holds commands for:
+            <ul>
+                <li>`New Section`: Only available when the base section (Section 000) is selected. A new section is created by visually selecting a range of the base section and clicking `Confirm`.</li>
+                <li>`Remove Section`: Can't be used when the base section is selected. Removes the currently active section (along with any associated data) from the list.</li>
+                <li>`Mark as Done`: Computes results for the current section and locks it to prevent further edits. See <a href="results.html">View and Export Results</a> for more information.</li>
+                <li>`Unlock Section`: Removes the editing lock from the current section, so that it can be edited again.</li>
+                <li>`Show Section Summary`: Shows a dialog window with a summary of the current section's data.</li>
+            </ul>
+        </p>
+
+        <h4>Section List</h4>
+
+        <p>
+            The list of available sections. Clicking on a section name will select it as the active section. The active
+            section is highlighted. Right-clicking a section will open a context menu with available commands for that
+            section.
+        </p>
+
     </body>
 </html>
