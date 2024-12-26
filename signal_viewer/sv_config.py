@@ -3,10 +3,9 @@ import typing as t
 
 import attrs
 import pyside_config as qconfig
-import qfluentwidgets as qfw
-from PySide6 import QtCore, QtGui
+from PySide6 import QtCore, QtGui, QtWidgets
 from pyside_config.helpers import make_combo_box_info, make_spin_box_info
-from pyside_widgets.enum_combo_box import EnumComboBox
+from pyside_widgets import AnimatedToggle, ColorPickerButton, EnumComboBox
 
 from signal_viewer.enum_defs import RateComputationMethod, TextFileSeparator
 from signal_viewer.utils import get_app_dir, make_qcolor, search_enum
@@ -22,9 +21,9 @@ class PlotConfig:
         metadata={
             "editor": qconfig.EditorWidgetInfo(
                 label="Background Color",
-                widget_factory=functools.partial(qfw.ColorPickerButton, color=QtGui.QColor("#000000"), title=""),
-                sig_value_changed="colorChanged",
-                set_value_method="setColor",
+                widget_factory=functools.partial(ColorPickerButton, color=QtGui.QColor("#000000")),
+                sig_value_changed="sig_color_changed",
+                set_value_method="set_color",
             ),
             "description": "Plot background color.",
             qconfig.QTYPE_KEY: QtGui.QColor,
@@ -36,9 +35,9 @@ class PlotConfig:
         metadata={
             "editor": qconfig.EditorWidgetInfo(
                 label="Foreground Color",
-                widget_factory=functools.partial(qfw.ColorPickerButton, color=QtGui.QColor("#969696"), title=""),
-                sig_value_changed="colorChanged",
-                set_value_method="setColor",
+                widget_factory=functools.partial(ColorPickerButton, color=QtGui.QColor("#969696")),
+                sig_value_changed="sig_color_changed",
+                set_value_method="set_color",
             ),
             "description": "Plot foreground color.",
             qconfig.QTYPE_KEY: QtGui.QColor,
@@ -50,7 +49,7 @@ class PlotConfig:
         metadata={
             "editor": make_spin_box_info(
                 label="Line click width",
-                widget_factory=qfw.SpinBox,
+                widget_factory=QtWidgets.QSpinBox,
                 minimum=3,
                 maximum=1_000,
                 singleStep=1,
@@ -65,7 +64,7 @@ class PlotConfig:
         metadata={
             "editor": make_spin_box_info(
                 label="Click radius",
-                widget_factory=qfw.SpinBox,
+                widget_factory=QtWidgets.QSpinBox,
                 minimum=0,
                 maximum=1_000,
                 singleStep=1,
@@ -87,8 +86,8 @@ class EditingConfig:
         metadata={
             "editor": qconfig.EditorWidgetInfo(
                 label="Filter stacking",
-                widget_factory=qfw.SwitchButton,
-                sig_value_changed="checkedChanged",
+                widget_factory=AnimatedToggle,
+                sig_value_changed="toggled",
                 set_value_method="setChecked",
             ),
             "description": "Whether to allow applying multiple filters to the same data.",
@@ -120,7 +119,7 @@ class DataConfig:
         metadata={
             "editor": make_spin_box_info(
                 label="Float precision",
-                widget_factory=qfw.SpinBox,
+                widget_factory=QtWidgets.QSpinBox,
                 minimum=0,
                 maximum=10,
                 singleStep=1,

@@ -1,23 +1,23 @@
 [app]
 
 # title of your application
-title = signal_viewer
+title = SignalViewer
 
 # project directory. the general assumption is that project_dir is the parent directory
 # of input_file
 project_dir = E:\dev-home\awi-projects\signal-viewer\signal_viewer
 
 # source file path
-input_file = E:\dev-home\awi-projects\signal-viewer\main.py
+input_file = E:\dev-home\awi-projects\signal-viewer\signal_viewer\__main__.py
 
 # directory where exec is stored
-exec_directory = .
+exec_directory = E:\dev-home\application-builds\signal-viewer
 
 # path to .pyproject project file
 project_file = signal-viewer.pyproject
 
 # application icon
-icon = E:\dev-home\awi-projects\signal-viewer\.venv\Lib\site-packages\PySide6\scripts\deploy_lib\pyside_icon.ico
+icon = E:\dev-home\awi-projects\signal-viewer\signal_viewer\icons\app_icon.png
 
 [python]
 
@@ -43,7 +43,7 @@ excluded_qml_plugins =
 modules = Gui,Core,Widgets
 
 # qt plugins used by the application
-plugins = iconengines,styles,xcbglintegrations,generic,platformthemes,imageformats,platforms,platforminputcontexts,egldeviceintegrations
+plugins = iconengines,styles,generic,imageformats,platforms,platforminputcontexts,sqldrivers,renderers
 
 [android]
 
@@ -67,7 +67,7 @@ macos.permissions =
 mode = standalone
 
 # (str) specify any extra nuitka arguments
-extra_args = --noinclude-qt-translations
+extra_args = --noinclude-qt-translations=True --include-data-files=signal_viewer/doc/signalviewer.qch=signal_viewer/doc --include-data-files=signal_viewer/doc/signalviewer.qhc=signal_viewer/doc
 
 [buildozer]
 

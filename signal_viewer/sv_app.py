@@ -12,7 +12,6 @@ import xlsxwriter
 from loguru import logger
 from PySide6 import QtCore, QtWidgets
 
-from signal_viewer.help_browser.help_controller import HelpController
 import signal_viewer.type_defs as _t
 from signal_viewer.constants import SECTION_INDEX_COL
 from signal_viewer.enum_defs import (
@@ -23,6 +22,7 @@ from signal_viewer.enum_defs import (
 )
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_gui import SVGUI
+from signal_viewer.sv_help import HelpController
 from signal_viewer.sv_logic.data_controller import DataController
 from signal_viewer.sv_logic.data_models import FileListModel
 from signal_viewer.sv_logic.file_io import write_hdf5
@@ -95,7 +95,7 @@ class SVApp(QtCore.QObject):
         super().__init__()
 
         self.setObjectName("SVApp")
-        
+
         self.gui = SVGUI(self)
         self.data = DataController(self)
         self.plot = PlotController(self, self.gui)
@@ -162,15 +162,13 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def show_user_guide(self) -> None:
-        
         self.help.show_page("index.html")
-        
 
     @QtCore.Slot()
     def _on_action_show_settings(self) -> None:
         snapshot = qconfig.create_snapshot()
 
-        settings_dlg = qconfig.create_editor(self.gui)
+        settings_dlg = qconfig.create_editor(self.gui, exclude=["InternalConfig"])
         settings_dlg.accepted.connect(self.apply_settings)
         settings_dlg.rejected.connect(lambda: qconfig.restore_snapshot(snapshot))
         settings_dlg.open()

@@ -1,20 +1,28 @@
 import typing as t
 
-import qfluentwidgets as qfw
 from PySide6 import QtCore, QtGui, QtWidgets
+from pyside_widgets import CommandBar
+
+from signal_viewer.utils import set_font
 
 
-class SectionListView(qfw.ListView):
+class SectionListView(QtWidgets.QListView):
     sig_delete_current_item: t.ClassVar[QtCore.Signal] = QtCore.Signal(QtCore.QModelIndex)
     sig_show_summary: t.ClassVar[QtCore.Signal] = QtCore.Signal(QtCore.QModelIndex)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
-        self.setSelectRightClickedRow(True)
+        self._select_right_clicked_row = True
         self.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.setSelectionRectVisible(True)
         self.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        if event.button() == QtCore.Qt.MouseButton.LeftButton or self._select_right_clicked_row:
+            super().mousePressEvent(event)
+
+        QtWidgets.QWidget.mousePressEvent(self, event)
 
     @QtCore.Slot()
     def emit_delete_current_request(self) -> None:
@@ -34,11 +42,12 @@ class SectionListWidget(QtWidgets.QWidget):
 
         self.list_view = SectionListView()
 
-        label_active_section = qfw.StrongBodyLabel("Active Section: ", self)
+        label_active_section = QtWidgets.QLabel("Active Section: ", self)
+        set_font(label_active_section, 14, weight=QtGui.QFont.Weight.DemiBold)
         layout.addWidget(label_active_section)
         self.label_active_section = label_active_section
 
-        command_bar = qfw.CommandBar()
+        command_bar = CommandBar()
         command_bar.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
         command_bar.setObjectName("command_bar_section_list")
         layout.addWidget(command_bar)
@@ -48,11 +57,11 @@ class SectionListWidget(QtWidgets.QWidget):
         confirm_cancel_layout = QtWidgets.QHBoxLayout(confirm_cancel_btns)
         confirm_cancel_layout.setContentsMargins(0, 0, 0, 0)
 
-        confirm_btn = qfw.PushButton(icon=QtGui.QIcon("://icons/CheckmarkCircle.svg"), text="Confirm")
+        confirm_btn = QtWidgets.QPushButton(QtGui.QIcon("://icons/CheckmarkCircle.svg"), "Confirm")
         confirm_cancel_layout.addWidget(confirm_btn)
         self.btn_confirm = confirm_btn
 
-        cancel_btn = qfw.PushButton(icon=QtGui.QIcon("://icons/DismissCircle.svg"), text="Cancel")
+        cancel_btn = QtWidgets.QPushButton(QtGui.QIcon("://icons/DismissCircle.svg"), "Cancel")
         confirm_cancel_layout.addWidget(cancel_btn)
         self.btn_cancel = cancel_btn
 

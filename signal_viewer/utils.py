@@ -144,3 +144,17 @@ def get_app() -> "SVApp":
 def get_gui() -> "SVGUI":
     """Get a reference to the `SVGUI` (main window) instance."""
     return get_app().gui
+
+
+def set_font(
+    widget: QtWidgets.QWidget,
+    font_size: int = 14,
+    weight: QtGui.QFont.Weight = QtGui.QFont.Weight.Normal,
+    family: str | None = None,
+) -> None:
+    font = widget.font()
+    font.setPointSize(font_size)
+    font.setWeight(weight)
+    if family:
+        font.setFamily(family)
+    widget.setFont(font)

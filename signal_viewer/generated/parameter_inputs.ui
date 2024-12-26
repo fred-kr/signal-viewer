@@ -2092,7 +2092,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </layout>
   <action name="action_restore_defaults_processing">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/ArrowReset.svg</normaloff>://icons/ArrowReset.svg</iconset>
    </property>
    <property name="text">
@@ -2107,7 +2107,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </action>
   <action name="action_restore_original_values">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/Eraser.svg</normaloff>://icons/Eraser.svg</iconset>
    </property>
    <property name="text">
@@ -2122,7 +2122,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </action>
   <action name="action_run_processing">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/Play.svg</normaloff>://icons/Play.svg</iconset>
    </property>
    <property name="text">
@@ -2137,7 +2137,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </action>
   <action name="action_run_peak_detection">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/Play.svg</normaloff>://icons/Play.svg</iconset>
    </property>
    <property name="text">
@@ -2152,7 +2152,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </action>
   <action name="action_restore_defaults_peak_detection">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/ArrowReset.svg</normaloff>://icons/ArrowReset.svg</iconset>
    </property>
    <property name="text">
@@ -2167,7 +2167,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </action>
   <action name="action_clear_peaks">
    <property name="icon">
-    <iconset resource="../resources/resources.qrc">
+    <iconset>
      <normaloff>://icons/Broom.svg</normaloff>://icons/Broom.svg</iconset>
    </property>
    <property name="text">
@@ -2238,7 +2238,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/resources.qrc"/>
+  <include location="../resources.qrc"/>
  </resources>
  <connections/>
 </ui>

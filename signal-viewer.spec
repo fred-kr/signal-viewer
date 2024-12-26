@@ -6,7 +6,7 @@ datas = [
     ("signal_viewer/doc/signalviewer.qhc", "signal_viewer/doc"),
 ]
 
-binaries = [(".venv/Scripts/pyside6-assistant.exe", "signal_viewer/bin")]
+binaries = []
 hiddenimports = ['jupyter_client', 'qtconsole', 'jupyter_core']
 binaries += collect_dynamic_libs('tables')
 tmp_ret = collect_all('mne')

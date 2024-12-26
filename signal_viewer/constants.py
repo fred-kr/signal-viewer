@@ -1,6 +1,6 @@
 import typing as t
 
-COMBO_BOX_NO_SELECTION: t.Final = "<Not Set>"
+COMBO_BOX_NO_SELECTION: t.Final = "<No Selection>"
 INDEX_COL: t.Final = "index"
 SECTION_INDEX_COL: t.Final = "section_index"
 IS_PEAK_COL: t.Final = "is_peak"

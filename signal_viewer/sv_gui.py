@@ -33,7 +33,7 @@ class SVGUI(QtWidgets.QMainWindow):
     def __init__(self, sv_app: "SVApp", version: str = "0.0.0") -> None:
         super().__init__()
 
-        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        # self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -182,7 +182,7 @@ class SVGUI(QtWidgets.QMainWindow):
             return
 
         console_window = JupyterConsoleWindow(
-            dict(
+            namespace=dict(
                 sv=sv,
                 sv_app=get_app(),
                 sv_gui=self,
@@ -218,7 +218,8 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dock_sections.command_bar.addActions(
             [self.ui.action_create_new_section, self.ui.action_remove_section, self.ui.action_mark_section_done]
         )
-        self.dock_sections.command_bar.addHiddenActions(
+        self.dock_sections.command_bar.addSeparator()
+        self.dock_sections.command_bar.addActions(
             [self.ui.action_unlock_section, self.action_show_section_summary, self.ui.action_show_section_overview]
         )
 
@@ -401,8 +402,11 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dock_parameters.close()
         self.dock_sections.close()
 
+        self.sv_app.help.close()
+
         if hasattr(self, "console_window"):
             self.console_window.close()
+
         return super().closeEvent(event)
 
     def show_success(self, title: str, text: str) -> None:

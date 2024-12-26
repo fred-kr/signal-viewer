@@ -83,10 +83,11 @@ class PeakDetectionMethod(enum.StrEnum):
 class NK2ECGPeakDetectionMethod(enum.StrEnum):
     Default = "neurokit"
     Emrich2023 = "emrich2023"
+    Gamboa2008 = "gamboa2008"
+    Promac = "promac"
+    # below methods dont have any adjustable parameters
     PanTompkins1985 = "pantompkins"
     Nabian2018 = "nabian2018"
-    Gamboa2008 = "gamboa2008"
-    # Zong2003 = "zong2003"  # think this is the same as the method used in the `wfdb` package
     Hamilton2002 = "hamilton2002"
     Christov2004 = "christov2004"
     Engzee2012 = "engzee2012"
@@ -95,7 +96,7 @@ class NK2ECGPeakDetectionMethod(enum.StrEnum):
     Kalidas2017 = "kalidas2017"
     Martinez2004 = "martinez2004"
     Rodrigues2020 = "rodrigues2020"
-    Promac = "promac"
+    # Zong2003 = "zong2003"  # think this is the same as the method used in the `wfdb` package
 
 
 class WFDBPeakDirection(enum.StrEnum):
