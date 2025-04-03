@@ -3,187 +3,165 @@
 ################################################################################
 ## Form generated from reading UI file 'main_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.1
+## Created by: Qt User Interface Compiler version 6.9.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFormLayout, QFrame,
+    QGridLayout, QGroupBox, QHBoxLayout, QHeaderView,
+    QMainWindow, QMenu, QMenuBar, QSizePolicy,
+    QStackedWidget, QTabWidget, QToolBar, QVBoxLayout,
+    QWidget)
+
 from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
-from PySide6.QtCore import QCoreApplication, QMetaObject, QRect, QSize, Qt
-from PySide6.QtGui import QAction, QIcon
-from PySide6.QtWidgets import (
-    QAbstractItemView,
-    QFormLayout,
-    QFrame,
-    QGridLayout,
-    QGroupBox,
-    QHBoxLayout,
-    QMainWindow,
-    QMenuBar,
-    QSizePolicy,
-    QStackedWidget,
-    QTabWidget,
-    QToolBar,
-    QVBoxLayout,
-    QWidget,
-)
-from qfluentwidgets import (
-    BodyLabel,
-    ComboBox,
-    LineEdit,
-    ListView,
-    PushButton,
-    RoundMenu,
-    SpinBox,
-    StrongBodyLabel,
-    SubtitleLabel,
-    TableView,
-    TreeView,
-)
-
-from .. import rc_resources  # type: ignore # noqa: F401
-
+from qfluentwidgets import (BodyLabel, ComboBox, LineEdit, ListView,
+    PushButton, SpinBox, StrongBodyLabel, SubtitleLabel,
+    TableView, TreeView)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
-            MainWindow.setObjectName("MainWindow")
+            MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1660, 937)
         MainWindow.setDockNestingEnabled(True)
-        MainWindow.setDockOptions(
-            QMainWindow.DockOption.AllowNestedDocks
-            | QMainWindow.DockOption.AllowTabbedDocks
-            | QMainWindow.DockOption.AnimatedDocks
-            | QMainWindow.DockOption.VerticalTabs
-        )
+        MainWindow.setDockOptions(QMainWindow.DockOption.AllowNestedDocks|QMainWindow.DockOption.AllowTabbedDocks|QMainWindow.DockOption.AnimatedDocks|QMainWindow.DockOption.VerticalTabs)
         self.action_open_file = QAction(MainWindow)
-        self.action_open_file.setObjectName("action_open_file")
+        self.action_open_file.setObjectName(u"action_open_file")
         icon = QIcon()
-        icon.addFile("://icons/FolderOpen.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon.addFile(u"://icons/FolderOpen.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_open_file.setIcon(icon)
         self.action_open_file.setIconVisibleInMenu(False)
         self.action_show_settings = QAction(MainWindow)
-        self.action_show_settings.setObjectName("action_show_settings")
+        self.action_show_settings.setObjectName(u"action_show_settings")
         icon1 = QIcon()
-        icon1.addFile("://icons/Settings.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon1.addFile(u"://icons/Settings.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_show_settings.setIcon(icon1)
         self.action_show_settings.setMenuRole(QAction.MenuRole.PreferencesRole)
         self.action_edit_metadata = QAction(MainWindow)
-        self.action_edit_metadata.setObjectName("action_edit_metadata")
+        self.action_edit_metadata.setObjectName(u"action_edit_metadata")
         self.action_edit_metadata.setEnabled(False)
         icon2 = QIcon()
-        icon2.addFile("://icons/DocumentEndnote.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon2.addFile(u"://icons/DocumentEndnote.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_edit_metadata.setIcon(icon2)
         self.action_edit_metadata.setIconVisibleInMenu(False)
         self.action_close_file = QAction(MainWindow)
-        self.action_close_file.setObjectName("action_close_file")
+        self.action_close_file.setObjectName(u"action_close_file")
         self.action_close_file.setEnabled(False)
         icon3 = QIcon()
-        icon3.addFile("://icons/DocumentDismiss.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon3.addFile(u"://icons/DocumentDismiss.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_close_file.setIcon(icon3)
         self.action_close_file.setMenuRole(QAction.MenuRole.NoRole)
         self.action_close_file.setIconVisibleInMenu(False)
         self.action_mark_section_done = QAction(MainWindow)
-        self.action_mark_section_done.setObjectName("action_mark_section_done")
+        self.action_mark_section_done.setObjectName(u"action_mark_section_done")
         icon4 = QIcon()
-        icon4.addFile("://icons/CheckmarkCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon4.addFile(u"://icons/CheckmarkCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_mark_section_done.setIcon(icon4)
         self.action_mark_section_done.setMenuRole(QAction.MenuRole.NoRole)
         self.action_create_new_section = QAction(MainWindow)
-        self.action_create_new_section.setObjectName("action_create_new_section")
+        self.action_create_new_section.setObjectName(u"action_create_new_section")
         self.action_create_new_section.setCheckable(True)
         icon5 = QIcon()
-        icon5.addFile("://icons/AddCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon5.addFile(u"://icons/AddCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_create_new_section.setIcon(icon5)
         self.action_create_new_section.setMenuRole(QAction.MenuRole.NoRole)
         self.action_toggle_auto_scaling = QAction(MainWindow)
-        self.action_toggle_auto_scaling.setObjectName("action_toggle_auto_scaling")
+        self.action_toggle_auto_scaling.setObjectName(u"action_toggle_auto_scaling")
         self.action_toggle_auto_scaling.setCheckable(True)
         icon6 = QIcon()
-        icon6.addFile("://icons/AutoFitHeight.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon6.addFile(u"://icons/AutoFitHeight.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_toggle_auto_scaling.setIcon(icon6)
         self.action_toggle_auto_scaling.setMenuRole(QAction.MenuRole.NoRole)
         self.action_confirm_section = QAction(MainWindow)
-        self.action_confirm_section.setObjectName("action_confirm_section")
+        self.action_confirm_section.setObjectName(u"action_confirm_section")
         icon7 = QIcon()
-        icon7.addFile("://icons/Checkmark.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon7.addFile(u"://icons/Checkmark.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_confirm_section.setIcon(icon7)
         self.action_confirm_section.setMenuRole(QAction.MenuRole.NoRole)
         self.action_cancel_section = QAction(MainWindow)
-        self.action_cancel_section.setObjectName("action_cancel_section")
+        self.action_cancel_section.setObjectName(u"action_cancel_section")
         icon8 = QIcon()
-        icon8.addFile("://icons/Dismiss.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon8.addFile(u"://icons/Dismiss.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_cancel_section.setIcon(icon8)
         self.action_cancel_section.setMenuRole(QAction.MenuRole.NoRole)
         self.action_show_section_overview = QAction(MainWindow)
-        self.action_show_section_overview.setObjectName("action_show_section_overview")
+        self.action_show_section_overview.setObjectName(u"action_show_section_overview")
         self.action_show_section_overview.setCheckable(True)
         self.action_show_section_overview.setChecked(False)
         icon9 = QIcon()
-        icon9.addFile("://icons/EyeHide.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        icon9.addFile("://icons/EyeShow.svg", QSize(), QIcon.Mode.Normal, QIcon.State.On)
+        icon9.addFile(u"://icons/EyeHide.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon9.addFile(u"://icons/EyeShow.svg", QSize(), QIcon.Mode.Normal, QIcon.State.On)
         self.action_show_section_overview.setIcon(icon9)
         self.action_show_section_overview.setMenuRole(QAction.MenuRole.NoRole)
         self.action_remove_peaks_in_selection = QAction(MainWindow)
-        self.action_remove_peaks_in_selection.setObjectName("action_remove_peaks_in_selection")
+        self.action_remove_peaks_in_selection.setObjectName(u"action_remove_peaks_in_selection")
         icon10 = QIcon()
-        icon10.addFile("://icons/Eraser.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon10.addFile(u"://icons/Eraser.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_remove_peaks_in_selection.setIcon(icon10)
         self.action_remove_peaks_in_selection.setMenuRole(QAction.MenuRole.NoRole)
         self.action_find_peaks_in_selection = QAction(MainWindow)
-        self.action_find_peaks_in_selection.setObjectName("action_find_peaks_in_selection")
+        self.action_find_peaks_in_selection.setObjectName(u"action_find_peaks_in_selection")
         icon11 = QIcon()
-        icon11.addFile("://icons/SearchSquare.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon11.addFile(u"://icons/SearchSquare.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_find_peaks_in_selection.setIcon(icon11)
         self.action_find_peaks_in_selection.setMenuRole(QAction.MenuRole.NoRole)
         self.action_show_user_guide = QAction(MainWindow)
-        self.action_show_user_guide.setObjectName("action_show_user_guide")
+        self.action_show_user_guide.setObjectName(u"action_show_user_guide")
         icon12 = QIcon()
-        icon12.addFile("://icons/BookQuestionMark.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon12.addFile(u"://icons/BookQuestionMark.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_show_user_guide.setIcon(icon12)
         self.action_show_user_guide.setMenuRole(QAction.MenuRole.NoRole)
         self.action_about_qt = QAction(MainWindow)
-        self.action_about_qt.setObjectName("action_about_qt")
+        self.action_about_qt.setObjectName(u"action_about_qt")
         self.action_about_qt.setMenuRole(QAction.MenuRole.AboutQtRole)
         self.action_about_app = QAction(MainWindow)
-        self.action_about_app.setObjectName("action_about_app")
+        self.action_about_app.setObjectName(u"action_about_app")
         icon13 = QIcon()
-        icon13.addFile("://icons/BookInformation.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon13.addFile(u"://icons/BookInformation.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_about_app.setIcon(icon13)
         self.action_about_app.setMenuRole(QAction.MenuRole.AboutRole)
         self.action_remove_section = QAction(MainWindow)
-        self.action_remove_section.setObjectName("action_remove_section")
+        self.action_remove_section.setObjectName(u"action_remove_section")
         icon14 = QIcon()
-        icon14.addFile("://icons/SubtractCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon14.addFile(u"://icons/SubtractCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_remove_section.setIcon(icon14)
         self.action_remove_section.setMenuRole(QAction.MenuRole.NoRole)
         self.action_clear_recent_files = QAction(MainWindow)
-        self.action_clear_recent_files.setObjectName("action_clear_recent_files")
+        self.action_clear_recent_files.setObjectName(u"action_clear_recent_files")
         self.action_clear_recent_files.setIcon(icon8)
         self.action_unlock_section = QAction(MainWindow)
-        self.action_unlock_section.setObjectName("action_unlock_section")
+        self.action_unlock_section.setObjectName(u"action_unlock_section")
         icon15 = QIcon()
-        icon15.addFile("://icons/LockOpen.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon15.addFile(u"://icons/LockOpen.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_unlock_section.setIcon(icon15)
         self.action_unlock_section.setMenuRole(QAction.MenuRole.NoRole)
         self.centralwidget = QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        self.centralwidget.setStyleSheet("")
+        self.centralwidget.setObjectName(u"centralwidget")
+        self.centralwidget.setStyleSheet(u"")
         self.h_layout_centralwidget = QHBoxLayout(self.centralwidget)
-        self.h_layout_centralwidget.setObjectName("h_layout_centralwidget")
+        self.h_layout_centralwidget.setObjectName(u"h_layout_centralwidget")
         self.h_layout_centralwidget.setContentsMargins(0, 0, 0, 0)
         self.stackedWidget = QStackedWidget(self.centralwidget)
-        self.stackedWidget.setObjectName("stackedWidget")
+        self.stackedWidget.setObjectName(u"stackedWidget")
         self.stacked_page_import = QWidget()
-        self.stacked_page_import.setObjectName("stacked_page_import")
+        self.stacked_page_import.setObjectName(u"stacked_page_import")
         self.horizontalLayout = QHBoxLayout(self.stacked_page_import)
-        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.container_file_information = QWidget(self.stacked_page_import)
-        self.container_file_information.setObjectName("container_file_information")
+        self.container_file_information.setObjectName(u"container_file_information")
         self.gridLayout = QGridLayout(self.container_file_information)
-        self.gridLayout.setObjectName("gridLayout")
+        self.gridLayout.setObjectName(u"gridLayout")
         self.btn_load_data = PushButton(self.container_file_information)
-        self.btn_load_data.setObjectName("btn_load_data")
+        self.btn_load_data.setObjectName(u"btn_load_data")
         self.btn_load_data.setEnabled(False)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -192,68 +170,69 @@ class Ui_MainWindow(object):
         self.btn_load_data.setSizePolicy(sizePolicy)
         self.btn_load_data.setMinimumSize(QSize(0, 41))
         icon16 = QIcon()
-        icon16.addFile("://icons/DocumentArrowRight.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon16.addFile(u"://icons/DocumentArrowRight.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.btn_load_data.setIcon(icon16)
 
         self.gridLayout.addWidget(self.btn_load_data, 3, 0, 1, 2)
 
         self.grp_box_required_info = QGroupBox(self.container_file_information)
-        self.grp_box_required_info.setObjectName("grp_box_required_info")
+        self.grp_box_required_info.setObjectName(u"grp_box_required_info")
         sizePolicy.setHeightForWidth(self.grp_box_required_info.sizePolicy().hasHeightForWidth())
         self.grp_box_required_info.setSizePolicy(sizePolicy)
         self.grp_box_required_info.setFlat(True)
         self.formLayout = QFormLayout(self.grp_box_required_info)
-        self.formLayout.setObjectName("formLayout")
+        self.formLayout.setObjectName(u"formLayout")
         self.samplingRateLabel = BodyLabel(self.grp_box_required_info)
-        self.samplingRateLabel.setObjectName("samplingRateLabel")
+        self.samplingRateLabel.setObjectName(u"samplingRateLabel")
         self.samplingRateLabel.setMinimumSize(QSize(0, 31))
 
-        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.samplingRateLabel)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.samplingRateLabel)
 
         self.spin_box_sampling_rate_import_page = SpinBox(self.grp_box_required_info)
-        self.spin_box_sampling_rate_import_page.setObjectName("spin_box_sampling_rate_import_page")
+        self.spin_box_sampling_rate_import_page.setObjectName(u"spin_box_sampling_rate_import_page")
         self.spin_box_sampling_rate_import_page.setMinimumSize(QSize(0, 31))
         self.spin_box_sampling_rate_import_page.setFrame(False)
         self.spin_box_sampling_rate_import_page.setMaximum(10000)
         self.spin_box_sampling_rate_import_page.setValue(0)
 
-        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.spin_box_sampling_rate_import_page)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.spin_box_sampling_rate_import_page)
 
         self.signalColumnChannelLabel = BodyLabel(self.grp_box_required_info)
-        self.signalColumnChannelLabel.setObjectName("signalColumnChannelLabel")
+        self.signalColumnChannelLabel.setObjectName(u"signalColumnChannelLabel")
         self.signalColumnChannelLabel.setMinimumSize(QSize(0, 31))
 
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.signalColumnChannelLabel)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.signalColumnChannelLabel)
 
         self.combo_box_signal_column_import_page = ComboBox(self.grp_box_required_info)
-        self.combo_box_signal_column_import_page.setObjectName("combo_box_signal_column_import_page")
+        self.combo_box_signal_column_import_page.setObjectName(u"combo_box_signal_column_import_page")
         self.combo_box_signal_column_import_page.setMinimumSize(QSize(0, 31))
 
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.combo_box_signal_column_import_page)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.combo_box_signal_column_import_page)
 
         self.line = QFrame(self.grp_box_required_info)
-        self.line.setObjectName("line")
+        self.line.setObjectName(u"line")
         self.line.setFrameShape(QFrame.Shape.HLine)
         self.line.setFrameShadow(QFrame.Shadow.Sunken)
 
-        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.line)
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.SpanningRole, self.line)
 
         self.infoColumnChannelLabel = BodyLabel(self.grp_box_required_info)
-        self.infoColumnChannelLabel.setObjectName("infoColumnChannelLabel")
+        self.infoColumnChannelLabel.setObjectName(u"infoColumnChannelLabel")
         self.infoColumnChannelLabel.setMinimumSize(QSize(0, 31))
 
-        self.formLayout.setWidget(3, QFormLayout.LabelRole, self.infoColumnChannelLabel)
+        self.formLayout.setWidget(3, QFormLayout.ItemRole.LabelRole, self.infoColumnChannelLabel)
 
         self.combo_box_info_column_import_page = ComboBox(self.grp_box_required_info)
-        self.combo_box_info_column_import_page.setObjectName("combo_box_info_column_import_page")
+        self.combo_box_info_column_import_page.setObjectName(u"combo_box_info_column_import_page")
         self.combo_box_info_column_import_page.setMinimumSize(QSize(0, 31))
 
-        self.formLayout.setWidget(3, QFormLayout.FieldRole, self.combo_box_info_column_import_page)
+        self.formLayout.setWidget(3, QFormLayout.ItemRole.FieldRole, self.combo_box_info_column_import_page)
+
 
         self.gridLayout.addWidget(self.grp_box_required_info, 2, 0, 1, 3)
 
         self.line_edit_active_file = LineEdit(self.container_file_information)
-        self.line_edit_active_file.setObjectName("line_edit_active_file")
+        self.line_edit_active_file.setObjectName(u"line_edit_active_file")
         self.line_edit_active_file.setMinimumSize(QSize(0, 31))
         self.line_edit_active_file.setFrame(False)
         self.line_edit_active_file.setReadOnly(True)
@@ -261,7 +240,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.line_edit_active_file, 1, 1, 1, 2)
 
         self.btn_open_file = PushButton(self.container_file_information)
-        self.btn_open_file.setObjectName("btn_open_file")
+        self.btn_open_file.setObjectName(u"btn_open_file")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
@@ -273,7 +252,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.btn_open_file, 1, 0, 1, 1)
 
         self.btn_close_file = PushButton(self.container_file_information)
-        self.btn_close_file.setObjectName("btn_close_file")
+        self.btn_close_file.setObjectName(u"btn_close_file")
         self.btn_close_file.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.btn_close_file.sizePolicy().hasHeightForWidth())
         self.btn_close_file.setSizePolicy(sizePolicy1)
@@ -283,58 +262,58 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.btn_close_file, 3, 2, 1, 1)
 
         self.label_2 = SubtitleLabel(self.container_file_information)
-        self.label_2.setObjectName("label_2")
+        self.label_2.setObjectName(u"label_2")
         sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
         self.label_2.setSizePolicy(sizePolicy)
 
         self.gridLayout.addWidget(self.label_2, 0, 0, 1, 3)
 
         self.container_recent_files = QWidget(self.container_file_information)
-        self.container_recent_files.setObjectName("container_recent_files")
+        self.container_recent_files.setObjectName(u"container_recent_files")
         self.verticalLayout_3 = QVBoxLayout(self.container_recent_files)
-        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(3, 3, 3, 3)
         self.label_3 = StrongBodyLabel(self.container_recent_files)
-        self.label_3.setObjectName("label_3")
+        self.label_3.setObjectName(u"label_3")
 
         self.verticalLayout_3.addWidget(self.label_3)
 
         self.list_view_recent_files = ListView(self.container_recent_files)
-        self.list_view_recent_files.setObjectName("list_view_recent_files")
+        self.list_view_recent_files.setObjectName(u"list_view_recent_files")
         self.list_view_recent_files.setTextElideMode(Qt.TextElideMode.ElideMiddle)
 
         self.verticalLayout_3.addWidget(self.list_view_recent_files)
 
+
         self.gridLayout.addWidget(self.container_recent_files, 4, 0, 1, 3)
+
 
         self.horizontalLayout.addWidget(self.container_file_information)
 
         self.container_loaded_data_table = QWidget(self.stacked_page_import)
-        self.container_loaded_data_table.setObjectName("container_loaded_data_table")
+        self.container_loaded_data_table.setObjectName(u"container_loaded_data_table")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.container_loaded_data_table.sizePolicy().hasHeightForWidth())
         self.container_loaded_data_table.setSizePolicy(sizePolicy2)
         self.gridLayout_7 = QGridLayout(self.container_loaded_data_table)
-        self.gridLayout_7.setObjectName("gridLayout_7")
+        self.gridLayout_7.setObjectName(u"gridLayout_7")
         self.label = SubtitleLabel(self.container_loaded_data_table)
-        self.label.setObjectName("label")
+        self.label.setObjectName(u"label")
 
         self.gridLayout_7.addWidget(self.label, 0, 0, 1, 1)
 
         self.label_showing_data_table = StrongBodyLabel(self.container_loaded_data_table)
-        self.label_showing_data_table.setObjectName("label_showing_data_table")
-        self.label_showing_data_table.setAlignment(
-            Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTrailing
-        )
+        self.label_showing_data_table.setObjectName(u"label_showing_data_table")
+        self.label_showing_data_table.setAlignment(Qt.AlignmentFlag.AlignBottom|Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing)
 
         self.gridLayout_7.addWidget(self.label_showing_data_table, 0, 1, 1, 1)
 
         self.table_view_import_data = TableView(self.container_loaded_data_table)
-        self.table_view_import_data.setObjectName("table_view_import_data")
+        self.table_view_import_data.setObjectName(u"table_view_import_data")
         self.table_view_import_data.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table_view_import_data.setProperty("showDropIndicator", False)
+        self.table_view_import_data.setProperty(u"showDropIndicator", False)
         self.table_view_import_data.setDragDropOverwriteMode(False)
         self.table_view_import_data.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table_view_import_data.setCornerButtonEnabled(False)
@@ -344,45 +323,46 @@ class Ui_MainWindow(object):
 
         self.gridLayout_7.addWidget(self.table_view_import_data, 1, 0, 1, 2)
 
+
         self.horizontalLayout.addWidget(self.container_loaded_data_table)
 
         self.horizontalLayout.setStretch(0, 3)
         self.horizontalLayout.setStretch(1, 6)
         self.stackedWidget.addWidget(self.stacked_page_import)
         self.stacked_page_edit = QWidget()
-        self.stacked_page_edit.setObjectName("stacked_page_edit")
+        self.stacked_page_edit.setObjectName(u"stacked_page_edit")
         self.gridLayout_2 = QGridLayout(self.stacked_page_edit)
-        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.plot_container = QWidget(self.stacked_page_edit)
-        self.plot_container.setObjectName("plot_container")
+        self.plot_container.setObjectName(u"plot_container")
 
         self.gridLayout_2.addWidget(self.plot_container, 0, 0, 1, 1)
 
         self.stackedWidget.addWidget(self.stacked_page_edit)
         self.stacked_page_export = QWidget()
-        self.stacked_page_export.setObjectName("stacked_page_export")
+        self.stacked_page_export.setObjectName(u"stacked_page_export")
         self.gridLayout_3 = QGridLayout(self.stacked_page_export)
-        self.gridLayout_3.setObjectName("gridLayout_3")
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.btn_export_all_results = PushButton(self.stacked_page_export)
-        self.btn_export_all_results.setObjectName("btn_export_all_results")
+        self.btn_export_all_results.setObjectName(u"btn_export_all_results")
         sizePolicy.setHeightForWidth(self.btn_export_all_results.sizePolicy().hasHeightForWidth())
         self.btn_export_all_results.setSizePolicy(sizePolicy)
 
         self.gridLayout_3.addWidget(self.btn_export_all_results, 0, 3, 1, 1)
 
         self.label_4 = SubtitleLabel(self.stacked_page_export)
-        self.label_4.setObjectName("label_4")
+        self.label_4.setObjectName(u"label_4")
 
         self.gridLayout_3.addWidget(self.label_4, 0, 0, 1, 1)
 
         self.tab_widget_result_views = QTabWidget(self.stacked_page_export)
-        self.tab_widget_result_views.setObjectName("tab_widget_result_views")
+        self.tab_widget_result_views.setObjectName(u"tab_widget_result_views")
         self.tab_result_peaks_info = QWidget()
-        self.tab_result_peaks_info.setObjectName("tab_result_peaks_info")
+        self.tab_result_peaks_info.setObjectName(u"tab_result_peaks_info")
         self.verticalLayout_2 = QVBoxLayout(self.tab_result_peaks_info)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.table_view_result_peaks = TableView(self.tab_result_peaks_info)
-        self.table_view_result_peaks.setObjectName("table_view_result_peaks")
+        self.table_view_result_peaks.setObjectName(u"table_view_result_peaks")
         self.table_view_result_peaks.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table_view_result_peaks.setCornerButtonEnabled(False)
         self.table_view_result_peaks.verticalHeader().setVisible(False)
@@ -391,11 +371,11 @@ class Ui_MainWindow(object):
 
         self.tab_widget_result_views.addTab(self.tab_result_peaks_info, "")
         self.tab_result_rate_info = QWidget()
-        self.tab_result_rate_info.setObjectName("tab_result_rate_info")
+        self.tab_result_rate_info.setObjectName(u"tab_result_rate_info")
         self.verticalLayout_4 = QVBoxLayout(self.tab_result_rate_info)
-        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.table_view_result_rate = TableView(self.tab_result_rate_info)
-        self.table_view_result_rate.setObjectName("table_view_result_rate")
+        self.table_view_result_rate.setObjectName(u"table_view_result_rate")
         self.table_view_result_rate.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table_view_result_rate.setCornerButtonEnabled(False)
         self.table_view_result_rate.verticalHeader().setVisible(False)
@@ -404,11 +384,11 @@ class Ui_MainWindow(object):
 
         self.tab_widget_result_views.addTab(self.tab_result_rate_info, "")
         self.tab_result_mpl_widget = QWidget()
-        self.tab_result_mpl_widget.setObjectName("tab_result_mpl_widget")
+        self.tab_result_mpl_widget.setObjectName(u"tab_result_mpl_widget")
         self.verticalLayout = QVBoxLayout(self.tab_result_mpl_widget)
-        self.verticalLayout.setObjectName("verticalLayout")
+        self.verticalLayout.setObjectName(u"verticalLayout")
         self.mpl_widget = MatplotlibWidget(self.tab_result_mpl_widget)
-        self.mpl_widget.setObjectName("mpl_widget")
+        self.mpl_widget.setObjectName(u"mpl_widget")
         sizePolicy2.setHeightForWidth(self.mpl_widget.sizePolicy().hasHeightForWidth())
         self.mpl_widget.setSizePolicy(sizePolicy2)
         self.mpl_widget.setMinimumSize(QSize(500, 0))
@@ -417,11 +397,11 @@ class Ui_MainWindow(object):
 
         self.tab_widget_result_views.addTab(self.tab_result_mpl_widget, "")
         self.tab_result_metadata = QWidget()
-        self.tab_result_metadata.setObjectName("tab_result_metadata")
+        self.tab_result_metadata.setObjectName(u"tab_result_metadata")
         self.gridLayout_4 = QGridLayout(self.tab_result_metadata)
-        self.gridLayout_4.setObjectName("gridLayout_4")
+        self.gridLayout_4.setObjectName(u"gridLayout_4")
         self.tree_view_result_metadata = TreeView(self.tab_result_metadata)
-        self.tree_view_result_metadata.setObjectName("tree_view_result_metadata")
+        self.tree_view_result_metadata.setObjectName(u"tree_view_result_metadata")
 
         self.gridLayout_4.addWidget(self.tree_view_result_metadata, 0, 0, 1, 1)
 
@@ -430,12 +410,12 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addWidget(self.tab_widget_result_views, 1, 0, 1, 4)
 
         self.label_showing_section_result = StrongBodyLabel(self.stacked_page_export)
-        self.label_showing_section_result.setObjectName("label_showing_section_result")
+        self.label_showing_section_result.setObjectName(u"label_showing_section_result")
 
         self.gridLayout_3.addWidget(self.label_showing_section_result, 0, 1, 1, 1)
 
         self.btn_export_to_excel = PushButton(self.stacked_page_export)
-        self.btn_export_to_excel.setObjectName("btn_export_to_excel")
+        self.btn_export_to_excel.setObjectName(u"btn_export_to_excel")
         sizePolicy.setHeightForWidth(self.btn_export_to_excel.sizePolicy().hasHeightForWidth())
         self.btn_export_to_excel.setSizePolicy(sizePolicy)
 
@@ -450,21 +430,21 @@ class Ui_MainWindow(object):
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
-        self.menubar.setObjectName("menubar")
+        self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 1660, 33))
-        self.menu_file = RoundMenu(self.menubar)
-        self.menu_file.setObjectName("menu_file")
-        self.menu_settings = RoundMenu(self.menubar)
-        self.menu_settings.setObjectName("menu_settings")
-        self.menu_view = RoundMenu(self.menubar)
-        self.menu_view.setObjectName("menu_view")
-        self.menu_plot = RoundMenu(self.menubar)
-        self.menu_plot.setObjectName("menu_plot")
-        self.menu_help = RoundMenu(self.menubar)
-        self.menu_help.setObjectName("menu_help")
+        self.menu_file = QMenu(self.menubar)
+        self.menu_file.setObjectName(u"menu_file")
+        self.menu_settings = QMenu(self.menubar)
+        self.menu_settings.setObjectName(u"menu_settings")
+        self.menu_view = QMenu(self.menubar)
+        self.menu_view.setObjectName(u"menu_view")
+        self.menu_plot = QMenu(self.menubar)
+        self.menu_plot.setObjectName(u"menu_plot")
+        self.menu_help = QMenu(self.menubar)
+        self.menu_help.setObjectName(u"menu_help")
         MainWindow.setMenuBar(self.menubar)
         self.tool_bar_file_actions = QToolBar(MainWindow)
-        self.tool_bar_file_actions.setObjectName("tool_bar_file_actions")
+        self.tool_bar_file_actions.setObjectName(u"tool_bar_file_actions")
         self.tool_bar_file_actions.setMovable(False)
         self.tool_bar_file_actions.setAllowedAreas(Qt.ToolBarArea.TopToolBarArea)
         self.tool_bar_file_actions.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
@@ -505,372 +485,181 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.line_edit_active_file.textChanged.connect(MainWindow.setWindowTitle)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(2)
         self.tab_widget_result_views.setCurrentIndex(0)
 
-        QMetaObject.connectSlotsByName(MainWindow)
 
+        QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", "SignalViewer", None))
-        self.action_open_file.setText(QCoreApplication.translate("MainWindow", "Open File", None))
-        self.action_show_settings.setText(QCoreApplication.translate("MainWindow", "Preferences", None))
-        # if QT_CONFIG(tooltip)
-        self.action_show_settings.setToolTip(QCoreApplication.translate("MainWindow", "Modify various settings", None))
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(shortcut)
-        self.action_show_settings.setShortcut(QCoreApplication.translate("MainWindow", "Ctrl+,", None))
-        # endif // QT_CONFIG(shortcut)
-        self.action_edit_metadata.setText(QCoreApplication.translate("MainWindow", "File Metadata", None))
-        # if QT_CONFIG(tooltip)
-        self.action_edit_metadata.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>Open a more detailed view of the current file's metadata.</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(whatsthis)
-        self.action_edit_metadata.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow",
-                '<html><head/><body><p>Shows a dialog window with fields for setting the sampling rate, data source and info source to be used for the current file.</p><p>If any additional metadata exists in the file (and if the app is able to read it and parse it into a python dictionary) it will be displayed as a read-only tree structure.</p><p><br/></p><p>For EDF files, shows the information from the <a href="https://mne.tools/stable/generated/mne.Info.html"><span style=" text-decoration: underline; color:#ff8c00;">Info</span></a> object created by the <a href="https://mne.tools/stable/index.html"><span style=" text-decoration: underline; color:#ff8c00;">mne</span></a> library.</p></body></html>',
-                None,
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        self.action_close_file.setText(QCoreApplication.translate("MainWindow", "Close File", None))
-        # if QT_CONFIG(tooltip)
-        self.action_close_file.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>Close the current file and reset the app state.</p><p>Make sure to export any existing results first, as they will be lost on reset.</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.action_mark_section_done.setText(QCoreApplication.translate("MainWindow", "Mark as Done", None))
-        # if QT_CONFIG(tooltip)
-        self.action_mark_section_done.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>Save the current section's data and lock it to prevent further edits.</p><p>To view or export the data, go to the &quot;Results&quot; page.</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(whatsthis)
-        self.action_mark_section_done.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>Save the current section's data and lock it to prevent further edits.</p><p>To view or export the data, go to the &quot;Results&quot; page.</p><p>To unlock a section, right-click it's name in the section list and select &quot;Unlock Section&quot;.</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        self.action_create_new_section.setText(QCoreApplication.translate("MainWindow", "New Section", None))
-        # if QT_CONFIG(tooltip)
-        self.action_create_new_section.setToolTip(
-            QCoreApplication.translate("MainWindow", "Create a new section", None)
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.action_toggle_auto_scaling.setText(QCoreApplication.translate("MainWindow", "Auto-Scaling", None))
-        # if QT_CONFIG(tooltip)
-        self.action_toggle_auto_scaling.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow", "Automatically adjust the y-axis limits to the visible data range", None
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.action_confirm_section.setText(QCoreApplication.translate("MainWindow", "Confirm Section", None))
-        # if QT_CONFIG(tooltip)
-        self.action_confirm_section.setToolTip(
-            QCoreApplication.translate("MainWindow", "Create a new section with the data of the selected region", None)
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.action_cancel_section.setText(QCoreApplication.translate("MainWindow", "Cancel Section", None))
-        # if QT_CONFIG(tooltip)
-        self.action_cancel_section.setToolTip(
-            QCoreApplication.translate("MainWindow", "Cancel the section creation process", None)
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.action_show_section_overview.setText(QCoreApplication.translate("MainWindow", "Section Overview", None))
-        # if QT_CONFIG(tooltip)
-        self.action_show_section_overview.setToolTip(
-            QCoreApplication.translate("MainWindow", "Shows the current sections as colored regions in the plot", None)
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.action_remove_peaks_in_selection.setText(
-            QCoreApplication.translate("MainWindow", "Remove Peaks in Selection", None)
-        )
-        # if QT_CONFIG(tooltip)
-        self.action_remove_peaks_in_selection.setToolTip(
-            QCoreApplication.translate("MainWindow", "Deletes all peaks inside the selected area", None)
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(shortcut)
-        self.action_remove_peaks_in_selection.setShortcut(QCoreApplication.translate("MainWindow", "Ctrl+D", None))
-        # endif // QT_CONFIG(shortcut)
-        self.action_find_peaks_in_selection.setText(
-            QCoreApplication.translate("MainWindow", "Find Peaks in Selection", None)
-        )
-        # if QT_CONFIG(tooltip)
-        self.action_find_peaks_in_selection.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow", "Detect peaks in just the selected area instead of the entire signal", None
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(shortcut)
-        self.action_find_peaks_in_selection.setShortcut(QCoreApplication.translate("MainWindow", "Ctrl+F", None))
-        # endif // QT_CONFIG(shortcut)
-        self.action_show_user_guide.setText(QCoreApplication.translate("MainWindow", "User Guide", None))
-        # if QT_CONFIG(tooltip)
-        self.action_show_user_guide.setToolTip(QCoreApplication.translate("MainWindow", "User Guide", None))
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(shortcut)
-        self.action_show_user_guide.setShortcut(QCoreApplication.translate("MainWindow", "F1", None))
-        # endif // QT_CONFIG(shortcut)
-        self.action_about_qt.setText(QCoreApplication.translate("MainWindow", "About Qt", None))
-        self.action_about_app.setText(QCoreApplication.translate("MainWindow", "About App", None))
-        # if QT_CONFIG(tooltip)
-        self.action_about_app.setToolTip(QCoreApplication.translate("MainWindow", "About this Application", None))
-        # endif // QT_CONFIG(tooltip)
-        self.action_remove_section.setText(QCoreApplication.translate("MainWindow", "Remove Section", None))
-        # if QT_CONFIG(tooltip)
-        self.action_remove_section.setToolTip(
-            QCoreApplication.translate("MainWindow", "Removes the selected section", None)
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.action_clear_recent_files.setText(QCoreApplication.translate("MainWindow", "Clear Recent Files", None))
-        self.action_unlock_section.setText(QCoreApplication.translate("MainWindow", "Unlock Section", None))
-        # if QT_CONFIG(tooltip)
-        self.action_unlock_section.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>Make a section marked as &quot;Done&quot; editable again.</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(tooltip)
-        self.btn_load_data.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>Loads the data from the columns or channels specified in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(whatsthis)
-        self.btn_load_data.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>Loads the data from the columns or channels specified in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        self.btn_load_data.setText(QCoreApplication.translate("MainWindow", "Load Data", None))
-        self.grp_box_required_info.setTitle(QCoreApplication.translate("MainWindow", "Required Information ", None))
-        # if QT_CONFIG(tooltip)
-        self.samplingRateLabel.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>The sampling rate of the signal in Hz (samples/second)</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(whatsthis)
-        self.samplingRateLabel.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        self.samplingRateLabel.setText(QCoreApplication.translate("MainWindow", "Sampling Rate", None))
-        # if QT_CONFIG(tooltip)
-        self.spin_box_sampling_rate_import_page.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>The sampling rate of the signal values in the file</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(whatsthis)
-        self.spin_box_sampling_rate_import_page.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        self.spin_box_sampling_rate_import_page.setSuffix(QCoreApplication.translate("MainWindow", " Hz", None))
-        # if QT_CONFIG(tooltip)
-        self.signalColumnChannelLabel.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>The column or channel containing the signal values</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(whatsthis)
-        self.signalColumnChannelLabel.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>The column or channel containing the signal values</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        self.signalColumnChannelLabel.setText(QCoreApplication.translate("MainWindow", "Signal Data", None))
-        # if QT_CONFIG(tooltip)
-        self.combo_box_signal_column_import_page.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>The column or channel containing the signal values</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(whatsthis)
-        self.combo_box_signal_column_import_page.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>The column or channel containing the signal values</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        # if QT_CONFIG(tooltip)
-        self.infoColumnChannelLabel.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(whatsthis)
-        self.infoColumnChannelLabel.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        self.infoColumnChannelLabel.setText(QCoreApplication.translate("MainWindow", "Additional Data", None))
-        # if QT_CONFIG(tooltip)
-        self.combo_box_info_column_import_page.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(whatsthis)
-        self.combo_box_info_column_import_page.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        # if QT_CONFIG(whatsthis)
-        self.btn_open_file.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>Opens a window allowing you to choose a file to load into the app.</p><p>The selected file is searched for available columns or channels of data.</p><p>If any are found, their names are made available for selection in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        self.btn_open_file.setText(QCoreApplication.translate("MainWindow", "Open File", None))
-        # if QT_CONFIG(tooltip)
-        self.btn_close_file.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>Close the current file and reset the app state.</p><p>Make sure to export any existing results first, as they will be lost on reset.</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(whatsthis)
-        self.btn_close_file.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>Close the current file and reset the app state.</p><p>Make sure to export any existing results first, as they will be lost on reset.</p></body></html>",
-                None,
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        self.btn_close_file.setText(QCoreApplication.translate("MainWindow", "Close File", None))
-        self.label_2.setText(QCoreApplication.translate("MainWindow", "Data Import", None))
-        self.label_3.setText(QCoreApplication.translate("MainWindow", "Recent Files", None))
-        # if QT_CONFIG(tooltip)
-        self.list_view_recent_files.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow", "<html><head/><body><p>Double-click on a filename to open it</p></body></html>", None
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.label.setText(QCoreApplication.translate("MainWindow", "Data View", None))
-        self.label_showing_data_table.setText(
-            QCoreApplication.translate("MainWindow", "<html><head/><body><p>Showing: -</p></body></html>", None)
-        )
-        # if QT_CONFIG(tooltip)
-        self.table_view_import_data.setToolTip(
-            QCoreApplication.translate(
-                "MainWindow", "<html><head/><body><p>A table showing the current section's data</p></body></html>", None
-            )
-        )
-        # endif // QT_CONFIG(tooltip)
-        self.btn_export_all_results.setText(QCoreApplication.translate("MainWindow", "Save to HDF5 (detailed)", None))
-        self.label_4.setText(QCoreApplication.translate("MainWindow", "Section Data and Results", None))
-        self.tab_widget_result_views.setTabText(
-            self.tab_widget_result_views.indexOf(self.tab_result_peaks_info),
-            QCoreApplication.translate("MainWindow", "Peak Indices", None),
-        )
-        self.tab_widget_result_views.setTabText(
-            self.tab_widget_result_views.indexOf(self.tab_result_rate_info),
-            QCoreApplication.translate("MainWindow", "Calculated Rate / Summary Statistics", None),
-        )
-        self.tab_widget_result_views.setTabText(
-            self.tab_widget_result_views.indexOf(self.tab_result_mpl_widget),
-            QCoreApplication.translate("MainWindow", "Plot View", None),
-        )
-        self.tab_widget_result_views.setTabText(
-            self.tab_widget_result_views.indexOf(self.tab_result_metadata),
-            QCoreApplication.translate("MainWindow", "Metadata", None),
-        )
-        # if QT_CONFIG(tooltip)
-        self.tab_widget_result_views.setTabToolTip(
-            self.tab_widget_result_views.indexOf(self.tab_result_metadata),
-            QCoreApplication.translate(
-                "MainWindow",
-                "<html><head/><body><p>Shows the methods and parameters used to produce the current results.</p></body></html>",
-                None,
-            ),
-        )
-        # endif // QT_CONFIG(tooltip)
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"SignalViewer", None))
+        self.action_open_file.setText(QCoreApplication.translate("MainWindow", u"Open File", None))
+        self.action_show_settings.setText(QCoreApplication.translate("MainWindow", u"Preferences", None))
+#if QT_CONFIG(tooltip)
+        self.action_show_settings.setToolTip(QCoreApplication.translate("MainWindow", u"Modify various settings", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(shortcut)
+        self.action_show_settings.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+,", None))
+#endif // QT_CONFIG(shortcut)
+        self.action_edit_metadata.setText(QCoreApplication.translate("MainWindow", u"File Metadata", None))
+#if QT_CONFIG(tooltip)
+        self.action_edit_metadata.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Open a more detailed view of the current file's metadata.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        self.action_edit_metadata.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Shows a dialog window with fields for setting the sampling rate, data source and info source to be used for the current file.</p><p>If any additional metadata exists in the file (and if the app is able to read it and parse it into a python dictionary) it will be displayed as a read-only tree structure.</p><p><br/></p><p>For EDF files, shows the information from the <a href=\"https://mne.tools/stable/generated/mne.Info.html\"><span style=\" text-decoration: underline; color:#ff8c00;\">Info</span></a> object created by the <a href=\"https://mne.tools/stable/index.html\"><span style=\" text-decoration: underline; color:#ff8c00;\">mne</span></a> library.</p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+        self.action_close_file.setText(QCoreApplication.translate("MainWindow", u"Close File", None))
+#if QT_CONFIG(tooltip)
+        self.action_close_file.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Close the current file and reset the app state.</p><p>Make sure to export any existing results first, as they will be lost on reset.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.action_mark_section_done.setText(QCoreApplication.translate("MainWindow", u"Mark as Done", None))
+#if QT_CONFIG(tooltip)
+        self.action_mark_section_done.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Save the current section's data and lock it to prevent further edits.</p><p>To view or export the data, go to the &quot;Results&quot; page.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        self.action_mark_section_done.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Save the current section's data and lock it to prevent further edits.</p><p>To view or export the data, go to the &quot;Results&quot; page.</p><p>To unlock a section, right-click it's name in the section list and select &quot;Unlock Section&quot;.</p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+        self.action_create_new_section.setText(QCoreApplication.translate("MainWindow", u"New Section", None))
+#if QT_CONFIG(tooltip)
+        self.action_create_new_section.setToolTip(QCoreApplication.translate("MainWindow", u"Create a new section", None))
+#endif // QT_CONFIG(tooltip)
+        self.action_toggle_auto_scaling.setText(QCoreApplication.translate("MainWindow", u"Auto-Scaling", None))
+#if QT_CONFIG(tooltip)
+        self.action_toggle_auto_scaling.setToolTip(QCoreApplication.translate("MainWindow", u"Automatically adjust the y-axis limits to the visible data range", None))
+#endif // QT_CONFIG(tooltip)
+        self.action_confirm_section.setText(QCoreApplication.translate("MainWindow", u"Confirm Section", None))
+#if QT_CONFIG(tooltip)
+        self.action_confirm_section.setToolTip(QCoreApplication.translate("MainWindow", u"Create a new section with the data of the selected region", None))
+#endif // QT_CONFIG(tooltip)
+        self.action_cancel_section.setText(QCoreApplication.translate("MainWindow", u"Cancel Section", None))
+#if QT_CONFIG(tooltip)
+        self.action_cancel_section.setToolTip(QCoreApplication.translate("MainWindow", u"Cancel the section creation process", None))
+#endif // QT_CONFIG(tooltip)
+        self.action_show_section_overview.setText(QCoreApplication.translate("MainWindow", u"Section Overview", None))
+#if QT_CONFIG(tooltip)
+        self.action_show_section_overview.setToolTip(QCoreApplication.translate("MainWindow", u"Shows the current sections as colored regions in the plot", None))
+#endif // QT_CONFIG(tooltip)
+        self.action_remove_peaks_in_selection.setText(QCoreApplication.translate("MainWindow", u"Remove Peaks in Selection", None))
+#if QT_CONFIG(tooltip)
+        self.action_remove_peaks_in_selection.setToolTip(QCoreApplication.translate("MainWindow", u"Deletes all peaks inside the selected area", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(shortcut)
+        self.action_remove_peaks_in_selection.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+D", None))
+#endif // QT_CONFIG(shortcut)
+        self.action_find_peaks_in_selection.setText(QCoreApplication.translate("MainWindow", u"Find Peaks in Selection", None))
+#if QT_CONFIG(tooltip)
+        self.action_find_peaks_in_selection.setToolTip(QCoreApplication.translate("MainWindow", u"Detect peaks in just the selected area instead of the entire signal", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(shortcut)
+        self.action_find_peaks_in_selection.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+F", None))
+#endif // QT_CONFIG(shortcut)
+        self.action_show_user_guide.setText(QCoreApplication.translate("MainWindow", u"User Guide", None))
+#if QT_CONFIG(tooltip)
+        self.action_show_user_guide.setToolTip(QCoreApplication.translate("MainWindow", u"User Guide", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(shortcut)
+        self.action_show_user_guide.setShortcut(QCoreApplication.translate("MainWindow", u"F1", None))
+#endif // QT_CONFIG(shortcut)
+        self.action_about_qt.setText(QCoreApplication.translate("MainWindow", u"About Qt", None))
+        self.action_about_app.setText(QCoreApplication.translate("MainWindow", u"About App", None))
+#if QT_CONFIG(tooltip)
+        self.action_about_app.setToolTip(QCoreApplication.translate("MainWindow", u"About this Application", None))
+#endif // QT_CONFIG(tooltip)
+        self.action_remove_section.setText(QCoreApplication.translate("MainWindow", u"Remove Section", None))
+#if QT_CONFIG(tooltip)
+        self.action_remove_section.setToolTip(QCoreApplication.translate("MainWindow", u"Removes the selected section", None))
+#endif // QT_CONFIG(tooltip)
+        self.action_clear_recent_files.setText(QCoreApplication.translate("MainWindow", u"Clear Recent Files", None))
+        self.action_unlock_section.setText(QCoreApplication.translate("MainWindow", u"Unlock Section", None))
+#if QT_CONFIG(tooltip)
+        self.action_unlock_section.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Make a section marked as &quot;Done&quot; editable again.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.btn_load_data.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Loads the data from the columns or channels specified in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        self.btn_load_data.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Loads the data from the columns or channels specified in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+        self.btn_load_data.setText(QCoreApplication.translate("MainWindow", u"Load Data", None))
+        self.grp_box_required_info.setTitle(QCoreApplication.translate("MainWindow", u"Required Information ", None))
+#if QT_CONFIG(tooltip)
+        self.samplingRateLabel.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>The sampling rate of the signal in Hz (samples/second)</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        self.samplingRateLabel.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.</p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+        self.samplingRateLabel.setText(QCoreApplication.translate("MainWindow", u"Sampling Rate", None))
+#if QT_CONFIG(tooltip)
+        self.spin_box_sampling_rate_import_page.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>The sampling rate of the signal values in the file</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        self.spin_box_sampling_rate_import_page.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.</p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+        self.spin_box_sampling_rate_import_page.setSuffix(QCoreApplication.translate("MainWindow", u" Hz", None))
+#if QT_CONFIG(tooltip)
+        self.signalColumnChannelLabel.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>The column or channel containing the signal values</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        self.signalColumnChannelLabel.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>The column or channel containing the signal values</p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+        self.signalColumnChannelLabel.setText(QCoreApplication.translate("MainWindow", u"Signal Data", None))
+#if QT_CONFIG(tooltip)
+        self.combo_box_signal_column_import_page.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>The column or channel containing the signal values</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        self.combo_box_signal_column_import_page.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>The column or channel containing the signal values</p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+#if QT_CONFIG(tooltip)
+        self.infoColumnChannelLabel.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        self.infoColumnChannelLabel.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+        self.infoColumnChannelLabel.setText(QCoreApplication.translate("MainWindow", u"Additional Data", None))
+#if QT_CONFIG(tooltip)
+        self.combo_box_info_column_import_page.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        self.combo_box_info_column_import_page.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+#if QT_CONFIG(whatsthis)
+        self.btn_open_file.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Opens a window allowing you to choose a file to load into the app.</p><p>The selected file is searched for available columns or channels of data.</p><p>If any are found, their names are made available for selection in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+        self.btn_open_file.setText(QCoreApplication.translate("MainWindow", u"Open File", None))
+#if QT_CONFIG(tooltip)
+        self.btn_close_file.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Close the current file and reset the app state.</p><p>Make sure to export any existing results first, as they will be lost on reset.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        self.btn_close_file.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Close the current file and reset the app state.</p><p>Make sure to export any existing results first, as they will be lost on reset.</p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+        self.btn_close_file.setText(QCoreApplication.translate("MainWindow", u"Close File", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Data Import", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"Recent Files", None))
+#if QT_CONFIG(tooltip)
+        self.list_view_recent_files.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Double-click on a filename to open it</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.label.setText(QCoreApplication.translate("MainWindow", u"Data View", None))
+        self.label_showing_data_table.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Showing: -</p></body></html>", None))
+#if QT_CONFIG(tooltip)
+        self.table_view_import_data.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>A table showing the current section's data</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.btn_export_all_results.setText(QCoreApplication.translate("MainWindow", u"Save to HDF5 (detailed)", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Section Data and Results", None))
+        self.tab_widget_result_views.setTabText(self.tab_widget_result_views.indexOf(self.tab_result_peaks_info), QCoreApplication.translate("MainWindow", u"Peak Indices", None))
+        self.tab_widget_result_views.setTabText(self.tab_widget_result_views.indexOf(self.tab_result_rate_info), QCoreApplication.translate("MainWindow", u"Calculated Rate / Summary Statistics", None))
+        self.tab_widget_result_views.setTabText(self.tab_widget_result_views.indexOf(self.tab_result_mpl_widget), QCoreApplication.translate("MainWindow", u"Plot View", None))
+        self.tab_widget_result_views.setTabText(self.tab_widget_result_views.indexOf(self.tab_result_metadata), QCoreApplication.translate("MainWindow", u"Metadata", None))
+#if QT_CONFIG(tooltip)
+        self.tab_widget_result_views.setTabToolTip(self.tab_widget_result_views.indexOf(self.tab_result_metadata), QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Shows the methods and parameters used to produce the current results.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.label_showing_section_result.setText("")
-        self.btn_export_to_excel.setText(QCoreApplication.translate("MainWindow", "Save to Excel", None))
-        self.menu_file.setTitle(QCoreApplication.translate("MainWindow", "File", None))
-        self.menu_settings.setTitle(QCoreApplication.translate("MainWindow", "Settings", None))
-        self.menu_view.setTitle(QCoreApplication.translate("MainWindow", "View", None))
-        self.menu_plot.setTitle(QCoreApplication.translate("MainWindow", "Plot", None))
-        self.menu_help.setTitle(QCoreApplication.translate("MainWindow", "Help", None))
-        self.tool_bar_file_actions.setWindowTitle(QCoreApplication.translate("MainWindow", "Editing Toolbar", None))
-
+        self.btn_export_to_excel.setText(QCoreApplication.translate("MainWindow", u"Save to Excel", None))
+        self.menu_file.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
+        self.menu_settings.setTitle(QCoreApplication.translate("MainWindow", u"Settings", None))
+        self.menu_view.setTitle(QCoreApplication.translate("MainWindow", u"View", None))
+        self.menu_plot.setTitle(QCoreApplication.translate("MainWindow", u"Plot", None))
+        self.menu_help.setTitle(QCoreApplication.translate("MainWindow", u"Help", None))
+        self.tool_bar_file_actions.setWindowTitle(QCoreApplication.translate("MainWindow", u"Editing Toolbar", None))
     # retranslateUi
+

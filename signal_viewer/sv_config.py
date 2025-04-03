@@ -5,7 +5,7 @@ import attrs
 import pyside_config as qconfig
 from PySide6 import QtCore, QtGui, QtWidgets
 from pyside_config.helpers import make_combo_box_info, make_spin_box_info
-from pyside_widgets import AnimatedToggle, ColorPickerButton, EnumComboBox
+from pyside_widgets import AnimatedToggleSwitch, ColorPickerButton, EnumComboBox
 
 from signal_viewer.enum_defs import RateComputationMethod, TextFileSeparator
 from signal_viewer.utils import get_app_dir, make_qcolor, search_enum
@@ -86,7 +86,7 @@ class EditingConfig:
         metadata={
             "editor": qconfig.EditorWidgetInfo(
                 label="Filter stacking",
-                widget_factory=AnimatedToggle,
+                widget_factory=AnimatedToggleSwitch,
                 sig_value_changed="toggled",
                 set_value_method="setChecked",
             ),

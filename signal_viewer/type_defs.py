@@ -42,7 +42,7 @@ class PGBrushKwargs(t.TypedDict, total=False):
 PGPen = t.Union[PGColor, "QtGui.QPen", PGPenKwargs, None]
 PGBrush = t.Union[PGColor, "QtGui.QBrush", PGBrushKwargs, None]
 
-PGPointSymbols = t.Union[PointSymbols, "QtGui.QPainterPath"]
+PGPointSymbols = t.Union[PointSymbols, "QtGui.QPainterPath", str]
 
 UpdatePeaksAction = t.Literal["add", "remove"]
 
@@ -94,8 +94,8 @@ class SpotDict(t.TypedDict):
 
 class SpotItemSetDataKwargs(t.TypedDict, total=False):
     spots: list[SpotDict]
-    x: npt.NDArray[np.float64 | np.intp | np.uintp] | t.Sequence[float | int]
-    y: npt.NDArray[np.float64 | np.intp | np.uintp] | t.Sequence[float | int]
+    x: npt.NDArray[np.float64 | np.intp | np.uintp] | t.Iterable[float | int]
+    y: npt.NDArray[np.float64 | np.intp | np.uintp] | t.Iterable[float | int]
     pos: npt.NDArray[np.float64 | np.intp] | list[tuple[float, float]]
     pxMode: bool
     symbol: PGPointSymbols
@@ -158,6 +158,21 @@ class PlotDataItemKwargs(t.TypedDict, total=False):
     skipFiniteCheck: bool
     name: str
     clickable: bool
+
+
+class PlotCurveItemKwargs(t.TypedDict, total=False):
+    x: npt.ArrayLike | None
+    y: npt.ArrayLike | None
+    pen: PGPen | None
+    shadowPen: PGPen | None
+    fillLevel: float | None
+    fillOutline: bool
+    brush: PGBrush | None
+    antialias: bool
+    stepMode: t.Literal["", "center", "left", "right"] | None
+    connect: t.Literal["all", "pairs", "finite"] | npt.NDArray[np.bool]
+    compositionMode: "QtGui.QPainter.CompositionMode"
+    skipFiniteCheck: bool
 
 
 class PlotDataItemOpts(t.TypedDict):

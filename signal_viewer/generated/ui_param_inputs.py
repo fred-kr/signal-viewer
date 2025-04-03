@@ -20,9 +20,9 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QFormLayout, QFrame,
     QSpacerItem, QStackedWidget, QTabWidget, QToolButton,
     QVBoxLayout, QWidget)
 
-from decimal_spin_box import DecimalSpinBox
-from enum_combo_box import EnumComboBox
-from . import resources_rc
+from pyside_widgets.decimal_spin_box import DecimalSpinBox
+from pyside_widgets.enum_combo_box import EnumComboBox
+from .. import rc_resources
 
 class Ui_containerParamInputs(object):
     def setupUi(self, containerParamInputs):
@@ -39,9 +39,57 @@ class Ui_containerParamInputs(object):
         self.tab_processing.setObjectName(u"tab_processing")
         self.gridLayout = QGridLayout(self.tab_processing)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.status_filter = QToolButton(self.tab_processing)
+        self.status_filter.setObjectName(u"status_filter")
+        self.status_filter.setEnabled(False)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.status_filter.sizePolicy().hasHeightForWidth())
+        self.status_filter.setSizePolicy(sizePolicy)
+        self.status_filter.setCheckable(True)
+
+        self.gridLayout.addWidget(self.status_filter, 4, 1, 1, 1, Qt.AlignmentFlag.AlignRight)
+
+        self.label_8 = QLabel(self.tab_processing)
+        self.label_8.setObjectName(u"label_8")
+        sizePolicy.setHeightForWidth(self.label_8.sizePolicy().hasHeightForWidth())
+        self.label_8.setSizePolicy(sizePolicy)
+        self.label_8.setMinimumSize(QSize(0, 24))
+
+        self.gridLayout.addWidget(self.label_8, 8, 0, 1, 1)
+
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.gridLayout.addItem(self.verticalSpacer, 10, 0, 1, 2)
+        self.gridLayout.addItem(self.verticalSpacer, 11, 0, 1, 2)
+
+        self.std_method = EnumComboBox(self.tab_processing)
+        self.std_method.setObjectName(u"std_method")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.std_method.sizePolicy().hasHeightForWidth())
+        self.std_method.setSizePolicy(sizePolicy1)
+
+        self.gridLayout.addWidget(self.std_method, 9, 0, 1, 2)
+
+        self.status_pipeline = QToolButton(self.tab_processing)
+        self.status_pipeline.setObjectName(u"status_pipeline")
+        self.status_pipeline.setEnabled(False)
+        sizePolicy.setHeightForWidth(self.status_pipeline.sizePolicy().hasHeightForWidth())
+        self.status_pipeline.setSizePolicy(sizePolicy)
+        self.status_pipeline.setCheckable(True)
+
+        self.gridLayout.addWidget(self.status_pipeline, 1, 1, 1, 1, Qt.AlignmentFlag.AlignRight)
+
+        self.status_standardization = QToolButton(self.tab_processing)
+        self.status_standardization.setObjectName(u"status_standardization")
+        self.status_standardization.setEnabled(False)
+        sizePolicy.setHeightForWidth(self.status_standardization.sizePolicy().hasHeightForWidth())
+        self.status_standardization.setSizePolicy(sizePolicy)
+        self.status_standardization.setCheckable(True)
+
+        self.gridLayout.addWidget(self.status_standardization, 8, 1, 1, 1, Qt.AlignmentFlag.AlignRight)
 
         self.groupBox = QGroupBox(self.tab_processing)
         self.groupBox.setObjectName(u"groupBox")
@@ -100,50 +148,7 @@ class Ui_containerParamInputs(object):
         self.formLayout_2.setWidget(4, QFormLayout.FieldRole, self.sf_powerline)
 
 
-        self.gridLayout.addWidget(self.groupBox, 5, 0, 1, 2)
-
-        self.label_2 = QLabel(self.tab_processing)
-        self.label_2.setObjectName(u"label_2")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
-        self.label_2.setSizePolicy(sizePolicy)
-        self.label_2.setMinimumSize(QSize(0, 24))
-
-        self.gridLayout.addWidget(self.label_2, 3, 0, 1, 1)
-
-        self.label = QLabel(self.tab_processing)
-        self.label.setObjectName(u"label")
-        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
-        self.label.setSizePolicy(sizePolicy)
-        self.label.setMinimumSize(QSize(0, 24))
-
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
-
-        self.line = QFrame(self.tab_processing)
-        self.line.setObjectName(u"line")
-        self.line.setFrameShape(QFrame.Shape.HLine)
-        self.line.setFrameShadow(QFrame.Shadow.Sunken)
-
-        self.gridLayout.addWidget(self.line, 2, 0, 1, 2)
-
-        self.sf_method = EnumComboBox(self.tab_processing)
-        self.sf_method.setObjectName(u"sf_method")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.sf_method.sizePolicy().hasHeightForWidth())
-        self.sf_method.setSizePolicy(sizePolicy1)
-
-        self.gridLayout.addWidget(self.sf_method, 4, 0, 1, 2)
-
-        self.std_method = EnumComboBox(self.tab_processing)
-        self.std_method.setObjectName(u"std_method")
-        sizePolicy1.setHeightForWidth(self.std_method.sizePolicy().hasHeightForWidth())
-        self.std_method.setSizePolicy(sizePolicy1)
-
-        self.gridLayout.addWidget(self.std_method, 8, 0, 1, 2)
+        self.gridLayout.addWidget(self.groupBox, 6, 0, 1, 2)
 
         self.groupBox_3 = QGroupBox(self.tab_processing)
         self.groupBox_3.setObjectName(u"groupBox_3")
@@ -181,56 +186,57 @@ class Ui_containerParamInputs(object):
         self.formLayout_3.setWidget(1, QFormLayout.FieldRole, self.std_window_size)
 
 
-        self.gridLayout.addWidget(self.groupBox_3, 9, 0, 1, 2)
+        self.gridLayout.addWidget(self.groupBox_3, 10, 0, 1, 2)
+
+        self.line = QFrame(self.tab_processing)
+        self.line.setObjectName(u"line")
+        self.line.setFrameShape(QFrame.Shape.HLine)
+        self.line.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.gridLayout.addWidget(self.line, 3, 0, 1, 2)
+
+        self.label_2 = QLabel(self.tab_processing)
+        self.label_2.setObjectName(u"label_2")
+        sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
+        self.label_2.setSizePolicy(sizePolicy)
+        self.label_2.setMinimumSize(QSize(0, 24))
+
+        self.gridLayout.addWidget(self.label_2, 4, 0, 1, 1)
+
+        self.label = QLabel(self.tab_processing)
+        self.label.setObjectName(u"label")
+        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy)
+        self.label.setMinimumSize(QSize(0, 24))
+
+        self.gridLayout.addWidget(self.label, 1, 0, 1, 1)
 
         self.sf_pipeline = EnumComboBox(self.tab_processing)
         self.sf_pipeline.setObjectName(u"sf_pipeline")
         sizePolicy1.setHeightForWidth(self.sf_pipeline.sizePolicy().hasHeightForWidth())
         self.sf_pipeline.setSizePolicy(sizePolicy1)
 
-        self.gridLayout.addWidget(self.sf_pipeline, 1, 0, 1, 2)
-
-        self.label_8 = QLabel(self.tab_processing)
-        self.label_8.setObjectName(u"label_8")
-        sizePolicy.setHeightForWidth(self.label_8.sizePolicy().hasHeightForWidth())
-        self.label_8.setSizePolicy(sizePolicy)
-        self.label_8.setMinimumSize(QSize(0, 24))
-
-        self.gridLayout.addWidget(self.label_8, 7, 0, 1, 1)
+        self.gridLayout.addWidget(self.sf_pipeline, 2, 0, 1, 2)
 
         self.line_2 = QFrame(self.tab_processing)
         self.line_2.setObjectName(u"line_2")
         self.line_2.setFrameShape(QFrame.Shape.HLine)
         self.line_2.setFrameShadow(QFrame.Shadow.Sunken)
 
-        self.gridLayout.addWidget(self.line_2, 6, 0, 1, 2)
+        self.gridLayout.addWidget(self.line_2, 7, 0, 1, 2)
 
-        self.status_pipeline = QToolButton(self.tab_processing)
-        self.status_pipeline.setObjectName(u"status_pipeline")
-        self.status_pipeline.setEnabled(False)
-        sizePolicy.setHeightForWidth(self.status_pipeline.sizePolicy().hasHeightForWidth())
-        self.status_pipeline.setSizePolicy(sizePolicy)
-        self.status_pipeline.setCheckable(True)
+        self.sf_method = EnumComboBox(self.tab_processing)
+        self.sf_method.setObjectName(u"sf_method")
+        sizePolicy1.setHeightForWidth(self.sf_method.sizePolicy().hasHeightForWidth())
+        self.sf_method.setSizePolicy(sizePolicy1)
 
-        self.gridLayout.addWidget(self.status_pipeline, 0, 1, 1, 1, Qt.AlignmentFlag.AlignRight)
+        self.gridLayout.addWidget(self.sf_method, 5, 0, 1, 2)
 
-        self.status_filter = QToolButton(self.tab_processing)
-        self.status_filter.setObjectName(u"status_filter")
-        self.status_filter.setEnabled(False)
-        sizePolicy.setHeightForWidth(self.status_filter.sizePolicy().hasHeightForWidth())
-        self.status_filter.setSizePolicy(sizePolicy)
-        self.status_filter.setCheckable(True)
+        self.sf_command_bar = QFrame(self.tab_processing)
+        self.sf_command_bar.setObjectName(u"sf_command_bar")
+        self.sf_command_bar.setFrameShape(QFrame.Shape.StyledPanel)
 
-        self.gridLayout.addWidget(self.status_filter, 3, 1, 1, 1, Qt.AlignmentFlag.AlignRight)
-
-        self.status_standardization = QToolButton(self.tab_processing)
-        self.status_standardization.setObjectName(u"status_standardization")
-        self.status_standardization.setEnabled(False)
-        sizePolicy.setHeightForWidth(self.status_standardization.sizePolicy().hasHeightForWidth())
-        self.status_standardization.setSizePolicy(sizePolicy)
-        self.status_standardization.setCheckable(True)
-
-        self.gridLayout.addWidget(self.status_standardization, 7, 1, 1, 1, Qt.AlignmentFlag.AlignRight)
+        self.gridLayout.addWidget(self.sf_command_bar, 0, 0, 1, 2)
 
         icon = QIcon()
         icon.addFile(u":/icons/BeakerEdit.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
@@ -239,15 +245,10 @@ class Ui_containerParamInputs(object):
         self.tab_peak.setObjectName(u"tab_peak")
         self.gridLayout_2 = QGridLayout(self.tab_peak)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.detectionMethodLabel = QLabel(self.tab_peak)
-        self.detectionMethodLabel.setObjectName(u"detectionMethodLabel")
-
-        self.gridLayout_2.addWidget(self.detectionMethodLabel, 0, 0, 1, 1)
-
         self.peak_method = EnumComboBox(self.tab_peak)
         self.peak_method.setObjectName(u"peak_method")
 
-        self.gridLayout_2.addWidget(self.peak_method, 1, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.peak_method, 2, 0, 1, 1)
 
         self.groupBox_2 = QGroupBox(self.tab_peak)
         self.groupBox_2.setObjectName(u"groupBox_2")
@@ -397,6 +398,9 @@ class Ui_containerParamInputs(object):
 
         self.peak_ecg_nk_smoothwindow = DecimalSpinBox(self.page_peak_ecg_nk)
         self.peak_ecg_nk_smoothwindow.setObjectName(u"peak_ecg_nk_smoothwindow")
+        self.peak_ecg_nk_smoothwindow.setProperty(u"decimals", 0)
+        self.peak_ecg_nk_smoothwindow.setProperty(u"f_minimum", 0.000000000000000)
+        self.peak_ecg_nk_smoothwindow.setProperty(u"f_singleStep", 0.000000000000000)
 
         self.formLayout_8.setWidget(0, QFormLayout.FieldRole, self.peak_ecg_nk_smoothwindow)
 
@@ -527,11 +531,22 @@ class Ui_containerParamInputs(object):
         self.verticalLayout_3.addWidget(self.stacked_widget_peak)
 
 
-        self.gridLayout_2.addWidget(self.groupBox_2, 2, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.groupBox_2, 3, 0, 1, 1)
 
         self.verticalSpacer_2 = QSpacerItem(20, 254, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.gridLayout_2.addItem(self.verticalSpacer_2, 3, 0, 1, 1)
+        self.gridLayout_2.addItem(self.verticalSpacer_2, 4, 0, 1, 1)
+
+        self.detectionMethodLabel = QLabel(self.tab_peak)
+        self.detectionMethodLabel.setObjectName(u"detectionMethodLabel")
+
+        self.gridLayout_2.addWidget(self.detectionMethodLabel, 1, 0, 1, 1)
+
+        self.peak_command_bar = QFrame(self.tab_peak)
+        self.peak_command_bar.setObjectName(u"peak_command_bar")
+        self.peak_command_bar.setFrameShape(QFrame.Shape.StyledPanel)
+
+        self.gridLayout_2.addWidget(self.peak_command_bar, 0, 0, 1, 1)
 
         icon1 = QIcon()
         icon1.addFile(u":/icons/Search.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
@@ -592,7 +607,7 @@ class Ui_containerParamInputs(object):
         self.retranslateUi(containerParamInputs)
 
         self.tab_widget_params.setCurrentIndex(0)
-        self.stacked_widget_peak.setCurrentIndex(0)
+        self.stacked_widget_peak.setCurrentIndex(4)
 
 
         QMetaObject.connectSlotsByName(containerParamInputs)
@@ -600,21 +615,20 @@ class Ui_containerParamInputs(object):
 
     def retranslateUi(self, containerParamInputs):
         containerParamInputs.setWindowTitle(QCoreApplication.translate("containerParamInputs", u"Form", None))
+        self.label_8.setText(QCoreApplication.translate("containerParamInputs", u"Standardization Method", None))
         self.groupBox.setTitle(QCoreApplication.translate("containerParamInputs", u"Filter Parameters", None))
         self.label_3.setText(QCoreApplication.translate("containerParamInputs", u"Lower cutoff", None))
         self.label_4.setText(QCoreApplication.translate("containerParamInputs", u"Upper cutoff", None))
         self.label_5.setText(QCoreApplication.translate("containerParamInputs", u"Order", None))
         self.label_6.setText(QCoreApplication.translate("containerParamInputs", u"Window Size", None))
         self.label_7.setText(QCoreApplication.translate("containerParamInputs", u"Powerline", None))
-        self.label_2.setText(QCoreApplication.translate("containerParamInputs", u"Filter Method", None))
-        self.label.setText(QCoreApplication.translate("containerParamInputs", u"Pipeline", None))
         self.groupBox_3.setTitle(QCoreApplication.translate("containerParamInputs", u"Standardization Parameters", None))
         self.label_10.setText(QCoreApplication.translate("containerParamInputs", u"Use rolling window", None))
         self.std_rolling_window.setText("")
         self.label_9.setText(QCoreApplication.translate("containerParamInputs", u"Window Size", None))
-        self.label_8.setText(QCoreApplication.translate("containerParamInputs", u"Standardization Method", None))
+        self.label_2.setText(QCoreApplication.translate("containerParamInputs", u"Filter Method", None))
+        self.label.setText(QCoreApplication.translate("containerParamInputs", u"Pipeline", None))
         self.tab_widget_params.setTabText(self.tab_widget_params.indexOf(self.tab_processing), QCoreApplication.translate("containerParamInputs", u"Preprocessing", None))
-        self.detectionMethodLabel.setText(QCoreApplication.translate("containerParamInputs", u"Detection Method", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("containerParamInputs", u"Method Parameters", None))
         self.label_11.setText(QCoreApplication.translate("containerParamInputs", u"Peak Window", None))
         self.label_12.setText(QCoreApplication.translate("containerParamInputs", u"Beat Window", None))
@@ -639,6 +653,7 @@ class Ui_containerParamInputs(object):
         self.label_31.setText(QCoreApplication.translate("containerParamInputs", u"Threshold", None))
         self.label_29.setText(QCoreApplication.translate("containerParamInputs", u"Gaussian SD", None))
         self.label_32.setText(QCoreApplication.translate("containerParamInputs", u"Selected method doesn't have any adjustable parameters.", None))
+        self.detectionMethodLabel.setText(QCoreApplication.translate("containerParamInputs", u"Detection Method", None))
         self.tab_widget_params.setTabText(self.tab_widget_params.indexOf(self.tab_peak), QCoreApplication.translate("containerParamInputs", u"Peak Detection", None))
         self.label_35.setText(QCoreApplication.translate("containerParamInputs", u"Incomplete window handling method", None))
         self.label_34.setText(QCoreApplication.translate("containerParamInputs", u"New window every", None))

@@ -10,3 +10,4 @@ wheels/
 .venv
 
 compile_doc.ps1
+testing_stuff.py

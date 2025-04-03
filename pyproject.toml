@@ -3,38 +3,35 @@ name = "signal-viewer"
 version = "0.1.0.dev0"
 description = "A GUI for working with (biological) signal data."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
-    "attrs>=24.3.0",
+    "attrs>=25.3.0",
     "loguru>=0.7.3",
     "mne>=1.9.0",
     "numexpr>=2.10.2",
-    "numpy>=2.2.1",
-    "polars[excel]>=1.18.0",
-    "pyarrow>=18.1.0",
-    "pyjanitor>=0.30.0",
-    "pyopengl>=3.1.7",
-    "pyopengl-accelerate>=3.1.7",
-    "pyqtgraph",
-    "pyside-config",
-    "pyside6==6.8.1",
+    "numpy>=2.2.4",
+    "polars[excel]>=1.26.0",
+    "pyarrow>=19.0.1",
+    "pyjanitor>=0.31.0",
+    "pyopengl>=3.1.9",
+    "pyopengl-accelerate>=3.1.9",
+    "pyside6>=6.9.0",
     "pywavelets>=1.8.0",
-    "scipy>=1.14.1",
-    "tables>=3.10.1",
-    "ts2vg>=1.2.4",
-    "wfdb>=4.1.2",
-    "pyside6-fluent-widgets>=1.7.4",
-    "scikit-learn>=1.6.0",
+    "scipy>=1.15.2",
+    "tables>=3.10.2",
+    "wfdb>=4.3.0",
+    "pyside6-fluent-widgets>=1.7.6",
+    "scikit-learn>=1.6.1",
     "neurokit2>=0.2.10",
+    "pyqtgraph",
     "pyside-widgets",
+    "pyside-config",
+    "ts2vg",
 ]
 
-[tool.uv.sources]
-pyopengl = { git = "https://github.com/mcfletch/pyopengl", tag = "release-3.1.8" }
-pyopengl_accelerate = { git = "https://github.com/mcfletch/pyopengl", tag = "release-3.1.8", subdirectory = "accelerate" }
-pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph.git" }
-pyside-config = { git = "https://github.com/fred-kr/pyside-config.git" }
-pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets.git" }
+# [tool.uv.sources]
+# pyopengl = { git = "https://github.com/mcfletch/pyopengl", tag = "release-3.1.8" }
+# pyopengl_accelerate = { git = "https://github.com/mcfletch/pyopengl", tag = "release-3.1.8", subdirectory = "accelerate" }
 
 [build-system]
 requires = ["hatchling"]
@@ -42,8 +39,8 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pyinstaller>=6.11.1",
-    "pyinstaller-hooks-contrib>=2024.10",
+    "pyinstaller>=6.12.0",
+    "pyinstaller-hooks-contrib>=2025.2",
 ]
 
 [project.scripts]
@@ -54,3 +51,9 @@ include = [
     "pyproject.toml",
     "signal_viewer/**/*",
 ]
+
+[tool.uv.sources]
+pyside-config = { git = "https://github.com/fred-kr/pyside-config.git" }
+ts2vg = { git = "https://github.com/CarlosBergillos/ts2vg.git" }
+pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets.git" }
+pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }

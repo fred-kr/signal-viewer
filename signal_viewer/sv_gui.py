@@ -197,7 +197,7 @@ class SVGUI(QtWidgets.QMainWindow):
     def _setup_actions(self) -> None:
         self.action_show_section_summary = QtGui.QAction(QtGui.QIcon("://icons/Info"), "Show Section Summary", self)
 
-        self.action_toggle_whats_this_mode = QtWidgets.QWhatsThis().createAction(self)
+        self.action_toggle_whats_this_mode = QtWidgets.QWhatsThis.createAction(self)
         self.action_toggle_whats_this_mode.setIcon(QtGui.QIcon("://icons/Question"))
 
         self.action_export_to_csv = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to CSV")

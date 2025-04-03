@@ -29,7 +29,7 @@
    <item>
     <widget class="QTabWidget" name="tab_widget_params">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -43,7 +43,42 @@
        <string>Preprocessing</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="10" column="0" colspan="2">
+       <item row="4" column="1" alignment="Qt::AlignmentFlag::AlignRight">
+        <widget class="QToolButton" name="status_filter">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Standardization Method</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0" colspan="2">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Orientation::Vertical</enum>
@@ -56,7 +91,49 @@
          </property>
         </spacer>
        </item>
-       <item row="5" column="0" colspan="2">
+       <item row="9" column="0" colspan="2">
+        <widget class="EnumComboBox" name="std_method">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" alignment="Qt::AlignmentFlag::AlignRight">
+        <widget class="QToolButton" name="status_pipeline">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1" alignment="Qt::AlignmentFlag::AlignRight">
+        <widget class="QToolButton" name="status_standardization">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
           <string>Filter Parameters</string>
@@ -121,72 +198,7 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>24</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Filter Method</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>24</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Pipeline</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="EnumComboBox" name="sf_method">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0" colspan="2">
-        <widget class="EnumComboBox" name="std_method">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0" colspan="2">
+       <item row="10" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
           <string>Standardization Parameters</string>
@@ -262,18 +274,15 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="EnumComboBox" name="sf_pipeline">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+       <item row="3" column="0" colspan="2">
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_8">
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_2">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -287,62 +296,60 @@
           </size>
          </property>
          <property name="text">
-          <string>Standardization Method</string>
+          <string>Filter Method</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="0" colspan="2">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Pipeline</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="EnumComboBox" name="sf_pipeline">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="2">
         <widget class="Line" name="line_2">
          <property name="orientation">
           <enum>Qt::Orientation::Horizontal</enum>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" alignment="Qt::AlignmentFlag::AlignRight">
-        <widget class="QToolButton" name="status_pipeline">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
+       <item row="5" column="0" colspan="2">
+        <widget class="EnumComboBox" name="sf_method">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="3" column="1" alignment="Qt::AlignmentFlag::AlignRight">
-        <widget class="QToolButton" name="status_filter">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1" alignment="Qt::AlignmentFlag::AlignRight">
-        <widget class="QToolButton" name="status_standardization">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
+       <item row="0" column="0" colspan="2">
+        <widget class="QFrame" name="sf_command_bar">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
         </widget>
        </item>
@@ -357,30 +364,10 @@
        <string>Peak Detection</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <widget class="QLabel" name="detectionMethodLabel">
-         <property name="text">
-          <string>Detection Method</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>254</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="EnumComboBox" name="peak_method"/>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
           <string>Method Parameters</string>
@@ -706,27 +693,29 @@
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="DecimalSpinBox" name="decimalSpinBox">
-         <property name="decimals" stdset="0">
-          <number>0</number>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
-         <property name="f_minimum" stdset="0">
-          <double>0.000000000000000</double>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>254</height>
+          </size>
          </property>
-         <property name="f_maximum" stdset="0">
-          <double>0.000000000000000</double>
+        </spacer>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="detectionMethodLabel">
+         <property name="text">
+          <string>Detection Method</string>
          </property>
-         <property name="f_singleStep" stdset="0">
-          <double>0.000000000000000</double>
-         </property>
-         <property name="prefix" stdset="0">
-          <string/>
-         </property>
-         <property name="suffix" stdset="0">
-          <string/>
-         </property>
-         <property name="floatValue" stdset="0">
-          <double>0.000000000000000</double>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QFrame" name="peak_command_bar">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
         </widget>
        </item>
@@ -781,12 +770,12 @@
   <customwidget>
    <class>DecimalSpinBox</class>
    <extends>QAbstractSpinBox</extends>
-   <header>decimal_spin_box</header>
+   <header>pyside_widgets.decimal_spin_box</header>
   </customwidget>
   <customwidget>
    <class>EnumComboBox</class>
    <extends>QComboBox</extends>
-   <header>enum_combo_box</header>
+   <header>pyside_widgets.enum_combo_box</header>
   </customwidget>
  </customwidgets>
  <resources>

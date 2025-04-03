@@ -98,6 +98,35 @@ class NK2ECGPeakDetectionMethod(enum.StrEnum):
     Rodrigues2020 = "rodrigues2020"
     # Zong2003 = "zong2003"  # think this is the same as the method used in the `wfdb` package
 
+class PeakDetectionAlgorithm(enum.StrEnum):
+    """
+    Available peak detection algorithms.
+    """
+    # PPG methods
+    PPGElgendi = "ppg_elgendi"
+    # ECG methods
+    ECGNeuroKit = "neurokit"
+    ECGEmrich2023 = "emrich2023"
+    ECGGamboa2008 = "gamboa2008"
+    ECGPromac = "promac"
+    ECGXQRS = "wfdb_xqrs"
+    # below methods dont have any adjustable parameters
+    ECGPanTompkins1985 = "pantompkins"
+    ECGNabian2018 = "nabian2018"
+    ECGHamilton2002 = "hamilton2002"
+    ECGChristov2004 = "christov2004"
+    ECGEngzee2012 = "engzee2012"
+    ECGManikandan2012 = "manikandan2012"
+    ECGElgendi2010 = "elgendi2010"
+    ECGKalidas2017 = "kalidas2017"
+    ECGMartinez2004 = "martinez2004"
+    ECGRodrigues2020 = "rodrigues2020"
+    # Other methods
+    LocalMaxima = "local_maxima"
+    LocalMinima = "local_minima"
+    
+    
+    
 
 class WFDBPeakDirection(enum.StrEnum):
     Up = "up"
