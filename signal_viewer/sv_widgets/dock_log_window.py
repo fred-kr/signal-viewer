@@ -1,7 +1,5 @@
 import enum
-import typing as t
 
-import qfluentwidgets as qfw
 from loguru import logger
 from PySide6 import QtCore, QtGui, QtWidgets
 
@@ -9,8 +7,8 @@ import signal_viewer.type_defs as _t
 from signal_viewer.enum_defs import LogLevel
 
 
-class LoggingWindow(qfw.TextEdit):
-    sig_log_message: t.ClassVar[QtCore.Signal] = QtCore.Signal(str, enum.IntEnum, dict)
+class LoggingWindow(QtWidgets.QTextEdit):
+    sig_log_message: QtCore.Signal = QtCore.Signal(str, enum.IntEnum, dict)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
@@ -33,7 +31,7 @@ class LoggingWindow(qfw.TextEdit):
 
     @QtCore.Slot(QtCore.QPoint)
     def show_context_menu(self, pos: QtCore.QPoint) -> None:
-        menu = qfw.RoundMenu(parent=self)
+        menu = QtWidgets.QMenu(parent=self)
         menu.addAction(self.action_clear_log)
         menu.exec(self.mapToGlobal(pos))
 

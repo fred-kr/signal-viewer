@@ -8,7 +8,6 @@ import numpy.typing as npt
 from signal_viewer.enum_defs import (
     FilterMethod,
     IncompleteWindowMethod,
-    NK2ECGPeakDetectionMethod,
     PointSymbols,
     StandardizationMethod,
     SVGColors,
@@ -235,13 +234,13 @@ class PeaksLocalMinima(t.TypedDict):
     min_distance: int
 
 
-class PeaksWFDBXQRS(t.TypedDict):
+class PeaksECGXQRS(t.TypedDict):
     search_radius: int
     peak_dir: WFDBPeakDirection
     min_peak_distance: int
 
 
-class NK2PeaksNeuroKit(t.TypedDict):
+class PeaksECGNeuroKit(t.TypedDict):
     smoothwindow: float
     avgwindow: float
     gradthreshweight: float
@@ -249,40 +248,43 @@ class NK2PeaksNeuroKit(t.TypedDict):
     mindelay: float
 
 
-class NK2PeaksGamboa(t.TypedDict):
+class PeaksECGGamboa(t.TypedDict):
     tol: float
 
 
-class NK2PeaksEmrich(t.TypedDict):
+class PeaksECGEmrich(t.TypedDict):
     window_seconds: float  # seconds
     window_overlap: float  # percentage (0-1)
     accelerated: bool
 
 
-class NK2PeaksPromac(t.TypedDict):
+class PeaksECGPromac(t.TypedDict):
     threshold: float
     gaussian_sd: int  # milliseconds
 
 
-NK2PeakMethodParams = t.Union[NK2PeaksNeuroKit, NK2PeaksGamboa, NK2PeaksPromac, NK2PeaksEmrich]
+# NK2PeakMethodParams = t.Union[PeaksECGNeuroKit, PeaksECGGamboa, PeaksECGPromac, PeaksECGEmrich]
 
 
-class PeaksECGNeuroKit2(t.TypedDict):
-    method: NK2ECGPeakDetectionMethod
-    params: t.Union[NK2PeakMethodParams, None]
+# class PeaksECGNeuroKit2(t.TypedDict):
+#     method: NK2ECGPeakDetectionMethod
+#     params: t.Union[NK2PeakMethodParams, None]
 
 
-class PeaksPanTompkins(t.TypedDict):
+class PeaksECGPanTompkins(t.TypedDict):
     correct_artifacts: bool
 
 
 PeakDetectionMethodParameters = t.Union[
     PeaksPPGElgendi,
-    PeaksECGNeuroKit2,
-    PeaksPanTompkins,
+    PeaksECGNeuroKit,
+    PeaksECGPromac,
+    PeaksECGGamboa,
+    PeaksECGEmrich,
+    PeaksECGPanTompkins,
     PeaksLocalMinima,
     PeaksLocalMaxima,
-    PeaksWFDBXQRS,
+    PeaksECGXQRS,
 ]
 
 

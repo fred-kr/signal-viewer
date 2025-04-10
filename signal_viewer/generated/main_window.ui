@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0">
+<ui version="4.0" connectslotsbyname="false">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
@@ -39,7 +39,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="stacked_page_import">
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,6">
@@ -47,7 +47,7 @@
          <widget class="QWidget" name="container_file_information" native="true">
           <layout class="QGridLayout" name="gridLayout">
            <item row="3" column="0" colspan="2">
-            <widget class="PushButton" name="btn_load_data">
+            <widget class="QPushButton" name="btn_load_data">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -94,7 +94,7 @@
              </property>
              <layout class="QFormLayout" name="formLayout">
               <item row="0" column="0">
-               <widget class="BodyLabel" name="samplingRateLabel">
+               <widget class="QLabel" name="samplingRateLabel">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
@@ -113,7 +113,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="SpinBox" name="spin_box_sampling_rate_import_page">
+               <widget class="QSpinBox" name="spin_box_sampling_rate_import_page">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
@@ -140,8 +140,8 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="BodyLabel" name="signalColumnChannelLabel">
+              <item row="2" column="0">
+               <widget class="QLabel" name="signalColumnChannelLabel">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
@@ -159,31 +159,15 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
-               <widget class="ComboBox" name="combo_box_signal_column_import_page">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>31</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column or channel containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="whatsThis">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column or channel containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0" colspan="2">
+              <item row="3" column="0" colspan="2">
                <widget class="Line" name="line">
                 <property name="orientation">
                  <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
-               <widget class="BodyLabel" name="infoColumnChannelLabel">
+              <item row="5" column="0">
+               <widget class="QLabel" name="infoColumnChannelLabel">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
@@ -201,19 +185,23 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="1">
-               <widget class="ComboBox" name="combo_box_info_column_import_page">
+              <item row="2" column="1">
+               <widget class="QComboBox" name="combo_box_signal_column_import_page">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
                   <height>31</height>
                  </size>
                 </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="whatsThis">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QComboBox" name="combo_box_info_column_import_page">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>31</height>
+                 </size>
                 </property>
                </widget>
               </item>
@@ -221,7 +209,7 @@
             </widget>
            </item>
            <item row="1" column="1" colspan="2">
-            <widget class="LineEdit" name="line_edit_active_file">
+            <widget class="QLineEdit" name="line_edit_active_file">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -237,7 +225,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="PushButton" name="btn_open_file">
+            <widget class="QPushButton" name="btn_open_file">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -263,7 +251,7 @@
             </widget>
            </item>
            <item row="3" column="2">
-            <widget class="PushButton" name="btn_close_file">
+            <widget class="QPushButton" name="btn_close_file">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -295,7 +283,7 @@
             </widget>
            </item>
            <item row="0" column="0" colspan="3">
-            <widget class="SubtitleLabel" name="label_2">
+            <widget class="QLabel" name="label_2">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -323,14 +311,14 @@
                <number>3</number>
               </property>
               <item>
-               <widget class="StrongBodyLabel" name="label_3">
+               <widget class="QLabel" name="label_3">
                 <property name="text">
                  <string>Recent Files</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="ListView" name="list_view_recent_files">
+               <widget class="QListView" name="list_view_recent_files">
                 <property name="toolTip">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double-click on a filename to open it&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
@@ -355,14 +343,14 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
            <item row="0" column="0">
-            <widget class="SubtitleLabel" name="label">
+            <widget class="QLabel" name="label">
              <property name="text">
               <string>Data View</string>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="StrongBodyLabel" name="label_showing_data_table">
+            <widget class="QLabel" name="label_showing_data_table">
              <property name="text">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Showing: -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
@@ -372,7 +360,7 @@
             </widget>
            </item>
            <item row="1" column="0" colspan="2">
-            <widget class="TableView" name="table_view_import_data">
+            <widget class="QTableView" name="table_view_import_data">
              <property name="toolTip">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A table showing the current section's data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
@@ -417,7 +405,7 @@
       <widget class="QWidget" name="stacked_page_export">
        <layout class="QGridLayout" name="gridLayout_3" columnstretch="2,1,1,0">
         <item row="0" column="3">
-         <widget class="PushButton" name="btn_export_all_results">
+         <widget class="QPushButton" name="btn_export_all_results">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -430,7 +418,7 @@
          </widget>
         </item>
         <item row="0" column="0">
-         <widget class="SubtitleLabel" name="label_4">
+         <widget class="QLabel" name="label_4">
           <property name="text">
            <string>Section Data and Results</string>
           </property>
@@ -439,7 +427,7 @@
         <item row="1" column="0" colspan="4">
          <widget class="QTabWidget" name="tab_widget_result_views">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_result_peaks_info">
            <attribute name="title">
@@ -447,7 +435,7 @@
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
-             <widget class="TableView" name="table_view_result_peaks">
+             <widget class="QTableView" name="table_view_result_peaks">
               <property name="editTriggers">
                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
               </property>
@@ -467,7 +455,7 @@
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
-             <widget class="TableView" name="table_view_result_rate">
+             <widget class="QTableView" name="table_view_result_rate">
               <property name="editTriggers">
                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
               </property>
@@ -513,21 +501,21 @@
            </attribute>
            <layout class="QGridLayout" name="gridLayout_4">
             <item row="0" column="0">
-             <widget class="TreeView" name="tree_view_result_metadata"/>
+             <widget class="QTreeView" name="tree_view_result_metadata"/>
             </item>
            </layout>
           </widget>
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="StrongBodyLabel" name="label_showing_section_result">
+         <widget class="QLabel" name="label_showing_section_result">
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
         <item row="0" column="2">
-         <widget class="PushButton" name="btn_export_to_excel">
+         <widget class="QPushButton" name="btn_export_to_excel">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -919,60 +907,10 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>qfluentwidgets</header>
-  </customwidget>
-  <customwidget>
-   <class>SpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>qfluentwidgets</header>
-  </customwidget>
-  <customwidget>
-   <class>ComboBox</class>
-   <extends>QPushButton</extends>
-   <header>qfluentwidgets</header>
-  </customwidget>
-  <customwidget>
-   <class>PushButton</class>
-   <extends>QPushButton</extends>
-   <header>qfluentwidgets</header>
-  </customwidget>
-  <customwidget>
-   <class>SubtitleLabel</class>
-   <extends>QLabel</extends>
-   <header>qfluentwidgets</header>
-  </customwidget>
-  <customwidget>
-   <class>BodyLabel</class>
-   <extends>QLabel</extends>
-   <header>qfluentwidgets</header>
-  </customwidget>
-  <customwidget>
    <class>MatplotlibWidget</class>
    <extends>QWidget</extends>
    <header>pyqtgraph.widgets.MatplotlibWidget</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>TableView</class>
-   <extends>QTableView</extends>
-   <header>qfluentwidgets</header>
-  </customwidget>
-  <customwidget>
-   <class>StrongBodyLabel</class>
-   <extends>QLabel</extends>
-   <header>qfluentwidgets</header>
-  </customwidget>
-  <customwidget>
-   <class>TreeView</class>
-   <extends>QTreeView</extends>
-   <header>qfluentwidgets</header>
-  </customwidget>
-  <customwidget>
-   <class>ListView</class>
-   <extends>QListView</extends>
-   <header>qfluentwidgets</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -983,9 +921,14 @@
   <tabstop>combo_box_info_column_import_page</tabstop>
   <tabstop>btn_load_data</tabstop>
   <tabstop>btn_close_file</tabstop>
-  <tabstop>container_recent_files</tabstop>
   <tabstop>list_view_recent_files</tabstop>
   <tabstop>table_view_import_data</tabstop>
+  <tabstop>table_view_result_peaks</tabstop>
+  <tabstop>table_view_result_rate</tabstop>
+  <tabstop>tree_view_result_metadata</tabstop>
+  <tabstop>btn_export_to_excel</tabstop>
+  <tabstop>btn_export_all_results</tabstop>
+  <tabstop>tab_widget_result_views</tabstop>
  </tabstops>
  <resources/>
  <connections>

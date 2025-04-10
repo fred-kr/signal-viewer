@@ -14,7 +14,7 @@ import signal_viewer.type_defs as _t
 from signal_viewer.constants import INDEX_COL, IS_MANUAL_COL, IS_PEAK_COL, SECTION_INDEX_COL
 from signal_viewer.enum_defs import (
     IncompleteWindowMethod,
-    PeakDetectionMethod,
+    PeakDetectionAlgorithm,
     PreprocessPipeline,
     RateComputationMethod,
 )
@@ -30,7 +30,7 @@ class ProcessingParameters:
     processing_pipeline: PreprocessPipeline | None = attrs.field(default=None)
     filter_parameters: list[_t.SignalFilterParameters] = attrs.field(factory=list)
     standardization_parameters: _t.StandardizationParameters | None = attrs.field(default=None)
-    peak_detection_method: PeakDetectionMethod | None = attrs.field(default=None)
+    peak_detection_method: PeakDetectionAlgorithm | None = attrs.field(default=None)
     peak_detection_method_parameters: _t.PeakDetectionMethodParameters | None = attrs.field(default=None)
     rate_computation_method: RateComputationMethod = attrs.field(default=Config.editing.rate_computation_method)
 
@@ -438,7 +438,7 @@ class Section:
     @logger.catch(message="Peak detection failed. Please check the parameters and try again.")
     def detect_peaks(
         self,
-        method: PeakDetectionMethod,
+        method: PeakDetectionAlgorithm,
         method_parameters: _t.PeakDetectionMethodParameters,
         *,
         rr_params: _t.RollingRateKwargsDict | None = None,
@@ -467,7 +467,7 @@ class Section:
 
     def set_peaks(
         self,
-        peaks: npt.NDArray[np.int32],
+        peaks: npt.NDArray[np.intp],
         update_rate: bool = True,
         *,
         rr_params: _t.RollingRateKwargsDict | None = None,
@@ -503,7 +503,7 @@ class Section:
     def update_peaks(
         self,
         action: _t.UpdatePeaksAction,
-        peaks: npt.NDArray[np.int32],
+        peaks: npt.NDArray[np.intp],
         update_rate: bool = True,
         *,
         rr_params: _t.RollingRateKwargsDict | None = None,

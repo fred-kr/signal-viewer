@@ -3849,6 +3849,15 @@ wheels = [
 ]
 
 [[package]]
+name = "safe-result"
+version = "4.0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a2/90/14d71ea7712fd5514cf7f25b06889d997bca69c79d1300adec29eccfcbf9/safe_result-4.0.1.tar.gz", hash = "sha256:a0e48b3388ab90c949d807236fceebb17207698f31b1d77ba45784850dec3e21", size = 23043 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1c/7a/c5068632ba71cf688fe4a6fc90d9b34c1e478bef4f7fa843c19817dfc3bd/safe_result-4.0.1-py3-none-any.whl", hash = "sha256:add3c60f503663daee0d348d9b9b97692cb0cbac65e969357a5b00e2adf0b276", size = 5587 },
+]
+
+[[package]]
 name = "scikit-learn"
 version = "1.6.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3943,6 +3952,7 @@ dependencies = [
     { name = "pyside6" },
     { name = "pyside6-fluent-widgets" },
     { name = "pywavelets" },
+    { name = "safe-result" },
     { name = "scikit-learn" },
     { name = "scipy" },
     { name = "tables" },
@@ -3975,6 +3985,7 @@ requires-dist = [
     { name = "pyside6", specifier = ">=6.9.0" },
     { name = "pyside6-fluent-widgets", specifier = ">=1.7.6" },
     { name = "pywavelets", specifier = ">=1.8.0" },
+    { name = "safe-result", specifier = ">=4.0.1" },
     { name = "scikit-learn", specifier = ">=1.6.1" },
     { name = "scipy", specifier = ">=1.15.2" },
     { name = "tables", specifier = ">=3.10.2" },

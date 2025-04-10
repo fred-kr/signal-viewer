@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-import typing as t
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 import numpy.typing as npt
@@ -13,7 +13,7 @@ import signal_viewer.type_defs as _t
 from signal_viewer.enum_defs import MouseButtons
 from signal_viewer.utils import make_qbrush, make_qpen
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from pyqtgraph.GraphicsScene import mouseEvents
 
 
@@ -36,7 +36,7 @@ class EditingViewBox(pg.ViewBox):
     `pyqtgraph.ViewBox` that makes selection of data easier.
     """
 
-    def __init__(self, *args: t.Any, **kargs: t.Any) -> None:
+    def __init__(self, *args: Any, **kargs: Any) -> None:
         super().__init__(*args, **kargs)
         self._selection_box: QtWidgets.QGraphicsRectItem | None = None
         self.mapped_selection_rect: QtCore.QRectF | None = None
@@ -187,7 +187,7 @@ class ClickableRegionItem(pg.LinearRegionItem):
     def __init__(
         self,
         values: Sequence[float] = (0, 1),
-        orientation: t.Literal["vertical", "horizontal"] = "vertical",
+        orientation: Literal["vertical", "horizontal"] = "vertical",
         brush: _t.PGBrush | None = None,
         pen: _t.PGPen | None = None,
         hoverBrush: _t.PGBrush | None = None,
@@ -195,7 +195,7 @@ class ClickableRegionItem(pg.LinearRegionItem):
         movable: bool = True,
         bounds: Sequence[float] | None = None,
         span: Sequence[float] = (0, 1),
-        swapMode: t.Literal["block", "push", "sort"] | None = "sort",
+        swapMode: Literal["block", "push", "sort"] = "sort",
         clipItem: pg.GraphicsObject | None = None,
     ) -> None:
         super().__init__(

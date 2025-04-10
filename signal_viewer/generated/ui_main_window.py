@@ -16,16 +16,15 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFormLayout, QFrame,
-    QGridLayout, QGroupBox, QHBoxLayout, QHeaderView,
-    QMainWindow, QMenu, QMenuBar, QSizePolicy,
-    QStackedWidget, QTabWidget, QToolBar, QVBoxLayout,
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QFormLayout,
+    QFrame, QGridLayout, QGroupBox, QHBoxLayout,
+    QHeaderView, QLabel, QLineEdit, QListView,
+    QMainWindow, QMenu, QMenuBar, QPushButton,
+    QSizePolicy, QSpinBox, QStackedWidget, QTabWidget,
+    QTableView, QToolBar, QTreeView, QVBoxLayout,
     QWidget)
 
 from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
-from qfluentwidgets import (BodyLabel, ComboBox, LineEdit, ListView,
-    PushButton, SpinBox, StrongBodyLabel, SubtitleLabel,
-    TableView, TreeView)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -160,7 +159,7 @@ class Ui_MainWindow(object):
         self.container_file_information.setObjectName(u"container_file_information")
         self.gridLayout = QGridLayout(self.container_file_information)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.btn_load_data = PushButton(self.container_file_information)
+        self.btn_load_data = QPushButton(self.container_file_information)
         self.btn_load_data.setObjectName(u"btn_load_data")
         self.btn_load_data.setEnabled(False)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
@@ -182,13 +181,13 @@ class Ui_MainWindow(object):
         self.grp_box_required_info.setFlat(True)
         self.formLayout = QFormLayout(self.grp_box_required_info)
         self.formLayout.setObjectName(u"formLayout")
-        self.samplingRateLabel = BodyLabel(self.grp_box_required_info)
+        self.samplingRateLabel = QLabel(self.grp_box_required_info)
         self.samplingRateLabel.setObjectName(u"samplingRateLabel")
         self.samplingRateLabel.setMinimumSize(QSize(0, 31))
 
         self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.samplingRateLabel)
 
-        self.spin_box_sampling_rate_import_page = SpinBox(self.grp_box_required_info)
+        self.spin_box_sampling_rate_import_page = QSpinBox(self.grp_box_required_info)
         self.spin_box_sampling_rate_import_page.setObjectName(u"spin_box_sampling_rate_import_page")
         self.spin_box_sampling_rate_import_page.setMinimumSize(QSize(0, 31))
         self.spin_box_sampling_rate_import_page.setFrame(False)
@@ -197,41 +196,41 @@ class Ui_MainWindow(object):
 
         self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.spin_box_sampling_rate_import_page)
 
-        self.signalColumnChannelLabel = BodyLabel(self.grp_box_required_info)
+        self.signalColumnChannelLabel = QLabel(self.grp_box_required_info)
         self.signalColumnChannelLabel.setObjectName(u"signalColumnChannelLabel")
         self.signalColumnChannelLabel.setMinimumSize(QSize(0, 31))
 
-        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.signalColumnChannelLabel)
-
-        self.combo_box_signal_column_import_page = ComboBox(self.grp_box_required_info)
-        self.combo_box_signal_column_import_page.setObjectName(u"combo_box_signal_column_import_page")
-        self.combo_box_signal_column_import_page.setMinimumSize(QSize(0, 31))
-
-        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.combo_box_signal_column_import_page)
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.signalColumnChannelLabel)
 
         self.line = QFrame(self.grp_box_required_info)
         self.line.setObjectName(u"line")
         self.line.setFrameShape(QFrame.Shape.HLine)
         self.line.setFrameShadow(QFrame.Shadow.Sunken)
 
-        self.formLayout.setWidget(2, QFormLayout.ItemRole.SpanningRole, self.line)
+        self.formLayout.setWidget(3, QFormLayout.ItemRole.SpanningRole, self.line)
 
-        self.infoColumnChannelLabel = BodyLabel(self.grp_box_required_info)
+        self.infoColumnChannelLabel = QLabel(self.grp_box_required_info)
         self.infoColumnChannelLabel.setObjectName(u"infoColumnChannelLabel")
         self.infoColumnChannelLabel.setMinimumSize(QSize(0, 31))
 
-        self.formLayout.setWidget(3, QFormLayout.ItemRole.LabelRole, self.infoColumnChannelLabel)
+        self.formLayout.setWidget(5, QFormLayout.ItemRole.LabelRole, self.infoColumnChannelLabel)
 
-        self.combo_box_info_column_import_page = ComboBox(self.grp_box_required_info)
+        self.combo_box_signal_column_import_page = QComboBox(self.grp_box_required_info)
+        self.combo_box_signal_column_import_page.setObjectName(u"combo_box_signal_column_import_page")
+        self.combo_box_signal_column_import_page.setMinimumSize(QSize(0, 31))
+
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.combo_box_signal_column_import_page)
+
+        self.combo_box_info_column_import_page = QComboBox(self.grp_box_required_info)
         self.combo_box_info_column_import_page.setObjectName(u"combo_box_info_column_import_page")
         self.combo_box_info_column_import_page.setMinimumSize(QSize(0, 31))
 
-        self.formLayout.setWidget(3, QFormLayout.ItemRole.FieldRole, self.combo_box_info_column_import_page)
+        self.formLayout.setWidget(5, QFormLayout.ItemRole.FieldRole, self.combo_box_info_column_import_page)
 
 
         self.gridLayout.addWidget(self.grp_box_required_info, 2, 0, 1, 3)
 
-        self.line_edit_active_file = LineEdit(self.container_file_information)
+        self.line_edit_active_file = QLineEdit(self.container_file_information)
         self.line_edit_active_file.setObjectName(u"line_edit_active_file")
         self.line_edit_active_file.setMinimumSize(QSize(0, 31))
         self.line_edit_active_file.setFrame(False)
@@ -239,7 +238,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.line_edit_active_file, 1, 1, 1, 2)
 
-        self.btn_open_file = PushButton(self.container_file_information)
+        self.btn_open_file = QPushButton(self.container_file_information)
         self.btn_open_file.setObjectName(u"btn_open_file")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
@@ -251,7 +250,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.btn_open_file, 1, 0, 1, 1)
 
-        self.btn_close_file = PushButton(self.container_file_information)
+        self.btn_close_file = QPushButton(self.container_file_information)
         self.btn_close_file.setObjectName(u"btn_close_file")
         self.btn_close_file.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.btn_close_file.sizePolicy().hasHeightForWidth())
@@ -261,7 +260,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.btn_close_file, 3, 2, 1, 1)
 
-        self.label_2 = SubtitleLabel(self.container_file_information)
+        self.label_2 = QLabel(self.container_file_information)
         self.label_2.setObjectName(u"label_2")
         sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
         self.label_2.setSizePolicy(sizePolicy)
@@ -273,12 +272,12 @@ class Ui_MainWindow(object):
         self.verticalLayout_3 = QVBoxLayout(self.container_recent_files)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(3, 3, 3, 3)
-        self.label_3 = StrongBodyLabel(self.container_recent_files)
+        self.label_3 = QLabel(self.container_recent_files)
         self.label_3.setObjectName(u"label_3")
 
         self.verticalLayout_3.addWidget(self.label_3)
 
-        self.list_view_recent_files = ListView(self.container_recent_files)
+        self.list_view_recent_files = QListView(self.container_recent_files)
         self.list_view_recent_files.setObjectName(u"list_view_recent_files")
         self.list_view_recent_files.setTextElideMode(Qt.TextElideMode.ElideMiddle)
 
@@ -299,18 +298,18 @@ class Ui_MainWindow(object):
         self.container_loaded_data_table.setSizePolicy(sizePolicy2)
         self.gridLayout_7 = QGridLayout(self.container_loaded_data_table)
         self.gridLayout_7.setObjectName(u"gridLayout_7")
-        self.label = SubtitleLabel(self.container_loaded_data_table)
+        self.label = QLabel(self.container_loaded_data_table)
         self.label.setObjectName(u"label")
 
         self.gridLayout_7.addWidget(self.label, 0, 0, 1, 1)
 
-        self.label_showing_data_table = StrongBodyLabel(self.container_loaded_data_table)
+        self.label_showing_data_table = QLabel(self.container_loaded_data_table)
         self.label_showing_data_table.setObjectName(u"label_showing_data_table")
         self.label_showing_data_table.setAlignment(Qt.AlignmentFlag.AlignBottom|Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing)
 
         self.gridLayout_7.addWidget(self.label_showing_data_table, 0, 1, 1, 1)
 
-        self.table_view_import_data = TableView(self.container_loaded_data_table)
+        self.table_view_import_data = QTableView(self.container_loaded_data_table)
         self.table_view_import_data.setObjectName(u"table_view_import_data")
         self.table_view_import_data.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table_view_import_data.setProperty(u"showDropIndicator", False)
@@ -343,14 +342,14 @@ class Ui_MainWindow(object):
         self.stacked_page_export.setObjectName(u"stacked_page_export")
         self.gridLayout_3 = QGridLayout(self.stacked_page_export)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.btn_export_all_results = PushButton(self.stacked_page_export)
+        self.btn_export_all_results = QPushButton(self.stacked_page_export)
         self.btn_export_all_results.setObjectName(u"btn_export_all_results")
         sizePolicy.setHeightForWidth(self.btn_export_all_results.sizePolicy().hasHeightForWidth())
         self.btn_export_all_results.setSizePolicy(sizePolicy)
 
         self.gridLayout_3.addWidget(self.btn_export_all_results, 0, 3, 1, 1)
 
-        self.label_4 = SubtitleLabel(self.stacked_page_export)
+        self.label_4 = QLabel(self.stacked_page_export)
         self.label_4.setObjectName(u"label_4")
 
         self.gridLayout_3.addWidget(self.label_4, 0, 0, 1, 1)
@@ -361,7 +360,7 @@ class Ui_MainWindow(object):
         self.tab_result_peaks_info.setObjectName(u"tab_result_peaks_info")
         self.verticalLayout_2 = QVBoxLayout(self.tab_result_peaks_info)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.table_view_result_peaks = TableView(self.tab_result_peaks_info)
+        self.table_view_result_peaks = QTableView(self.tab_result_peaks_info)
         self.table_view_result_peaks.setObjectName(u"table_view_result_peaks")
         self.table_view_result_peaks.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table_view_result_peaks.setCornerButtonEnabled(False)
@@ -374,7 +373,7 @@ class Ui_MainWindow(object):
         self.tab_result_rate_info.setObjectName(u"tab_result_rate_info")
         self.verticalLayout_4 = QVBoxLayout(self.tab_result_rate_info)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.table_view_result_rate = TableView(self.tab_result_rate_info)
+        self.table_view_result_rate = QTableView(self.tab_result_rate_info)
         self.table_view_result_rate.setObjectName(u"table_view_result_rate")
         self.table_view_result_rate.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table_view_result_rate.setCornerButtonEnabled(False)
@@ -400,7 +399,7 @@ class Ui_MainWindow(object):
         self.tab_result_metadata.setObjectName(u"tab_result_metadata")
         self.gridLayout_4 = QGridLayout(self.tab_result_metadata)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.tree_view_result_metadata = TreeView(self.tab_result_metadata)
+        self.tree_view_result_metadata = QTreeView(self.tab_result_metadata)
         self.tree_view_result_metadata.setObjectName(u"tree_view_result_metadata")
 
         self.gridLayout_4.addWidget(self.tree_view_result_metadata, 0, 0, 1, 1)
@@ -409,12 +408,12 @@ class Ui_MainWindow(object):
 
         self.gridLayout_3.addWidget(self.tab_widget_result_views, 1, 0, 1, 4)
 
-        self.label_showing_section_result = StrongBodyLabel(self.stacked_page_export)
+        self.label_showing_section_result = QLabel(self.stacked_page_export)
         self.label_showing_section_result.setObjectName(u"label_showing_section_result")
 
         self.gridLayout_3.addWidget(self.label_showing_section_result, 0, 1, 1, 1)
 
-        self.btn_export_to_excel = PushButton(self.stacked_page_export)
+        self.btn_export_to_excel = QPushButton(self.stacked_page_export)
         self.btn_export_to_excel.setObjectName(u"btn_export_to_excel")
         sizePolicy.setHeightForWidth(self.btn_export_to_excel.sizePolicy().hasHeightForWidth())
         self.btn_export_to_excel.setSizePolicy(sizePolicy)
@@ -455,9 +454,14 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.combo_box_signal_column_import_page, self.combo_box_info_column_import_page)
         QWidget.setTabOrder(self.combo_box_info_column_import_page, self.btn_load_data)
         QWidget.setTabOrder(self.btn_load_data, self.btn_close_file)
-        QWidget.setTabOrder(self.btn_close_file, self.container_recent_files)
-        QWidget.setTabOrder(self.container_recent_files, self.list_view_recent_files)
+        QWidget.setTabOrder(self.btn_close_file, self.list_view_recent_files)
         QWidget.setTabOrder(self.list_view_recent_files, self.table_view_import_data)
+        QWidget.setTabOrder(self.table_view_import_data, self.table_view_result_peaks)
+        QWidget.setTabOrder(self.table_view_result_peaks, self.table_view_result_rate)
+        QWidget.setTabOrder(self.table_view_result_rate, self.tree_view_result_metadata)
+        QWidget.setTabOrder(self.tree_view_result_metadata, self.btn_export_to_excel)
+        QWidget.setTabOrder(self.btn_export_to_excel, self.btn_export_all_results)
+        QWidget.setTabOrder(self.btn_export_all_results, self.tab_widget_result_views)
 
         self.menubar.addAction(self.menu_file.menuAction())
         self.menubar.addAction(self.menu_view.menuAction())
@@ -485,11 +489,9 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.line_edit_active_file.textChanged.connect(MainWindow.setWindowTitle)
 
-        self.stackedWidget.setCurrentIndex(2)
-        self.tab_widget_result_views.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(0)
+        self.tab_widget_result_views.setCurrentIndex(1)
 
-
-        QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
 
     def retranslateUi(self, MainWindow):
@@ -605,24 +607,12 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(whatsthis)
         self.signalColumnChannelLabel.setText(QCoreApplication.translate("MainWindow", u"Signal Data", None))
 #if QT_CONFIG(tooltip)
-        self.combo_box_signal_column_import_page.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>The column or channel containing the signal values</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-#if QT_CONFIG(whatsthis)
-        self.combo_box_signal_column_import_page.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>The column or channel containing the signal values</p></body></html>", None))
-#endif // QT_CONFIG(whatsthis)
-#if QT_CONFIG(tooltip)
         self.infoColumnChannelLabel.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(whatsthis)
         self.infoColumnChannelLabel.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>", None))
 #endif // QT_CONFIG(whatsthis)
         self.infoColumnChannelLabel.setText(QCoreApplication.translate("MainWindow", u"Additional Data", None))
-#if QT_CONFIG(tooltip)
-        self.combo_box_info_column_import_page.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-#if QT_CONFIG(whatsthis)
-        self.combo_box_info_column_import_page.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>", None))
-#endif // QT_CONFIG(whatsthis)
 #if QT_CONFIG(whatsthis)
         self.btn_open_file.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Opens a window allowing you to choose a file to load into the app.</p><p>The selected file is searched for available columns or channels of data.</p><p>If any are found, their names are made available for selection in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>", None))
 #endif // QT_CONFIG(whatsthis)

@@ -15,7 +15,7 @@ from PySide6 import QtCore, QtWidgets
 import signal_viewer.type_defs as _t
 from signal_viewer.constants import SECTION_INDEX_COL
 from signal_viewer.enum_defs import (
-    PeakDetectionMethod,
+    PeakDetectionAlgorithm,
     PreprocessPipeline,
     RateComputationMethod,
     StandardizationMethod,
@@ -45,7 +45,7 @@ class PeakDetectionWorker(QtCore.QRunnable):
     def __init__(
         self,
         section: "Section",
-        method: PeakDetectionMethod,
+        method: PeakDetectionAlgorithm,
         method_parameters: _t.PeakDetectionMethodParameters,
         *,
         rr_params: _t.RollingRateKwargsDict | None = None,
@@ -147,12 +147,12 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_mark_section_done.triggered.connect(self._lock_section)
         self.gui.ui.action_unlock_section.triggered.connect(self._unlock_section)
 
-        self.gui.dock_parameters.sig_filter_requested.connect(self.filter_active_signal)
-        self.gui.dock_parameters.sig_pipeline_requested.connect(self.run_preprocess_pipeline)
-        self.gui.dock_parameters.sig_standardization_requested.connect(self.standardize_active_signal)
-        self.gui.dock_parameters.sig_data_reset_requested.connect(self.restore_original_signal)
-        self.gui.dock_parameters.sig_peak_detection_requested.connect(self.run_peak_detection_worker)
-        self.gui.dock_parameters.sig_clear_peaks_requested.connect(self.clear_peaks)
+        self.gui.dock_parameters.ui.sig_run_filter.connect(self.filter_active_signal)
+        self.gui.dock_parameters.ui.sig_run_pipeline.connect(self.run_preprocess_pipeline)
+        self.gui.dock_parameters.ui.sig_run_standardization.connect(self.standardize_active_signal)
+        self.gui.dock_parameters.ui.sig_reset_data.connect(self.restore_original_signal)
+        self.gui.dock_parameters.ui.sig_run_peak_detection.connect(self.run_peak_detection_worker)
+        self.gui.dock_parameters.ui.sig_clear_peaks.connect(self.clear_peaks)
 
         self.gui.ui.action_find_peaks_in_selection.triggered.connect(self.find_peaks_in_selection)
         self.gui.ui.action_remove_peaks_in_selection.triggered.connect(self.plot.remove_peaks_in_selection)
@@ -189,10 +189,10 @@ class SVApp(QtCore.QObject):
         left, right = int(rect.left()), int(rect.right())
         self.plot.remove_selection_rect()
 
-        peak_method = PeakDetectionMethod(self.gui.dock_parameters.ui.combo_peak_method.currentData())
+        peak_method = PeakDetectionAlgorithm(self.gui.dock_parameters.ui.ui.peak_method.currentData())
         param_dock = self.gui.dock_parameters
-        peak_params = param_dock.get_peak_detection_params(peak_method)
-        rolling_rate_params = param_dock.get_rate_calculation_params()
+        peak_params = param_dock.ui.get_peak_detection_params(peak_method)
+        rolling_rate_params = param_dock.ui.get_rate_params()
 
         edge_buffer = 10
         b_left = max(left + edge_buffer, 0)
@@ -210,8 +210,8 @@ class SVApp(QtCore.QObject):
         self.sig_peaks_updated.emit()
 
     @QtCore.Slot(str, object)
-    def handle_peak_edit(self, action: _t.UpdatePeaksAction, indices: npt.NDArray[np.int32]) -> None:
-        rolling_rate_kwargs = self.gui.dock_parameters.get_rate_calculation_params()
+    def handle_peak_edit(self, action: _t.UpdatePeaksAction, indices: npt.NDArray[np.intp]) -> None:
+        rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
         self.data.active_section.update_peaks(action, indices, rr_params=rolling_rate_kwargs)
         self.sig_peaks_updated.emit()
 
@@ -221,7 +221,7 @@ class SVApp(QtCore.QObject):
         pos = cas.get_peak_pos()
         self.plot.set_peak_data(pos.get_column(SECTION_INDEX_COL), pos.get_column(cas.processed_signal_name))
         if Config.editing.rate_computation_method == RateComputationMethod.RollingWindow:
-            rolling_rate_kwargs = self.gui.dock_parameters.get_rate_calculation_params()
+            rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
             cas.update_rate_data(rr_params=rolling_rate_kwargs)
         else:
             cas.update_rate_data()
@@ -229,11 +229,11 @@ class SVApp(QtCore.QObject):
         self.plot.set_rate_data(x_data=rate_data.get_column(SECTION_INDEX_COL), y_data=rate_data.get_column("rate_bpm"))
 
     def update_status_indicators(self) -> None:
-        self.gui.dock_parameters.set_filter_status(
-            self.data.active_section.is_filtered, self.data.active_section.n_filters
-        )
-        self.gui.dock_parameters.set_pipeline_status(self.data.active_section.is_processed)
-        self.gui.dock_parameters.set_standardization_status(self.data.active_section.is_standardized)
+        self.gui.dock_parameters.ui.ui.status_filter.setChecked(self.data.active_section.is_filtered)
+        self.gui.dock_parameters.ui.ui.status_filter.setToolTip(f"Times filtered: {self.data.active_section.n_filters}")
+
+        self.gui.dock_parameters.ui.ui.status_pipeline.setChecked(self.data.active_section.is_processed)
+        self.gui.dock_parameters.ui.ui.status_standardization.setChecked(self.data.active_section.is_standardized)
 
     @QtCore.Slot(dict)
     def filter_active_signal(self, filter_params: _t.SignalFilterParameters) -> None:
@@ -266,8 +266,10 @@ class SVApp(QtCore.QObject):
         self.update_status_indicators()
 
     @QtCore.Slot(enum.StrEnum, dict)
-    def run_peak_detection_worker(self, method: PeakDetectionMethod, params: _t.PeakDetectionMethodParameters) -> None:
-        rolling_rate_kwargs = self.gui.dock_parameters.get_rate_calculation_params()
+    def run_peak_detection_worker(
+        self, method: PeakDetectionAlgorithm, params: _t.PeakDetectionMethodParameters
+    ) -> None:
+        rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
         worker = PeakDetectionWorker(self.data.active_section, method, params, rr_params=rolling_rate_kwargs)
         worker.signals.sig_success.connect(self.refresh_peak_data)
         worker.signals.sig_finished.connect(self._on_worker_finished)
@@ -606,7 +608,7 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def _lock_section(self) -> None:
-        rate_params = self.gui.dock_parameters.get_rate_calculation_params()
+        rate_params = self.gui.dock_parameters.ui.get_rate_params()
 
         worker = SectionResultWorker(self.data.active_section, rr_params=rate_params)
         worker.signals.sig_success.connect(self.update_result_views)
@@ -667,4 +669,4 @@ class SVApp(QtCore.QObject):
         else:
             raise NotImplementedError
 
-        self.gui.show_success("Success!", f"Saved to '{out_path}'")
+        QtWidgets.QMessageBox.information(self.gui, "Success!", f"Saved to '{out_path}'")

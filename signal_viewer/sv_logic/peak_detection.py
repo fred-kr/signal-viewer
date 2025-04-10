@@ -7,39 +7,39 @@ modified to fit the needs of this application.
 # Since neurokit2 isn't typed all that well, we disable the following checks to appease the type checker:
 
 # pyright: reportUnknownVariableType=false, reportUnknownArgumentType=false
-import typing as t
+
+from collections.abc import Callable
+from typing import Literal, cast
 
 import neurokit2 as nk
 import numpy as np
 import numpy.typing as npt
-import polars as pl
 import wfdb.processing as wp
-from loguru import logger
 from scipy import ndimage
 
 import signal_viewer.type_defs as _t
-from signal_viewer.enum_defs import PeakDetectionMethod, WFDBPeakDirection
+from signal_viewer.enum_defs import PeakDetectionAlgorithm, WFDBPeakDirection
 
 
-def _find_peaks_local_max(sig: npt.NDArray[np.float64], search_radius: int) -> npt.NDArray[np.int32]:
+def _find_peaks_local_max(sig: npt.NDArray[np.float64], search_radius: int) -> npt.NDArray[np.intp]:
     if len(sig) == 0 or np.min(sig) == np.max(sig):
-        return np.array([], dtype=np.int32)
+        return np.array([], dtype=np.intp)
 
     max_vals = ndimage.maximum_filter1d(sig, size=2 * search_radius + 1, mode="constant")
     return np.flatnonzero(sig == max_vals)
 
 
-def _find_peaks_local_min(sig: npt.NDArray[np.float64], search_radius: int) -> npt.NDArray[np.int32]:
+def _find_peaks_local_min(sig: npt.NDArray[np.float64], search_radius: int) -> npt.NDArray[np.intp]:
     if len(sig) == 0 or np.min(sig) == np.max(sig):
-        return np.array([], dtype=np.int32)
+        return np.array([], dtype=np.intp)
 
     min_vals = ndimage.minimum_filter1d(sig, size=2 * search_radius + 1, mode="constant")
     return np.flatnonzero(sig == min_vals)
 
 
 def find_extrema(
-    sig: npt.NDArray[np.float64], search_radius: int, direction: t.Literal["up", "down"], min_peak_distance: int
-) -> npt.NDArray[np.int32]:
+    sig: npt.NDArray[np.float64], search_radius: int, direction: Literal["up", "down"], min_peak_distance: int
+) -> npt.NDArray[np.intp]:
     if direction == "up":
         peaks = _find_peaks_local_max(sig, search_radius)
     else:
@@ -59,8 +59,8 @@ def find_extrema(
 
 # XQRS related functions
 def _shift_peaks(
-    sig: npt.NDArray[np.float64], peaks: npt.NDArray[np.int32], radius: int, dir_is_up: bool
-) -> npt.NDArray[np.int32]:
+    sig: npt.NDArray[np.float64], peaks: npt.NDArray[np.intp], radius: int, dir_is_up: bool
+) -> npt.NDArray[np.intp]:
     start_indices = np.maximum(peaks - radius, 0)
     end_indices = np.minimum(peaks + radius, sig.size)
 
@@ -79,10 +79,10 @@ def _shift_peaks(
 
 def _adjust_peak_positions(
     sig: npt.NDArray[np.float64],
-    peaks: npt.NDArray[np.int32],
+    peaks: npt.NDArray[np.intp],
     radius: int,
     direction: WFDBPeakDirection,
-) -> npt.NDArray[np.int32]:
+) -> npt.NDArray[np.intp]:
     if direction == WFDBPeakDirection.Up:
         return _shift_peaks(sig, peaks, radius, dir_is_up=True)
     elif direction == WFDBPeakDirection.Down:
@@ -99,7 +99,7 @@ def _adjust_peak_positions(
         return shifted_up if np.greater_equal(up_dist, down_dist) else shifted_down
 
 
-def _get_comparison_func(find_peak_func: t.Callable[..., np.intp]) -> t.Callable[..., np.bool_]:
+def _get_comparison_func(find_peak_func: Callable[..., np.intp]) -> Callable[..., np.bool_]:
     if find_peak_func == np.argmax:
         return np.less_equal
     elif find_peak_func == np.argmin:
@@ -110,11 +110,14 @@ def _get_comparison_func(find_peak_func: t.Callable[..., np.intp]) -> t.Callable
 
 def _remove_outliers(
     sig: npt.NDArray[np.float64],
-    qrs_locations: npt.NDArray[np.int32],
+    qrs_locations: npt.NDArray[np.intp],
     n_std: float,
-    find_peak_func: t.Callable[..., np.intp],
-) -> npt.NDArray[np.int32]:
-    comparison_ops = {np.argmax: (np.less_equal, -1), np.argmin: (np.greater_equal, 1)}
+    find_peak_func: Callable[..., np.intp],
+) -> npt.NDArray[np.intp]:
+    comparison_ops: dict[Callable[..., np.intp], tuple[Callable[..., np.bool_], int]] = {
+        np.argmax: (np.less_equal, -1),
+        np.argmin: (np.greater_equal, 1),
+    }
 
     if find_peak_func not in comparison_ops:
         raise ValueError("find_peak_func must be np.argmax or np.argmin")
@@ -141,11 +144,11 @@ def _remove_outliers(
 
 def _handle_close_peaks(
     sig: npt.NDArray[np.float64],
-    qrs_locations: npt.NDArray[np.int32],
+    qrs_locations: npt.NDArray[np.intp],
     n_std: float,
-    find_peak_func: t.Callable[..., np.intp],
+    find_peak_func: Callable[..., np.intp],
     min_peak_distance: int,
-) -> npt.NDArray[np.int32]:
+) -> npt.NDArray[np.intp]:
     qrs_diffs = np.diff(qrs_locations)
     close_indices = np.where(qrs_diffs <= min_peak_distance)[0]
 
@@ -163,10 +166,10 @@ def _handle_close_peaks(
 
 def _sanitize_qrs_locations(
     sig: npt.NDArray[np.float64],
-    qrs_locations: npt.NDArray[np.int32],
+    qrs_locations: npt.NDArray[np.intp],
     min_peak_distance: int,
     n_std: float = 4.0,
-) -> npt.NDArray[np.int32]:
+) -> npt.NDArray[np.intp]:
     find_peak_func = np.argmax if np.mean(sig) < np.mean(sig[qrs_locations]) else np.argmin
 
     peak_indices = _handle_close_peaks(sig, qrs_locations, n_std, find_peak_func, min_peak_distance)
@@ -183,11 +186,11 @@ def _find_peaks_xqrs(
     radius: int,
     min_peak_distance: int,
     peak_dir: WFDBPeakDirection = WFDBPeakDirection.Up,
-) -> npt.NDArray[np.int32]:
+) -> npt.NDArray[np.intp]:
     xqrs_out = wp.XQRS(sig, sampling_rate)
     xqrs_out.detect(verbose=False, learn=True)
     peak_indices = _adjust_peak_positions(
-        sig, peaks=np.array(xqrs_out.qrs_inds, dtype=np.int32), radius=radius, direction=peak_dir
+        sig, peaks=np.array(xqrs_out.qrs_inds, dtype=np.intp), radius=radius, direction=peak_dir
     )
 
     return _sanitize_qrs_locations(sig, peak_indices, min_peak_distance)
@@ -196,33 +199,33 @@ def _find_peaks_xqrs(
 def find_peaks(
     sig: npt.NDArray[np.float64],
     sampling_rate: int,
-    method: PeakDetectionMethod,
-    method_parameters: _t.PeakDetectionMethodParameters,
-) -> npt.NDArray[np.int32]:
-    if method == PeakDetectionMethod.LocalMaxima:
-        method_parameters = t.cast(_t.PeaksLocalMaxima, method_parameters)
+    method: PeakDetectionAlgorithm,
+    method_parameters: _t.PeakDetectionMethodParameters | None,
+) -> npt.NDArray[np.intp]:
+    if method == PeakDetectionAlgorithm.LocalMaxima:
+        method_parameters = cast(_t.PeaksLocalMaxima, method_parameters)
         return find_extrema(
             sig,
             search_radius=method_parameters["search_radius"],
             direction="up",
             min_peak_distance=method_parameters["min_distance"],
         )
-    elif method == PeakDetectionMethod.LocalMinima:
-        method_parameters = t.cast(_t.PeaksLocalMinima, method_parameters)
+    elif method == PeakDetectionAlgorithm.LocalMinima:
+        method_parameters = cast(_t.PeaksLocalMinima, method_parameters)
         return find_extrema(
             sig,
             search_radius=method_parameters["search_radius"],
             direction="down",
             min_peak_distance=method_parameters["min_distance"],
         )
-    elif method == PeakDetectionMethod.PPGElgendi:
-        method_parameters = t.cast(_t.PeaksPPGElgendi, method_parameters)
+    elif method == PeakDetectionAlgorithm.PPGElgendi:
+        method_parameters = cast(_t.PeaksPPGElgendi, method_parameters)
         peak_dict = nk.ppg_findpeaks(
             sig, sampling_rate=sampling_rate, method="elgendi", show=False, **method_parameters
         )
-        return np.asarray(peak_dict["PPG_Peaks"], dtype=np.int32)
-    elif method == PeakDetectionMethod.WFDBXQRS:
-        method_parameters = t.cast(_t.PeaksWFDBXQRS, method_parameters)
+        return np.asarray(peak_dict["PPG_Peaks"], dtype=np.intp)
+    elif method == PeakDetectionAlgorithm.ECGXQRS:
+        method_parameters = cast(_t.PeaksECGXQRS, method_parameters)
         return _find_peaks_xqrs(
             sig,
             sampling_rate,
@@ -230,25 +233,41 @@ def find_peaks(
             min_peak_distance=method_parameters["min_peak_distance"],
             peak_dir=WFDBPeakDirection(method_parameters["peak_dir"]),
         )
-    elif method == PeakDetectionMethod.ECGNeuroKit2:
-        method_parameters = t.cast(_t.PeaksECGNeuroKit2, method_parameters)
-        assert "method" in method_parameters, "NeuroKit2 ECG peak detection method not specified"
-        return _find_peaks_nk_ecg(method_parameters, sig, sampling_rate)
-
-
-def _find_peaks_nk_ecg(
-    method_parameters: _t.PeaksECGNeuroKit2, sig: npt.NDArray[np.float64] | pl.Series, sampling_rate: int
-) -> npt.NDArray[np.int32]:
-    nk_method = method_parameters["method"]
-    logger.info(f"Using NeuroKit2 ECG peak detection method: {nk_method}")
-    params = method_parameters["params"]
-    if params is None:
-        params = {}
-
-    return nk.ecg_findpeaks(
-        ecg_cleaned=sig,
-        sampling_rate=sampling_rate,
-        method=nk_method,
-        show=False,
-        **params,
-    )["ECG_R_Peaks"]
+    elif method == PeakDetectionAlgorithm.ECGNeuroKit:
+        method_parameters = cast(_t.PeaksECGNeuroKit, method_parameters)
+        return nk.ecg_findpeaks(
+            ecg_cleaned=sig,
+            sampling_rate=sampling_rate,
+            method=method,
+            show=False,
+            **method_parameters,
+        )["ECG_R_Peaks"]
+    elif method == PeakDetectionAlgorithm.ECGEmrich2023:
+        method_parameters = cast(_t.PeaksECGEmrich, method_parameters)
+        return nk.ecg_findpeaks(
+            ecg_cleaned=sig,
+            sampling_rate=sampling_rate,
+            method=method,
+            show=False,
+            **method_parameters,
+        )["ECG_R_Peaks"]
+    elif method == PeakDetectionAlgorithm.ECGGamboa2008:
+        method_parameters = cast(_t.PeaksECGGamboa, method_parameters)
+        return nk.ecg_findpeaks(
+            ecg_cleaned=sig,
+            sampling_rate=sampling_rate,
+            method=method,
+            show=False,
+            **method_parameters,
+        )["ECG_R_Peaks"]
+    elif method == PeakDetectionAlgorithm.ECGPromac:
+        method_parameters = cast(_t.PeaksECGPromac, method_parameters)
+        return nk.ecg_findpeaks(
+            ecg_cleaned=sig,
+            sampling_rate=sampling_rate,
+            method=method,
+            show=False,
+            **method_parameters,
+        )["ECG_R_Peaks"]
+    else:
+        raise NotImplementedError

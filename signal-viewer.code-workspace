@@ -11,6 +11,7 @@
 			"**/output": true,
 			"**/pickles": true,
 			"**/.idea": true,
+			"**/.venv": true
 		},
 		"python.analysis.exclude": [
 			"**/__pycache__",
@@ -24,7 +25,9 @@
 			"**/build/**",
 			"**/output/**",
 			"**/.idea/**",
-			// "**/ui_*.py",
+			"**/ui_*.py",
+			"**/doc/**",
+			"**/icons",
 		],
 		"python.analysis.ignore": [
 			"signal_viewer/generated/*.py",

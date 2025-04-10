@@ -27,11 +27,8 @@ dependencies = [
     "pyside-widgets",
     "pyside-config",
     "ts2vg",
+    "safe-result>=4.0.1",
 ]
-
-# [tool.uv.sources]
-# pyopengl = { git = "https://github.com/mcfletch/pyopengl", tag = "release-3.1.8" }
-# pyopengl_accelerate = { git = "https://github.com/mcfletch/pyopengl", tag = "release-3.1.8", subdirectory = "accelerate" }
 
 [build-system]
 requires = ["hatchling"]

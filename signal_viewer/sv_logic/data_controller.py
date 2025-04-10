@@ -5,16 +5,16 @@ from pathlib import Path
 import attrs
 import mne.io
 import polars as pl
+from janitor.polars import clean_names
 from loguru import logger
 from PySide6 import QtCore
 
-# from pyside_config import config
 import signal_viewer.type_defs as _t
-from signal_viewer.sv_config import Config
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION
 from signal_viewer.enum_defs import InputFileFormat, TextFileSeparator
-from signal_viewer.sv_logic.file_io import detect_sampling_rate, read_edf, sanitize_input
-from signal_viewer.sv_logic.data_models import FileMetadata, DataFrameModel, SectionListModel
+from signal_viewer.sv_config import Config
+from signal_viewer.sv_logic.data_models import DataFrameModel, FileMetadata, SectionListModel
+from signal_viewer.sv_logic.file_io import detect_sampling_rate, read_edf
 from signal_viewer.sv_logic.section import DetailedSectionResult, Section, SectionID
 
 
@@ -169,7 +169,7 @@ class DataController(QtCore.QObject):
             other_info = dict(edf_info.info)
         elif file_path.suffix in {".feather", ".csv", ".txt", ".tsv"}:
             lf = self._reader_funcs[file_path.suffix](file_path)
-            lf = sanitize_input(lf)[0]
+            lf: pl.LazyFrame = clean_names(lf, remove_special=True, strip_underscores=True, strip_accents=True)
             column_names = lf.collect_schema().names()
             try:
                 sampling_rate = detect_sampling_rate(lf)
@@ -177,7 +177,7 @@ class DataController(QtCore.QObject):
                 sampling_rate = 0
         elif file_path.suffix in {".xls", ".xlsx"}:
             lf = pl.read_excel(file_path).lazy()
-            lf = sanitize_input(lf)[0]
+            lf = clean_names(lf, remove_special=True, strip_underscores=True, strip_accents=True)
             column_names = lf.collect_schema().names()
             try:
                 sampling_rate = detect_sampling_rate(lf)

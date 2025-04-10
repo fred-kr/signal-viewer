@@ -2,7 +2,7 @@ import decimal
 import enum
 
 import pyside_widgets as pw
-from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6 import QtCore, QtGui, QtWidgets
 
 import signal_viewer.type_defs as _t
 from signal_viewer.enum_defs import (
@@ -24,7 +24,7 @@ def restore_default(w: QtWidgets.QWidget | QtCore.QObject) -> None:
     if isinstance(w, QtWidgets.QComboBox):
         w.setCurrentIndex(0)
         return
-    
+
     if default_value := w.property("defaultValue"):
         if isinstance(w, (pw.DecimalSpinBox, QtWidgets.QSpinBox, QtWidgets.QDoubleSpinBox)):
             w.setValue(default_value)
@@ -32,7 +32,6 @@ def restore_default(w: QtWidgets.QWidget | QtCore.QObject) -> None:
         elif isinstance(w, (pw.ToggleSwitch, pw.AnimatedToggleSwitch, QtWidgets.QCheckBox)):
             w.setChecked(default_value)
             return
-
 
 
 def _setup_spinbox(
@@ -93,7 +92,7 @@ class Inputs(QtWidgets.QWidget):
         self.action_sf_reset_inputs = QtGui.QAction(QtGui.QIcon("://icons/ArrowReset.svg"), "Reset Inputs", self)
         self.action_sf_reset_inputs.triggered.connect(self.reset_inputs)
         self.action_sf_reset_data = QtGui.QAction(QtGui.QIcon("://icons/Broom.svg"), "Reset Data", self)
-        # self.action_sf_reset_data.triggered.connect(self.reset_data)
+        self.action_sf_reset_data.triggered.connect(self.reset_data)
 
         # Peak Detection
         self.action_peak_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Run", self)
@@ -101,13 +100,15 @@ class Inputs(QtWidgets.QWidget):
         self.action_peak_reset_inputs = QtGui.QAction(QtGui.QIcon("://icons/ArrowReset.svg"), "Reset Inputs", self)
         self.action_peak_reset_inputs.triggered.connect(self.reset_inputs)
         self.action_peak_reset_data = QtGui.QAction(QtGui.QIcon("://icons/Broom.svg"), "Clear Peaks", self)
-        # self.action_peak_reset_data.triggered.connect(self.reset_data)
+        self.action_peak_reset_data.triggered.connect(self.clear_peaks)
 
     def finish_setup(self) -> None:
         # Signal Filter
+        self.ui.sf_pipeline.setAllowNone(True)
         self.ui.sf_pipeline.set_enum_class(PreprocessPipeline)
         self.ui.sf_pipeline.currentIndexChanged.connect(self._on_pipeline_changed)
 
+        self.ui.sf_method.setAllowNone(True)
         self.ui.sf_method.set_enum_class(FilterMethod)
         self.ui.sf_method.currentIndexChanged.connect(self._on_filter_method_changed)
 
@@ -128,6 +129,7 @@ class Inputs(QtWidgets.QWidget):
         self.ui.sf_command_bar.setLayout(sf_tb_l)
 
         # Standardization
+        self.ui.std_method.setAllowNone(True)
         self.ui.std_method.set_enum_class(StandardizationMethod)
         self.ui.std_method.currentIndexChanged.connect(self._on_std_method_changed)
 
@@ -186,6 +188,13 @@ class Inputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.rate_period, 1, 10_000, 1, 60, 0)
         _setup_spinbox(self.ui.rate_every, 1, 600, 1, 10, 0)
 
+    @QtCore.Slot()
+    def reset_data(self) -> None:
+        self.sig_reset_data.emit()
+
+    @QtCore.Slot()
+    def clear_peaks(self) -> None:
+        self.sig_clear_peaks.emit()
 
     @QtCore.Slot()
     def reset_inputs(self) -> None:
@@ -199,7 +208,7 @@ class Inputs(QtWidgets.QWidget):
                 restore_default(c)
         else:
             print(f"Unknown sender: {sender}")
-            
+
     @QtCore.Slot(bool)
     def _on_rolling_window_toggled(self, checked: bool) -> None:
         self.ui.std_window_size.setEnabled(checked)
@@ -337,7 +346,7 @@ class Inputs(QtWidgets.QWidget):
                 mindelay=self.ui.peak_ppg_elgendi_mindelay.floatValue(),
             )
         elif method == PeakDetectionAlgorithm.ECGNeuroKit:
-            peak_params = _t.NK2PeaksNeuroKit(
+            peak_params = _t.PeaksECGNeuroKit(
                 smoothwindow=self.ui.peak_ecg_nk_smoothwindow.floatValue(),
                 avgwindow=self.ui.peak_ecg_nk_avgwindow.floatValue(),
                 gradthreshweight=self.ui.peak_ecg_nk_gradthreshweight.floatValue(),
@@ -345,14 +354,14 @@ class Inputs(QtWidgets.QWidget):
                 mindelay=self.ui.peak_ecg_nk_mindelay.floatValue(),
             )
         elif method == PeakDetectionAlgorithm.ECGPromac:
-            peak_params = _t.NK2PeaksPromac(
+            peak_params = _t.PeaksECGPromac(
                 threshold=self.ui.peak_ecg_promac_threshold.floatValue(),
                 gaussian_sd=self.ui.peak_ecg_promac_gaussian_sd.intValue(),
             )
         elif method == PeakDetectionAlgorithm.ECGGamboa2008:
-            peak_params = _t.NK2PeaksGamboa(tol=self.ui.peak_ecg_gamboa_tol.floatValue())
+            peak_params = _t.PeaksECGGamboa(tol=self.ui.peak_ecg_gamboa_tol.floatValue())
         elif method == PeakDetectionAlgorithm.ECGEmrich2023:
-            peak_params = _t.NK2PeaksEmrich(
+            peak_params = _t.PeaksECGEmrich(
                 window_seconds=self.ui.peak_ecg_emrich_window_seconds.floatValue(),
                 window_overlap=self.ui.peak_ecg_emrich_window_overlap.floatValue(),
                 accelerated=self.ui.peak_ecg_emrich_accelerated.isChecked(),
@@ -373,7 +382,7 @@ class Inputs(QtWidgets.QWidget):
             peak_dir: WFDBPeakDirection = self.ui.peak_xqrs_direction.current_enum()
             if peak_dir is None:
                 peak_dir = WFDBPeakDirection.Up
-            peak_params = _t.PeaksWFDBXQRS(
+            peak_params = _t.PeaksECGXQRS(
                 search_radius=self.ui.peak_xqrs_radius.intValue(),
                 peak_dir=peak_dir,
                 min_peak_distance=self.ui.peak_xqrs_min_dist.intValue(),
@@ -381,12 +390,37 @@ class Inputs(QtWidgets.QWidget):
 
         return peak_params
 
+    def get_rate_params(self) -> _t.RollingRateKwargsDict:
+        return {
+            "sec_new_window_every": self.ui.rate_every.intValue(),
+            "sec_window_length": self.ui.rate_period.intValue(),
+            "incomplete_window_method": IncompleteWindowMethod(self.ui.rate_handle_incomplete.currentData()),
+        }
+
+
+class InputsDock(QtWidgets.QDockWidget):
+    def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
+        super().__init__("Parameter Inputs", parent=parent)
+        self.setAllowedAreas(QtCore.Qt.DockWidgetArea.AllDockWidgetAreas)
+        self.setWindowIcon(QtGui.QIcon("://icons/Options.svg"))
+        self.toggleViewAction().setIcon(QtGui.QIcon("://icons/Options.svg"))
+
+        self.ui = Inputs()
+        self.setWidget(self.ui)
+
 
 if __name__ == "__main__":
     import sys
 
     QtWidgets.QApplication.setStyle("Fusion")
     app = QtWidgets.QApplication(sys.argv)
-    window = Inputs()
+    window = InputsDock()
+    window.ui.sig_clear_peaks.connect(print)
+    window.ui.sig_reset_data.connect(print)
+    window.ui.sig_run_filter.connect(print)
+    window.ui.sig_run_peak_detection.connect(print)
+    window.ui.sig_run_pipeline.connect(print)
+    window.ui.sig_run_standardization.connect(print)
+
     window.show()
     sys.exit(app.exec())

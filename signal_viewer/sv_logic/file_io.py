@@ -110,7 +110,7 @@ def detect_sampling_rate(
             time_column = possible_columns[0]
         else:
             raise ValueError(
-                f"Detected multiple columns that could be interpreted as time data: [{', '.join([f'\'{col}\'' for col in possible_columns])}]. Please specify the time column manually."
+                f"Detected multiple columns that could be interpreted as time data: [{', '.join([f"'{col}'" for col in possible_columns])}]. Please specify the time column manually."
             )
 
     time_col_dtype = lf.collect_schema()[time_column]
@@ -221,7 +221,7 @@ def write_hdf5(file_path: Path, data: _t.CompleteResultDict) -> None:
             peak_method = section_data["metadata"]["processing_parameters"]["peak_detection_method"] or "None"
             peak_params = section_data["metadata"]["processing_parameters"]["peak_detection_method_parameters"] or {}
             if peak_method == PeakDetectionMethod.ECGNeuroKit2:
-                peak_method = f"{peak_method} ({peak_params.get("method", "None")})"
+                peak_method = f"{peak_method} ({peak_params.get('method', 'None')})"
                 peak_params = peak_params.get("params") or {}
             h5f.set_node_attr(peak_detect_group, "method", peak_method)
             if peak_params:
@@ -234,9 +234,9 @@ def write_hdf5(file_path: Path, data: _t.CompleteResultDict) -> None:
             h5f.set_node_attr(rate_group, "method", rate_method)
 
 
-def sanitize_input[T: (pl.LazyFrame, pl.DataFrame)](data: T, **kwargs: t.Any) -> tuple[T, dict[str, str]]:
-    """
-    Cleans column names of input data.
-    """
-    orig_names = data.collect_schema().names()
-    return data.clean_names(**kwargs), dict(zip(orig_names, data.collect_schema().names(), strict=False))
+# def sanitize_input[T: (pl.LazyFrame, pl.DataFrame)](data: T, **kwargs: t.Any) -> tuple[T, dict[str, str]]:
+#     """
+#     Cleans column names of input data.
+#     """
+#     orig_names = data.collect_schema().names()
+#     return data.clean_names(**kwargs), dict(zip(orig_names, data.collect_schema().names(), strict=False))

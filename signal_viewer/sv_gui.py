@@ -4,7 +4,6 @@ import os
 from typing import TYPE_CHECKING
 
 import pyside_config as qconfig
-import qfluentwidgets as qfw
 from loguru import logger
 from PySide6 import QtCore, QtGui, QtWidgets
 from pyside_widgets import OverlayWidget, SearchableDataTreeWidget
@@ -17,7 +16,9 @@ from signal_viewer.generated.ui_main_window import Ui_MainWindow
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_widgets.dlg_metadata import MetadataDialog
 from signal_viewer.sv_widgets.dock_log_window import StatusMessageDock
-from signal_viewer.sv_widgets.dock_parameter_inputs import ParameterInputsDock
+
+# from signal_viewer.sv_widgets.dock_parameter_inputs import ParameterInputsDock
+from signal_viewer.sv_widgets.dock_param_inputs import InputsDock
 from signal_viewer.sv_widgets.dock_sections import SectionListDock
 from signal_viewer.utils import get_app
 
@@ -167,7 +168,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dock_sections = dock_sections
         self.dock_sections.setEnabled(False)
 
-        dock_parameters = ParameterInputsDock()
+        dock_parameters = InputsDock()
         self.addDockWidget(dwa.RightDockWidgetArea, dock_parameters)
         self.dock_parameters = dock_parameters
         self.dock_parameters.setEnabled(False)
@@ -240,7 +241,7 @@ class SVGUI(QtWidgets.QMainWindow):
 
     @QtCore.Slot(QtCore.QPoint)
     def show_section_list_context_menu(self, pos: QtCore.QPoint) -> None:
-        menu = qfw.RoundMenu(parent=self.dock_sections.list_view)
+        menu = QtWidgets.QMenu(parent=self.dock_sections.list_view)
         menu.addAction(self.ui.action_remove_section)
         menu.addAction(self.action_show_section_summary)
         menu.exec(QtGui.QCursor.pos())
@@ -260,7 +261,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.ui.menu_help.addAction(self.dock_status_log.toggleViewAction())
         self.ui.menu_help.insertAction(self.ui.action_show_user_guide, self.action_toggle_whats_this_mode)
 
-        self.menu_export = qfw.RoundMenu()
+        self.menu_export = QtWidgets.QMenu()
         self.menu_export.addActions([self.action_export_to_csv, self.action_export_to_xlsx, self.action_export_to_hdf5])
 
     def hide_all_docks(self) -> None:
@@ -328,7 +329,7 @@ class SVGUI(QtWidgets.QMainWindow):
 
     @QtCore.Slot(QtCore.QPoint)
     def show_data_view_context_menu(self, pos: QtCore.QPoint) -> None:
-        menu = qfw.RoundMenu(parent=self.ui.table_view_import_data)
+        menu = QtWidgets.QMenu(parent=self.ui.table_view_import_data)
         action = QtGui.QAction(QtGui.QIcon("://icons/ArrowSync"), "Refresh", self.ui.table_view_import_data)
         action.triggered.connect(self.sig_table_refresh_requested.emit)
         menu.addAction(action)
@@ -343,7 +344,7 @@ class SVGUI(QtWidgets.QMainWindow):
             table_view = self.ui.table_view_result_rate
         else:
             return
-        menu = qfw.RoundMenu(parent=table_view)
+        menu = QtWidgets.QMenu(parent=table_view)
         action_copy_table = QtGui.QAction(
             QtGui.QIcon("://icons/Copy"),
             "Copy to Clipboard",
@@ -408,15 +409,6 @@ class SVGUI(QtWidgets.QMainWindow):
             self.console_window.close()
 
         return super().closeEvent(event)
-
-    def show_success(self, title: str, text: str) -> None:
-        qfw.InfoBar.success(
-            title=title,
-            content=text,
-            duration=5000,
-            position=qfw.InfoBarPosition.TOP,
-            parent=self,
-        )
 
     @QtCore.Slot(str, int, str)
     def maybe_show_error_dialog(
