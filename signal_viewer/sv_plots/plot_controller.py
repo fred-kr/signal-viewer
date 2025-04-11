@@ -43,8 +43,6 @@ def find_nearest_extrema(
     x_distances = np.abs(valid_x - cursor_x)
     y_distances = np.abs(valid_y - cursor_y)
 
-    # min_distances = np.minimum(x_distances, y_distances)
-
     extrema_idx = left_idx + np.argmin(x_distances)
     extrema_val = y_data[extrema_idx]
 
@@ -56,17 +54,6 @@ def find_nearest_extrema(
         extrema_val = extrema_val_y
 
     return x_data[extrema_idx], extrema_val
-    # min_distance = np.minimum(x_distances, y_distances)
-    # if len(min_distance) == 0:
-    #     return None
-
-    # if np.all(min_distance > search_radius):
-    #     return None
-
-    # extrema_idx = l_idx + np.argmin(min_distance)
-    # extrema_val = valid_y[np.argmin(min_distance)]
-
-    # return x_data[extrema_idx], extrema_val
 
 
 class PlotController(QtCore.QObject):
@@ -89,8 +76,7 @@ class PlotController(QtCore.QObject):
         self._setup_plot_data_items()
 
         self.block_clicks = False
-        self.manual_edit = False
-        # self._closest_extreme: tuple[int | float, int | float] | None = None
+        self.manual_edit = True
 
     def _setup_plot_widgets(self) -> None:
         widget_layout = QtWidgets.QVBoxLayout()
@@ -108,6 +94,8 @@ class PlotController(QtCore.QObject):
 
     def _setup_plot_items(self) -> None:
         for plt_item in (self.pw_main.getPlotItem(), self.pw_rate.getPlotItem()):
+            if plt_item is None:
+                continue
             vb = plt_item.getViewBox()
             plt_item.setAxisItems({"top": TimeAxisItem(orientation="top")})
             plt_item.showGrid(x=False, y=True)
@@ -177,15 +165,6 @@ class PlotController(QtCore.QObject):
         self.signal_curve = signal
         self.pw_main.addItem(self.signal_curve)
 
-        # # XXX: temp testing
-        # pg.setConfigOption("mouseRateLimit", 50)
-        # click_target = pg.TargetItem(movable=False, symbol=PointSymbols.Circle, pen=make_qpen(SVGColors.SandyBrown))
-        # click_target.setZValue(1e9)
-        # self.click_target = click_target
-        # self.click_target.setVisible(False)
-        # self.pw_main.addItem(self.click_target)
-        # self.pw_main.scene().sigMouseMoved.connect(self._on_mouse_moved)
-
     def remove_signal_curve(self) -> None:
         if self.signal_curve is None:
             return
@@ -194,13 +173,6 @@ class PlotController(QtCore.QObject):
         self.pw_main.removeItem(self.signal_curve)
         self.signal_curve.setParent(None)
         self.signal_curve = None
-
-        # if self.click_target is None:
-        #     return
-        # self.pw_main.scene().sigMouseMoved.disconnect(self._on_mouse_moved)
-        # self.pw_main.removeItem(self.click_target)
-        # self.click_target.setParent(None)
-        # self.click_target = None
 
     def _init_peak_scatter(
         self,
@@ -443,8 +415,7 @@ class PlotController(QtCore.QObject):
     def _nearest_extreme_point(
         self, pos: QtCore.QPointF, radius_px: int | None = None
     ) -> tuple[int | float, int | float] | None:
-        print("nearest_extreme_point")
-        if self.signal_curve is None or self.block_clicks or not self.manual_edit:
+        if self.signal_curve is None or self.block_clicks:
             return None
 
         radius_px = radius_px or Config.plot.click_radius
@@ -480,72 +451,19 @@ class PlotController(QtCore.QObject):
     @QtCore.Slot(object, object)
     def _on_curve_clicked(self, sender: pg.PlotCurveItem, ev: "mouseEvents.MouseClickEvent") -> None:
         ev.accept()
-        if self.block_clicks or not self.manual_edit:
+        if self.block_clicks:
             return
         if self.peak_scatter is None:
             return
 
-        # click_x = int(ev.pos().x())
-        # click_y = ev.pos().y()
-        # x_data = self.signal_curve.xData
-        # y_data = self.signal_curve.yData
-        # if x_data is None or y_data is None:
-        #     return
-
-        # scatter_search_radius = Config.plot.click_radius
-
-        # left_index = np.searchsorted(x_data, click_x - scatter_search_radius, side="left")
-        # right_index = np.searchsorted(x_data, click_x + scatter_search_radius, side="right")
-
-        # valid_x = x_data[left_index:right_index]
-        # valid_y = y_data[left_index:right_index]
-
-        # # # Find the index of the nearest extreme point to the click position
-        # extreme_index = left_index + np.argmin(np.abs(valid_x - click_x))
-        # extreme_value = valid_y[np.argmin(np.abs(valid_x - click_x))]
-
-        # # # Find the index of the nearest extreme point to the click position in the y direction
-        # extreme_index_y = left_index + np.argmin(np.abs(valid_y - click_y))
-        # extreme_value_y = valid_y[np.argmin(np.abs(valid_y - click_y))]
-
-        # # # Use the index of the nearest extreme point in the y direction if it is closer to the click position
-        # if np.abs(extreme_value_y - click_y) < np.abs(extreme_value - click_y):
-        #     extreme_index = extreme_index_y
-        #     extreme_value = extreme_value_y
-
-        # if extreme_index in self.peak_scatter.data["x"]:
-        # return
         closest_extreme = self._nearest_extreme_point(ev.pos())
         if closest_extreme is None:
             return
 
         x_new, y_new = closest_extreme
-        # new_method = self._nearest_extreme_point(ev.pos())
-        # new_x2 = new_y2 = None
-        # if new_method is not None:
-        # new_x2, new_y2 = new_method
-
-        # print(f"Old method: {x_new}, {y_new}; New method: {new_x2}, {new_y2}")
 
         self.peak_scatter.addPoints(x=[x_new], y=[y_new])
         self.sig_scatter_data_changed.emit("add", np.array([x_new], dtype=np.int32))
-
-    # @QtCore.Slot(QtCore.QPointF)
-    # def _on_mouse_moved(self, scene_pos: QtCore.QPointF) -> None:
-    #     if self.block_clicks or not self.manual_edit:
-    #         return
-    #     if self.signal_curve is None or self.click_target is None:
-    #         return
-
-    #     plot_pos = self.signal_curve.curve.mapFromScene(scene_pos)
-    #     self._closest_extreme = self._nearest_extreme_point(plot_pos)
-
-    #     if self._closest_extreme is None:
-    #         self.click_target.setVisible(False)
-    #         return
-
-    #     self.click_target.setPos(self._closest_extreme)
-    #     self.click_target.setVisible(True)
 
     @QtCore.Slot()
     def remove_peaks_in_selection(self) -> None:
