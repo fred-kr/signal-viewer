@@ -20,9 +20,9 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QForm
     QFrame, QGridLayout, QGroupBox, QHBoxLayout,
     QHeaderView, QLabel, QLineEdit, QListView,
     QMainWindow, QMenu, QMenuBar, QPushButton,
-    QSizePolicy, QSpinBox, QStackedWidget, QTabWidget,
-    QTableView, QToolBar, QTreeView, QVBoxLayout,
-    QWidget)
+    QSizePolicy, QSpacerItem, QSpinBox, QStackedWidget,
+    QTabWidget, QTableView, QToolBar, QTreeView,
+    QVBoxLayout, QWidget)
 
 from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
 
@@ -159,114 +159,6 @@ class Ui_MainWindow(object):
         self.container_file_information.setObjectName(u"container_file_information")
         self.gridLayout = QGridLayout(self.container_file_information)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.btn_load_data = QPushButton(self.container_file_information)
-        self.btn_load_data.setObjectName(u"btn_load_data")
-        self.btn_load_data.setEnabled(False)
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.btn_load_data.sizePolicy().hasHeightForWidth())
-        self.btn_load_data.setSizePolicy(sizePolicy)
-        self.btn_load_data.setMinimumSize(QSize(0, 41))
-        icon16 = QIcon()
-        icon16.addFile(u"://icons/DocumentArrowRight.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.btn_load_data.setIcon(icon16)
-
-        self.gridLayout.addWidget(self.btn_load_data, 3, 0, 1, 2)
-
-        self.grp_box_required_info = QGroupBox(self.container_file_information)
-        self.grp_box_required_info.setObjectName(u"grp_box_required_info")
-        sizePolicy.setHeightForWidth(self.grp_box_required_info.sizePolicy().hasHeightForWidth())
-        self.grp_box_required_info.setSizePolicy(sizePolicy)
-        self.grp_box_required_info.setFlat(True)
-        self.formLayout = QFormLayout(self.grp_box_required_info)
-        self.formLayout.setObjectName(u"formLayout")
-        self.samplingRateLabel = QLabel(self.grp_box_required_info)
-        self.samplingRateLabel.setObjectName(u"samplingRateLabel")
-        self.samplingRateLabel.setMinimumSize(QSize(0, 31))
-
-        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.samplingRateLabel)
-
-        self.spin_box_sampling_rate_import_page = QSpinBox(self.grp_box_required_info)
-        self.spin_box_sampling_rate_import_page.setObjectName(u"spin_box_sampling_rate_import_page")
-        self.spin_box_sampling_rate_import_page.setMinimumSize(QSize(0, 31))
-        self.spin_box_sampling_rate_import_page.setFrame(False)
-        self.spin_box_sampling_rate_import_page.setMaximum(10000)
-        self.spin_box_sampling_rate_import_page.setValue(0)
-
-        self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.spin_box_sampling_rate_import_page)
-
-        self.signalColumnChannelLabel = QLabel(self.grp_box_required_info)
-        self.signalColumnChannelLabel.setObjectName(u"signalColumnChannelLabel")
-        self.signalColumnChannelLabel.setMinimumSize(QSize(0, 31))
-
-        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.signalColumnChannelLabel)
-
-        self.line = QFrame(self.grp_box_required_info)
-        self.line.setObjectName(u"line")
-        self.line.setFrameShape(QFrame.Shape.HLine)
-        self.line.setFrameShadow(QFrame.Shadow.Sunken)
-
-        self.formLayout.setWidget(3, QFormLayout.ItemRole.SpanningRole, self.line)
-
-        self.infoColumnChannelLabel = QLabel(self.grp_box_required_info)
-        self.infoColumnChannelLabel.setObjectName(u"infoColumnChannelLabel")
-        self.infoColumnChannelLabel.setMinimumSize(QSize(0, 31))
-
-        self.formLayout.setWidget(5, QFormLayout.ItemRole.LabelRole, self.infoColumnChannelLabel)
-
-        self.combo_box_signal_column_import_page = QComboBox(self.grp_box_required_info)
-        self.combo_box_signal_column_import_page.setObjectName(u"combo_box_signal_column_import_page")
-        self.combo_box_signal_column_import_page.setMinimumSize(QSize(0, 31))
-
-        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.combo_box_signal_column_import_page)
-
-        self.combo_box_info_column_import_page = QComboBox(self.grp_box_required_info)
-        self.combo_box_info_column_import_page.setObjectName(u"combo_box_info_column_import_page")
-        self.combo_box_info_column_import_page.setMinimumSize(QSize(0, 31))
-
-        self.formLayout.setWidget(5, QFormLayout.ItemRole.FieldRole, self.combo_box_info_column_import_page)
-
-
-        self.gridLayout.addWidget(self.grp_box_required_info, 2, 0, 1, 3)
-
-        self.line_edit_active_file = QLineEdit(self.container_file_information)
-        self.line_edit_active_file.setObjectName(u"line_edit_active_file")
-        self.line_edit_active_file.setMinimumSize(QSize(0, 31))
-        self.line_edit_active_file.setFrame(False)
-        self.line_edit_active_file.setReadOnly(True)
-
-        self.gridLayout.addWidget(self.line_edit_active_file, 1, 1, 1, 2)
-
-        self.btn_open_file = QPushButton(self.container_file_information)
-        self.btn_open_file.setObjectName(u"btn_open_file")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.btn_open_file.sizePolicy().hasHeightForWidth())
-        self.btn_open_file.setSizePolicy(sizePolicy1)
-        self.btn_open_file.setMinimumSize(QSize(0, 41))
-        self.btn_open_file.setIcon(icon)
-
-        self.gridLayout.addWidget(self.btn_open_file, 1, 0, 1, 1)
-
-        self.btn_close_file = QPushButton(self.container_file_information)
-        self.btn_close_file.setObjectName(u"btn_close_file")
-        self.btn_close_file.setEnabled(False)
-        sizePolicy1.setHeightForWidth(self.btn_close_file.sizePolicy().hasHeightForWidth())
-        self.btn_close_file.setSizePolicy(sizePolicy1)
-        self.btn_close_file.setMinimumSize(QSize(0, 41))
-        self.btn_close_file.setIcon(icon3)
-
-        self.gridLayout.addWidget(self.btn_close_file, 3, 2, 1, 1)
-
-        self.label_2 = QLabel(self.container_file_information)
-        self.label_2.setObjectName(u"label_2")
-        sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
-        self.label_2.setSizePolicy(sizePolicy)
-
-        self.gridLayout.addWidget(self.label_2, 0, 0, 1, 3)
-
         self.container_recent_files = QWidget(self.container_file_information)
         self.container_recent_files.setObjectName(u"container_recent_files")
         self.verticalLayout_3 = QVBoxLayout(self.container_recent_files)
@@ -280,11 +172,114 @@ class Ui_MainWindow(object):
         self.list_view_recent_files = QListView(self.container_recent_files)
         self.list_view_recent_files.setObjectName(u"list_view_recent_files")
         self.list_view_recent_files.setTextElideMode(Qt.TextElideMode.ElideMiddle)
+        self.list_view_recent_files.setSpacing(4)
 
         self.verticalLayout_3.addWidget(self.list_view_recent_files)
 
 
         self.gridLayout.addWidget(self.container_recent_files, 4, 0, 1, 3)
+
+        self.btn_open_file = QPushButton(self.container_file_information)
+        self.btn_open_file.setObjectName(u"btn_open_file")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.btn_open_file.sizePolicy().hasHeightForWidth())
+        self.btn_open_file.setSizePolicy(sizePolicy)
+        self.btn_open_file.setIcon(icon)
+
+        self.gridLayout.addWidget(self.btn_open_file, 1, 0, 1, 1)
+
+        self.line_edit_active_file = QLineEdit(self.container_file_information)
+        self.line_edit_active_file.setObjectName(u"line_edit_active_file")
+        self.line_edit_active_file.setFrame(False)
+        self.line_edit_active_file.setReadOnly(True)
+
+        self.gridLayout.addWidget(self.line_edit_active_file, 1, 1, 1, 2)
+
+        self.grp_box_required_info = QGroupBox(self.container_file_information)
+        self.grp_box_required_info.setObjectName(u"grp_box_required_info")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.grp_box_required_info.sizePolicy().hasHeightForWidth())
+        self.grp_box_required_info.setSizePolicy(sizePolicy1)
+        self.grp_box_required_info.setFlat(True)
+        self.formLayout = QFormLayout(self.grp_box_required_info)
+        self.formLayout.setObjectName(u"formLayout")
+        self.samplingRateLabel = QLabel(self.grp_box_required_info)
+        self.samplingRateLabel.setObjectName(u"samplingRateLabel")
+        self.samplingRateLabel.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
+
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.samplingRateLabel)
+
+        self.spin_box_sampling_rate_import_page = QSpinBox(self.grp_box_required_info)
+        self.spin_box_sampling_rate_import_page.setObjectName(u"spin_box_sampling_rate_import_page")
+        self.spin_box_sampling_rate_import_page.setFrame(True)
+        self.spin_box_sampling_rate_import_page.setMaximum(10000)
+        self.spin_box_sampling_rate_import_page.setValue(0)
+
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.spin_box_sampling_rate_import_page)
+
+        self.signalColumnChannelLabel = QLabel(self.grp_box_required_info)
+        self.signalColumnChannelLabel.setObjectName(u"signalColumnChannelLabel")
+        self.signalColumnChannelLabel.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
+
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.signalColumnChannelLabel)
+
+        self.line = QFrame(self.grp_box_required_info)
+        self.line.setObjectName(u"line")
+        self.line.setFrameShape(QFrame.Shape.HLine)
+        self.line.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.formLayout.setWidget(3, QFormLayout.ItemRole.SpanningRole, self.line)
+
+        self.infoColumnChannelLabel = QLabel(self.grp_box_required_info)
+        self.infoColumnChannelLabel.setObjectName(u"infoColumnChannelLabel")
+
+        self.formLayout.setWidget(5, QFormLayout.ItemRole.LabelRole, self.infoColumnChannelLabel)
+
+        self.combo_box_signal_column_import_page = QComboBox(self.grp_box_required_info)
+        self.combo_box_signal_column_import_page.setObjectName(u"combo_box_signal_column_import_page")
+
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.combo_box_signal_column_import_page)
+
+        self.combo_box_info_column_import_page = QComboBox(self.grp_box_required_info)
+        self.combo_box_info_column_import_page.setObjectName(u"combo_box_info_column_import_page")
+
+        self.formLayout.setWidget(5, QFormLayout.ItemRole.FieldRole, self.combo_box_info_column_import_page)
+
+
+        self.gridLayout.addWidget(self.grp_box_required_info, 2, 0, 1, 3)
+
+        self.label_2 = QLabel(self.container_file_information)
+        self.label_2.setObjectName(u"label_2")
+        sizePolicy1.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
+        self.label_2.setSizePolicy(sizePolicy1)
+
+        self.gridLayout.addWidget(self.label_2, 0, 0, 1, 3)
+
+        self.btn_close_file = QPushButton(self.container_file_information)
+        self.btn_close_file.setObjectName(u"btn_close_file")
+        self.btn_close_file.setEnabled(False)
+        sizePolicy.setHeightForWidth(self.btn_close_file.sizePolicy().hasHeightForWidth())
+        self.btn_close_file.setSizePolicy(sizePolicy)
+        self.btn_close_file.setIcon(icon3)
+
+        self.gridLayout.addWidget(self.btn_close_file, 3, 0, 1, 1)
+
+        self.btn_load_data = QPushButton(self.container_file_information)
+        self.btn_load_data.setObjectName(u"btn_load_data")
+        self.btn_load_data.setEnabled(False)
+        icon16 = QIcon()
+        icon16.addFile(u"://icons/DocumentArrowRight.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.btn_load_data.setIcon(icon16)
+
+        self.gridLayout.addWidget(self.btn_load_data, 3, 2, 1, 1)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.gridLayout.addItem(self.horizontalSpacer, 3, 1, 1, 1)
 
 
         self.horizontalLayout.addWidget(self.container_file_information)
@@ -344,8 +339,8 @@ class Ui_MainWindow(object):
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.btn_export_all_results = QPushButton(self.stacked_page_export)
         self.btn_export_all_results.setObjectName(u"btn_export_all_results")
-        sizePolicy.setHeightForWidth(self.btn_export_all_results.sizePolicy().hasHeightForWidth())
-        self.btn_export_all_results.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.btn_export_all_results.sizePolicy().hasHeightForWidth())
+        self.btn_export_all_results.setSizePolicy(sizePolicy1)
 
         self.gridLayout_3.addWidget(self.btn_export_all_results, 0, 3, 1, 1)
 
@@ -415,8 +410,8 @@ class Ui_MainWindow(object):
 
         self.btn_export_to_excel = QPushButton(self.stacked_page_export)
         self.btn_export_to_excel.setObjectName(u"btn_export_to_excel")
-        sizePolicy.setHeightForWidth(self.btn_export_to_excel.sizePolicy().hasHeightForWidth())
-        self.btn_export_to_excel.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.btn_export_to_excel.sizePolicy().hasHeightForWidth())
+        self.btn_export_to_excel.setSizePolicy(sizePolicy1)
 
         self.gridLayout_3.addWidget(self.btn_export_to_excel, 0, 2, 1, 1)
 
@@ -431,6 +426,7 @@ class Ui_MainWindow(object):
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 1660, 33))
+        self.menubar.setNativeMenuBar(False)
         self.menu_file = QMenu(self.menubar)
         self.menu_file.setObjectName(u"menu_file")
         self.menu_settings = QMenu(self.menubar)
@@ -452,9 +448,7 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.line_edit_active_file, self.spin_box_sampling_rate_import_page)
         QWidget.setTabOrder(self.spin_box_sampling_rate_import_page, self.combo_box_signal_column_import_page)
         QWidget.setTabOrder(self.combo_box_signal_column_import_page, self.combo_box_info_column_import_page)
-        QWidget.setTabOrder(self.combo_box_info_column_import_page, self.btn_load_data)
-        QWidget.setTabOrder(self.btn_load_data, self.btn_close_file)
-        QWidget.setTabOrder(self.btn_close_file, self.list_view_recent_files)
+        QWidget.setTabOrder(self.combo_box_info_column_import_page, self.list_view_recent_files)
         QWidget.setTabOrder(self.list_view_recent_files, self.table_view_import_data)
         QWidget.setTabOrder(self.table_view_import_data, self.table_view_result_peaks)
         QWidget.setTabOrder(self.table_view_result_peaks, self.table_view_result_rate)
@@ -577,13 +571,14 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(tooltip)
         self.action_unlock_section.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Make a section marked as &quot;Done&quot; editable again.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:10pt; font-weight:700;\">Recent Files</span></p></body></html>", None))
 #if QT_CONFIG(tooltip)
-        self.btn_load_data.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Loads the data from the columns or channels specified in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>", None))
+        self.list_view_recent_files.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Double-click on a filename to open it</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(whatsthis)
-        self.btn_load_data.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Loads the data from the columns or channels specified in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>", None))
+        self.btn_open_file.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Opens a window allowing you to choose a file to load into the app.</p><p>The selected file is searched for available columns or channels of data.</p><p>If any are found, their names are made available for selection in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>", None))
 #endif // QT_CONFIG(whatsthis)
-        self.btn_load_data.setText(QCoreApplication.translate("MainWindow", u"Load Data", None))
+        self.btn_open_file.setText(QCoreApplication.translate("MainWindow", u"Open File", None))
         self.grp_box_required_info.setTitle(QCoreApplication.translate("MainWindow", u"Required Information ", None))
 #if QT_CONFIG(tooltip)
         self.samplingRateLabel.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>The sampling rate of the signal in Hz (samples/second)</p></body></html>", None))
@@ -613,10 +608,7 @@ class Ui_MainWindow(object):
         self.infoColumnChannelLabel.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)</p></body></html>", None))
 #endif // QT_CONFIG(whatsthis)
         self.infoColumnChannelLabel.setText(QCoreApplication.translate("MainWindow", u"Additional Data", None))
-#if QT_CONFIG(whatsthis)
-        self.btn_open_file.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Opens a window allowing you to choose a file to load into the app.</p><p>The selected file is searched for available columns or channels of data.</p><p>If any are found, their names are made available for selection in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>", None))
-#endif // QT_CONFIG(whatsthis)
-        self.btn_open_file.setText(QCoreApplication.translate("MainWindow", u"Open File", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-weight:700;\">Data Import</span></p></body></html>", None))
 #if QT_CONFIG(tooltip)
         self.btn_close_file.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Close the current file and reset the app state.</p><p>Make sure to export any existing results first, as they will be lost on reset.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
@@ -624,12 +616,14 @@ class Ui_MainWindow(object):
         self.btn_close_file.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Close the current file and reset the app state.</p><p>Make sure to export any existing results first, as they will be lost on reset.</p></body></html>", None))
 #endif // QT_CONFIG(whatsthis)
         self.btn_close_file.setText(QCoreApplication.translate("MainWindow", u"Close File", None))
-        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Data Import", None))
-        self.label_3.setText(QCoreApplication.translate("MainWindow", u"Recent Files", None))
 #if QT_CONFIG(tooltip)
-        self.list_view_recent_files.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Double-click on a filename to open it</p></body></html>", None))
+        self.btn_load_data.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Loads the data from the columns or channels specified in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.label.setText(QCoreApplication.translate("MainWindow", u"Data View", None))
+#if QT_CONFIG(whatsthis)
+        self.btn_load_data.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Loads the data from the columns or channels specified in the &quot;Signal Data&quot; and &quot;Additional Data&quot; fields.</p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+        self.btn_load_data.setText(QCoreApplication.translate("MainWindow", u"Load Data", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-weight:700;\">Data View</span></p></body></html>", None))
         self.label_showing_data_table.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Showing: -</p></body></html>", None))
 #if QT_CONFIG(tooltip)
         self.table_view_import_data.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>A table showing the current section's data</p></body></html>", None))

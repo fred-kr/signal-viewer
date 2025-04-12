@@ -1,6 +1,6 @@
 import datetime
-import typing as t
 from pathlib import Path
+from typing import Any
 
 import polars as pl
 from PySide6 import QtCore, QtGui
@@ -9,8 +9,6 @@ import signal_viewer.type_defs as _t
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION, RESERVED_COLUMN_NAMES
 from signal_viewer.enum_defs import InputFileFormat
 from signal_viewer.sv_config import Config
-
-# from .gui.icons import AppIcons
 from signal_viewer.sv_logic.section import Section, SectionID
 from signal_viewer.utils import format_file_path, human_readable_timedelta
 
@@ -40,7 +38,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self,
         index: ModelIndex,
         role: int = ItemDataRole.DisplayRole,
-    ) -> t.Any:
+    ) -> Any:
         if not index.isValid():
             return None
         if index.row() >= self.rowCount() or index.column() >= self.columnCount():
@@ -98,7 +96,11 @@ class FileListModel(QtCore.QAbstractListModel):
     sig_files_changed = QtCore.Signal()
 
     def __init__(
-        self, recent_files: list[str] | None = None, validate_files: bool = True, max_files: int = 10, parent: QtCore.QObject | None = None
+        self,
+        recent_files: list[str] | None = None,
+        validate_files: bool = True,
+        max_files: int = 10,
+        parent: QtCore.QObject | None = None,
     ) -> None:
         super().__init__(parent)
         self._recent_files = recent_files or []
@@ -112,7 +114,7 @@ class FileListModel(QtCore.QAbstractListModel):
     def rowCount(self, parent: ModelIndex | None = None) -> int:
         return len(self._recent_files)
 
-    def data(self, index: ModelIndex, role: int = ItemDataRole.DisplayRole) -> t.Any:
+    def data(self, index: ModelIndex, role: int = ItemDataRole.DisplayRole) -> Any:
         if not index.isValid() or not self._recent_files:
             return None
 
@@ -128,9 +130,7 @@ class FileListModel(QtCore.QAbstractListModel):
             return file_path
         return None
 
-    def headerData(
-        self, section: int, orientation: QtCore.Qt.Orientation, role: int = ItemDataRole.DisplayRole
-    ) -> t.Any:
+    def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: int = ItemDataRole.DisplayRole) -> Any:
         if role != ItemDataRole.DisplayRole:
             return None
 
@@ -218,7 +218,7 @@ class SectionListModel(QtCore.QAbstractListModel):
         self,
         index: ModelIndex,
         role: int = ItemDataRole.DisplayRole,
-    ) -> t.Any:
+    ) -> Any:
         if not index.isValid() or not self._sections:
             return None
         row = index.row()
@@ -300,7 +300,7 @@ class FileMetadata:
             info_col = COMBO_BOX_NO_SELECTION
         self._info_column = info_col
 
-        self.other_info: dict[str, t.Any] = {}
+        self.other_info: dict[str, Any] = {}
 
     @property
     def file_name(self) -> str:

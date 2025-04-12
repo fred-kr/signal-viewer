@@ -3,8 +3,6 @@ from PySide6 import QtCore, QtWidgets
 from signal_viewer.generated.ui_dialog_metadata import Ui_MetadataDialog
 from signal_viewer.sv_config import Config
 
-# from .icons import AppIcons
-
 STYLE_SHEET_SPIN_BOX = """
 SpinBox[requiresInput="false"] {
     border: 2px solid mediumseagreen;

@@ -1,6 +1,7 @@
 import pprint
 import re
-import typing as t
+from collections.abc import Sequence
+from typing import Literal, Unpack
 
 import attrs
 import neurokit2 as nk
@@ -73,7 +74,7 @@ class ManualPeakEdits:
         self.added.clear()
         self.removed.clear()
 
-    def new_added(self, value: int | t.Sequence[int] | pl.Series) -> None:
+    def new_added(self, value: int | Sequence[int] | pl.Series) -> None:
         if isinstance(value, int):
             if value in self.removed:
                 self.removed.remove(value)
@@ -86,7 +87,7 @@ class ManualPeakEdits:
                 else:
                     self.added.append(v)
 
-    def new_removed(self, value: int | t.Sequence[int] | pl.Series) -> None:
+    def new_removed(self, value: int | Sequence[int] | pl.Series) -> None:
         if isinstance(value, int):
             if value in self.added:
                 self.added.remove(value)
@@ -346,7 +347,7 @@ class Section:
     def filter_signal(
         self,
         pipeline: PreprocessPipeline | None = None,
-        **kwargs: t.Unpack[_t.SignalFilterParameters],
+        **kwargs: Unpack[_t.SignalFilterParameters],
     ) -> None:
         """
         Filter this section's signal using the specified pipeline / custom filter parameters.
@@ -404,7 +405,7 @@ class Section:
 
         self.data = self.data.with_columns(pl.Series(self.processed_signal_name, filtered))
 
-    def standardize_signal(self, **kwargs: t.Unpack[_t.StandardizationParameters]) -> None:
+    def standardize_signal(self, **kwargs: Unpack[_t.StandardizationParameters]) -> None:
         """
         Standardize this section's signal using the specified parameters. Based on `neurokit2.standardize`.
 
@@ -616,7 +617,7 @@ class Section:
         sec_window_length: int = 60,
         sec_start_at: int = 0,
         full_info: bool = False,
-        label: t.Literal["left", "right", "datapoint"] = "datapoint",
+        label: Literal["left", "right", "datapoint"] = "datapoint",
         incomplete_window_method: IncompleteWindowMethod = IncompleteWindowMethod.Drop,
     ) -> None:
         sampling_rate = self.sampling_rate

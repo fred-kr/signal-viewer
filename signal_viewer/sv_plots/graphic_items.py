@@ -77,7 +77,7 @@ class EditingViewBox(pg.ViewBox):
         mouse_enabled = np.array(self.state["mouseEnabled"], dtype=np.float64)
         mask = mouse_enabled.copy()
         if axis is not None:
-            mask[1 - axis] = 0.0
+            mask[1 - axis] = 0.0  # type: ignore
 
         button_type = _get_button_type(ev)
 

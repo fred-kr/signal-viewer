@@ -1,8 +1,8 @@
 import datetime
-import typing as t
+from collections.abc import Sequence
 from pathlib import Path
+from typing import Literal
 
-import janitor.polars  # noqa: F401  # type: ignore
 import mne.io
 import polars as pl
 import polars.selectors as cs
@@ -14,7 +14,7 @@ from signal_viewer.constants import COMBO_BOX_NO_SELECTION
 from signal_viewer.enum_defs import PeakDetectionMethod
 
 
-def _infer_time_column(lf: pl.LazyFrame, contains: t.Sequence[str] | None = None) -> list[str]:
+def _infer_time_column(lf: pl.LazyFrame, contains: Sequence[str] | None = None) -> list[str]:
     if contains is None:
         contains = ("time", "ts")
     return (
@@ -25,8 +25,8 @@ def _infer_time_column(lf: pl.LazyFrame, contains: t.Sequence[str] | None = None
 
 
 def _infer_time_unit(
-    time_col_dtype: pl.DataType, interpret_integers_as: t.Literal["ms", "us", "ns"]
-) -> t.Literal["s", "ms", "us", "ns", "datetime"]:
+    time_col_dtype: pl.DataType, interpret_integers_as: Literal["ms", "us", "ns"]
+) -> Literal["s", "ms", "us", "ns", "datetime"]:
     if time_col_dtype.is_float():
         return "s"
     if time_col_dtype.is_integer():
@@ -43,7 +43,7 @@ def _infer_time_unit(
 
 
 def _get_target_for_time_unit(
-    time_unit: t.Literal["s", "ms", "us", "ns", "datetime"],
+    time_unit: Literal["s", "ms", "us", "ns", "datetime"],
     time_col_dtype: pl.DataType,
     start_val: datetime.datetime | None = None,
 ) -> int | float | datetime.datetime:
@@ -63,8 +63,8 @@ def _get_target_for_time_unit(
 def detect_sampling_rate(
     lf: pl.LazyFrame,
     time_column: str | int = "auto",
-    time_unit: t.Literal["auto", "s", "ms", "us", "ns", "datetime"] = "auto",
-    interpret_integers_as: t.Literal["ms", "us", "ns"] = "us",
+    time_unit: Literal["auto", "s", "ms", "us", "ns", "datetime"] = "auto",
+    interpret_integers_as: Literal["ms", "us", "ns"] = "us",
     first_column_is_time: bool = False,
 ) -> int:
     """
@@ -232,11 +232,3 @@ def write_hdf5(file_path: Path, data: _t.CompleteResultDict) -> None:
             rate_group = h5f.create_group(processing_group, "rate_computation", "Rate Computation Method")
             rate_method = section_data["metadata"]["processing_parameters"]["rate_computation_method"]
             h5f.set_node_attr(rate_group, "method", rate_method)
-
-
-# def sanitize_input[T: (pl.LazyFrame, pl.DataFrame)](data: T, **kwargs: t.Any) -> tuple[T, dict[str, str]]:
-#     """
-#     Cleans column names of input data.
-#     """
-#     orig_names = data.collect_schema().names()
-#     return data.clean_names(**kwargs), dict(zip(orig_names, data.collect_schema().names(), strict=False))

@@ -1,7 +1,8 @@
 # Since neurokit2 isn't typed all that well, we disable the following checks to appease the type checker.
 
 # pyright: reportUnknownVariableType=false, reportUnknownArgumentType=false
-import typing as t
+
+from typing import NamedTuple, Unpack
 
 import neurokit2 as nk
 import numpy as np
@@ -13,15 +14,15 @@ import signal_viewer.type_defs as _t
 from signal_viewer.enum_defs import FilterMethod, PreprocessPipeline
 
 
-class CleaningResult(t.NamedTuple):
+class CleaningResult(NamedTuple):
     cleaned: npt.NDArray[np.float64]
     parameters: _t.SignalFilterParameters
     additional_parameters: _t.SignalFilterParameters | None = None
 
 
 def rolling_standardize(sig: pl.Series, window_size: int) -> pl.Series:
-    roll_mean = sig.rolling_mean(window_size, min_periods=0)
-    roll_std = sig.rolling_std(window_size, min_periods=0)
+    roll_mean = sig.rolling_mean(window_size, min_samples=0)
+    roll_std = sig.rolling_std(window_size, min_samples=0)
     return (sig - roll_mean) / roll_std
 
 
@@ -158,7 +159,7 @@ def ecg_clean_vgraph(
 def filter_signal(
     sig: npt.NDArray[np.float64],
     sampling_rate: int,
-    **kwargs: t.Unpack[_t.SignalFilterParameters],
+    **kwargs: Unpack[_t.SignalFilterParameters],
 ) -> tuple[npt.NDArray[np.float64], _t.SignalFilterParameters]:
     highcut = kwargs.get("highcut")
     lowcut = kwargs.get("lowcut")

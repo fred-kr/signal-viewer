@@ -1,5 +1,5 @@
-import typing as t
 from collections.abc import Sequence
+from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 import numpy.typing as npt
@@ -16,7 +16,7 @@ from signal_viewer.sv_plots.graphic_items import (
 )
 from signal_viewer.utils import make_qbrush, make_qcolor, make_qpen, safe_disconnect
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from pyqtgraph.GraphicsScene import mouseEvents
     from pyqtgraph.Point import Point
 
@@ -24,7 +24,7 @@ if t.TYPE_CHECKING:
 
 type _IsPlottable = np.float64 | np.intp | np.uintp
 
-T = t.TypeVar("T", bound=_IsPlottable)
+T = TypeVar("T", bound=_IsPlottable)
 
 
 def find_nearest_extrema(

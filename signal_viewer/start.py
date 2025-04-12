@@ -30,6 +30,7 @@ def gui() -> None:
 
     QtWidgets.QApplication.setOrganizationName(org_name)
     QtWidgets.QApplication.setApplicationName(app_name)
+    QtWidgets.QApplication.setStyle("Fusion")
     use_opengl = args.no_opengl
     if use_opengl:
         os.environ["QSG_RHI_BACKEND"] = "opengl"

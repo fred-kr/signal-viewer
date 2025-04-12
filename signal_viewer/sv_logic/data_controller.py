@@ -1,6 +1,6 @@
 import functools
-import typing as t
 from pathlib import Path
+from typing import Any, cast
 
 import attrs
 import mne.io
@@ -160,11 +160,11 @@ class DataController(QtCore.QObject):
         last_signal_col = Config.internal.last_signal_column
         last_info_col = Config.internal.last_info_column
 
-        other_info: dict[str, t.Any] = {}
+        other_info: dict[str, Any] = {}
 
         if file_path.suffix == ".edf":
             edf_info = mne.io.read_raw_edf(file_path, preload=False, verbose=False)
-            sampling_rate = t.cast(int, edf_info.info["sfreq"])
+            sampling_rate = cast(int, edf_info.info["sfreq"])
             column_names: list[str] = edf_info.ch_names  # type: ignore
             other_info = dict(edf_info.info)
         elif file_path.suffix in {".feather", ".csv", ".txt", ".tsv"}:

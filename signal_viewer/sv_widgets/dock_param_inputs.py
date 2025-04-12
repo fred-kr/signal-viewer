@@ -401,6 +401,7 @@ class Inputs(QtWidgets.QWidget):
 class InputsDock(QtWidgets.QDockWidget):
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__("Parameter Inputs", parent=parent)
+        self.setObjectName("DockWidgetParameterInputs")
         self.setAllowedAreas(QtCore.Qt.DockWidgetArea.AllDockWidgetAreas)
         self.setWindowIcon(QtGui.QIcon("://icons/Options.svg"))
         self.toggleViewAction().setIcon(QtGui.QIcon("://icons/Options.svg"))
