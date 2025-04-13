@@ -152,7 +152,7 @@ class PlotController(QtCore.QObject):
 
     def _init_signal_curve(self) -> None:
         pen = make_qpen(SVGColors.DodgerBlue, width=1)
-        click_width = Config.plot.click_radius
+        click_width = Config.plot.line_click_width
         signal = pg.PlotDataItem(
             pen=pen,
             skipFiniteCheck=True,

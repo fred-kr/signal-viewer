@@ -1,4 +1,4 @@
-# Since neurokit2 isn't typed all that well, we disable the following checks to appease the type checker.
+# Since neurokit2 isn't typed all that well, we disable the following checks to appease the type checker
 
 # pyright: reportUnknownVariableType=false, reportUnknownArgumentType=false
 
