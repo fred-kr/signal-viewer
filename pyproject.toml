@@ -10,7 +10,7 @@ dependencies = [
     "mne>=1.9.0",
     "numexpr>=2.10.2",
     "numpy>=2.2.4",
-    "polars[excel]>=1.26.0",
+    "polars[excel]>=1.27.1",
     "pyarrow>=19.0.1",
     "pyjanitor>=0.31.0",
     "pyopengl>=3.1.9",
@@ -20,14 +20,14 @@ dependencies = [
     "scipy>=1.15.2",
     "tables>=3.10.2",
     "wfdb>=4.3.0",
-    "pyside6-fluent-widgets>=1.7.6",
+    "pyside6-fluent-widgets>=1.7.7",
     "scikit-learn>=1.6.1",
     "neurokit2>=0.2.10",
     "pyqtgraph",
     "pyside-widgets",
     "pyside-config",
-    "ts2vg",
-    "safe-result>=4.0.1",
+    "safe-result>=4.0.3",
+    "ts2vg>=1.2.4",
 ]
 
 [build-system]
@@ -51,6 +51,5 @@ include = [
 
 [tool.uv.sources]
 pyside-config = { git = "https://github.com/fred-kr/pyside-config.git" }
-ts2vg = { git = "https://github.com/CarlosBergillos/ts2vg.git" }
-pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets.git" }
 pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }
+pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets.git" }

@@ -5,6 +5,7 @@ import numpy as np
 import numpy.typing as npt
 import polars as pl
 import pyqtgraph as pg
+from loguru import logger
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from signal_viewer.enum_defs import PointSymbols, SVGColors
@@ -145,12 +146,12 @@ class PlotController(QtCore.QObject):
             self.region_selector = None
 
     def _setup_plot_data_items(self) -> None:
-        self._init_signal_curve()
-        self._init_peak_scatter()
-        self._init_rate_curve()
+        self._setup_signal_curve()
+        self._setup_peak_scatter()
+        self._setup_rate_curve()
         self._setup_region_selector()
 
-    def _init_signal_curve(self) -> None:
+    def _setup_signal_curve(self) -> None:
         pen = make_qpen(SVGColors.DodgerBlue, width=1)
         click_width = Config.plot.line_click_width
         signal = pg.PlotDataItem(
@@ -174,9 +175,7 @@ class PlotController(QtCore.QObject):
         self.signal_curve.setParent(None)
         self.signal_curve = None
 
-    def _init_peak_scatter(
-        self,
-    ) -> None:
+    def _setup_peak_scatter(self) -> None:
         brush = make_qbrush(SVGColors.GoldenRod)
         hover_brush = make_qbrush(SVGColors.Red)
         hover_pen = make_qpen(SVGColors.Black, width=1)
@@ -208,7 +207,7 @@ class PlotController(QtCore.QObject):
         self.peak_scatter.setParent(None)
         self.peak_scatter = None
 
-    def _init_rate_curve(self) -> None:
+    def _setup_rate_curve(self) -> None:
         pen = make_qpen(SVGColors.IndianRed, width=1)
         rate_curve = pg.PlotDataItem(
             pen=pen,
@@ -237,6 +236,8 @@ class PlotController(QtCore.QObject):
         if sampling_rate == 0:
             return
         for plt_item in (self.pw_main.getPlotItem(), self.pw_rate.getPlotItem()):
+            if plt_item is None:
+                continue
             plt_item.getAxis("top").setScale(1 / sampling_rate)
 
     @QtCore.Slot(object)
@@ -265,6 +266,7 @@ class PlotController(QtCore.QObject):
 
     @QtCore.Slot(bool)
     def toggle_regions(self, visible: bool) -> None:
+        """Updates section ids and visibility of regions."""
         # Start at 1 since section 0 is the base from which all others are added
         for i, region in enumerate(self.regions, start=1):
             region.section_id = i
@@ -368,7 +370,9 @@ class PlotController(QtCore.QObject):
             self.rate_curve.setData(y_data)
 
     def set_peak_data(
-        self, x_data: npt.NDArray[np.intp | np.uintp] | pl.Series, y_data: npt.NDArray[np.float64] | pl.Series
+        self,
+        x_data: npt.NDArray[np.intp | np.uintp] | pl.Series,
+        y_data: npt.NDArray[np.float64] | pl.Series,
     ) -> None:
         if self.peak_scatter is None:
             return
@@ -405,7 +409,7 @@ class PlotController(QtCore.QObject):
         point_x = int(point.pos().x())
         point_index = point.index()
 
-        scatter_data = self.peak_scatter.data
+        scatter_data: npt.NDArray[np.void] = self.peak_scatter.data
         new_x = np.delete(scatter_data["x"], point_index)
         new_y = np.delete(scatter_data["y"], point_index)
         self.peak_scatter.setData(x=new_x, y=new_y)
@@ -452,12 +456,14 @@ class PlotController(QtCore.QObject):
     def _on_curve_clicked(self, sender: pg.PlotCurveItem, ev: "mouseEvents.MouseClickEvent") -> None:
         ev.accept()
         if self.block_clicks:
+            logger.info("Click interaction is blocked for this plot.")
             return
         if self.peak_scatter is None:
             return
 
         closest_extreme = self._nearest_extreme_point(ev.pos())
         if closest_extreme is None:
+            logger.info("No peaks found within click radius.")
             return
 
         x_new, y_new = closest_extreme

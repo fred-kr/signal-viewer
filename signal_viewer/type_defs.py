@@ -39,12 +39,12 @@ class PGBrushKwargs(TypedDict, total=False):
     color: PGColor
 
 
-PGPen = Union[PGColor, "QtGui.QPen", PGPenKwargs, None]
-PGBrush = Union[PGColor, "QtGui.QBrush", PGBrushKwargs, None]
+type PGPen = Union[PGColor, "QtGui.QPen", PGPenKwargs, None]
+type PGBrush = Union[PGColor, "QtGui.QBrush", PGBrushKwargs, None]
 
-PGPointSymbols = Union[PointSymbols, "QtGui.QPainterPath", str]
+type PGPointSymbols = Union[PointSymbols, "QtGui.QPainterPath", str]
 
-UpdatePeaksAction = Literal["add", "remove"]
+type UpdatePeaksAction = Literal["add", "remove"]
 
 
 class FindPeaksKwargs(TypedDict, total=False):

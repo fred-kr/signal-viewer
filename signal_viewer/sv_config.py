@@ -21,7 +21,9 @@ class PlotConfig:
         metadata={
             "editor": qconfig.EditorWidgetInfo(
                 label="Background Color",
-                widget_factory=functools.partial(ColorPickerButton, color=QtGui.QColor("#000000")),
+                widget_factory=functools.partial(
+                    ColorPickerButton, color=QtGui.QColor("#000000")
+                ),
                 sig_value_changed="sig_color_changed",
                 set_value_method="set_color",
             ),
@@ -35,7 +37,9 @@ class PlotConfig:
         metadata={
             "editor": qconfig.EditorWidgetInfo(
                 label="Foreground Color",
-                widget_factory=functools.partial(ColorPickerButton, color=QtGui.QColor("#969696")),
+                widget_factory=functools.partial(
+                    ColorPickerButton, color=QtGui.QColor("#969696")
+                ),
                 sig_value_changed="sig_color_changed",
                 set_value_method="set_color",
             ),
@@ -55,7 +59,7 @@ class PlotConfig:
                 singleStep=1,
                 suffix=" px",
             ),
-            "description": "Area in pixels around the line in which a click will be counted as a click on the line.",
+            "description": "The width in pixels orthogonal to the curve that will respond to a mouse click.",
         },
     )
     click_radius: int = attrs.field(
@@ -70,7 +74,7 @@ class PlotConfig:
                 singleStep=1,
                 suffix=" samples",
             ),
-            "description": "Area in pixels around a click on the line that will be considered a click on the line.",
+            "description": "The radius in pixels around a click that will be searched for an extreme point when manually adding peaks / valleys.",
         },
     )
 
@@ -99,7 +103,9 @@ class EditingConfig:
         metadata={
             "editor": make_combo_box_info(
                 label="Rate computation method",
-                widget_factory=functools.partial(EnumComboBox, enum_class=RateComputationMethod),
+                widget_factory=functools.partial(
+                    EnumComboBox, enum_class=RateComputationMethod
+                ),
                 sig_value_changed="sig_current_enum_changed",
                 set_value_method="set_current_enum",
             ),
@@ -133,7 +139,9 @@ class DataConfig:
         metadata={
             "editor": make_combo_box_info(
                 label="Text file separator",
-                widget_factory=functools.partial(EnumComboBox, enum_class=TextFileSeparator),
+                widget_factory=functools.partial(
+                    EnumComboBox, enum_class=TextFileSeparator
+                ),
                 sig_value_changed="sig_current_enum_changed",
                 set_value_method="set_current_enum",
             ),

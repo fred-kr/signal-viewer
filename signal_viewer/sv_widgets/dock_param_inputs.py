@@ -1,8 +1,8 @@
 import decimal
 import enum
 
-import pyside_widgets as pw
 from PySide6 import QtCore, QtGui, QtWidgets
+from pyside_widgets import AnimatedToggleSwitch, CommandBar, DecimalSpinBox, ToggleSwitch
 
 import signal_viewer.type_defs as _t
 from signal_viewer.enum_defs import (
@@ -26,16 +26,16 @@ def restore_default(w: QtWidgets.QWidget | QtCore.QObject) -> None:
         return
 
     if default_value := w.property("defaultValue"):
-        if isinstance(w, (pw.DecimalSpinBox, QtWidgets.QSpinBox, QtWidgets.QDoubleSpinBox)):
+        if isinstance(w, (DecimalSpinBox, QtWidgets.QSpinBox, QtWidgets.QDoubleSpinBox)):
             w.setValue(default_value)
             return
-        elif isinstance(w, (pw.ToggleSwitch, pw.AnimatedToggleSwitch, QtWidgets.QCheckBox)):
+        elif isinstance(w, (ToggleSwitch, AnimatedToggleSwitch, QtWidgets.QCheckBox)):
             w.setChecked(default_value)
             return
 
 
 def _setup_spinbox(
-    dec_sb: pw.DecimalSpinBox,
+    dec_sb: DecimalSpinBox,
     min: SupportsDecimal,
     max: SupportsDecimal,
     step: SupportsDecimal,
@@ -49,7 +49,7 @@ def _setup_spinbox(
     restore_default(dec_sb)
 
 
-class Inputs(QtWidgets.QWidget):
+class ParameterInputs(QtWidgets.QWidget):
     sig_run_pipeline = QtCore.Signal(enum.StrEnum)  # PreprocessPipeline
     sig_run_filter = QtCore.Signal(dict)  # _t.SignalFilterParameters
     sig_run_standardization = QtCore.Signal(dict)  # _t.StandardizationParameters
@@ -118,8 +118,7 @@ class Inputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.sf_window_size, 5, 1_000_000, 10, 100, 0)
         _setup_spinbox(self.ui.sf_powerline, 0, 100_000, 0.1, 50.0, 1)
 
-        sf_tb = pw.CommandBar()
-        # sf_tb.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
+        sf_tb = CommandBar(fill=False)
         sf_tb.addActions([self.action_sf_run, self.action_sf_reset_inputs, self.action_sf_reset_data])
 
         sf_tb_l = QtWidgets.QVBoxLayout()
@@ -173,9 +172,14 @@ class Inputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.peak_ecg_promac_threshold, 0.0, 1.0, 0.01, 0.33, 2)
         _setup_spinbox(self.ui.peak_ecg_promac_gaussian_sd, 0.0, 100_000, 1, 100, 0)
 
-        peak_tb = pw.CommandBar()
-        # peak_tb.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
-        peak_tb.addActions([self.action_peak_run, self.action_peak_reset_inputs, self.action_peak_reset_data])
+        peak_tb = CommandBar(fill=False)
+        peak_tb.addActions(
+            [
+                self.action_peak_run,
+                self.action_peak_reset_inputs,
+                self.action_peak_reset_data,
+            ]
+        )
 
         peak_tb_l = QtWidgets.QVBoxLayout()
         peak_tb_l.setContentsMargins(0, 0, 0, 0)
@@ -232,7 +236,11 @@ class Inputs(QtWidgets.QWidget):
             for widget in self.sf_widgets:
                 widget.setEnabled(False)
                 restore_default(widget)
-        elif filter_method in [FilterMethod.Butterworth, FilterMethod.ButterworthLegacy, FilterMethod.Bessel]:
+        elif filter_method in [
+            FilterMethod.Butterworth,
+            FilterMethod.ButterworthLegacy,
+            FilterMethod.Bessel,
+        ]:
             self.ui.sf_lower_cutoff.setEnabled(True)
             self.ui.sf_upper_cutoff.setEnabled(True)
             self.ui.sf_order.setEnabled(True)
@@ -406,22 +414,5 @@ class InputsDock(QtWidgets.QDockWidget):
         self.setWindowIcon(QtGui.QIcon("://icons/Options.svg"))
         self.toggleViewAction().setIcon(QtGui.QIcon("://icons/Options.svg"))
 
-        self.ui = Inputs()
+        self.ui = ParameterInputs()
         self.setWidget(self.ui)
-
-
-if __name__ == "__main__":
-    import sys
-
-    QtWidgets.QApplication.setStyle("Fusion")
-    app = QtWidgets.QApplication(sys.argv)
-    window = InputsDock()
-    window.ui.sig_clear_peaks.connect(print)
-    window.ui.sig_reset_data.connect(print)
-    window.ui.sig_run_filter.connect(print)
-    window.ui.sig_run_peak_detection.connect(print)
-    window.ui.sig_run_pipeline.connect(print)
-    window.ui.sig_run_standardization.connect(print)
-
-    window.show()
-    sys.exit(app.exec())

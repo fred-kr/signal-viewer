@@ -4,26 +4,26 @@ from signal_viewer.generated.ui_dialog_metadata import Ui_MetadataDialog
 from signal_viewer.sv_config import Config
 
 STYLE_SHEET_SPIN_BOX = """
-SpinBox[requiresInput="false"] {
+QSpinBox[requiresInput="false"] {
     border: 2px solid mediumseagreen;
     border-radius: 5px;
 }
-SpinBox[requiresInput="false"]:focus {
+QSpinBox[requiresInput="false"]:focus {
     border: 2px solid mediumseagreen;
     border-radius: 5px;
 }
 
-SpinBox[requiresInput="true"] {
+QSpinBox[requiresInput="true"] {
     border: 2px solid red;
     border-radius: 5px;
 }
-SpinBox[requiresInput="true"]:focus {
+QSpinBox[requiresInput="true"]:focus {
     border: 2px solid red;
     border-radius: 5px;
 }
 """
 STYLE_SHEET_COMBO_BOX = """
-ComboBox[requiresInput="false"] {
+QComboBox[requiresInput="false"] {
     border: 2px solid mediumseagreen;
     border-radius: 5px;
     padding: 5px 31px 6px 11px;
@@ -33,7 +33,7 @@ ComboBox[requiresInput="false"] {
     text-align: left;
     outline: none;
 }
-ComboBox[requiresInput="true"] {
+QComboBox[requiresInput="true"] {
     border: 2px solid crimson;
     border-radius: 5px;
     padding: 5px 31px 6px 11px;
@@ -44,37 +44,37 @@ ComboBox[requiresInput="true"] {
     outline: none;
 }
 
-ComboBox[requiresInput="false"]:hover {
+QComboBox[requiresInput="false"]:hover {
     border: 2px solid mediumseagreen;
     border-radius: 5px;
     background-color: rgba(249, 249, 249, 0.5);
 }
-ComboBox[requiresInput="true"]:hover {
+QComboBox[requiresInput="true"]:hover {
     border: 2px solid crimson;
     border-radius: 5px;
     background-color: rgba(249, 249, 249, 0.5);
 }
 
-ComboBox[requiresInput="false"]:pressed {
+QComboBox[requiresInput="false"]:pressed {
     border: 2px solid mediumseagreen;
     border-radius: 5px;
     background-color: rgba(249, 249, 249, 0.3);
     color: rgba(0, 0, 0, 0.63);
 }
-ComboBox[requiresInput="true"]:pressed {
+QComboBox[requiresInput="true"]:pressed {
     border: 2px solid crimson;
     border-radius: 5px;
     background-color: rgba(249, 249, 249, 0.3);
     color: rgba(0, 0, 0, 0.63);
 }
 
-ComboBox:disabled {
+QComboBox:disabled {
     color: rgba(0, 0, 0, 0.36);
     background: rgba(249, 249, 249, 0.3);
     border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-ComboBox {
+QComboBox {
     color: rgba(0, 0, 0, 0.6063);
 }
 """
