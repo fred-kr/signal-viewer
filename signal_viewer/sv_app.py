@@ -562,6 +562,8 @@ class SVApp(QtCore.QObject):
         Config.internal.last_info_column = self.data.metadata.info_column
         Config.internal.last_sampling_rate = self.data.metadata.sampling_rate
 
+        logger.info(f"Read data from file: {self.data.metadata.file_name}")
+
     @QtCore.Slot()
     def close_file(self) -> None:
         self.gui.ui.table_view_import_data.setModel(None)
@@ -596,6 +598,8 @@ class SVApp(QtCore.QObject):
         self.gui.dialog_meta.spin_box_sampling_rate.setEnabled(True)
         self.gui.dialog_meta.combo_box_signal_column.setEnabled(True)
         self.gui.dialog_meta.combo_box_info_column.setEnabled(True)
+
+        logger.info("Closed file")
 
     @QtCore.Slot()
     def apply_settings(self) -> None:
