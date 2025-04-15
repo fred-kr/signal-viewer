@@ -7,7 +7,7 @@ import pyside_config as qconfig
 from loguru import logger
 from PySide6 import QtCore, QtGui, QtWidgets
 from pyside_widgets import OverlayWidget, SearchableDataTreeWidget
-from qfluentwidgets import NavigationInterface, NavigationItemPosition, qrouter
+from qfluentwidgets import NavigationInterface, NavigationItemPosition
 
 import signal_viewer.type_defs as _t
 from signal_viewer.constants import INDEX_COL
@@ -32,7 +32,6 @@ class SVGUI(QtWidgets.QMainWindow):
     def __init__(self, sv_app: "SVApp", version: str = "0.0.0") -> None:
         super().__init__()
 
-        # self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -82,7 +81,6 @@ class SVGUI(QtWidgets.QMainWindow):
         self.add_sub_interface(self.ui.stacked_page_edit, QtGui.QIcon("://icons/Edit.svg"), "View & Edit")
         self.add_sub_interface(self.ui.stacked_page_export, QtGui.QIcon("://icons/DocumentArrowRight.svg"), "Results")
 
-        qrouter.setDefaultRouteKey(self.ui.stackedWidget, self.ui.stacked_page_import.objectName())
         self.navigation_interface.setExpandWidth(250)
 
         self.ui.stackedWidget.currentChanged.connect(self._on_current_interface_changed)
@@ -114,7 +112,6 @@ class SVGUI(QtWidgets.QMainWindow):
     def _on_current_interface_changed(self, index: int) -> None:
         widget = self.ui.stackedWidget.widget(index)
         self.navigation_interface.setCurrentItem(widget.objectName())
-        qrouter.push(self.ui.stackedWidget, widget.objectName())
 
     def _setup_widgets(self) -> None:
         self.dialog_meta = MetadataDialog(self)

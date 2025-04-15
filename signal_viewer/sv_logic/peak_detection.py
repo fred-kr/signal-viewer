@@ -270,4 +270,9 @@ def find_peaks(
             **method_parameters,
         )["ECG_R_Peaks"]
     else:
-        raise NotImplementedError
+        return nk.ecg_findpeaks(
+            ecg_cleaned=sig,
+            sampling_rate=sampling_rate,
+            method=method,
+            show=False,
+        )["ECG_R_Peaks"]

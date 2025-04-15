@@ -59,8 +59,8 @@ class EditingViewBox(pg.ViewBox):
     def selection_box(self) -> QtWidgets.QGraphicsRectItem:
         if self._selection_box is None:
             selection_box = QtWidgets.QGraphicsRectItem(0, 0, 1, 1)
-            pen = make_qpen((255, 165, 0, 255))
-            brush = make_qbrush((255, 165, 0, 100))
+            pen = make_qpen((100, 255, 100, 255))
+            brush = make_qbrush((100, 255, 100, 100))
             selection_box.setPen(pen)
             selection_box.setBrush(brush)
             selection_box.setZValue(1e9)

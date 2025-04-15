@@ -2,7 +2,7 @@ import decimal
 import enum
 
 from PySide6 import QtCore, QtGui, QtWidgets
-from pyside_widgets import AnimatedToggleSwitch, CommandBar, DecimalSpinBox, ToggleSwitch
+from pyside_widgets import AnimatedToggleSwitch, DecimalSpinBox, ToggleSwitch
 
 import signal_viewer.type_defs as _t
 from signal_viewer.enum_defs import (
@@ -20,7 +20,7 @@ D = decimal.Decimal
 type SupportsDecimal = int | float | D
 
 
-def restore_default(w: QtWidgets.QWidget | QtCore.QObject) -> None:
+def _restore_default(w: QtWidgets.QWidget | QtCore.QObject) -> None:
     if isinstance(w, QtWidgets.QComboBox):
         w.setCurrentIndex(0)
         return
@@ -46,7 +46,7 @@ def _setup_spinbox(
     dec_sb.setSingleStep(step)
     dec_sb.setDecimals(precision)
     dec_sb.setProperty("defaultValue", default)
-    restore_default(dec_sb)
+    _restore_default(dec_sb)
 
 
 class ParameterInputs(QtWidgets.QWidget):
@@ -118,7 +118,8 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.sf_window_size, 5, 1_000_000, 10, 100, 0)
         _setup_spinbox(self.ui.sf_powerline, 0, 100_000, 0.1, 50.0, 1)
 
-        sf_tb = CommandBar()
+        sf_tb = QtWidgets.QToolBar("sf_command_bar")
+        sf_tb.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
         sf_tb.addActions([self.action_sf_run, self.action_sf_reset_inputs, self.action_sf_reset_data])
 
         sf_tb_l = QtWidgets.QVBoxLayout()
@@ -172,7 +173,8 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.peak_ecg_promac_threshold, 0.0, 1.0, 0.01, 0.33, 2)
         _setup_spinbox(self.ui.peak_ecg_promac_gaussian_sd, 0.0, 100_000, 1, 100, 0)
 
-        peak_tb = CommandBar()
+        peak_tb = QtWidgets.QToolBar("peak_command_bar")
+        peak_tb.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
         peak_tb.addActions(
             [
                 self.action_peak_run,
@@ -206,10 +208,10 @@ class ParameterInputs(QtWidgets.QWidget):
         if sender is self.action_peak_reset_inputs:
             current_page = self.ui.stacked_widget_peak.currentWidget()
             for c in current_page.children():
-                restore_default(c)
+                _restore_default(c)
         elif sender is self.action_sf_reset_inputs:
             for c in self.sf_widgets + self.std_widgets + [self.ui.sf_pipeline, self.ui.sf_method, self.ui.std_method]:
-                restore_default(c)
+                _restore_default(c)
         else:
             print(f"Unknown sender: {sender}")
 
@@ -235,7 +237,7 @@ class ParameterInputs(QtWidgets.QWidget):
         if filter_method is None:
             for widget in self.sf_widgets:
                 widget.setEnabled(False)
-                restore_default(widget)
+                _restore_default(widget)
         elif filter_method in [
             FilterMethod.Butterworth,
             FilterMethod.ButterworthLegacy,
@@ -271,7 +273,7 @@ class ParameterInputs(QtWidgets.QWidget):
         if std_method is None:
             for widget in self.std_widgets:
                 widget.setEnabled(False)
-                restore_default(widget)
+                _restore_default(widget)
         elif std_method == StandardizationMethod.ZScore:
             self.ui.std_rolling_window.setEnabled(True)
         else:
