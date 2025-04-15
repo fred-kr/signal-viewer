@@ -39,6 +39,7 @@ class SectionListWidget(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout()
 
         self.command_bar_section_list = QtWidgets.QToolBar("command_bar_section_list")
+        self.command_bar_section_list.setIconSize(QtCore.QSize(16, 16))
         self.command_bar_section_list.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
         layout.addWidget(self.command_bar_section_list)
 

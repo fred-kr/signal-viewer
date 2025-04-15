@@ -86,20 +86,26 @@ class ParameterInputs(QtWidgets.QWidget):
 
     def setup_actions(self) -> None:
         # Signal Filter
-        self.action_sf_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Run", self)
+        self.action_sf_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Process Signal", self)
+        self.action_sf_run.setToolTip("Apply the selected processing steps to the signal data.")
         self.action_sf_run.triggered.connect(self.run_processing)
 
-        self.action_sf_reset_inputs = QtGui.QAction(QtGui.QIcon("://icons/ArrowReset.svg"), "Reset Inputs", self)
+        self.action_sf_reset_inputs = QtGui.QAction(QtGui.QIcon("://icons/ArrowReset.svg"), "Restore Defaults", self)
+        self.action_sf_reset_inputs.setToolTip("Reset all inputs to their default values.")
         self.action_sf_reset_inputs.triggered.connect(self.reset_inputs)
-        self.action_sf_reset_data = QtGui.QAction(QtGui.QIcon("://icons/Broom.svg"), "Reset Data", self)
+        self.action_sf_reset_data = QtGui.QAction(QtGui.QIcon("://icons/Broom.svg"), "Reset Signal", self)
+        self.action_sf_reset_data.setToolTip("Reset the signal data to its original, unprocessed state.")
         self.action_sf_reset_data.triggered.connect(self.reset_data)
 
         # Peak Detection
-        self.action_peak_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Run", self)
+        self.action_peak_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Detect Peaks", self)
+        self.action_peak_run.setToolTip("Run the selected peak detection algorithm.")
         self.action_peak_run.triggered.connect(self.run_peak_detection)
-        self.action_peak_reset_inputs = QtGui.QAction(QtGui.QIcon("://icons/ArrowReset.svg"), "Reset Inputs", self)
+        self.action_peak_reset_inputs = QtGui.QAction(QtGui.QIcon("://icons/ArrowReset.svg"), "Restore Defaults", self)
+        self.action_peak_reset_inputs.setToolTip("Reset all inputs to their default values.")
         self.action_peak_reset_inputs.triggered.connect(self.reset_inputs)
-        self.action_peak_reset_data = QtGui.QAction(QtGui.QIcon("://icons/Broom.svg"), "Clear Peaks", self)
+        self.action_peak_reset_data = QtGui.QAction(QtGui.QIcon("://icons/Broom.svg"), "Reset Peaks", self)
+        self.action_peak_reset_data.setToolTip("Remove all peaks. Does not reset the signal data.")
         self.action_peak_reset_data.triggered.connect(self.clear_peaks)
 
     def finish_setup(self) -> None:
@@ -119,6 +125,7 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.sf_powerline, 0, 100_000, 0.1, 50.0, 1)
 
         sf_tb = QtWidgets.QToolBar("sf_command_bar")
+        sf_tb.setIconSize(QtCore.QSize(16, 16))
         sf_tb.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
         sf_tb.addActions([self.action_sf_run, self.action_sf_reset_inputs, self.action_sf_reset_data])
 
@@ -174,6 +181,7 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.peak_ecg_promac_gaussian_sd, 0.0, 100_000, 1, 100, 0)
 
         peak_tb = QtWidgets.QToolBar("peak_command_bar")
+        peak_tb.setIconSize(QtCore.QSize(16, 16))
         peak_tb.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
         peak_tb.addActions(
             [
@@ -212,8 +220,6 @@ class ParameterInputs(QtWidgets.QWidget):
         elif sender is self.action_sf_reset_inputs:
             for c in self.sf_widgets + self.std_widgets + [self.ui.sf_pipeline, self.ui.sf_method, self.ui.std_method]:
                 _restore_default(c)
-        else:
-            print(f"Unknown sender: {sender}")
 
     @QtCore.Slot(bool)
     def _on_rolling_window_toggled(self, checked: bool) -> None:
@@ -282,7 +288,7 @@ class ParameterInputs(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def run_processing(self) -> None:
-        pipeline: PreprocessPipeline = self.ui.sf_pipeline.current_enum()
+        pipeline: PreprocessPipeline | None = self.ui.sf_pipeline.current_enum()
         if pipeline is not None:
             self.sig_run_pipeline.emit(pipeline)
         else:
@@ -319,14 +325,14 @@ class ParameterInputs(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def run_peak_detection(self) -> None:
-        peak_method: PeakDetectionAlgorithm = self.ui.peak_method.current_enum()
+        peak_method: PeakDetectionAlgorithm | None = self.ui.peak_method.current_enum()
         if peak_method is not None:
             peak_params = self.get_peak_detection_params(peak_method)
             self.sig_run_peak_detection.emit(peak_method, peak_params)
 
     @QtCore.Slot(int)
     def _on_peak_method_changed(self, index: int) -> None:
-        peak_method: PeakDetectionAlgorithm = self.ui.peak_method.current_enum()
+        peak_method: PeakDetectionAlgorithm | None = self.ui.peak_method.current_enum()
         if peak_method == PeakDetectionAlgorithm.PPGElgendi:
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_ppg_elgendi)
         elif peak_method == PeakDetectionAlgorithm.ECGNeuroKit:
@@ -389,7 +395,7 @@ class ParameterInputs(QtWidgets.QWidget):
             )
 
         elif method == PeakDetectionAlgorithm.ECGXQRS:
-            peak_dir: WFDBPeakDirection = self.ui.peak_xqrs_direction.current_enum()
+            peak_dir: WFDBPeakDirection | None = self.ui.peak_xqrs_direction.current_enum()
             if peak_dir is None:
                 peak_dir = WFDBPeakDirection.Up
             peak_params = _t.PeaksECGXQRS(

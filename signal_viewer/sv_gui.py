@@ -230,6 +230,7 @@ class SVGUI(QtWidgets.QMainWindow):
 
     def _setup_toolbar(self, name: str, actions: list[QtGui.QAction], movable: bool = False) -> QtWidgets.QToolBar:
         tb = QtWidgets.QToolBar(name)
+        tb.setIconSize(QtCore.QSize(16, 16))
         tb.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         tb.setObjectName(name)
         tb.setMovable(movable)

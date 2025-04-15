@@ -442,6 +442,7 @@ class Ui_MainWindow(object):
         self.tool_bar_file_actions.setObjectName(u"tool_bar_file_actions")
         self.tool_bar_file_actions.setMovable(False)
         self.tool_bar_file_actions.setAllowedAreas(Qt.ToolBarArea.TopToolBarArea)
+        self.tool_bar_file_actions.setIconSize(QSize(16, 16))
         self.tool_bar_file_actions.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         MainWindow.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.tool_bar_file_actions)
         QWidget.setTabOrder(self.btn_open_file, self.line_edit_active_file)

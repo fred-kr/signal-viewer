@@ -245,6 +245,7 @@ class SVApp(QtCore.QObject):
         self.data.active_section.reset_signal()
         self.refresh_plot_data()
         self.plot.clear_peaks()
+        self.update_status_indicators()
 
     @QtCore.Slot(object)
     def run_preprocess_pipeline(self, pipeline: PreprocessPipeline) -> None:
