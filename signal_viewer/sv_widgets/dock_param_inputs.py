@@ -118,7 +118,7 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.sf_window_size, 5, 1_000_000, 10, 100, 0)
         _setup_spinbox(self.ui.sf_powerline, 0, 100_000, 0.1, 50.0, 1)
 
-        sf_tb = CommandBar(fill=False)
+        sf_tb = CommandBar()
         sf_tb.addActions([self.action_sf_run, self.action_sf_reset_inputs, self.action_sf_reset_data])
 
         sf_tb_l = QtWidgets.QVBoxLayout()
@@ -172,7 +172,7 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.peak_ecg_promac_threshold, 0.0, 1.0, 0.01, 0.33, 2)
         _setup_spinbox(self.ui.peak_ecg_promac_gaussian_sd, 0.0, 100_000, 1, 100, 0)
 
-        peak_tb = CommandBar(fill=False)
+        peak_tb = CommandBar()
         peak_tb.addActions(
             [
                 self.action_peak_run,

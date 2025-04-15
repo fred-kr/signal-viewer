@@ -13,7 +13,7 @@ from signal_viewer.sv_config import Config
 from signal_viewer.sv_plots.graphic_items import (
     ClickableRegionItem,
     EditingViewBox,
-    TimeAxisItem,
+    TimeDeltaAxisItem,
 )
 from signal_viewer.utils import make_qbrush, make_qcolor, make_qpen, safe_disconnect
 
@@ -98,7 +98,7 @@ class PlotController(QtCore.QObject):
             if plt_item is None:
                 continue
             vb = plt_item.getViewBox()
-            plt_item.setAxisItems({"top": TimeAxisItem(orientation="top")})
+            plt_item.setAxisItems({"top": TimeDeltaAxisItem(orientation="top")})
             plt_item.showGrid(x=False, y=True)
             plt_item.setDownsampling(auto=True)
             plt_item.setClipToView(True)

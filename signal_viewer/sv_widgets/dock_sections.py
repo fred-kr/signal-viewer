@@ -1,14 +1,11 @@
-import typing as t
-
 from PySide6 import QtCore, QtGui, QtWidgets
-from pyside_widgets import CommandBar
 
 from signal_viewer.utils import set_font
 
 
 class SectionListView(QtWidgets.QListView):
-    sig_delete_current_item: t.ClassVar[QtCore.Signal] = QtCore.Signal(QtCore.QModelIndex)
-    sig_show_summary: t.ClassVar[QtCore.Signal] = QtCore.Signal(QtCore.QModelIndex)
+    sig_delete_current_item = QtCore.Signal(QtCore.QModelIndex)
+    sig_show_summary = QtCore.Signal(QtCore.QModelIndex)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
@@ -38,39 +35,31 @@ class SectionListView(QtWidgets.QListView):
 class SectionListWidget(QtWidgets.QWidget):
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
+
         layout = QtWidgets.QVBoxLayout()
 
-        self.list_view = SectionListView()
+        self.command_bar_section_list = QtWidgets.QToolBar("command_bar_section_list")
+        self.command_bar_section_list.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
+        layout.addWidget(self.command_bar_section_list)
 
-        label_active_section = QtWidgets.QLabel("Active Section: ", self)
-        set_font(label_active_section, 14, weight=QtGui.QFont.Weight.DemiBold)
-        layout.addWidget(label_active_section)
-        self.label_active_section = label_active_section
+        self.btn_confirm = QtWidgets.QPushButton("Confirm")
+        self.btn_cancel = QtWidgets.QPushButton("Cancel")
 
-        command_bar = CommandBar()
-        command_bar.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
-        command_bar.setObjectName("command_bar_section_list")
-        layout.addWidget(command_bar)
-        self.command_bar = command_bar
+        l_btn_container = QtWidgets.QHBoxLayout()
+        l_btn_container.setContentsMargins(0, 0, 0, 0)
+        l_btn_container.addWidget(self.btn_confirm)
+        l_btn_container.addWidget(self.btn_cancel)
+        self.btn_container = QtWidgets.QWidget()
+        self.btn_container.setLayout(l_btn_container)
+        layout.addWidget(self.btn_container)
 
-        confirm_cancel_btns = QtWidgets.QWidget()
-        confirm_cancel_layout = QtWidgets.QHBoxLayout(confirm_cancel_btns)
-        confirm_cancel_layout.setContentsMargins(0, 0, 0, 0)
+        self.label_active_section = QtWidgets.QLabel("Active Section:")
+        set_font(self.label_active_section, font_size=14, weight=QtGui.QFont.Weight.DemiBold)
+        layout.addWidget(self.label_active_section)
 
-        confirm_btn = QtWidgets.QPushButton(QtGui.QIcon("://icons/CheckmarkCircle.svg"), "Confirm")
-        confirm_cancel_layout.addWidget(confirm_btn)
-        self.btn_confirm = confirm_btn
+        self.section_list = SectionListView()
+        layout.addWidget(self.section_list)
 
-        cancel_btn = QtWidgets.QPushButton(QtGui.QIcon("://icons/DismissCircle.svg"), "Cancel")
-        confirm_cancel_layout.addWidget(cancel_btn)
-        self.btn_cancel = cancel_btn
-
-        self.btn_container = confirm_cancel_btns
-        confirm_cancel_btns.setLayout(confirm_cancel_layout)
-        layout.addWidget(confirm_cancel_btns)
-
-        layout.addWidget(self.list_view)
-        self.main_layout = layout
         self.setLayout(layout)
 
 
@@ -83,8 +72,8 @@ class SectionListDock(QtWidgets.QDockWidget):
         self.setWindowIcon(QtGui.QIcon("://icons/app_icon.svg"))
 
         self._widget = SectionListWidget()
-        self.list_view = self._widget.list_view
-        self.command_bar = self._widget.command_bar
+        self.list_view = self._widget.section_list
+        self.command_bar = self._widget.command_bar_section_list
         self.label_active_section = self._widget.label_active_section
         self.btn_confirm = self._widget.btn_confirm
         self.btn_cancel = self._widget.btn_cancel

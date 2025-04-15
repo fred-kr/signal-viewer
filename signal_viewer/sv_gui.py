@@ -16,8 +16,6 @@ from signal_viewer.generated.ui_main_window import Ui_MainWindow
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_widgets.dlg_metadata import MetadataDialog
 from signal_viewer.sv_widgets.dock_log_window import StatusMessageDock
-
-# from signal_viewer.sv_widgets.dock_parameter_inputs import ParameterInputsDock
 from signal_viewer.sv_widgets.dock_param_inputs import InputsDock
 from signal_viewer.sv_widgets.dock_sections import SectionListDock
 from signal_viewer.utils import get_app
@@ -217,11 +215,14 @@ class SVGUI(QtWidgets.QMainWindow):
         )
 
         self.dock_sections.command_bar.addActions(
-            [self.ui.action_create_new_section, self.ui.action_remove_section, self.ui.action_mark_section_done]
-        )
-        self.dock_sections.command_bar.addSeparator()
-        self.dock_sections.command_bar.addActions(
-            [self.ui.action_unlock_section, self.action_show_section_summary, self.ui.action_show_section_overview]
+            [
+                self.ui.action_create_new_section,
+                self.ui.action_remove_section,
+                self.ui.action_mark_section_done,
+                self.ui.action_unlock_section,
+                self.action_show_section_summary,
+                self.ui.action_show_section_overview,
+            ]
         )
 
         self.command_bar_section_list = self.dock_sections.command_bar

@@ -1,5 +1,5 @@
 import functools
-import typing as t
+from typing import NamedTuple
 
 import attrs
 import pyside_config as qconfig
@@ -21,9 +21,7 @@ class PlotConfig:
         metadata={
             "editor": qconfig.EditorWidgetInfo(
                 label="Background Color",
-                widget_factory=functools.partial(
-                    ColorPickerButton, color=QtGui.QColor("#000000")
-                ),
+                widget_factory=functools.partial(ColorPickerButton, color=QtGui.QColor("#000000")),
                 sig_value_changed="sig_color_changed",
                 set_value_method="set_color",
             ),
@@ -37,9 +35,7 @@ class PlotConfig:
         metadata={
             "editor": qconfig.EditorWidgetInfo(
                 label="Foreground Color",
-                widget_factory=functools.partial(
-                    ColorPickerButton, color=QtGui.QColor("#969696")
-                ),
+                widget_factory=functools.partial(ColorPickerButton, color=QtGui.QColor("#969696")),
                 sig_value_changed="sig_color_changed",
                 set_value_method="set_color",
             ),
@@ -103,9 +99,7 @@ class EditingConfig:
         metadata={
             "editor": make_combo_box_info(
                 label="Rate computation method",
-                widget_factory=functools.partial(
-                    EnumComboBox, enum_class=RateComputationMethod
-                ),
+                widget_factory=functools.partial(EnumComboBox, enum_class=RateComputationMethod),
                 sig_value_changed="sig_current_enum_changed",
                 set_value_method="set_current_enum",
             ),
@@ -139,9 +133,7 @@ class DataConfig:
         metadata={
             "editor": make_combo_box_info(
                 label="Text file separator",
-                widget_factory=functools.partial(
-                    EnumComboBox, enum_class=TextFileSeparator
-                ),
+                widget_factory=functools.partial(EnumComboBox, enum_class=TextFileSeparator),
                 sig_value_changed="sig_current_enum_changed",
                 set_value_method="set_current_enum",
             ),
@@ -209,7 +201,7 @@ class InternalConfig:
 internal: InternalConfig = qconfig.get_config("InternalConfig")
 
 
-class Config(t.NamedTuple):
+class Config(NamedTuple):
     plot = plot
     editing = editing
     data = data
