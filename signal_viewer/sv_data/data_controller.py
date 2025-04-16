@@ -168,7 +168,6 @@ class DataController(QtCore.QObject):
             other_info = dict(edf_info.info)
         elif file_path.suffix in {".feather", ".csv", ".txt", ".tsv"}:
             lf = self._reader_funcs[file_path.suffix](file_path)
-            # lf: pl.LazyFrame = clean_names(lf, remove_special=True, strip_underscores=True, strip_accents=True)
             column_names = lf.collect_schema().names()
             try:
                 sampling_rate = detect_sampling_rate(lf)
@@ -176,7 +175,6 @@ class DataController(QtCore.QObject):
                 sampling_rate = 0
         elif file_path.suffix in {".xls", ".xlsx"}:
             lf = pl.read_excel(file_path).lazy()
-            # lf = clean_names(lf, remove_special=True, strip_underscores=True, strip_accents=True)
             column_names = lf.collect_schema().names()
             try:
                 sampling_rate = detect_sampling_rate(lf)
