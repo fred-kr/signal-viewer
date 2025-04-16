@@ -1,7 +1,7 @@
 # pyright: reportOptionalMemberAccess=false
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING
 
 import numpy as np
 import numpy.typing as npt
@@ -21,42 +21,8 @@ from signal_viewer.utils import make_qbrush, make_qcolor, make_qpen, safe_discon
 
 if TYPE_CHECKING:
     from pyqtgraph.GraphicsScene import mouseEvents
-    from pyqtgraph.Point import Point
 
     from signal_viewer.sv_gui import SVGUI
-
-type _IsPlottable = np.float64 | np.intp | np.uintp
-
-T = TypeVar("T", bound=_IsPlottable)
-
-
-def find_nearest_extrema(
-    x_data: npt.NDArray[T],
-    y_data: npt.NDArray[T],
-    cursor_pos: "Point | QtCore.QPoint | QtCore.QPointF",
-    search_radius: int,
-) -> tuple[T, T] | None:
-    cursor_x, cursor_y = cursor_pos.x(), cursor_pos.y()
-    left_idx = np.searchsorted(x_data, cursor_x - search_radius, side="left")
-    right_idx = np.searchsorted(x_data, cursor_x + search_radius, side="right")
-
-    valid_x = x_data[left_idx:right_idx]
-    valid_y = y_data[left_idx:right_idx]
-
-    x_distances = np.abs(valid_x - cursor_x)
-    y_distances = np.abs(valid_y - cursor_y)
-
-    extrema_idx = left_idx + np.argmin(x_distances)
-    extrema_val = y_data[extrema_idx]
-
-    extrema_idx_y = left_idx + np.argmin(y_distances)
-    extrema_val_y = y_data[extrema_idx_y]
-
-    if np.abs(extrema_val_y - cursor_y) < np.abs(extrema_val - cursor_y):
-        extrema_idx = extrema_idx_y
-        extrema_val = extrema_val_y
-
-    return x_data[extrema_idx], extrema_val
 
 
 class PlotController(QtCore.QObject):
