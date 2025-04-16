@@ -1,17 +1,18 @@
 import datetime
 import enum
 import sys
-import typing as t
+from collections.abc import Callable, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, Final, Unpack
 
 import pyqtgraph as pg
 from PySide6 import QtCore, QtGui, QtWidgets
 
 import signal_viewer.type_defs as _t
 
-MICRO: t.Final = "\u03bc"
+MICRO: Final = "\u03bc"
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from signal_viewer.sv_app import SVApp
     from signal_viewer.sv_gui import SVGUI
 
@@ -54,7 +55,7 @@ def get_app_dir() -> str:
 def safe_disconnect(
     sender: QtCore.QObject,
     signal: QtCore.SignalInstance,
-    slot: QtCore.Slot | t.Callable[..., t.Any],
+    slot: QtCore.Slot | Callable[..., Any],
 ) -> None:
     """
     Checks if the provided signal and slot are connected, and disconnects them if they are.
@@ -66,7 +67,7 @@ def safe_disconnect(
 
 def safe_multi_disconnect(
     sender: QtCore.QObject,
-    signal_slot_pairs: list[tuple[QtCore.SignalInstance, QtCore.Slot | t.Callable[..., t.Any]]],
+    signal_slot_pairs: list[tuple[QtCore.SignalInstance, QtCore.Slot | Callable[..., Any]]],
 ) -> None:
     """
     Checks if the provided signal/slot pairs are connected, and disconnects them if they are.
@@ -75,7 +76,7 @@ def safe_multi_disconnect(
         safe_disconnect(sender, signal, slot)
 
 
-def sequence_repr(seq: t.Sequence[int | float]) -> str:
+def sequence_repr(seq: Sequence[int | float]) -> str:
     """
     Improves readibility of large, numerical sequences when printed to the console by only showing the start and end values.
     """
@@ -90,14 +91,14 @@ def make_qcolor(*args: _t.PGColor) -> QtGui.QColor:
     return args[0] if isinstance(args[0], QtGui.QColor) else pg.mkColor(*args)
 
 
-def make_qpen(*args: _t.PGPen, **kwargs: t.Unpack[_t.PGPenKwargs]) -> QtGui.QPen:
+def make_qpen(*args: _t.PGPen, **kwargs: Unpack[_t.PGPenKwargs]) -> QtGui.QPen:
     """Creates a QPen from the provided arguments."""
     if len(args) == 1 and isinstance(args[0], QtGui.QPen):
         return args[0]
     return pg.mkPen(*args, **kwargs)
 
 
-def make_qbrush(*args: _t.PGBrush, **kwargs: t.Unpack[_t.PGBrushKwargs]) -> QtGui.QBrush:
+def make_qbrush(*args: _t.PGBrush, **kwargs: Unpack[_t.PGBrushKwargs]) -> QtGui.QBrush:
     """Creates a QBrush from the provided arguments."""
     if len(args) == 1 and isinstance(args[0], QtGui.QBrush):
         return args[0]
@@ -110,7 +111,7 @@ def format_file_path(path: str, max_len: int = 50) -> str:
 
     len_name = len(path_obj.name)
     if len_name >= max_len:
-        name = f"{path_obj.name[:max_len - 3]}..."
+        name = f"{path_obj.name[: max_len - 3]}..."
         len_prefix = 0
     else:
         name = path_obj.name
@@ -120,7 +121,7 @@ def format_file_path(path: str, max_len: int = 50) -> str:
     return f"{prefix}.../{name}"
 
 
-def search_enum[T: enum.Enum](value: t.Any, enum_class: type[T]) -> T:
+def search_enum[T: enum.Enum](value: Any, enum_class: type[T]) -> T:
     """
     Searches for `value` in both names and values of `enum_class` and returns the corresponding enum member if found.
     """

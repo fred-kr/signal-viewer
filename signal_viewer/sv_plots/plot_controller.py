@@ -1,3 +1,5 @@
+# pyright: reportOptionalMemberAccess=false
+
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, TypeVar
 
@@ -77,7 +79,6 @@ class PlotController(QtCore.QObject):
         self._setup_plot_data_items()
 
         self.block_clicks = False
-        self.manual_edit = True
 
     def _setup_plot_widgets(self) -> None:
         widget_layout = QtWidgets.QVBoxLayout()
