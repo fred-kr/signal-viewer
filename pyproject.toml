@@ -20,7 +20,6 @@ dependencies = [
     "scipy>=1.15.2",
     "tables>=3.10.2",
     "wfdb>=4.3.0",
-    "pyside6-fluent-widgets>=1.7.7",
     "scikit-learn>=1.6.1",
     "neurokit2>=0.2.10",
     "pyqtgraph",

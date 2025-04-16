@@ -1,5 +1,3 @@
-# This Python file uses the following encoding: utf-8
-
 import os
 from typing import TYPE_CHECKING
 
@@ -7,7 +5,6 @@ import pyside_config as qconfig
 from loguru import logger
 from PySide6 import QtCore, QtGui, QtWidgets
 from pyside_widgets import OverlayWidget, SearchableDataTreeWidget
-from qfluentwidgets import NavigationInterface, NavigationItemPosition
 
 import signal_viewer.type_defs as _t
 from signal_viewer.constants import INDEX_COL
@@ -39,14 +36,6 @@ class SVGUI(QtWidgets.QMainWindow):
 
         self.sv_app = sv_app
 
-        self.new_central_widget = QtWidgets.QWidget()
-        self._h_layout = QtWidgets.QHBoxLayout(self.new_central_widget)
-        self.navigation_interface = NavigationInterface(self, showMenuButton=True)
-        self.navigation_interface.panel.expandAni.setDuration(0)
-
-        self._setup_layout()
-        self.setCentralWidget(self.new_central_widget)
-        self._setup_navigation()
         self._setup_window()
 
         self.overlay_widget = OverlayWidget(self)
@@ -69,49 +58,8 @@ class SVGUI(QtWidgets.QMainWindow):
         w, h = desktop.width(), desktop.height()
         self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
 
-    def _setup_layout(self) -> None:
-        self._h_layout.setSpacing(0)
-        self._h_layout.setContentsMargins(0, 0, 0, 0)
-        self._h_layout.addWidget(self.navigation_interface)
-        self._h_layout.addWidget(self.ui.stackedWidget)
-        self._h_layout.setStretchFactor(self.ui.stackedWidget, 1)
-
-    def _setup_navigation(self) -> None:
-        self.add_sub_interface(self.ui.stacked_page_import, QtGui.QIcon("://icons/DocumentArrowLeft.svg"), "Input Data")
-        self.add_sub_interface(self.ui.stacked_page_edit, QtGui.QIcon("://icons/Edit.svg"), "View & Edit")
-        self.add_sub_interface(self.ui.stacked_page_export, QtGui.QIcon("://icons/DocumentArrowRight.svg"), "Results")
-
-        self.navigation_interface.setExpandWidth(250)
-
-        self.ui.stackedWidget.currentChanged.connect(self._on_current_interface_changed)
-        self.ui.stackedWidget.setCurrentIndex(0)
-        self.navigation_interface.setCurrentItem(self.ui.stackedWidget.currentWidget().objectName())
-
-    def add_sub_interface(
-        self,
-        widget: QtWidgets.QWidget,
-        icon: QtGui.QIcon,
-        text: str,
-        position: NavigationItemPosition = NavigationItemPosition.TOP,
-    ) -> None:
-        if self.ui.stackedWidget.indexOf(widget) == -1:
-            self.ui.stackedWidget.addWidget(widget)
-        self.navigation_interface.addItem(
-            routeKey=widget.objectName(),
-            icon=icon,
-            text=text,
-            onClick=lambda: self.switch_to(widget),
-            position=position,
-            tooltip=text,
-        )
-
     def switch_to(self, widget: QtWidgets.QWidget) -> None:
-        self.ui.stackedWidget.setCurrentWidget(widget)
-
-    @QtCore.Slot(int)
-    def _on_current_interface_changed(self, index: int) -> None:
-        widget = self.ui.stackedWidget.widget(index)
-        self.navigation_interface.setCurrentItem(widget.objectName())
+        self.ui.tab_widget_main.setCurrentWidget(widget)
 
     def _setup_widgets(self) -> None:
         self.dialog_meta = MetadataDialog(self)
@@ -149,7 +97,7 @@ class SVGUI(QtWidgets.QMainWindow):
         # self.btn_export_all_results.setIcon(QtGui.QIcon("://icons/ArrowExportLtr"))
         self.ui.btn_export_all_results.clicked.connect(lambda: self.sig_export_requested.emit("hdf5"))
 
-        self.ui.stackedWidget.setCurrentIndex(0)
+        self.ui.tab_widget_main.setCurrentIndex(0)
 
     def _setup_docks(self) -> None:  # sourcery skip: extract-duplicate-method
         dwa = QtCore.Qt.DockWidgetArea
@@ -276,7 +224,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self._on_page_changed(0)
 
     def _connect_signals(self) -> None:
-        self.ui.stackedWidget.currentChanged.connect(self._on_page_changed)
+        self.ui.tab_widget_main.currentChanged.connect(self._on_page_changed)
 
         self.ui.spin_box_sampling_rate_import_page.valueChanged.connect(
             self.dialog_meta.spin_box_sampling_rate.setValue

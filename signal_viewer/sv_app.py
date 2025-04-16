@@ -331,7 +331,7 @@ class SVApp(QtCore.QObject):
         if not self.plot.region_selector.isVisible():
             return
         start, stop = self.plot.region_selector.getRegion()
-        self.data.create_section(start, stop)
+        self.data.create_section(start, stop)  # type: ignore
         self.plot.hide_region_selector()
         self.gui.show_section_confirm_cancel(False)
         self.gui.ui.action_create_new_section.setChecked(False)
@@ -528,7 +528,7 @@ class SVApp(QtCore.QObject):
 
         self._set_column_models()
         self.recent_files.add_file(file_path)
-        self.gui.switch_to(self.gui.ui.stacked_page_import)
+        self.gui.switch_to(self.gui.ui.tab_import)
 
         logger.info(f"Opened file: {file_path}")
 

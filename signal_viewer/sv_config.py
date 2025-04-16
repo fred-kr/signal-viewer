@@ -1,48 +1,50 @@
+# pyright: reportAssignmentType=false
+
 import functools
 from typing import NamedTuple
 
 import attrs
 import pyside_config as qconfig
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtWidgets
 from pyside_config.helpers import make_combo_box_info, make_spin_box_info
-from pyside_widgets import AnimatedToggleSwitch, ColorPickerButton, EnumComboBox
+from pyside_widgets import AnimatedToggleSwitch, EnumComboBox
 
 from signal_viewer.enum_defs import RateComputationMethod, TextFileSeparator
-from signal_viewer.utils import get_app_dir, make_qcolor, search_enum
+from signal_viewer.utils import get_app_dir, search_enum
 
 app_dir = get_app_dir()
 
 
 @qconfig.config
 class PlotConfig:
-    background_color: QtGui.QColor = attrs.field(
-        default=QtGui.QColor("#000000"),
-        converter=make_qcolor,
-        metadata={
-            "editor": qconfig.EditorWidgetInfo(
-                label="Background Color",
-                widget_factory=functools.partial(ColorPickerButton, color=QtGui.QColor("#000000")),
-                sig_value_changed="sig_color_changed",
-                set_value_method="set_color",
-            ),
-            "description": "Plot background color.",
-            qconfig.QTYPE_KEY: QtGui.QColor,
-        },
-    )
-    foreground_color: QtGui.QColor = attrs.field(
-        default=QtGui.QColor("#969696"),
-        converter=make_qcolor,
-        metadata={
-            "editor": qconfig.EditorWidgetInfo(
-                label="Foreground Color",
-                widget_factory=functools.partial(ColorPickerButton, color=QtGui.QColor("#969696")),
-                sig_value_changed="sig_color_changed",
-                set_value_method="set_color",
-            ),
-            "description": "Plot foreground color.",
-            qconfig.QTYPE_KEY: QtGui.QColor,
-        },
-    )
+    # background_color: QtGui.QColor = attrs.field(
+    #     default=QtGui.QColor("#000000"),
+    #     converter=make_qcolor,
+    #     metadata={
+    #         "editor": qconfig.EditorWidgetInfo(
+    #             label="Background Color",
+    #             widget_factory=functools.partial(ColorPickerButton, color=QtGui.QColor("#000000")),
+    #             sig_value_changed="sig_color_changed",
+    #             set_value_method="set_color",
+    #         ),
+    #         "description": "Plot background color.",
+    #         qconfig.QTYPE_KEY: QtGui.QColor,
+    #     },
+    # )
+    # foreground_color: QtGui.QColor = attrs.field(
+    #     default=QtGui.QColor("#969696"),
+    #     converter=make_qcolor,
+    #     metadata={
+    #         "editor": qconfig.EditorWidgetInfo(
+    #             label="Foreground Color",
+    #             widget_factory=functools.partial(ColorPickerButton, color=QtGui.QColor("#969696")),
+    #             sig_value_changed="sig_color_changed",
+    #             set_value_method="set_color",
+    #         ),
+    #         "description": "Plot foreground color.",
+    #         qconfig.QTYPE_KEY: QtGui.QColor,
+    #     },
+    # )
     line_click_width: int = attrs.field(
         default=70,
         converter=int,

@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QForm
     QFrame, QGridLayout, QGroupBox, QHBoxLayout,
     QHeaderView, QLabel, QLineEdit, QListView,
     QMainWindow, QMenu, QMenuBar, QPushButton,
-    QSizePolicy, QSpacerItem, QSpinBox, QStackedWidget,
+    QSizePolicy, QSpacerItem, QSpinBox, QStatusBar,
     QTabWidget, QTableView, QToolBar, QTreeView,
     QVBoxLayout, QWidget)
 
@@ -149,13 +149,14 @@ class Ui_MainWindow(object):
         self.h_layout_centralwidget = QHBoxLayout(self.centralwidget)
         self.h_layout_centralwidget.setObjectName(u"h_layout_centralwidget")
         self.h_layout_centralwidget.setContentsMargins(0, 0, 0, 0)
-        self.stackedWidget = QStackedWidget(self.centralwidget)
-        self.stackedWidget.setObjectName(u"stackedWidget")
-        self.stacked_page_import = QWidget()
-        self.stacked_page_import.setObjectName(u"stacked_page_import")
-        self.horizontalLayout = QHBoxLayout(self.stacked_page_import)
+        self.tab_widget_main = QTabWidget(self.centralwidget)
+        self.tab_widget_main.setObjectName(u"tab_widget_main")
+        self.tab_widget_main.setTabPosition(QTabWidget.TabPosition.West)
+        self.tab_import = QWidget()
+        self.tab_import.setObjectName(u"tab_import")
+        self.horizontalLayout = QHBoxLayout(self.tab_import)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.container_file_information = QWidget(self.stacked_page_import)
+        self.container_file_information = QWidget(self.tab_import)
         self.container_file_information.setObjectName(u"container_file_information")
         self.gridLayout = QGridLayout(self.container_file_information)
         self.gridLayout.setObjectName(u"gridLayout")
@@ -284,7 +285,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.container_file_information)
 
-        self.container_loaded_data_table = QWidget(self.stacked_page_import)
+        self.container_loaded_data_table = QWidget(self.tab_import)
         self.container_loaded_data_table.setObjectName(u"container_loaded_data_table")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         sizePolicy2.setHorizontalStretch(0)
@@ -322,34 +323,34 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.setStretch(0, 3)
         self.horizontalLayout.setStretch(1, 6)
-        self.stackedWidget.addWidget(self.stacked_page_import)
-        self.stacked_page_edit = QWidget()
-        self.stacked_page_edit.setObjectName(u"stacked_page_edit")
-        self.gridLayout_2 = QGridLayout(self.stacked_page_edit)
+        self.tab_widget_main.addTab(self.tab_import, "")
+        self.tab_edit = QWidget()
+        self.tab_edit.setObjectName(u"tab_edit")
+        self.gridLayout_2 = QGridLayout(self.tab_edit)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.plot_container = QWidget(self.stacked_page_edit)
+        self.plot_container = QWidget(self.tab_edit)
         self.plot_container.setObjectName(u"plot_container")
 
         self.gridLayout_2.addWidget(self.plot_container, 0, 0, 1, 1)
 
-        self.stackedWidget.addWidget(self.stacked_page_edit)
-        self.stacked_page_export = QWidget()
-        self.stacked_page_export.setObjectName(u"stacked_page_export")
-        self.gridLayout_3 = QGridLayout(self.stacked_page_export)
+        self.tab_widget_main.addTab(self.tab_edit, "")
+        self.tab_export = QWidget()
+        self.tab_export.setObjectName(u"tab_export")
+        self.gridLayout_3 = QGridLayout(self.tab_export)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.btn_export_all_results = QPushButton(self.stacked_page_export)
+        self.btn_export_all_results = QPushButton(self.tab_export)
         self.btn_export_all_results.setObjectName(u"btn_export_all_results")
         sizePolicy1.setHeightForWidth(self.btn_export_all_results.sizePolicy().hasHeightForWidth())
         self.btn_export_all_results.setSizePolicy(sizePolicy1)
 
         self.gridLayout_3.addWidget(self.btn_export_all_results, 0, 3, 1, 1)
 
-        self.label_4 = QLabel(self.stacked_page_export)
+        self.label_4 = QLabel(self.tab_export)
         self.label_4.setObjectName(u"label_4")
 
         self.gridLayout_3.addWidget(self.label_4, 0, 0, 1, 1)
 
-        self.tab_widget_result_views = QTabWidget(self.stacked_page_export)
+        self.tab_widget_result_views = QTabWidget(self.tab_export)
         self.tab_widget_result_views.setObjectName(u"tab_widget_result_views")
         self.tab_result_peaks_info = QWidget()
         self.tab_result_peaks_info.setObjectName(u"tab_result_peaks_info")
@@ -403,12 +404,12 @@ class Ui_MainWindow(object):
 
         self.gridLayout_3.addWidget(self.tab_widget_result_views, 1, 0, 1, 4)
 
-        self.label_showing_section_result = QLabel(self.stacked_page_export)
+        self.label_showing_section_result = QLabel(self.tab_export)
         self.label_showing_section_result.setObjectName(u"label_showing_section_result")
 
         self.gridLayout_3.addWidget(self.label_showing_section_result, 0, 1, 1, 1)
 
-        self.btn_export_to_excel = QPushButton(self.stacked_page_export)
+        self.btn_export_to_excel = QPushButton(self.tab_export)
         self.btn_export_to_excel.setObjectName(u"btn_export_to_excel")
         sizePolicy1.setHeightForWidth(self.btn_export_to_excel.sizePolicy().hasHeightForWidth())
         self.btn_export_to_excel.setSizePolicy(sizePolicy1)
@@ -418,9 +419,9 @@ class Ui_MainWindow(object):
         self.gridLayout_3.setColumnStretch(0, 2)
         self.gridLayout_3.setColumnStretch(1, 1)
         self.gridLayout_3.setColumnStretch(2, 1)
-        self.stackedWidget.addWidget(self.stacked_page_export)
+        self.tab_widget_main.addTab(self.tab_export, "")
 
-        self.h_layout_centralwidget.addWidget(self.stackedWidget)
+        self.h_layout_centralwidget.addWidget(self.tab_widget_main)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -445,6 +446,9 @@ class Ui_MainWindow(object):
         self.tool_bar_file_actions.setIconSize(QSize(16, 16))
         self.tool_bar_file_actions.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         MainWindow.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.tool_bar_file_actions)
+        self.status_bar = QStatusBar(MainWindow)
+        self.status_bar.setObjectName(u"status_bar")
+        MainWindow.setStatusBar(self.status_bar)
         QWidget.setTabOrder(self.btn_open_file, self.line_edit_active_file)
         QWidget.setTabOrder(self.line_edit_active_file, self.spin_box_sampling_rate_import_page)
         QWidget.setTabOrder(self.spin_box_sampling_rate_import_page, self.combo_box_signal_column_import_page)
@@ -482,9 +486,8 @@ class Ui_MainWindow(object):
         self.tool_bar_file_actions.addAction(self.action_edit_metadata)
 
         self.retranslateUi(MainWindow)
-        self.line_edit_active_file.textChanged.connect(MainWindow.setWindowTitle)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.tab_widget_main.setCurrentIndex(0)
         self.tab_widget_result_views.setCurrentIndex(1)
 
     # setupUi
@@ -629,6 +632,8 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(tooltip)
         self.table_view_import_data.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>A table showing the current section's data</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
+        self.tab_widget_main.setTabText(self.tab_widget_main.indexOf(self.tab_import), QCoreApplication.translate("MainWindow", u"Import && Data", None))
+        self.tab_widget_main.setTabText(self.tab_widget_main.indexOf(self.tab_edit), QCoreApplication.translate("MainWindow", u"View && Edit", None))
         self.btn_export_all_results.setText(QCoreApplication.translate("MainWindow", u"Save to HDF5 (detailed)", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"Section Data and Results", None))
         self.tab_widget_result_views.setTabText(self.tab_widget_result_views.indexOf(self.tab_result_peaks_info), QCoreApplication.translate("MainWindow", u"Peak Indices", None))
@@ -640,6 +645,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.label_showing_section_result.setText("")
         self.btn_export_to_excel.setText(QCoreApplication.translate("MainWindow", u"Save to Excel", None))
+        self.tab_widget_main.setTabText(self.tab_widget_main.indexOf(self.tab_export), QCoreApplication.translate("MainWindow", u"Results && Export", None))
         self.menu_file.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menu_settings.setTitle(QCoreApplication.translate("MainWindow", u"Settings", None))
         self.menu_view.setTitle(QCoreApplication.translate("MainWindow", u"View", None))

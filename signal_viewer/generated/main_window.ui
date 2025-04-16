@@ -37,11 +37,17 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QStackedWidget" name="stackedWidget">
+     <widget class="QTabWidget" name="tab_widget_main">
+      <property name="tabPosition">
+       <enum>QTabWidget::TabPosition::West</enum>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="stacked_page_import">
+      <widget class="QWidget" name="tab_import" native="true">
+       <attribute name="title">
+        <string>Import &amp;&amp; Data</string>
+       </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,6">
         <item>
          <widget class="QWidget" name="container_file_information" native="true">
@@ -349,14 +355,20 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="stacked_page_edit">
+      <widget class="QWidget" name="tab_edit" native="true">
+       <attribute name="title">
+        <string>View &amp;&amp; Edit</string>
+       </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <widget class="QWidget" name="plot_container" native="true"/>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="stacked_page_export">
+      <widget class="QWidget" name="tab_export" native="true">
+       <attribute name="title">
+        <string>Results &amp;&amp; Export</string>
+       </attribute>
        <layout class="QGridLayout" name="gridLayout_3" columnstretch="2,1,1,0">
         <item row="0" column="3">
          <widget class="QPushButton" name="btn_export_all_results">
@@ -573,6 +585,7 @@
    <addaction name="action_close_file"/>
    <addaction name="action_edit_metadata"/>
   </widget>
+  <widget class="QStatusBar" name="status_bar"/>
   <action name="action_open_file">
    <property name="icon">
     <iconset>
@@ -892,22 +905,5 @@
   <tabstop>tab_widget_result_views</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>line_edit_active_file</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>setWindowTitle(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>363</x>
-     <y>152</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>187</x>
-     <y>-11</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
