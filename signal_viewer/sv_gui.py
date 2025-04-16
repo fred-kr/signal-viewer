@@ -52,7 +52,7 @@ class SVGUI(QtWidgets.QMainWindow):
 
     def _setup_window(self) -> None:
         self.setWindowTitle("SignalViewer")
-        self.setWindowIcon(QtGui.QIcon("://icons/app_icon.svg"))
+        self.setWindowIcon(QtGui.QIcon("://icons/fancy_icon2.png"))
 
         desktop = QtWidgets.QApplication.primaryScreen().availableGeometry()
         w, h = desktop.width(), desktop.height()

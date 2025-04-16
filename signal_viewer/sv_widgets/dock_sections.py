@@ -70,7 +70,7 @@ class SectionListDock(QtWidgets.QDockWidget):
         self.setVisible(False)
         self.setObjectName("SectionListDock")
         self.setWindowTitle("Section List")
-        self.setWindowIcon(QtGui.QIcon("://icons/app_icon.svg"))
+        self.setWindowIcon(QtGui.QIcon("://icons/fancy_icon2.png"))
 
         self._widget = SectionListWidget()
         self.list_view = self._widget.section_list

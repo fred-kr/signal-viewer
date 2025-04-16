@@ -11,7 +11,6 @@ import xlsxwriter
 from loguru import logger
 from PySide6 import QtCore, QtWidgets
 
-import signal_viewer.type_defs as _t
 from signal_viewer.constants import SECTION_INDEX_COL
 from signal_viewer.enum_defs import (
     PeakDetectionAlgorithm,
@@ -27,6 +26,14 @@ from signal_viewer.sv_data.peak_detection import find_peaks
 from signal_viewer.sv_gui import SVGUI
 from signal_viewer.sv_help import HelpController
 from signal_viewer.sv_plots.plot_controller import PlotController
+from signal_viewer.type_defs import (
+    MetadataDict,
+    PeakDetectionAlgorithmParameters,
+    RollingRateKwargsDict,
+    SignalFilterKwargs,
+    SignalStandardizeKwargs,
+    UpdatePeaksAction,
+)
 from signal_viewer.utils import safe_multi_disconnect
 
 if TYPE_CHECKING:
@@ -45,9 +52,9 @@ class PeakDetectionWorker(QtCore.QRunnable):
         self,
         section: "Section",
         method: PeakDetectionAlgorithm,
-        method_parameters: _t.PeakDetectionAlgorithmParameters,
+        method_parameters: PeakDetectionAlgorithmParameters,
         *,
-        rr_params: _t.RollingRateKwargsDict | None = None,
+        rr_params: RollingRateKwargsDict | None = None,
     ) -> None:
         super().__init__()
         self.section = section
@@ -69,7 +76,7 @@ class PeakDetectionWorker(QtCore.QRunnable):
 
 
 class SectionResultWorker(QtCore.QRunnable):
-    def __init__(self, section: "Section", *, rr_params: _t.RollingRateKwargsDict | None = None) -> None:
+    def __init__(self, section: "Section", *, rr_params: RollingRateKwargsDict | None = None) -> None:
         super().__init__()
         self.section = section
         self.rr_params = rr_params
@@ -209,7 +216,7 @@ class SVApp(QtCore.QObject):
         self.sig_peaks_updated.emit()
 
     @QtCore.Slot(str, object)
-    def handle_peak_edit(self, action: _t.UpdatePeaksAction, indices: npt.NDArray[np.intp]) -> None:
+    def handle_peak_edit(self, action: UpdatePeaksAction, indices: npt.NDArray[np.intp]) -> None:
         rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
         self.data.active_section.update_peaks(action, indices, rr_params=rolling_rate_kwargs)
         self.sig_peaks_updated.emit()
@@ -235,7 +242,7 @@ class SVApp(QtCore.QObject):
         self.gui.dock_parameters.ui.ui.status_standardization.setChecked(self.data.active_section.is_standardized)
 
     @QtCore.Slot(dict)
-    def filter_active_signal(self, filter_params: _t.SignalFilterKwargs) -> None:
+    def filter_active_signal(self, filter_params: SignalFilterKwargs) -> None:
         self.data.active_section.filter_signal(pipeline=None, **filter_params)
         self.refresh_plot_data()
 
@@ -254,7 +261,7 @@ class SVApp(QtCore.QObject):
         self.refresh_plot_data()
 
     @QtCore.Slot(dict)
-    def standardize_active_signal(self, standardization_params: _t.SignalStandardizeKwargs) -> None:
+    def standardize_active_signal(self, standardization_params: SignalStandardizeKwargs) -> None:
         method = standardization_params.pop("method")
         window_size = standardization_params.pop("window_size")
         robust = method == StandardizationMethod.ZScoreRobust
@@ -267,7 +274,7 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(enum.StrEnum, dict)
     def run_peak_detection_worker(
-        self, method: PeakDetectionAlgorithm, params: _t.PeakDetectionAlgorithmParameters
+        self, method: PeakDetectionAlgorithm, params: PeakDetectionAlgorithmParameters
     ) -> None:
         rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
         worker = PeakDetectionWorker(self.data.active_section, method, params, rr_params=rolling_rate_kwargs)
@@ -397,7 +404,7 @@ class SVApp(QtCore.QObject):
         self.data.active_section_model.set_df(self.data.active_section.data)
 
     @QtCore.Slot(dict)
-    def update_metadata(self, metadata_dict: _t.MetadataDict) -> None:
+    def update_metadata(self, metadata_dict: MetadataDict) -> None:
         sampling_rate = metadata_dict.get("sampling_rate", None)
         info_col = metadata_dict.get("info_column", None)
         signal_col = metadata_dict.get("signal_column", None)
