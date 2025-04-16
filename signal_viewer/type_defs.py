@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from loguru import RecordException, RecordFile, RecordLevel, RecordProcess, RecordThread
     from PySide6 import QtCore, QtGui
 
-    from signal_viewer.sv_logic.section import SectionID
+    from signal_viewer.sv_data.section import SectionID
 
 type PGColor = Union[str, int, float, tuple[int, int, int], tuple[int, int, int, int], "QtGui.QColor", SVGColors]
 type PGPen = Union[PGColor, "QtGui.QPen", PGPenKwargs, None]

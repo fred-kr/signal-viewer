@@ -20,8 +20,8 @@ from signal_viewer.enum_defs import (
     RateComputationMethod,
 )
 from signal_viewer.sv_config import Config
-from signal_viewer.sv_logic.peak_detection import find_peaks
-from signal_viewer.sv_logic.signal_processing import apply_cleaning_pipeline, filter_signal, standardize_signal
+from signal_viewer.sv_data.peak_detection import find_peaks
+from signal_viewer.sv_data.signal_processing import apply_cleaning_pipeline, filter_signal, standardize_signal
 from signal_viewer.utils import sequence_repr
 
 

@@ -3,13 +3,14 @@ from pathlib import Path
 from typing import Any
 
 import polars as pl
+from janitor.polars.clean_names import _clean_column_names
 from PySide6 import QtCore, QtGui
 
-import signal_viewer.type_defs as _t
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION, RESERVED_COLUMN_NAMES
 from signal_viewer.enum_defs import InputFileFormat
 from signal_viewer.sv_config import Config
-from signal_viewer.sv_logic.section import Section, SectionID
+from signal_viewer.sv_data.section import Section, SectionID
+from signal_viewer.type_defs import MetadataDict
 from signal_viewer.utils import format_file_path, human_readable_timedelta
 
 ItemDataRole = QtCore.Qt.ItemDataRole
@@ -278,6 +279,7 @@ class FileMetadata:
         "_columns",
         "_signal_column",
         "_info_column",
+        "name_map",
         "other_info",
     )
 
@@ -299,6 +301,18 @@ class FileMetadata:
         if info_col not in self._columns:
             info_col = COMBO_BOX_NO_SELECTION
         self._info_column = info_col
+
+        self.name_map = {
+            c: _clean_column_names(
+                c,
+                strip_underscores=True,
+                case_type="lower",
+                remove_special=True,
+                strip_accents=True,
+                truncate_limit=None,  # type: ignore
+            )
+            for c in self._columns
+        }
 
         self.other_info: dict[str, Any] = {}
 
@@ -360,7 +374,15 @@ class FileMetadata:
             value = COMBO_BOX_NO_SELECTION
         self._info_column = value
 
-    def to_dict(self) -> _t.MetadataDict:
+    def apply_name_map(self) -> None:
+        old_signal_name = self.signal_column
+        self.signal_column = self.name_map[old_signal_name]
+
+        old_info_name = self.info_column
+        if old_info_name != COMBO_BOX_NO_SELECTION:
+            self.info_column = self.name_map[old_info_name]
+
+    def to_dict(self) -> MetadataDict:
         return {
             "file_path": self.file_path,
             "sampling_rate": self.sampling_rate,

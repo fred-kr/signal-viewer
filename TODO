@@ -1,0 +1,6 @@
+
+Todo:
+  ☐ add functionality to load comments from separate file
+  ☐ replace input widget highlighting in metadata dialog (stylesheets don't work well)
+  ☐ write documentation
+  ☐ try to get rid of neurokit2 dependency by reimplementing relevant functions

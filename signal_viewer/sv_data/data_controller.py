@@ -5,17 +5,16 @@ from typing import Any, cast
 import attrs
 import mne.io
 import polars as pl
-from janitor.polars import clean_names
 from loguru import logger
 from PySide6 import QtCore
 
-import signal_viewer.type_defs as _t
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION
 from signal_viewer.enum_defs import InputFileFormat, TextFileSeparator
 from signal_viewer.sv_config import Config
-from signal_viewer.sv_logic.data_models import DataFrameModel, FileMetadata, SectionListModel
-from signal_viewer.sv_logic.file_io import detect_sampling_rate, read_edf
-from signal_viewer.sv_logic.section import DetailedSectionResult, Section, SectionID
+from signal_viewer.sv_data.data_models import DataFrameModel, FileMetadata, SectionListModel
+from signal_viewer.sv_data.file_io import detect_sampling_rate, read_edf
+from signal_viewer.sv_data.section import DetailedSectionResult, Section, SectionID
+from signal_viewer.type_defs import CompleteResultDict, SelectedFileMetadataDict
 
 
 @attrs.define(frozen=True, repr=True)
@@ -26,8 +25,8 @@ class SelectedFileMetadata:
     name_signal_column: str = attrs.field()
     name_info_column: str | None = attrs.field(default=None)
 
-    def to_dict(self) -> _t.SelectedFileMetadataDict:
-        return _t.SelectedFileMetadataDict(
+    def to_dict(self) -> SelectedFileMetadataDict:
+        return SelectedFileMetadataDict(
             file_name=self.file_name,
             file_format=self.file_format,
             sampling_rate=self.sampling_rate,
@@ -42,10 +41,10 @@ class CompleteResult:
     global_dataframe: pl.DataFrame = attrs.field()
     section_results: dict["SectionID", DetailedSectionResult] = attrs.field()
 
-    def to_dict(self) -> _t.CompleteResultDict:
+    def to_dict(self) -> CompleteResultDict:
         section_results = {k: v.to_dict() for k, v in self.section_results.items()}
 
-        return _t.CompleteResultDict(
+        return CompleteResultDict(
             metadata=self.metadata.to_dict(),
             global_dataframe=self.global_dataframe.to_numpy(structured=True),
             section_results=section_results,
@@ -169,7 +168,7 @@ class DataController(QtCore.QObject):
             other_info = dict(edf_info.info)
         elif file_path.suffix in {".feather", ".csv", ".txt", ".tsv"}:
             lf = self._reader_funcs[file_path.suffix](file_path)
-            lf: pl.LazyFrame = clean_names(lf, remove_special=True, strip_underscores=True, strip_accents=True)
+            # lf: pl.LazyFrame = clean_names(lf, remove_special=True, strip_underscores=True, strip_accents=True)
             column_names = lf.collect_schema().names()
             try:
                 sampling_rate = detect_sampling_rate(lf)
@@ -177,7 +176,7 @@ class DataController(QtCore.QObject):
                 sampling_rate = 0
         elif file_path.suffix in {".xls", ".xlsx"}:
             lf = pl.read_excel(file_path).lazy()
-            lf = clean_names(lf, remove_special=True, strip_underscores=True, strip_accents=True)
+            # lf = clean_names(lf, remove_special=True, strip_underscores=True, strip_accents=True)
             column_names = lf.collect_schema().names()
             try:
                 sampling_rate = detect_sampling_rate(lf)
@@ -239,6 +238,9 @@ class DataController(QtCore.QObject):
             df = pl.read_excel(file_path, columns=columns)
         else:
             raise NotImplementedError(f"Unsupported file format: {suffix}.")
+
+        df = df.rename(self.metadata.name_map, strict=False)
+        self.metadata.apply_name_map()
 
         self.data_model.set_df(df)
         self._base_section = self.get_base_section()

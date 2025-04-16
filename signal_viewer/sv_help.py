@@ -4,6 +4,7 @@ from pathlib import Path
 from PySide6 import QtCore, QtWidgets
 
 from signal_viewer.sv_site import DOCDIR
+from signal_viewer.utils import get_gui
 
 
 class HelpController(QtCore.QObject):
@@ -29,7 +30,13 @@ class HelpController(QtCore.QObject):
                 app += "/assistant"
             else:
                 app += "/Assistant.app/Contents/MacOS/Assistant"
-            args = ["-collectionFile", Path(DOCDIR / "signalviewer.qhc").as_posix(), "-enableRemoteControl"]
+            args = [
+                "-collectionFile",
+                Path(DOCDIR / "signalviewer.qhc").as_posix(),
+                "-enableRemoteControl",
+                "-style",
+                "fusion",
+            ]
 
             self.help_process.start(app, args)
 
@@ -41,7 +48,7 @@ class HelpController(QtCore.QObject):
         return True
 
     def show_error(self, error_msg: str) -> None:
-        QtWidgets.QMessageBox.critical(QtWidgets.QApplication.activeWindow(), "Error", error_msg)
+        QtWidgets.QMessageBox.critical(QtWidgets.QApplication.activeWindow() or get_gui(), "Error", error_msg)
 
     def close(self) -> None:
         if self.help_process.state() == QtCore.QProcess.ProcessState.Running:

@@ -1,4 +1,3 @@
-# This Python file uses the following encoding: utf-8
 import contextlib
 import enum
 import traceback
@@ -21,18 +20,18 @@ from signal_viewer.enum_defs import (
     StandardizationMethod,
 )
 from signal_viewer.sv_config import Config
+from signal_viewer.sv_data.data_controller import DataController
+from signal_viewer.sv_data.data_models import FileListModel
+from signal_viewer.sv_data.file_io import write_hdf5
+from signal_viewer.sv_data.peak_detection import find_peaks
 from signal_viewer.sv_gui import SVGUI
 from signal_viewer.sv_help import HelpController
-from signal_viewer.sv_logic.data_controller import DataController
-from signal_viewer.sv_logic.data_models import FileListModel
-from signal_viewer.sv_logic.file_io import write_hdf5
-from signal_viewer.sv_logic.peak_detection import find_peaks
 from signal_viewer.sv_plots.plot_controller import PlotController
 from signal_viewer.utils import safe_multi_disconnect
 
 if TYPE_CHECKING:
-    from signal_viewer.sv_logic.data_models import FileMetadata
-    from signal_viewer.sv_logic.section import Section
+    from signal_viewer.sv_data.data_models import FileMetadata
+    from signal_viewer.sv_data.section import Section
 
 
 class WorkerSignals(QtCore.QObject):
@@ -545,6 +544,10 @@ class SVApp(QtCore.QObject):
             self.close_file()
             self._on_file_opened(loaded_file)
 
+        Config.internal.last_signal_column = self.data.metadata.signal_column
+        Config.internal.last_info_column = self.data.metadata.info_column
+        Config.internal.last_sampling_rate = self.data.metadata.sampling_rate
+
         self.data.load_data()
         self.gui.ui.table_view_import_data.horizontalHeader().setSectionResizeMode(
             QtWidgets.QHeaderView.ResizeMode.Stretch
@@ -558,10 +561,6 @@ class SVApp(QtCore.QObject):
         self.gui.dialog_meta.spin_box_sampling_rate.setEnabled(False)
         self.gui.dialog_meta.combo_box_signal_column.setEnabled(False)
         self.gui.dialog_meta.combo_box_info_column.setEnabled(False)
-
-        Config.internal.last_signal_column = self.data.metadata.signal_column
-        Config.internal.last_info_column = self.data.metadata.info_column
-        Config.internal.last_sampling_rate = self.data.metadata.sampling_rate
 
         logger.info(f"Read data from file: {self.data.metadata.file_name}")
 
