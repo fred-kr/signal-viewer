@@ -32,7 +32,7 @@ class ProcessingParameters:
     filter_parameters: list[_t.SignalFilterKwargs] = attrs.field(factory=list)
     standardization_parameters: _t.SignalStandardizeKwargs | None = attrs.field(default=None)
     peak_detection_method: PeakDetectionAlgorithm | None = attrs.field(default=None)
-    peak_detection_method_parameters: _t.PeakDetectionMethodParameters | None = attrs.field(default=None)
+    peak_detection_method_parameters: _t.PeakDetectionAlgorithmParameters | None = attrs.field(default=None)
     rate_computation_method: RateComputationMethod = attrs.field(default=Config.editing.rate_computation_method)
 
     def to_dict(self) -> _t.ProcessingParametersDict:
@@ -440,7 +440,7 @@ class Section:
     def detect_peaks(
         self,
         method: PeakDetectionAlgorithm,
-        method_parameters: _t.PeakDetectionMethodParameters,
+        method_parameters: _t.PeakDetectionAlgorithmParameters,
         *,
         rr_params: _t.RollingRateKwargsDict | None = None,
     ) -> None:
@@ -451,7 +451,7 @@ class Section:
         ----------
         method : PeakDetectionMethod
             The method to use for peak detection
-        method_parameters : PeakDetectionMethodParameters
+        method_parameters : PeakDetectionAlgorithmParameters
             The parameters to use for the peak detection method
         """
         peaks = find_peaks(

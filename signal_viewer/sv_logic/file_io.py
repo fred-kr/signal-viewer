@@ -6,12 +6,10 @@ from typing import Literal
 import mne.io
 import polars as pl
 import polars.selectors as cs
-import tables as tb
 from loguru import logger
 
 import signal_viewer.type_defs as _t
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION
-from signal_viewer.enum_defs import PeakDetectionMethod
 
 
 def _infer_time_column(lf: pl.LazyFrame, contains: Sequence[str] | None = None) -> list[str]:
@@ -162,73 +160,74 @@ def read_edf(
 
 @logger.catch
 def write_hdf5(file_path: Path, data: _t.CompleteResultDict) -> None:
-    fp = file_path.resolve().as_posix()
-    with tb.open_file(fp, "w", title=f"Results_{file_path.stem}") as h5f:
-        # Root level metadata
-        for k, v in data["metadata"].items():
-            h5f.set_node_attr(h5f.root, k, v)
+    raise NotImplementedError("Needs to be updated to work with new peak algorithm structure.")
+    # fp = file_path.resolve().as_posix()
+    # with tb.open_file(fp, "w", title=f"Results_{file_path.stem}") as h5f:
+    #     # Root level metadata
+    #     for k, v in data["metadata"].items():
+    #         h5f.set_node_attr(h5f.root, k, v)
 
-        h5f.create_table(
-            h5f.root, name="combined_data", title="Combined Section Dataframe", obj=data["global_dataframe"]
-        )
+    #     h5f.create_table(
+    #         h5f.root, name="combined_data", title="Combined Section Dataframe", obj=data["global_dataframe"]
+    #     )
 
-        section_results = h5f.create_group(h5f.root, "section_results", "Results by Section")
+    #     section_results = h5f.create_group(h5f.root, "section_results", "Results by Section")
 
-        for section_id, section_data in data["section_results"].items():
-            section_group = h5f.create_group(section_results, section_id, f"Results for {section_id.pretty_name()}")
+    #     for section_id, section_data in data["section_results"].items():
+    #         section_group = h5f.create_group(section_results, section_id, f"Results for {section_id.pretty_name()}")
 
-            h5f.create_table(
-                section_group, name="peak_result", obj=section_data["section_result"]["peak_data"], title="Peak Results"
-            )
-            h5f.create_table(
-                section_group, name="rate_result", obj=section_data["section_result"]["rate_data"], title="Rate Results"
-            )
+    #         h5f.create_table(
+    #             section_group, name="peak_result", obj=section_data["section_result"]["peak_data"], title="Peak Results"
+    #         )
+    #         h5f.create_table(
+    #             section_group, name="rate_result", obj=section_data["section_result"]["rate_data"], title="Rate Results"
+    #         )
 
-            # Section dataframe
-            h5f.create_table(
-                section_group,
-                name="data",
-                obj=section_data["section_dataframe"],
-                title="Section Dataframe",
-            )
+    #         # Section dataframe
+    #         h5f.create_table(
+    #             section_group,
+    #             name="data",
+    #             obj=section_data["section_dataframe"],
+    #             title="Section Dataframe",
+    #         )
 
-            # Processing info
-            processing_group = h5f.create_group(section_group, "processing_info", "Data Processing Information")
-            h5f.set_node_attr(processing_group, "sampling_rate", section_data["metadata"]["sampling_rate"])
-            h5f.set_node_attr(
-                processing_group,
-                "processing_pipeline",
-                section_data["metadata"]["processing_parameters"]["processing_pipeline"],
-            )
+    #         # Processing info
+    #         processing_group = h5f.create_group(section_group, "processing_info", "Data Processing Information")
+    #         h5f.set_node_attr(processing_group, "sampling_rate", section_data["metadata"]["sampling_rate"])
+    #         h5f.set_node_attr(
+    #             processing_group,
+    #             "processing_pipeline",
+    #             section_data["metadata"]["processing_parameters"]["processing_pipeline"],
+    #         )
 
-            # Filters
-            filters_group = h5f.create_group(processing_group, "filters", "Applied Filters")
-            for i, filter_params in enumerate(
-                section_data["metadata"]["processing_parameters"]["filter_parameters"], 1
-            ):
-                filter_group = h5f.create_group(filters_group, f"filter_{i}", f"Filter {i} Parameters")
-                for param, value in filter_params.items():
-                    h5f.set_node_attr(filter_group, param, value)
+    #         # Filters
+    #         filters_group = h5f.create_group(processing_group, "filters", "Applied Filters")
+    #         for i, filter_params in enumerate(
+    #             section_data["metadata"]["processing_parameters"]["filter_parameters"], 1
+    #         ):
+    #             filter_group = h5f.create_group(filters_group, f"filter_{i}", f"Filter {i} Parameters")
+    #             for param, value in filter_params.items():
+    #                 h5f.set_node_attr(filter_group, param, value)
 
-            # Standardization
-            std_group = h5f.create_group(processing_group, "standardization", "Data Standardization")
-            if std_params := section_data["metadata"]["processing_parameters"].get("standardization_parameters", {}):
-                for param, value in std_params.items():
-                    h5f.set_node_attr(std_group, param, value)
+    #         # Standardization
+    #         std_group = h5f.create_group(processing_group, "standardization", "Data Standardization")
+    #         if std_params := section_data["metadata"]["processing_parameters"].get("standardization_parameters", {}):
+    #             for param, value in std_params.items():
+    #                 h5f.set_node_attr(std_group, param, value)
 
-            # Peak detection
-            peak_detect_group = h5f.create_group(processing_group, "peak_detection", "Peak Detection Method")
-            peak_method = section_data["metadata"]["processing_parameters"]["peak_detection_method"] or "None"
-            peak_params = section_data["metadata"]["processing_parameters"]["peak_detection_method_parameters"] or {}
-            if peak_method == PeakDetectionMethod.ECGNeuroKit2:
-                peak_method = f"{peak_method} ({peak_params.get('method', 'None')})"
-                peak_params = peak_params.get("params") or {}
-            h5f.set_node_attr(peak_detect_group, "method", peak_method)
-            if peak_params:
-                for param, value in peak_params.items():
-                    h5f.set_node_attr(peak_detect_group, param, value)
+    #         # Peak detection
+    #         peak_detect_group = h5f.create_group(processing_group, "peak_detection", "Peak Detection Method")
+    #         peak_method = section_data["metadata"]["processing_parameters"]["peak_detection_method"] or "None"
+    #         peak_params = section_data["metadata"]["processing_parameters"]["peak_detection_method_parameters"] or {}
+    #         if peak_method == PeakDetectionMethod.ECGNeuroKit2:
+    #             peak_method = f"{peak_method} ({peak_params.get('method', 'None')})"
+    #             peak_params = peak_params.get("params") or {}
+    #         h5f.set_node_attr(peak_detect_group, "method", peak_method)
+    #         if peak_params:
+    #             for param, value in peak_params.items():
+    #                 h5f.set_node_attr(peak_detect_group, param, value)
 
-            # Rate computation
-            rate_group = h5f.create_group(processing_group, "rate_computation", "Rate Computation Method")
-            rate_method = section_data["metadata"]["processing_parameters"]["rate_computation_method"]
-            h5f.set_node_attr(rate_group, "method", rate_method)
+    #         # Rate computation
+    #         rate_group = h5f.create_group(processing_group, "rate_computation", "Rate Computation Method")
+    #         rate_method = section_data["metadata"]["processing_parameters"]["rate_computation_method"]
+    #         h5f.set_node_attr(rate_group, "method", rate_method)

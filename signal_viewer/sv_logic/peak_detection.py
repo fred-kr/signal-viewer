@@ -4,8 +4,6 @@ Various functions for detecting peaks in (bio)signal data.
 Most of the functions are adapted from the NeuroKit2 package, with improved type annotations and where necessary
 modified to fit the needs of this application.
 """
-# Since neurokit2 isn't typed all that well, we disable the following checks to appease the type checker:
-
 # pyright: reportUnknownVariableType=false, reportUnknownArgumentType=false
 
 from collections.abc import Callable
@@ -17,8 +15,18 @@ import numpy.typing as npt
 import wfdb.processing as wp
 from scipy import ndimage
 
-import signal_viewer.type_defs as _t
 from signal_viewer.enum_defs import PeakDetectionAlgorithm, WFDBPeakDirection
+from signal_viewer.type_defs import (
+    PeakDetectionAlgorithmParameters,
+    PeaksECGEmrich,
+    PeaksECGGamboa,
+    PeaksECGNeuroKit,
+    PeaksECGPromac,
+    PeaksECGXQRS,
+    PeaksLocalMaxima,
+    PeaksLocalMinima,
+    PeaksPPGElgendi,
+)
 
 
 def _find_peaks_local_max(sig: npt.NDArray[np.float64], search_radius: int) -> npt.NDArray[np.intp]:
@@ -200,10 +208,10 @@ def find_peaks(
     sig: npt.NDArray[np.float64],
     sampling_rate: int,
     method: PeakDetectionAlgorithm,
-    method_parameters: _t.PeakDetectionMethodParameters | None,
+    method_parameters: PeakDetectionAlgorithmParameters | None,
 ) -> npt.NDArray[np.intp]:
     if method == PeakDetectionAlgorithm.LocalMaxima:
-        method_parameters = cast(_t.PeaksLocalMaxima, method_parameters)
+        method_parameters = cast(PeaksLocalMaxima, method_parameters)
         return find_extrema(
             sig,
             search_radius=method_parameters["search_radius"],
@@ -211,21 +219,21 @@ def find_peaks(
             min_peak_distance=method_parameters["min_distance"],
         )
     elif method == PeakDetectionAlgorithm.LocalMinima:
-        method_parameters = cast(_t.PeaksLocalMinima, method_parameters)
+        method_parameters = cast(PeaksLocalMinima, method_parameters)
         return find_extrema(
             sig,
             search_radius=method_parameters["search_radius"],
             direction="down",
             min_peak_distance=method_parameters["min_distance"],
         )
-    elif method == PeakDetectionAlgorithm.PPGElgendi:
-        method_parameters = cast(_t.PeaksPPGElgendi, method_parameters)
+    elif method == PeakDetectionAlgorithm.PPG_Elgendi:
+        method_parameters = cast(PeaksPPGElgendi, method_parameters)
         peak_dict = nk.ppg_findpeaks(
             sig, sampling_rate=sampling_rate, method="elgendi", show=False, **method_parameters
         )
         return np.asarray(peak_dict["PPG_Peaks"], dtype=np.intp)
-    elif method == PeakDetectionAlgorithm.ECGXQRS:
-        method_parameters = cast(_t.PeaksECGXQRS, method_parameters)
+    elif method == PeakDetectionAlgorithm.ECG_XQRS:
+        method_parameters = cast(PeaksECGXQRS, method_parameters)
         return _find_peaks_xqrs(
             sig,
             sampling_rate,
@@ -233,8 +241,8 @@ def find_peaks(
             min_peak_distance=method_parameters["min_peak_distance"],
             peak_dir=WFDBPeakDirection(method_parameters["peak_dir"]),
         )
-    elif method == PeakDetectionAlgorithm.ECGNeuroKit:
-        method_parameters = cast(_t.PeaksECGNeuroKit, method_parameters)
+    elif method == PeakDetectionAlgorithm.ECG_NeuroKit:
+        method_parameters = cast(PeaksECGNeuroKit, method_parameters)
         return nk.ecg_findpeaks(
             ecg_cleaned=sig,
             sampling_rate=sampling_rate,
@@ -242,8 +250,8 @@ def find_peaks(
             show=False,
             **method_parameters,
         )["ECG_R_Peaks"]
-    elif method == PeakDetectionAlgorithm.ECGEmrich2023:
-        method_parameters = cast(_t.PeaksECGEmrich, method_parameters)
+    elif method == PeakDetectionAlgorithm.ECG_Emrich_2023:
+        method_parameters = cast(PeaksECGEmrich, method_parameters)
         return nk.ecg_findpeaks(
             ecg_cleaned=sig,
             sampling_rate=sampling_rate,
@@ -251,8 +259,8 @@ def find_peaks(
             show=False,
             **method_parameters,
         )["ECG_R_Peaks"]
-    elif method == PeakDetectionAlgorithm.ECGGamboa2008:
-        method_parameters = cast(_t.PeaksECGGamboa, method_parameters)
+    elif method == PeakDetectionAlgorithm.ECG_Gamboa_2008:
+        method_parameters = cast(PeaksECGGamboa, method_parameters)
         return nk.ecg_findpeaks(
             ecg_cleaned=sig,
             sampling_rate=sampling_rate,
@@ -260,8 +268,8 @@ def find_peaks(
             show=False,
             **method_parameters,
         )["ECG_R_Peaks"]
-    elif method == PeakDetectionAlgorithm.ECGPromac:
-        method_parameters = cast(_t.PeaksECGPromac, method_parameters)
+    elif method == PeakDetectionAlgorithm.ECG_Promac:
+        method_parameters = cast(PeaksECGPromac, method_parameters)
         return nk.ecg_findpeaks(
             ecg_cleaned=sig,
             sampling_rate=sampling_rate,

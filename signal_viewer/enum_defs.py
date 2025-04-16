@@ -57,46 +57,19 @@ class PreprocessPipeline(enum.StrEnum):
     Processing pipelines available in the `neurokit2` package.
     """
 
-    PPGElgendi = "ppg_elgendi"
-    ECGNeuroKit2 = "ecg_neurokit2"
-    ECGBioSPPy = "biosppy"
-    ECGPanTompkins1985 = "pantompkins1985"
-    ECGHamilton2002 = "hamilton2002"
-    ECGElgendi2010 = "elgendi2010"
-    ECGEngzeeMod2012 = "engzeemod2012"
-    ECGVisibilityGraph = "vg"
+    PPG_Elgendi = "ppg_elgendi"
+    ECG_NeuroKit = "ecg_neurokit2"
+    ECG_BioSPPy = "biosppy"
+    ECG_PanTompkins_1985 = "pantompkins1985"
+    ECG_Hamilton_2002 = "hamilton2002"
+    ECG_Elgendi_2010 = "elgendi2010"
+    ECG_EngzeeMod_2012 = "engzeemod2012"
+    ECG_Emrich_2023 = "vg"
 
 
 class StandardizationMethod(enum.StrEnum):
     ZScore = "std"
     ZScoreRobust = "mad"
-
-
-class PeakDetectionMethod(enum.StrEnum):
-    PPGElgendi = "ppg_elgendi"
-    LocalMaxima = "local_maxima"
-    LocalMinima = "local_minima"
-    ECGNeuroKit2 = "neurokit"
-    WFDBXQRS = "wfdb_xqrs"
-
-
-class NK2ECGPeakDetectionMethod(enum.StrEnum):
-    Default = "neurokit"
-    Emrich2023 = "emrich2023"
-    Gamboa2008 = "gamboa2008"
-    Promac = "promac"
-    # below methods dont have any adjustable parameters
-    PanTompkins1985 = "pantompkins"
-    Nabian2018 = "nabian2018"
-    Hamilton2002 = "hamilton2002"
-    Christov2004 = "christov2004"
-    Engzee2012 = "engzee2012"
-    Manikandan2012 = "manikandan2012"
-    Elgendi2010 = "elgendi2010"
-    Kalidas2017 = "kalidas2017"
-    Martinez2004 = "martinez2004"
-    Rodrigues2020 = "rodrigues2020"
-    # Zong2003 = "zong2003"  # think this is the same as the method used in the `wfdb` package
 
 
 class PeakDetectionAlgorithm(enum.StrEnum):
@@ -105,24 +78,58 @@ class PeakDetectionAlgorithm(enum.StrEnum):
     """
 
     # PPG methods
-    PPGElgendi = "ppg_elgendi"
+    PPG_Elgendi = "ppg_elgendi"
+    """
+    Implementation of Elgendi M, Norton I, Brearley M, Abbott D, Schuurmans D (2013) Systolic Peak Detection in
+    Acceleration Photoplethysmograms Measured from Emergency Responders in Tropical Conditions. PLoS ONE 8(10): e76585.
+    doi:10.1371/journal.pone.0076585.
+    """
     # ECG methods
-    ECGNeuroKit = "neurokit"
-    ECGEmrich2023 = "emrich2023"
-    ECGGamboa2008 = "gamboa2008"
-    ECGPromac = "promac"
-    ECGXQRS = "wfdb_xqrs"
+    ECG_Emrich_2023 = "emrich2023"
+    """
+    FastNVG Algorithm by Emrich et al. (2023) based on the visibility graph detector of Koka et al. (2022). Provides
+    fast and sample-accurate R-peak detection. The algorithm transforms the ecg into a graph representation and extracts
+    exact R-peak positions using graph metrics.
+    """
+    ECG_NeuroKit = "neurokit"
+    """
+    QRS complexes are detected based on the steepness of the absolute gradient of the ECG signal. Subsequently, R-peaks
+    are detected as local maxima in the QRS complexes. The method is unpublished, but see: (i)
+    https://github.com/neuropsychology/NeuroKit/issues/476 for discussion of this algorithm; and (ii)
+    https://doi.org/10.21105/joss.02621 for the original validation of this algorithm.
+    """
+    ECG_Gamboa_2008 = "gamboa2008"
+    """Algorithm by Gamboa (2008)."""
+    ECG_Promac = "promac"
+    """
+    ProMAC combines the result of several R-peak detectors in a probabilistic way. For a given peak detector, the binary
+    signal representing the peak locations is convolved with a Gaussian distribution, resulting in a probabilistic
+    representation of each peak location. This procedure is repeated for all selected methods and the resulting signals
+    are accumulated. Finally, a threshold is used to accept or reject the peak locations. See this discussion for more
+    information on the origins of the method: https://github.com/neuropsychology/NeuroKit/issues/222
+    """
+    ECG_XQRS = "wfdb_xqrs"
     # below methods dont have any adjustable parameters
-    ECGPanTompkins1985 = "pantompkins"
-    ECGNabian2018 = "nabian2018"
-    ECGHamilton2002 = "hamilton2002"
-    ECGChristov2004 = "christov2004"
-    ECGEngzee2012 = "engzee2012"
-    ECGManikandan2012 = "manikandan2012"
-    ECGElgendi2010 = "elgendi2010"
-    ECGKalidas2017 = "kalidas2017"
-    ECGMartinez2004 = "martinez2004"
-    ECGRodrigues2020 = "rodrigues2020"
+    ECG_PanTompkins_1985 = "pantompkins"
+    """Algorithm by Pan & Tompkins (1985)."""
+    ECG_Hamilton_2002 = "hamilton2002"
+    """Algorithm by Hamilton (2002)."""
+    ECG_Martinez_2004 = "martinez2004"
+    """Algorithm by Martinez et al. (2004)."""
+    ECG_Christov_2004 = "christov2004"
+    """Algorithm by Christov (2004)."""
+    ECG_Nabian_2018 = "nabian2018"
+    """Algorithm by Nabian et al. (2018) based on the Pan-Tompkins algorithm."""
+    ECG_EngzeeMod_2012 = "engzee2012"
+    """Original algorithm by Engelse & Zeelenberg (1979) modified by Lourenço et al. (2012)."""
+    ECG_Manikandan_2012 = "manikandan2012"
+    """Algorithm by Manikandan & Soman (2012) based on the Shannon energy envelope (SEE)."""
+    ECG_Elgendi_2010 = "elgendi2010"
+    """Algorithm by Elgendi et al. (2010)."""
+    ECG_Kalidas_2017 = "kalidas2017"
+    """Algorithm by Kalidas et al. (2017)."""
+    ECG_Rodrigues_2021 = "rodrigues2021"
+    """Adaptation of the work by Sadhukhan & Mitra (2012) and Gutiérrez-Rivas et al. (2015) by Rodrigues et al. (2021)."""
     # Other methods
     LocalMaxima = "local_maxima"
     LocalMinima = "local_minima"
@@ -153,40 +160,6 @@ class PointSymbols(enum.StrEnum):
     ArrowDown = "arrow_down"
     ArrowLeft = "arrow_left"
     Crosshair = "crosshair"
-
-
-class SmoothingKernels(enum.StrEnum):
-    """
-    Smoothing kernels available in the `scipy.signal` package.
-    """
-
-    BARTHANN = "barthann"
-    BARTLETT = "bartlett"
-    BLACKMAN = "blackman"
-    BLACKMANHARRIS = "blackmanharris"
-    BOHMAN = "bohman"
-    BOXCAR = "boxcar"
-    CHEBWIN = "chebwin"
-    COSINE = "cosine"
-    DPSS = "dpss"
-    EXPONENTIAL = "exponential"
-    FLATTOP = "flattop"
-    GAUSSIAN = "gaussian"
-    GENERAL_COSINE = "general_cosine"
-    GENERAL_GAUSSIAN = "general_gaussian"
-    GENERAL_HAMMING = "general_hamming"
-    HAMMING = "hamming"
-    HANN = "hann"
-    KAISER = "kaiser"
-    KAISER_BESSEL_DERIVED = "kaiser_bessel_derived"
-    LANCZOS = "lanczos"
-    NUTTALL = "nuttall"
-    PARZEN = "parzen"
-    TAYLOR = "taylor"
-    TRIANGLE = "triangle"
-    TUKEY = "tukey"
-    BOXZEN = "boxzen"
-    MEDIAN = "median"
 
 
 class MouseButtons(enum.StrEnum):

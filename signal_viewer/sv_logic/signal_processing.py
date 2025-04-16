@@ -176,9 +176,9 @@ def apply_cleaning_pipeline(
     sig: npt.NDArray[np.float64], sampling_rate: int, pipeline: PreprocessPipeline
 ) -> CleaningResult:
     additional_params: _t.SignalFilterKwargs | None = None
-    if pipeline == PreprocessPipeline.PPGElgendi:
+    if pipeline == PreprocessPipeline.PPG_Elgendi:
         cleaned, params = ppg_clean_elgendi(sig, sampling_rate)
-    elif pipeline == PreprocessPipeline.ECGNeuroKit2:
+    elif pipeline == PreprocessPipeline.ECG_NeuroKit:
         cleaned = ecg_clean_neurokit(sig, sampling_rate)
         params: _t.SignalFilterKwargs = {
             "lowcut": 0.5,
@@ -189,17 +189,17 @@ def apply_cleaning_pipeline(
             "method": str(FilterMethod.Powerline),
             "powerline": 50,
         }
-    elif pipeline == PreprocessPipeline.ECGBioSPPy:
+    elif pipeline == PreprocessPipeline.ECG_BioSPPy:
         cleaned, params = ecg_clean_biosppy(sig, sampling_rate)
-    elif pipeline == PreprocessPipeline.ECGPanTompkins1985:
+    elif pipeline == PreprocessPipeline.ECG_PanTompkins_1985:
         cleaned, params = ecg_clean_pantompkins(sig, sampling_rate)
-    elif pipeline == PreprocessPipeline.ECGHamilton2002:
+    elif pipeline == PreprocessPipeline.ECG_Hamilton_2002:
         cleaned, params = ecg_clean_hamilton(sig, sampling_rate)
-    elif pipeline == PreprocessPipeline.ECGElgendi2010:
+    elif pipeline == PreprocessPipeline.ECG_Elgendi_2010:
         cleaned, params = ecg_clean_elgendi(sig, sampling_rate)
-    elif pipeline == PreprocessPipeline.ECGEngzeeMod2012:
+    elif pipeline == PreprocessPipeline.ECG_EngzeeMod_2012:
         cleaned, params = ecg_clean_engzee(sig, sampling_rate)
-    elif pipeline == PreprocessPipeline.ECGVisibilityGraph:
+    elif pipeline == PreprocessPipeline.ECG_Emrich_2023:
         cleaned, params = ecg_clean_vgraph(sig, sampling_rate)
 
     return CleaningResult(cleaned, params, additional_params)

@@ -333,35 +333,35 @@ class ParameterInputs(QtWidgets.QWidget):
     @QtCore.Slot(int)
     def _on_peak_method_changed(self, index: int) -> None:
         peak_method: PeakDetectionAlgorithm | None = self.ui.peak_method.current_enum()
-        if peak_method == PeakDetectionAlgorithm.PPGElgendi:
+        if peak_method == PeakDetectionAlgorithm.PPG_Elgendi:
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_ppg_elgendi)
-        elif peak_method == PeakDetectionAlgorithm.ECGNeuroKit:
+        elif peak_method == PeakDetectionAlgorithm.ECG_NeuroKit:
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_ecg_nk)
-        elif peak_method == PeakDetectionAlgorithm.ECGPromac:
+        elif peak_method == PeakDetectionAlgorithm.ECG_Promac:
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_ecg_promac)
-        elif peak_method == PeakDetectionAlgorithm.ECGEmrich2023:
+        elif peak_method == PeakDetectionAlgorithm.ECG_Emrich_2023:
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_ecg_emrich)
-        elif peak_method == PeakDetectionAlgorithm.ECGGamboa2008:
+        elif peak_method == PeakDetectionAlgorithm.ECG_Gamboa_2008:
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_ecg_gamboa)
         elif peak_method == PeakDetectionAlgorithm.LocalMaxima:
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_localmax)
         elif peak_method == PeakDetectionAlgorithm.LocalMinima:
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_localmin)
-        elif peak_method == PeakDetectionAlgorithm.ECGXQRS:
+        elif peak_method == PeakDetectionAlgorithm.ECG_XQRS:
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_xqrs)
         else:
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_no_params)
 
-    def get_peak_detection_params(self, method: PeakDetectionAlgorithm) -> _t.PeakDetectionMethodParameters | None:
+    def get_peak_detection_params(self, method: PeakDetectionAlgorithm) -> _t.PeakDetectionAlgorithmParameters | None:
         peak_params = None
-        if method == PeakDetectionAlgorithm.PPGElgendi:
+        if method == PeakDetectionAlgorithm.PPG_Elgendi:
             peak_params = PeaksPPGElgendi(
                 peakwindow=self.ui.peak_ppg_elgendi_peakwindow.floatValue(),
                 beatwindow=self.ui.peak_ppg_elgendi_beatwindow.floatValue(),
                 beatoffset=self.ui.peak_ppg_elgendi_beatoffset.floatValue(),
                 mindelay=self.ui.peak_ppg_elgendi_mindelay.floatValue(),
             )
-        elif method == PeakDetectionAlgorithm.ECGNeuroKit:
+        elif method == PeakDetectionAlgorithm.ECG_NeuroKit:
             peak_params = _t.PeaksECGNeuroKit(
                 smoothwindow=self.ui.peak_ecg_nk_smoothwindow.floatValue(),
                 avgwindow=self.ui.peak_ecg_nk_avgwindow.floatValue(),
@@ -369,14 +369,14 @@ class ParameterInputs(QtWidgets.QWidget):
                 minlenweight=self.ui.peak_ecg_nk_minlenweight.floatValue(),
                 mindelay=self.ui.peak_ecg_nk_mindelay.floatValue(),
             )
-        elif method == PeakDetectionAlgorithm.ECGPromac:
+        elif method == PeakDetectionAlgorithm.ECG_Promac:
             peak_params = _t.PeaksECGPromac(
                 threshold=self.ui.peak_ecg_promac_threshold.floatValue(),
                 gaussian_sd=self.ui.peak_ecg_promac_gaussian_sd.intValue(),
             )
-        elif method == PeakDetectionAlgorithm.ECGGamboa2008:
+        elif method == PeakDetectionAlgorithm.ECG_Gamboa_2008:
             peak_params = _t.PeaksECGGamboa(tol=self.ui.peak_ecg_gamboa_tol.floatValue())
-        elif method == PeakDetectionAlgorithm.ECGEmrich2023:
+        elif method == PeakDetectionAlgorithm.ECG_Emrich_2023:
             peak_params = _t.PeaksECGEmrich(
                 window_seconds=self.ui.peak_ecg_emrich_window_seconds.floatValue(),
                 window_overlap=self.ui.peak_ecg_emrich_window_overlap.floatValue(),
@@ -394,7 +394,7 @@ class ParameterInputs(QtWidgets.QWidget):
                 min_distance=self.ui.peak_localmin_min_dist.intValue(),
             )
 
-        elif method == PeakDetectionAlgorithm.ECGXQRS:
+        elif method == PeakDetectionAlgorithm.ECG_XQRS:
             peak_dir: WFDBPeakDirection | None = self.ui.peak_xqrs_direction.current_enum()
             if peak_dir is None:
                 peak_dir = WFDBPeakDirection.Up

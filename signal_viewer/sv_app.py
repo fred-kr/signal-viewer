@@ -46,7 +46,7 @@ class PeakDetectionWorker(QtCore.QRunnable):
         self,
         section: "Section",
         method: PeakDetectionAlgorithm,
-        method_parameters: _t.PeakDetectionMethodParameters,
+        method_parameters: _t.PeakDetectionAlgorithmParameters,
         *,
         rr_params: _t.RollingRateKwargsDict | None = None,
     ) -> None:
@@ -268,7 +268,7 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(enum.StrEnum, dict)
     def run_peak_detection_worker(
-        self, method: PeakDetectionAlgorithm, params: _t.PeakDetectionMethodParameters
+        self, method: PeakDetectionAlgorithm, params: _t.PeakDetectionAlgorithmParameters
     ) -> None:
         rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
         worker = PeakDetectionWorker(self.data.active_section, method, params, rr_params=rolling_rate_kwargs)
