@@ -29,8 +29,8 @@ from signal_viewer.utils import sequence_repr
 class ProcessingParameters:
     sampling_rate: int = attrs.field()
     processing_pipeline: PreprocessPipeline | None = attrs.field(default=None)
-    filter_parameters: list[_t.SignalFilterParameters] = attrs.field(factory=list)
-    standardization_parameters: _t.StandardizationParameters | None = attrs.field(default=None)
+    filter_parameters: list[_t.SignalFilterKwargs] = attrs.field(factory=list)
+    standardization_parameters: _t.SignalStandardizeKwargs | None = attrs.field(default=None)
     peak_detection_method: PeakDetectionAlgorithm | None = attrs.field(default=None)
     peak_detection_method_parameters: _t.PeakDetectionMethodParameters | None = attrs.field(default=None)
     rate_computation_method: RateComputationMethod = attrs.field(default=Config.editing.rate_computation_method)
@@ -347,7 +347,7 @@ class Section:
     def filter_signal(
         self,
         pipeline: PreprocessPipeline | None = None,
-        **kwargs: Unpack[_t.SignalFilterParameters],
+        **kwargs: Unpack[_t.SignalFilterKwargs],
     ) -> None:
         """
         Filter this section's signal using the specified pipeline / custom filter parameters.
@@ -381,8 +381,8 @@ class Section:
         else:
             sig_data = self.processed_signal.to_numpy(allow_copy=False)
         method = kwargs.get("method", None)
-        filter_params: _t.SignalFilterParameters = {}
-        additional_params: _t.SignalFilterParameters | None = None
+        filter_params: _t.SignalFilterKwargs = {}
+        additional_params: _t.SignalFilterKwargs | None = None
 
         if pipeline is None:
             self._processing_parameters.processing_pipeline = pipeline
@@ -405,7 +405,7 @@ class Section:
 
         self.data = self.data.with_columns(pl.Series(self.processed_signal_name, filtered))
 
-    def standardize_signal(self, **kwargs: Unpack[_t.StandardizationParameters]) -> None:
+    def standardize_signal(self, **kwargs: Unpack[_t.SignalStandardizeKwargs]) -> None:
         """
         Standardize this section's signal using the specified parameters. Based on `neurokit2.standardize`.
 

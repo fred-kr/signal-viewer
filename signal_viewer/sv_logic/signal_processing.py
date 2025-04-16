@@ -16,8 +16,8 @@ from signal_viewer.enum_defs import FilterMethod, PreprocessPipeline
 
 class CleaningResult(NamedTuple):
     cleaned: npt.NDArray[np.float64]
-    parameters: _t.SignalFilterParameters
-    additional_parameters: _t.SignalFilterParameters | None = None
+    parameters: _t.SignalFilterKwargs
+    additional_parameters: _t.SignalFilterKwargs | None = None
 
 
 def rolling_standardize(sig: pl.Series, window_size: int) -> pl.Series:
@@ -60,7 +60,7 @@ def ecg_clean_neurokit(
 
 def ppg_clean_elgendi(
     sig: npt.NDArray[np.float64], sampling_rate: int
-) -> tuple[npt.NDArray[np.float64], _t.SignalFilterParameters]:
+) -> tuple[npt.NDArray[np.float64], _t.SignalFilterKwargs]:
     return nk.signal_filter(
         sig,
         sampling_rate=sampling_rate,
@@ -73,7 +73,7 @@ def ppg_clean_elgendi(
 
 def ecg_clean_biosppy(
     sig: npt.NDArray[np.float64], sampling_rate: int
-) -> tuple[npt.NDArray[np.float64], _t.SignalFilterParameters]:
+) -> tuple[npt.NDArray[np.float64], _t.SignalFilterKwargs]:
     order = int(1.5 * sampling_rate)
     if order % 2 == 0:
         order += 1
@@ -94,7 +94,7 @@ def ecg_clean_biosppy(
 
 def ecg_clean_pantompkins(
     sig: npt.NDArray[np.float64], sampling_rate: int
-) -> tuple[npt.NDArray[np.float64], _t.SignalFilterParameters]:
+) -> tuple[npt.NDArray[np.float64], _t.SignalFilterKwargs]:
     return nk.signal_filter(
         sig,
         sampling_rate=sampling_rate,
@@ -107,7 +107,7 @@ def ecg_clean_pantompkins(
 
 def ecg_clean_hamilton(
     sig: npt.NDArray[np.float64], sampling_rate: int
-) -> tuple[npt.NDArray[np.float64], _t.SignalFilterParameters]:
+) -> tuple[npt.NDArray[np.float64], _t.SignalFilterKwargs]:
     return nk.signal_filter(
         sig,
         sampling_rate=sampling_rate,
@@ -120,7 +120,7 @@ def ecg_clean_hamilton(
 
 def ecg_clean_elgendi(
     sig: npt.NDArray[np.float64], sampling_rate: int
-) -> tuple[npt.NDArray[np.float64], _t.SignalFilterParameters]:
+) -> tuple[npt.NDArray[np.float64], _t.SignalFilterKwargs]:
     return nk.signal_filter(
         sig,
         sampling_rate=sampling_rate,
@@ -133,7 +133,7 @@ def ecg_clean_elgendi(
 
 def ecg_clean_engzee(
     sig: npt.NDArray[np.float64], sampling_rate: int
-) -> tuple[npt.NDArray[np.float64], _t.SignalFilterParameters]:
+) -> tuple[npt.NDArray[np.float64], _t.SignalFilterKwargs]:
     return nk.signal_filter(
         sig,
         sampling_rate=sampling_rate,
@@ -146,7 +146,7 @@ def ecg_clean_engzee(
 
 def ecg_clean_vgraph(
     sig: npt.NDArray[np.float64], sampling_rate: int
-) -> tuple[npt.NDArray[np.float64], _t.SignalFilterParameters]:
+) -> tuple[npt.NDArray[np.float64], _t.SignalFilterKwargs]:
     return nk.signal_filter(
         sig,
         sampling_rate=sampling_rate,
@@ -159,8 +159,8 @@ def ecg_clean_vgraph(
 def filter_signal(
     sig: npt.NDArray[np.float64],
     sampling_rate: int,
-    **kwargs: Unpack[_t.SignalFilterParameters],
-) -> tuple[npt.NDArray[np.float64], _t.SignalFilterParameters]:
+    **kwargs: Unpack[_t.SignalFilterKwargs],
+) -> tuple[npt.NDArray[np.float64], _t.SignalFilterKwargs]:
     highcut = kwargs.get("highcut")
     lowcut = kwargs.get("lowcut")
     if highcut == 0:
@@ -175,12 +175,12 @@ def filter_signal(
 def apply_cleaning_pipeline(
     sig: npt.NDArray[np.float64], sampling_rate: int, pipeline: PreprocessPipeline
 ) -> CleaningResult:
-    additional_params: _t.SignalFilterParameters | None = None
+    additional_params: _t.SignalFilterKwargs | None = None
     if pipeline == PreprocessPipeline.PPGElgendi:
         cleaned, params = ppg_clean_elgendi(sig, sampling_rate)
     elif pipeline == PreprocessPipeline.ECGNeuroKit2:
         cleaned = ecg_clean_neurokit(sig, sampling_rate)
-        params: _t.SignalFilterParameters = {
+        params: _t.SignalFilterKwargs = {
             "lowcut": 0.5,
             "method": str(FilterMethod.Butterworth),
             "order": 5,

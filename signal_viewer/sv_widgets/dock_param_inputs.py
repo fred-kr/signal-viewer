@@ -302,7 +302,7 @@ class ParameterInputs(QtWidgets.QWidget):
                 std_params = self.get_std_params(std_method)
                 self.sig_run_standardization.emit(std_params)
 
-    def get_filter_params(self, sf_method: FilterMethod) -> _t.SignalFilterParameters:
+    def get_filter_params(self, sf_method: FilterMethod) -> _t.SignalFilterKwargs:
         window = self.ui.sf_window_size
         if window.value() == window.minimum():
             window_size = "default"
@@ -317,7 +317,7 @@ class ParameterInputs(QtWidgets.QWidget):
             "powerline": self.ui.sf_powerline.floatValue(),
         }
 
-    def get_std_params(self, std_method: StandardizationMethod) -> _t.StandardizationParameters:
+    def get_std_params(self, std_method: StandardizationMethod) -> _t.SignalStandardizeKwargs:
         return {
             "method": std_method,
             "window_size": self.ui.std_window_size.intValue() if self.ui.std_rolling_window.isChecked() else None,

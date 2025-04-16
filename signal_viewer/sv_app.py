@@ -236,7 +236,7 @@ class SVApp(QtCore.QObject):
         self.gui.dock_parameters.ui.ui.status_standardization.setChecked(self.data.active_section.is_standardized)
 
     @QtCore.Slot(dict)
-    def filter_active_signal(self, filter_params: _t.SignalFilterParameters) -> None:
+    def filter_active_signal(self, filter_params: _t.SignalFilterKwargs) -> None:
         self.data.active_section.filter_signal(pipeline=None, **filter_params)
         self.refresh_plot_data()
 
@@ -255,7 +255,7 @@ class SVApp(QtCore.QObject):
         self.refresh_plot_data()
 
     @QtCore.Slot(dict)
-    def standardize_active_signal(self, standardization_params: _t.StandardizationParameters) -> None:
+    def standardize_active_signal(self, standardization_params: _t.SignalStandardizeKwargs) -> None:
         method = standardization_params.pop("method")
         window_size = standardization_params.pop("window_size")
         robust = method == StandardizationMethod.ZScoreRobust
