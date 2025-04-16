@@ -138,7 +138,7 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_create_new_section.toggled.connect(self.maybe_new_section)
         self.gui.ui.action_confirm_section.triggered.connect(self._on_confirm_new_section)
         self.gui.ui.action_cancel_section.triggered.connect(self._on_cancel_new_section)
-        self.gui.ui.action_show_section_overview.toggled.connect(self.plot.toggle_regions)
+        self.gui.ui.action_show_section_overview.toggled.connect(self.plot.update_regions)
 
         self.gui.ui.action_toggle_auto_scaling.toggled.connect(self.plot.toggle_auto_scaling)
 
@@ -604,7 +604,7 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def apply_settings(self) -> None:
-        self.plot.apply_settings()
+        logger.debug("Implementation pending")
 
     @QtCore.Slot()
     def update_result_views(self) -> None:

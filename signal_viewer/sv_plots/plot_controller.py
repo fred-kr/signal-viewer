@@ -5,10 +5,9 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import numpy.typing as npt
-import polars as pl
 import pyqtgraph as pg
 from loguru import logger
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
 from signal_viewer.enum_defs import PointSymbols, SVGColors
 from signal_viewer.sv_config import Config
@@ -17,7 +16,7 @@ from signal_viewer.sv_plots.graphic_items import (
     EditingViewBox,
     TimeDeltaAxisItem,
 )
-from signal_viewer.utils import make_qbrush, make_qcolor, make_qpen, safe_disconnect
+from signal_viewer.utils import make_qbrush, make_qpen, safe_disconnect
 
 if TYPE_CHECKING:
     from pyqtgraph.GraphicsScene import mouseEvents
@@ -29,11 +28,7 @@ class PlotController(QtCore.QObject):
     sig_scatter_data_changed = QtCore.Signal(str, object)
     sig_section_clicked = QtCore.Signal(int)
 
-    def __init__(
-        self,
-        parent: QtCore.QObject | None,
-        gui: "SVGUI",
-    ) -> None:
+    def __init__(self, parent: QtCore.QObject | None, gui: "SVGUI") -> None:
         super().__init__(parent)
 
         self._gui = gui
@@ -64,21 +59,61 @@ class PlotController(QtCore.QObject):
         for plt_item in (self.pw_main.getPlotItem(), self.pw_rate.getPlotItem()):
             if plt_item is None:
                 continue
-            vb = plt_item.getViewBox()
+            # vb = plt_item.getViewBox()
             plt_item.setAxisItems({"top": TimeDeltaAxisItem(orientation="top")})
             plt_item.showGrid(x=False, y=True)
             plt_item.setDownsampling(auto=True)
             plt_item.setClipToView(True)
             plt_item.addLegend(colCount=2)
             plt_item.addLegend().anchor(itemPos=(0, 1), parentPos=(0, 1), offset=(5, -5))
-            plt_item.setMouseEnabled(x=True, y=False)
-            vb.enableAutoRange("y", enable=0.99)
-            vb.setAutoVisible(y=False)
+            plt_item.setMouseEnabled(x=True, y=False)  # type: ignore
+            # vb.enableAutoRange("y", enable=0.99)  # type: ignore
+            # vb.setAutoPan(y=True)
+            # vb.setAutoVisible(y=False)
+
+        self.pw_main.getPlotItem().getViewBox().enableAutoRange(pg.ViewBox.YAxis, enable=0.99)  # type: ignore
+        self.pw_main.getPlotItem().getViewBox().setAutoPan(y=True)
+
+        self.pw_rate.getPlotItem().getViewBox().enableAutoRange(pg.ViewBox.YAxis, enable=True)
+        self.pw_rate.getPlotItem().getViewBox().setAutoVisible(y=False)
 
         self.pw_main.getPlotItem().getViewBox().setXLink("rate_plot")
 
-        self.set_background_color(Config.plot.background_color)
-        self.set_foreground_color(Config.plot.foreground_color)
+    def _setup_plot_data_items(self) -> None:
+        self._setup_signal_curve()
+        self._setup_peak_scatter()
+        self._setup_rate_curve()
+        self._setup_region_selector()
+
+    def _remove_plot_data_items(self) -> None:
+        self._remove_signal_curve()
+        self._remove_peak_scatter()
+        self._remove_rate_curve()
+        self._remove_region_selector()
+
+    def _setup_signal_curve(self) -> None:
+        pen = make_qpen(SVGColors.DodgerBlue, width=1)
+        click_width = Config.plot.line_click_width
+        signal = pg.PlotDataItem(
+            pen=pen,
+            skipFiniteCheck=True,
+            autoDownsample=True,
+            name="Signal",
+        )
+        signal.setCurveClickable(True, width=click_width)
+        signal.sigClicked.connect(self._on_curve_clicked)
+        signal.sigPlotChanged.connect(self.set_view_limits)
+        self.signal_curve = signal
+        self.pw_main.addItem(self.signal_curve)
+
+    def _remove_signal_curve(self) -> None:
+        if self.signal_curve is None:
+            return
+        self.signal_curve.sigClicked.disconnect(self._on_curve_clicked)
+        self.signal_curve.sigPlotChanged.disconnect(self.set_view_limits)
+        self.pw_main.removeItem(self.signal_curve)
+        self.signal_curve.setParent(None)
+        self.signal_curve = None
 
     def _setup_region_selector(self) -> None:
         brush_col = SVGColors.LimeGreen.qcolor()
@@ -103,44 +138,11 @@ class PlotController(QtCore.QObject):
 
         self.pw_main.addItem(self.region_selector)
 
-    def remove_region_selector(self) -> None:
-        """
-        Remove the region selector from the main plot widget.
-        """
+    def _remove_region_selector(self) -> None:
         if self.region_selector:
             self.pw_main.removeItem(self.region_selector)
             self.region_selector.setParent(None)
             self.region_selector = None
-
-    def _setup_plot_data_items(self) -> None:
-        self._setup_signal_curve()
-        self._setup_peak_scatter()
-        self._setup_rate_curve()
-        self._setup_region_selector()
-
-    def _setup_signal_curve(self) -> None:
-        pen = make_qpen(SVGColors.DodgerBlue, width=1)
-        click_width = Config.plot.line_click_width
-        signal = pg.PlotDataItem(
-            pen=pen,
-            skipFiniteCheck=True,
-            autoDownsample=True,
-            name="Signal",
-        )
-        signal.setCurveClickable(True, width=click_width)
-        signal.sigClicked.connect(self._on_curve_clicked)
-        signal.sigPlotChanged.connect(self.set_view_limits)
-        self.signal_curve = signal
-        self.pw_main.addItem(self.signal_curve)
-
-    def remove_signal_curve(self) -> None:
-        if self.signal_curve is None:
-            return
-        self.signal_curve.sigClicked.disconnect(self._on_curve_clicked)
-        self.signal_curve.sigPlotChanged.disconnect(self.set_view_limits)
-        self.pw_main.removeItem(self.signal_curve)
-        self.signal_curve.setParent(None)
-        self.signal_curve = None
 
     def _setup_peak_scatter(self) -> None:
         brush = make_qbrush(SVGColors.GoldenRod)
@@ -166,7 +168,7 @@ class PlotController(QtCore.QObject):
         self.peak_scatter = scatter
         self.pw_main.addItem(self.peak_scatter)
 
-    def remove_peak_scatter(self) -> None:
+    def _remove_peak_scatter(self) -> None:
         if self.peak_scatter is None:
             return
         self.peak_scatter.sigClicked.disconnect(self._on_scatter_clicked)
@@ -185,18 +187,12 @@ class PlotController(QtCore.QObject):
         self.rate_curve = rate_curve
         self.pw_rate.addItem(self.rate_curve)
 
-    def remove_rate_curve(self) -> None:
+    def _remove_rate_curve(self) -> None:
         if self.rate_curve is None:
             return
         self.pw_rate.removeItem(self.rate_curve)
         self.rate_curve.setParent(None)
         self.rate_curve = None
-
-    def remove_plot_data_items(self) -> None:
-        self.remove_signal_curve()
-        self.remove_peak_scatter()
-        self.remove_rate_curve()
-        self.remove_region_selector()
 
     @QtCore.Slot(int)
     def update_time_axis_scale(self, sampling_rate: int) -> None:
@@ -218,6 +214,7 @@ class PlotController(QtCore.QObject):
         self.pw_rate.plotItem.vb.setRange(xRange=(0, len_data), disableAutoRange=False)
 
     def reset(self) -> None:
+        """Resets all plot items, regions, and data items to initial state."""
         self.pw_main.clear()
         if self.pw_main.plotItem.legend:
             self.pw_main.plotItem.legend.clear()
@@ -228,12 +225,12 @@ class PlotController(QtCore.QObject):
         self.mpw_result.fig.clear()
 
         self.clear_regions()
-        self.remove_plot_data_items()
+        self._remove_plot_data_items()
         self._setup_plot_data_items()
 
     @QtCore.Slot(bool)
-    def toggle_regions(self, visible: bool) -> None:
-        """Updates section ids and visibility of regions."""
+    def update_regions(self, visible: bool) -> None:
+        """Updates IDs and visibility of regions."""
         # Start at 1 since section 0 is the base from which all others are added
         for i, region in enumerate(self.regions, start=1):
             region.section_id = i
@@ -242,6 +239,7 @@ class PlotController(QtCore.QObject):
         self._show_regions = visible
 
     def remove_region(self, section_index: QtCore.QModelIndex) -> None:
+        """Removes a region from the plot and list of regions."""
         if section_index.row() > 0:
             for region in self.regions:
                 if region.section_id == section_index.row():
@@ -250,9 +248,10 @@ class PlotController(QtCore.QObject):
                     self.regions.remove(region)
                     self.pw_main.removeItem(region)
 
-        self.toggle_regions(self._show_regions)
+        self.update_regions(self._show_regions)
 
     def clear_regions(self) -> None:
+        """Removes all regions from the plot and list of regions."""
         for region in self.regions:
             region.setParent(None)
             if region in self.pw_main.plotItem.items:
@@ -262,9 +261,18 @@ class PlotController(QtCore.QObject):
 
     @QtCore.Slot(int)
     def _on_region_clicked(self, section_id: int) -> None:
+        """Emits the `sig_section_clicked` signal when a region is clicked."""
         self.sig_section_clicked.emit(section_id)
 
     def show_region_selector(self, bounds: tuple[float, float]) -> None:
+        """
+        Shows the region selector.
+
+        Parameters
+        ----------
+        bounds : tuple[float, float]
+            The min and max boundaries in plot coordinates in which the region selector is allowed.
+        """
         if not self.region_selector:
             return
 
@@ -279,11 +287,22 @@ class PlotController(QtCore.QObject):
         self.region_selector.setVisible(True)
 
     def hide_region_selector(self) -> None:
+        """Hides the region selector."""
         if self.region_selector:
             self.region_selector.setVisible(False)
 
     @QtCore.Slot(int, int)
     def mark_region(self, x1: int, x2: int) -> None:
+        """
+        Marks a region on the plot.
+
+        Parameters
+        ----------
+        x1 : int
+            Plot coordinate of the start of the region
+        x2 : int
+            Plot coordinate of the end of the region
+        """
         brush_color = SVGColors.Aquamarine.qcolor()
         brush_color.setAlpha(50)
         brush = make_qbrush(brush_color)
@@ -309,9 +328,19 @@ class PlotController(QtCore.QObject):
         self.regions.append(marked_region)
         self.pw_main.addItem(marked_region)
         self.hide_region_selector()
-        self.toggle_regions(self._show_regions)
+        self.update_regions(self._show_regions)
 
-    def set_signal_data(self, y_data: npt.NDArray[np.float64] | pl.Series, clear: bool = False) -> None:
+    def set_signal_data(self, y_data: npt.ArrayLike, clear: bool = False) -> None:
+        """
+        Sets the values of the signal curve.
+
+        Parameters
+        ----------
+        y_data : npt.ArrayLike
+            1D array of signal values
+        clear : bool, optional
+            Whether to clear the existing signal and peak data before setting, by default False
+        """
         if self.signal_curve is None:
             return
         if clear:
@@ -320,12 +349,20 @@ class PlotController(QtCore.QObject):
 
         self.signal_curve.setData(y_data)
 
-    def set_rate_data(
-        self,
-        y_data: npt.NDArray[np.float64 | np.intp] | pl.Series,
-        x_data: npt.NDArray[np.intp] | pl.Series | None = None,
-        clear: bool = False,
-    ) -> None:
+    def set_rate_data(self, y_data: npt.ArrayLike, x_data: npt.ArrayLike | None = None, clear: bool = False) -> None:
+        """
+        Sets the values of the rate curve.
+
+        Parameters
+        ----------
+        y_data : npt.ArrayLike
+            1D array of rate values
+        x_data : npt.ArrayLike, optional
+            1D array of same length as `y_data`. If `None`, x is automatically set to `np.arange(len(y_data))`, by
+            default `None`
+        clear : bool, optional
+            If `True`, explicitly calls `clear()` on the rate curve before setting, by default False
+        """
         if self.rate_curve is None:
             return
         if clear:
@@ -336,17 +373,24 @@ class PlotController(QtCore.QObject):
         else:
             self.rate_curve.setData(y_data)
 
-    def set_peak_data(
-        self,
-        x_data: npt.NDArray[np.intp | np.uintp] | pl.Series,
-        y_data: npt.NDArray[np.float64] | pl.Series,
-    ) -> None:
+    def set_peak_data(self, x_data: npt.ArrayLike, y_data: npt.ArrayLike) -> None:
+        """
+        Sets the values of the peak scatter plot.
+
+        Parameters
+        ----------
+        x_data : npt.ArrayLike
+            1D array of x-axis positions of the peaks
+        y_data : npt.ArrayLike
+            1D array of y-axis positions of the peaks
+        """
         if self.peak_scatter is None:
             return
         self.peak_scatter.setData(x=x_data, y=y_data)
 
     @QtCore.Slot()
     def clear_peaks(self) -> None:
+        """Clears the peak scatter plot and rate curve."""
         if self.peak_scatter is None:
             return
         self.peak_scatter.clear()
@@ -368,6 +412,20 @@ class PlotController(QtCore.QObject):
         points: Sequence[pg.SpotItem],
         ev: "mouseEvents.MouseClickEvent",
     ) -> None:
+        """
+        Handles click events on the peak scatter plot.
+
+        Removes the clicked point from the scatter plot and emits the `sig_scatter_data_changed` signal.
+
+        Parameters
+        ----------
+        sender : pg.ScatterPlotItem
+            The scatter plot item that was clicked. Not used.
+        points : Sequence[pg.SpotItem]
+            A sequence of spot items that were under the cursor when the click occurred.
+        ev : mouseEvents.MouseClickEvent
+            The mouse click event.
+        """
         ev.accept()
         if not self.peak_scatter or len(points) == 0 or self.block_clicks:
             return
@@ -376,20 +434,31 @@ class PlotController(QtCore.QObject):
         point_x = int(point.pos().x())
         point_index = point.index()
 
-        scatter_data: npt.NDArray[np.void] = self.peak_scatter.data
+        scatter_data: npt.NDArray[np.void] = self.peak_scatter.data  # type: ignore
         new_x = np.delete(scatter_data["x"], point_index)
         new_y = np.delete(scatter_data["y"], point_index)
         self.peak_scatter.setData(x=new_x, y=new_y)
 
         self.sig_scatter_data_changed.emit("remove", np.array([point_x], dtype=np.int32))
 
-    def _nearest_extreme_point(
-        self, pos: QtCore.QPointF, radius_px: int | None = None
-    ) -> tuple[int | float, int | float] | None:
+    def _nearest_extreme_point(self, pos: QtCore.QPointF) -> tuple[int | float, int | float] | None:
+        """
+        Returns the x and y coordinates of the nearest point on the signal curve to the given position.
+
+        Parameters
+        ----------
+        pos : QtCore.QPointF
+            The position to find the nearest point to
+
+        Returns
+        -------
+        tuple[int | float, int | float] | None
+            The x and y coordinates of the nearest point, or `None` if no point is found
+        """
         if self.signal_curve is None or self.block_clicks:
             return None
 
-        radius_px = radius_px or Config.plot.click_radius
+        radius_px = Config.plot.click_radius
 
         w = h = radius_px
         px, py = self.signal_curve.curve.pixelVectors()
@@ -414,16 +483,29 @@ class PlotController(QtCore.QObject):
         closest_index = np.argmin(np.abs(y_data[mask] - y))
 
         x_pos = x_data[mask][closest_index]
-        if self.peak_scatter is not None and x_pos in self.peak_scatter.data["x"]:
+        if self.peak_scatter is not None and x_pos in self.peak_scatter.data["x"]:  # type: ignore
             return None
 
         return x_pos, y_data[mask][closest_index]
 
     @QtCore.Slot(object, object)
     def _on_curve_clicked(self, sender: pg.PlotCurveItem, ev: "mouseEvents.MouseClickEvent") -> None:
+        """
+        Handles click events on the signal curve.
+
+        Searches for the nearest peak/valley to the click position. If one is found, adds it to the peak scatter plot
+        and emits the `sig_scatter_data_changed` signal.
+
+        Parameters
+        ----------
+        sender : pg.PlotCurveItem
+            The curve item that was clicked. Not used.
+        ev : mouseEvents.MouseClickEvent
+            The mouse click event.
+        """
         ev.accept()
         if self.block_clicks:
-            logger.info("Click interaction is blocked for this plot.")
+            logger.info("Click interaction is blocked for this section.")
             return
         if self.peak_scatter is None:
             return
@@ -440,12 +522,17 @@ class PlotController(QtCore.QObject):
 
     @QtCore.Slot()
     def remove_peaks_in_selection(self) -> None:
-        vb: EditingViewBox = self.pw_main.plotItem.vb  # type: ignore
-        if vb.mapped_selection_rect is None or self.peak_scatter is None or self.block_clicks:
+        """
+        Removes all peaks in the selection rectangle from the peak scatter plot and emits the `sig_scatter_data_changed`
+        signal.
+        """
+        # vb: EditingViewBox = self.pw_main.plotItem.vb  # type: ignore
+        r = self.get_selection_area()
+        if r is None or self.peak_scatter is None or self.block_clicks:
             self.remove_selection_rect()
             return
 
-        r = vb.mapped_selection_rect
+        # r = vb.mapped_selection_rect
         rx, ry, rw, rh = r.x(), r.y(), r.width(), r.height()
 
         scatter_x, scatter_y = self.peak_scatter.getData()
@@ -457,33 +544,19 @@ class PlotController(QtCore.QObject):
         self.remove_selection_rect()
 
     def get_selection_area(self) -> QtCore.QRectF | None:
+        """
+        Get the current selection rectangle.
+
+        Returns
+        -------
+        QtCore.QRectF | None
+            The selection rectangle, or `None` if no selection rectangle is currently active.
+        """
         return self.pw_main.plotItem.vb.mapped_selection_rect  # type: ignore
-
-    def set_background_color(self, color: str | QtGui.QColor) -> None:
-        self.pw_main.setBackground(make_qcolor(color))
-        self.pw_rate.setBackground(make_qcolor(color))
-
-    def set_foreground_color(self, color: str | QtGui.QColor) -> None:
-        color = make_qcolor(color)
-        for ax in {"left", "top", "right", "bottom"}:
-            edit_axis = self.pw_main.plotItem.getAxis(ax)
-            rate_axis = self.pw_rate.plotItem.getAxis(ax)
-
-            if edit_axis.isVisible():
-                edit_axis.setPen(color)
-                edit_axis.setTextPen(color)
-            if rate_axis.isVisible():
-                rate_axis.setPen(color)
-                rate_axis.setTextPen(color)
-
-    def apply_settings(self) -> None:
-        bg_color = make_qcolor(Config.plot.background_color)
-        fg_color = make_qcolor(Config.plot.foreground_color)
-
-        self.set_background_color(bg_color)
-        self.set_foreground_color(fg_color)
 
     @QtCore.Slot(bool)
     def toggle_auto_scaling(self, state: bool) -> None:
-        self.pw_main.enableAutoRange(y=state)
-        self.pw_rate.enableAutoRange(y=state)
+        # TODO: Update implementation so that scaling and panning are independent and correctly communicated to the user
+        enable = 0.99 if state else state
+        self.pw_main.getPlotItem().getViewBox().enableAutoRange(pg.ViewBox.YAxis, enable=enable)  # type: ignore
+        self.pw_main.getPlotItem().getViewBox().setAutoPan(y=True)
