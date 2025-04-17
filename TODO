@@ -4,3 +4,4 @@ Todo:
   ☐ replace input widget highlighting in metadata dialog (stylesheets don't work well)
   ☐ write documentation
   ☐ try to get rid of neurokit2 dependency by reimplementing relevant functions
+  ☐ check out `polars_list_utils` package for signal processing in polars

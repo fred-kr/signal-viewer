@@ -1,4 +1,5 @@
 import os
+import traceback
 from typing import TYPE_CHECKING
 
 import pyside_config as qconfig
@@ -376,15 +377,15 @@ class SVGUI(QtWidgets.QMainWindow):
 
         msg_box = QtWidgets.QMessageBox(parent)
         msg_box.setText(record_dict["level"].name)
-        # msg_box.setIconPixmap(self._msg_box_icons[msg_log_level].pixmap(48, 48))
-        msg_box.setInformativeText(message)
+        msg_box.setDetailedText(message)
 
         if msg_log_level >= threshold:
-            traceback_text = "No details available"
+            traceback_text = []
             if record_dict["exception"] is not None:
-                traceback_text = str(record_dict["exception"])
+                traceback_text = traceback.format_exception_only(record_dict["exception"][1])
 
-            msg_box.setDetailedText(traceback_text)
+            traceback_text = "".join(traceback_text)
+            msg_box.setInformativeText(traceback_text)
 
         msg_box.exec()
 

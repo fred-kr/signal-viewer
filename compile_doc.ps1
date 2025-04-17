@@ -1,1 +1,1 @@
-C:\Qt\6.8.1\msvc2022_64\bin\qhelpgenerator.exe .\signal_viewer\doc\signalviewer.qhcp -o .\signal_viewer\doc\signalviewer.qhc
+$env:QT_BIN_DIR\qhelpgenerator.exe .\signal_viewer\doc\signalviewer.qhcp -o .\signal_viewer\doc\signalviewer.qhc

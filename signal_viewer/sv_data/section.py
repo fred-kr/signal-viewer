@@ -356,6 +356,7 @@ class Section:
         self._manual_peak_edits.sort_and_deduplicate()
         return self._manual_peak_edits
 
+    @logger.catch(message="Signal filtering failed. Please check the parameters and try again.")
     def filter_signal(
         self,
         pipeline: PreprocessPipeline | None = None,

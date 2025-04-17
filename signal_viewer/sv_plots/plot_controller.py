@@ -59,7 +59,6 @@ class PlotController(QtCore.QObject):
         for plt_item in (self.pw_main.getPlotItem(), self.pw_rate.getPlotItem()):
             if plt_item is None:
                 continue
-            # vb = plt_item.getViewBox()
             plt_item.setAxisItems({"top": TimeDeltaAxisItem(orientation="top")})
             plt_item.showGrid(x=False, y=True)
             plt_item.setDownsampling(auto=True)
@@ -67,9 +66,6 @@ class PlotController(QtCore.QObject):
             plt_item.addLegend(colCount=2)
             plt_item.addLegend().anchor(itemPos=(0, 1), parentPos=(0, 1), offset=(5, -5))
             plt_item.setMouseEnabled(x=True, y=False)  # type: ignore
-            # vb.enableAutoRange("y", enable=0.99)  # type: ignore
-            # vb.setAutoPan(y=True)
-            # vb.setAutoVisible(y=False)
 
         self.pw_main.getPlotItem().getViewBox().enableAutoRange(pg.ViewBox.YAxis, enable=0.99)  # type: ignore
         self.pw_main.getPlotItem().getViewBox().setAutoPan(y=True)

@@ -15,12 +15,12 @@ class LoggingWindow(QtWidgets.QTextEdit):
         self.setReadOnly(True)
         self.setLineWrapMode(QtWidgets.QTextEdit.LineWrapMode.NoWrap)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        self.setFont(QtGui.QFont("Roboto Mono", 10))
+        # self.setFont(QtGui.QFont("Roboto Mono", 10))
         logger.add(
             self.append_html,
             format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {message}",
-            backtrace=True,
-            diagnose=True,
+            # backtrace=True,
+            # diagnose=True,
         )
 
         self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
