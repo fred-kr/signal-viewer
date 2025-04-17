@@ -8,8 +8,8 @@ import polars as pl
 import polars.selectors as cs
 from loguru import logger
 
-import signal_viewer.type_defs as _t
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION
+from signal_viewer.type_defs import CompleteResultDict
 
 
 def _infer_time_column(lf: pl.LazyFrame, contains: Sequence[str] | None = None) -> list[str]:
@@ -159,7 +159,7 @@ def read_edf(
 
 
 @logger.catch
-def write_hdf5(file_path: Path, data: _t.CompleteResultDict) -> None:
+def write_hdf5(file_path: Path, data: CompleteResultDict) -> None:
     raise NotImplementedError("Needs to be updated to work with new peak algorithm structure.")
     # fp = file_path.resolve().as_posix()
     # with tb.open_file(fp, "w", title=f"Results_{file_path.stem}") as h5f:

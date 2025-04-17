@@ -4,7 +4,6 @@ import enum
 from PySide6 import QtCore, QtGui, QtWidgets
 from pyside_widgets import AnimatedToggleSwitch, DecimalSpinBox, ToggleSwitch
 
-import signal_viewer.type_defs as _t
 from signal_viewer.enum_defs import (
     FilterMethod,
     IncompleteWindowMethod,
@@ -14,7 +13,20 @@ from signal_viewer.enum_defs import (
     WFDBPeakDirection,
 )
 from signal_viewer.generated.ui_param_inputs import Ui_containerParamInputs
-from signal_viewer.type_defs import PeaksPPGElgendi
+from signal_viewer.type_defs import (
+    PeakDetectionAlgorithmParameters,
+    PeaksECGEmrich,
+    PeaksECGGamboa,
+    PeaksECGNeuroKit,
+    PeaksECGPromac,
+    PeaksECGXQRS,
+    PeaksLocalMaxima,
+    PeaksLocalMinima,
+    PeaksPPGElgendi,
+    RollingRateKwargsDict,
+    SignalFilterKwargs,
+    SignalStandardizeKwargs,
+)
 
 D = decimal.Decimal
 type SupportsDecimal = int | float | D
@@ -51,8 +63,8 @@ def _setup_spinbox(
 
 class ParameterInputs(QtWidgets.QWidget):
     sig_run_pipeline = QtCore.Signal(enum.StrEnum)  # PreprocessPipeline
-    sig_run_filter = QtCore.Signal(dict)  # _t.SignalFilterParameters
-    sig_run_standardization = QtCore.Signal(dict)  # _t.StandardizationParameters
+    sig_run_filter = QtCore.Signal(dict)  # SignalFilterParameters
+    sig_run_standardization = QtCore.Signal(dict)  # StandardizationParameters
     sig_reset_data = QtCore.Signal()
 
     sig_run_peak_detection = QtCore.Signal(enum.StrEnum, dict)
@@ -302,7 +314,7 @@ class ParameterInputs(QtWidgets.QWidget):
                 std_params = self.get_std_params(std_method)
                 self.sig_run_standardization.emit(std_params)
 
-    def get_filter_params(self, sf_method: FilterMethod) -> _t.SignalFilterKwargs:
+    def get_filter_params(self, sf_method: FilterMethod) -> SignalFilterKwargs:
         window = self.ui.sf_window_size
         if window.value() == window.minimum():
             window_size = "default"
@@ -317,7 +329,7 @@ class ParameterInputs(QtWidgets.QWidget):
             "powerline": self.ui.sf_powerline.floatValue(),
         }
 
-    def get_std_params(self, std_method: StandardizationMethod) -> _t.SignalStandardizeKwargs:
+    def get_std_params(self, std_method: StandardizationMethod) -> SignalStandardizeKwargs:
         return {
             "method": std_method,
             "window_size": self.ui.std_window_size.intValue() if self.ui.std_rolling_window.isChecked() else None,
@@ -352,7 +364,7 @@ class ParameterInputs(QtWidgets.QWidget):
         else:
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_no_params)
 
-    def get_peak_detection_params(self, method: PeakDetectionAlgorithm) -> _t.PeakDetectionAlgorithmParameters | None:
+    def get_peak_detection_params(self, method: PeakDetectionAlgorithm) -> PeakDetectionAlgorithmParameters | None:
         peak_params = None
         if method == PeakDetectionAlgorithm.PPG_Elgendi:
             peak_params = PeaksPPGElgendi(
@@ -362,7 +374,7 @@ class ParameterInputs(QtWidgets.QWidget):
                 mindelay=self.ui.peak_ppg_elgendi_mindelay.floatValue(),
             )
         elif method == PeakDetectionAlgorithm.ECG_NeuroKit:
-            peak_params = _t.PeaksECGNeuroKit(
+            peak_params = PeaksECGNeuroKit(
                 smoothwindow=self.ui.peak_ecg_nk_smoothwindow.floatValue(),
                 avgwindow=self.ui.peak_ecg_nk_avgwindow.floatValue(),
                 gradthreshweight=self.ui.peak_ecg_nk_gradthreshweight.floatValue(),
@@ -370,26 +382,26 @@ class ParameterInputs(QtWidgets.QWidget):
                 mindelay=self.ui.peak_ecg_nk_mindelay.floatValue(),
             )
         elif method == PeakDetectionAlgorithm.ECG_Promac:
-            peak_params = _t.PeaksECGPromac(
+            peak_params = PeaksECGPromac(
                 threshold=self.ui.peak_ecg_promac_threshold.floatValue(),
                 gaussian_sd=self.ui.peak_ecg_promac_gaussian_sd.intValue(),
             )
         elif method == PeakDetectionAlgorithm.ECG_Gamboa_2008:
-            peak_params = _t.PeaksECGGamboa(tol=self.ui.peak_ecg_gamboa_tol.floatValue())
+            peak_params = PeaksECGGamboa(tol=self.ui.peak_ecg_gamboa_tol.floatValue())
         elif method == PeakDetectionAlgorithm.ECG_Emrich_2023:
-            peak_params = _t.PeaksECGEmrich(
+            peak_params = PeaksECGEmrich(
                 window_seconds=self.ui.peak_ecg_emrich_window_seconds.floatValue(),
                 window_overlap=self.ui.peak_ecg_emrich_window_overlap.floatValue(),
                 accelerated=self.ui.peak_ecg_emrich_accelerated.isChecked(),
             )
         elif method == PeakDetectionAlgorithm.LocalMaxima:
-            peak_params = _t.PeaksLocalMaxima(
+            peak_params = PeaksLocalMaxima(
                 search_radius=self.ui.peak_localmax_radius.intValue(),
                 min_distance=self.ui.peak_localmax_min_dist.intValue(),
             )
 
         elif method == PeakDetectionAlgorithm.LocalMinima:
-            peak_params = _t.PeaksLocalMinima(
+            peak_params = PeaksLocalMinima(
                 search_radius=self.ui.peak_localmin_radius.intValue(),
                 min_distance=self.ui.peak_localmin_min_dist.intValue(),
             )
@@ -398,7 +410,7 @@ class ParameterInputs(QtWidgets.QWidget):
             peak_dir: WFDBPeakDirection | None = self.ui.peak_xqrs_direction.current_enum()
             if peak_dir is None:
                 peak_dir = WFDBPeakDirection.Up
-            peak_params = _t.PeaksECGXQRS(
+            peak_params = PeaksECGXQRS(
                 search_radius=self.ui.peak_xqrs_radius.intValue(),
                 peak_dir=peak_dir,
                 min_peak_distance=self.ui.peak_xqrs_min_dist.intValue(),
@@ -406,7 +418,7 @@ class ParameterInputs(QtWidgets.QWidget):
 
         return peak_params
 
-    def get_rate_params(self) -> _t.RollingRateKwargsDict:
+    def get_rate_params(self) -> RollingRateKwargsDict:
         return {
             "sec_new_window_every": self.ui.rate_every.intValue(),
             "sec_window_length": self.ui.rate_period.intValue(),

@@ -3,7 +3,7 @@ import enum
 import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final, Unpack
+from typing import TYPE_CHECKING, Any, Unpack
 
 import numpy as np
 import numpy.typing as npt
@@ -11,9 +11,9 @@ import pyqtgraph as pg
 from pyqtgraph.Point import Point
 from PySide6 import QtCore, QtGui, QtWidgets
 
-import signal_viewer.type_defs as _t
+from signal_viewer.type_defs import PGBrush, PGBrushKwargs, PGColor, PGPen, PGPenKwargs
 
-MICRO: Final = "\u03bc"
+MICRO = "\u03bc"
 
 if TYPE_CHECKING:
     from signal_viewer.sv_app import SVApp
@@ -89,19 +89,19 @@ def sequence_repr(seq: Sequence[int | float]) -> str:
         return str(seq)
 
 
-def make_qcolor(*args: _t.PGColor) -> QtGui.QColor:
+def make_qcolor(*args: PGColor) -> QtGui.QColor:
     """Creates a QColor from the provided arguments."""
     return args[0] if isinstance(args[0], QtGui.QColor) else pg.mkColor(*args)
 
 
-def make_qpen(*args: _t.PGPen, **kwargs: Unpack[_t.PGPenKwargs]) -> QtGui.QPen:
+def make_qpen(*args: PGPen, **kwargs: Unpack[PGPenKwargs]) -> QtGui.QPen:
     """Creates a QPen from the provided arguments."""
     if len(args) == 1 and isinstance(args[0], QtGui.QPen):
         return args[0]
     return pg.mkPen(*args, **kwargs)
 
 
-def make_qbrush(*args: _t.PGBrush, **kwargs: Unpack[_t.PGBrushKwargs]) -> QtGui.QBrush:
+def make_qbrush(*args: PGBrush, **kwargs: Unpack[PGBrushKwargs]) -> QtGui.QBrush:
     """Creates a QBrush from the provided arguments."""
     if len(args) == 1 and isinstance(args[0], QtGui.QBrush):
         return args[0]

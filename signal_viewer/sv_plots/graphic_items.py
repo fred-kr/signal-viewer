@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 import numpy.typing as npt
 import pyqtgraph as pg
-
-# from pyqtgraph import AxisItem, DateAxisItem
 from pyqtgraph.graphicsItems.DateAxisItem import (
     DAY_SPACING,
     HMS_ZOOM_LEVEL,
@@ -23,8 +21,8 @@ from pyqtgraph.GraphicsScene import mouseEvents
 from pyqtgraph.Point import Point
 from PySide6 import QtCore, QtGui, QtWidgets
 
-import signal_viewer.type_defs as _t
 from signal_viewer.enum_defs import MouseButtons
+from signal_viewer.type_defs import PGBrush, PGPen
 from signal_viewer.utils import make_qbrush, make_qpen
 
 if TYPE_CHECKING:
@@ -81,7 +79,7 @@ class EditingViewBox(pg.ViewBox):
         self.addItem(selection_box, ignoreBounds=True)
         return
 
-    def mouseDragEvent(self, ev: "mouseEvents.MouseDragEvent", axis: int | float | None = None) -> None:
+    def mouseDragEvent(self, ev: "mouseEvents.MouseDragEvent", axis: int | None = None) -> None:
         ev.accept()
 
         pos = ev.pos()
@@ -91,7 +89,7 @@ class EditingViewBox(pg.ViewBox):
         mouse_enabled = np.array(self.state["mouseEnabled"], dtype=np.float64)
         mask = mouse_enabled.copy()
         if axis is not None:
-            mask[1 - axis] = 0.0  # type: ignore
+            mask[1 - axis] = 0.0
 
         button_type = _get_button_type(ev)
 
@@ -294,10 +292,10 @@ class ClickableRegionItem(pg.LinearRegionItem):
         self,
         values: Sequence[float] = (0, 1),
         orientation: Literal["vertical", "horizontal"] = "vertical",
-        brush: _t.PGBrush | None = None,
-        pen: _t.PGPen | None = None,
-        hoverBrush: _t.PGBrush | None = None,
-        hoverPen: _t.PGPen | None = None,
+        brush: PGBrush | None = None,
+        pen: PGPen | None = None,
+        hoverBrush: PGBrush | None = None,
+        hoverPen: PGPen | None = None,
         movable: bool = True,
         bounds: Sequence[float] | None = None,
         span: Sequence[float] = (0, 1),

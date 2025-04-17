@@ -11,7 +11,6 @@ import polars as pl
 import polars.selectors as ps
 from loguru import logger
 
-import signal_viewer.type_defs as _t
 from signal_viewer.constants import INDEX_COL, IS_MANUAL_COL, IS_PEAK_COL, SECTION_INDEX_COL
 from signal_viewer.enum_defs import (
     IncompleteWindowMethod,
@@ -22,6 +21,19 @@ from signal_viewer.enum_defs import (
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.peak_detection import find_peaks
 from signal_viewer.sv_data.signal_processing import apply_cleaning_pipeline, filter_signal, standardize_signal
+from signal_viewer.type_defs import (
+    DetailedSectionResultDict,
+    ManualPeakEditsDict,
+    PeakDetectionAlgorithmParameters,
+    ProcessingParametersDict,
+    RollingRateKwargsDict,
+    SectionMetadataDict,
+    SectionResultDict,
+    SectionSummaryDict,
+    SignalFilterKwargs,
+    SignalStandardizeKwargs,
+    UpdatePeaksAction,
+)
 from signal_viewer.utils import sequence_repr
 
 
@@ -29,13 +41,13 @@ from signal_viewer.utils import sequence_repr
 class ProcessingParameters:
     sampling_rate: int = attrs.field()
     processing_pipeline: PreprocessPipeline | None = attrs.field(default=None)
-    filter_parameters: list[_t.SignalFilterKwargs] = attrs.field(factory=list)
-    standardization_parameters: _t.SignalStandardizeKwargs | None = attrs.field(default=None)
+    filter_parameters: list[SignalFilterKwargs] = attrs.field(factory=list)
+    standardization_parameters: SignalStandardizeKwargs | None = attrs.field(default=None)
     peak_detection_method: PeakDetectionAlgorithm | None = attrs.field(default=None)
-    peak_detection_method_parameters: _t.PeakDetectionAlgorithmParameters | None = attrs.field(default=None)
+    peak_detection_method_parameters: PeakDetectionAlgorithmParameters | None = attrs.field(default=None)
     rate_computation_method: RateComputationMethod = attrs.field(default=Config.editing.rate_computation_method)
 
-    def to_dict(self) -> _t.ProcessingParametersDict:
+    def to_dict(self) -> ProcessingParametersDict:
         return {
             "sampling_rate": self.sampling_rate,
             "processing_pipeline": str(self.processing_pipeline),
@@ -107,9 +119,9 @@ class ManualPeakEdits:
     def get_joined(self) -> list[int]:
         return sorted(set(self.added) | set(self.removed))
 
-    def to_dict(self) -> _t.ManualPeakEditsDict:
+    def to_dict(self) -> ManualPeakEditsDict:
         self.sort_and_deduplicate()
-        return _t.ManualPeakEditsDict(
+        return ManualPeakEditsDict(
             added=self.added,
             removed=self.removed,
         )
@@ -144,8 +156,8 @@ class SectionMetadata:
     processing_parameters: ProcessingParameters = attrs.field()
     rate_computation_method: RateComputationMethod = attrs.field()
 
-    def to_dict(self) -> _t.SectionMetadataDict:
-        return _t.SectionMetadataDict(
+    def to_dict(self) -> SectionMetadataDict:
+        return SectionMetadataDict(
             signal_name=self.signal_name,
             section_id=self.section_id,
             global_bounds=self.global_bounds,
@@ -174,8 +186,8 @@ class SectionResult:
     def has_rate_data(self) -> bool:
         return not self.rate_data.is_empty()
 
-    def to_dict(self) -> _t.SectionResultDict:
-        return _t.SectionResultDict(
+    def to_dict(self) -> SectionResultDict:
+        return SectionResultDict(
             peak_data=self.peak_data.to_numpy(structured=True),
             rate_data=self.rate_data.to_numpy(structured=True),
         )
@@ -193,8 +205,8 @@ class DetailedSectionResult:
     section_result: SectionResult = attrs.field()
     rate_per_temperature: pl.DataFrame = attrs.field()
 
-    def to_dict(self) -> _t.DetailedSectionResultDict:
-        return _t.DetailedSectionResultDict(
+    def to_dict(self) -> DetailedSectionResultDict:
+        return DetailedSectionResultDict(
             metadata=self.metadata.to_dict(),
             section_dataframe=self.section_dataframe.to_numpy(structured=True),
             manual_peak_edits=self.manual_peak_edits.to_dict(),
@@ -347,7 +359,7 @@ class Section:
     def filter_signal(
         self,
         pipeline: PreprocessPipeline | None = None,
-        **kwargs: Unpack[_t.SignalFilterKwargs],
+        **kwargs: Unpack[SignalFilterKwargs],
     ) -> None:
         """
         Filter this section's signal using the specified pipeline / custom filter parameters.
@@ -381,8 +393,8 @@ class Section:
         else:
             sig_data = self.processed_signal.to_numpy(allow_copy=False)
         method = kwargs.get("method", None)
-        filter_params: _t.SignalFilterKwargs = {}
-        additional_params: _t.SignalFilterKwargs | None = None
+        filter_params: SignalFilterKwargs = {}
+        additional_params: SignalFilterKwargs | None = None
 
         if pipeline is None:
             self._processing_parameters.processing_pipeline = pipeline
@@ -405,7 +417,7 @@ class Section:
 
         self.data = self.data.with_columns(pl.Series(self.processed_signal_name, filtered))
 
-    def standardize_signal(self, **kwargs: Unpack[_t.SignalStandardizeKwargs]) -> None:
+    def standardize_signal(self, **kwargs: Unpack[SignalStandardizeKwargs]) -> None:
         """
         Standardize this section's signal using the specified parameters. Based on `neurokit2.standardize`.
 
@@ -440,9 +452,9 @@ class Section:
     def detect_peaks(
         self,
         method: PeakDetectionAlgorithm,
-        method_parameters: _t.PeakDetectionAlgorithmParameters,
+        method_parameters: PeakDetectionAlgorithmParameters,
         *,
-        rr_params: _t.RollingRateKwargsDict | None = None,
+        rr_params: RollingRateKwargsDict | None = None,
     ) -> None:
         """
         Find peaks in the processed signal using the specified method and parameters.
@@ -471,7 +483,7 @@ class Section:
         peaks: npt.NDArray[np.intp],
         update_rate: bool = True,
         *,
-        rr_params: _t.RollingRateKwargsDict | None = None,
+        rr_params: RollingRateKwargsDict | None = None,
     ) -> None:
         """
         Sets the `is_peak` column in `self.data` to 1 at the indices provided in `peaks`, and to 0
@@ -503,11 +515,11 @@ class Section:
 
     def update_peaks(
         self,
-        action: _t.UpdatePeaksAction,
+        action: UpdatePeaksAction,
         peaks: npt.NDArray[np.intp],
         update_rate: bool = True,
         *,
-        rr_params: _t.RollingRateKwargsDict | None = None,
+        rr_params: RollingRateKwargsDict | None = None,
     ) -> None:
         """
         Updates the `is_peak` column in `self.data` at the given indices according to the provided
@@ -556,7 +568,7 @@ class Section:
             self.update_rate_data(rr_params=rr_params)
 
     def update_rate_data(
-        self, full_info: bool = False, force: bool = False, *, rr_params: _t.RollingRateKwargsDict | None = None
+        self, full_info: bool = False, force: bool = False, *, rr_params: RollingRateKwargsDict | None = None
     ) -> None:
         """
         Recalculates the signal rate based on the current peaks.
@@ -739,7 +751,7 @@ class Section:
             .collect()
         )
 
-    def lock_result(self, *, rr_params: _t.RollingRateKwargsDict | None = None) -> None:
+    def lock_result(self, *, rr_params: RollingRateKwargsDict | None = None) -> None:
         self.update_peak_data(include_global=True, include_info=True)
         self.update_rate_data(full_info=True, force=True, rr_params=rr_params)
         self.set_locked(True)
@@ -849,7 +861,7 @@ class Section:
         self.manual_peak_edits.clear()
         self._processing_parameters.reset(peaks_only=True)
 
-    def get_summary(self) -> _t.SectionSummaryDict:
+    def get_summary(self) -> SectionSummaryDict:
         return {
             "name": self.section_id.pretty_name(),
             "size": self.data.height,

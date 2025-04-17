@@ -3,8 +3,8 @@ import enum
 from loguru import logger
 from PySide6 import QtCore, QtGui, QtWidgets
 
-import signal_viewer.type_defs as _t
 from signal_viewer.enum_defs import LogLevel
+from signal_viewer.type_defs import LogRecordDict
 
 
 class LoggingWindow(QtWidgets.QTextEdit):
@@ -36,13 +36,13 @@ class LoggingWindow(QtWidgets.QTextEdit):
         menu.exec(self.mapToGlobal(pos))
 
     def append_html(self, message: str) -> None:
-        record_dict: _t.LogRecordDict = message.record  # type: ignore
+        record_dict: LogRecordDict = message.record  # type: ignore
         level = LogLevel[record_dict["level"].name]
 
         self.sig_log_message.emit(message, level, record_dict)
 
     @QtCore.Slot(str, int, str)
-    def append(self, message: str, log_level: LogLevel, record_dict: _t.LogRecordDict) -> None:
+    def append(self, message: str, log_level: LogLevel, record_dict: LogRecordDict) -> None:
         self.moveCursor(QtGui.QTextCursor.MoveOperation.End)
         self.textCursor().insertHtml(f"{message}<br>")
         self.moveCursor(QtGui.QTextCursor.MoveOperation.End)

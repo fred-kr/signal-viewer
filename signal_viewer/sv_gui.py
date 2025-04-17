@@ -6,7 +6,6 @@ from loguru import logger
 from PySide6 import QtCore, QtGui, QtWidgets
 from pyside_widgets import OverlayWidget, SearchableDataTreeWidget
 
-import signal_viewer.type_defs as _t
 from signal_viewer.constants import INDEX_COL
 from signal_viewer.enum_defs import LogLevel
 from signal_viewer.generated.ui_main_window import Ui_MainWindow
@@ -15,6 +14,7 @@ from signal_viewer.sv_widgets.dlg_metadata import MetadataDialog
 from signal_viewer.sv_widgets.dock_log_window import StatusMessageDock
 from signal_viewer.sv_widgets.dock_param_inputs import InputsDock
 from signal_viewer.sv_widgets.dock_sections import SectionListDock
+from signal_viewer.type_defs import LogRecordDict, SectionSummaryDict
 from signal_viewer.utils import get_app
 
 if TYPE_CHECKING:
@@ -302,7 +302,7 @@ class SVGUI(QtWidgets.QMainWindow):
         menu.addAction(self.action_export_to_xlsx)
         menu.exec(QtGui.QCursor.pos())
 
-    def show_section_summary_box(self, summary: _t.SectionSummaryDict) -> None:
+    def show_section_summary_box(self, summary: SectionSummaryDict) -> None:
         dlg = QtWidgets.QDialog(self)
         dlg.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         dlg.setModal(True)
@@ -362,7 +362,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self,
         message: str,
         msg_log_level: LogLevel,
-        record_dict: _t.LogRecordDict,
+        record_dict: LogRecordDict,
         threshold: LogLevel = LogLevel.WARNING,
     ) -> None:
         if os.environ.get("DEBUG") == "1":
