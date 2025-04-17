@@ -2,7 +2,7 @@
 <QHelpCollectionProject version="1.0">
     <assistant>
         <title>SignalViewer - User Guide</title>
-        <applicationIcon>images/app_icon.svg</applicationIcon>
+        <applicationIcon>images/app_icon.png</applicationIcon>
         <cacheDirectory>QuackTech/SignalViewer</cacheDirectory>
         <startPage>qthelp://com.quacktech.signalviewer/signalviewer/index.html</startPage>
         <aboutMenuText>

@@ -1,6 +1,6 @@
 import functools
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import attrs
 import mne.io
@@ -163,7 +163,7 @@ class DataController(QtCore.QObject):
 
         if file_path.suffix == ".edf":
             edf_info = mne.io.read_raw_edf(file_path, preload=False, verbose=False)
-            sampling_rate = cast(int, edf_info.info["sfreq"])
+            sampling_rate = int(edf_info.info["sfreq"])
             column_names: list[str] = edf_info.ch_names  # type: ignore
             other_info = dict(edf_info.info)
         elif file_path.suffix in {".feather", ".csv", ".txt", ".tsv"}:
@@ -185,7 +185,7 @@ class DataController(QtCore.QObject):
         else:
             raise ValueError(f"Unsupported file format: {file_path.suffix}. Please select a valid file format.")
 
-        metadata = FileMetadata(file_path, column_names, sampling_rate)  # type: ignore
+        metadata = FileMetadata(file_path, column_names, sampling_rate)
         if last_signal_col in metadata.valid_columns:
             metadata.signal_column = last_signal_col
         if last_info_col in metadata.valid_columns:

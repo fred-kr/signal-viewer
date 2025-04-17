@@ -33,7 +33,7 @@ class Ui_MetadataDialog(object):
         MetadataDialog.resize(648, 400)
         MetadataDialog.setMinimumSize(QSize(600, 400))
         icon = QIcon()
-        icon.addFile("://icons/app_icon.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon.addFile("://icons/app_icon.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         MetadataDialog.setWindowIcon(icon)
         MetadataDialog.setStyleSheet("")
         self.gridLayout = QGridLayout(MetadataDialog)

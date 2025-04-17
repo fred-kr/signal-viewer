@@ -94,7 +94,6 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dialog_meta.container_additional_metadata.setLayout(layout)
         self.data_tree_widget_additional_metadata = data_tree_widget
 
-        # self.btn_export_all_results.setIcon(QtGui.QIcon("://icons/ArrowExportLtr"))
         self.ui.btn_export_all_results.clicked.connect(lambda: self.sig_export_requested.emit("hdf5"))
 
         self.ui.tab_widget_main.setCurrentIndex(0)

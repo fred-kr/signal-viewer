@@ -119,8 +119,5 @@
     <file>icons/ZoomIn.svg</file>
     <file>icons/ZoomOut.svg</file>
     <file>icons/app_icon.png</file>
-    <file>icons/app_icon.svg</file>
-    <file>icons/fancy_icon1.png</file>
-    <file>icons/fancy_icon2.png</file>
   </qresource>
 </RCC>

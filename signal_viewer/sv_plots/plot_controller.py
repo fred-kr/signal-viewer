@@ -348,6 +348,7 @@ class PlotController(QtCore.QObject):
             self.clear_peaks()
 
         self.signal_curve.setData(y_data)
+        self.pw_main.plotItem.vb.menu.autoRange()  # calling autoRange() on the vb menu ignores the region when switching to base section, not sure why but it works
 
     def set_rate_data(self, y_data: npt.ArrayLike, x_data: npt.ArrayLike | None = None, clear: bool = False) -> None:
         """

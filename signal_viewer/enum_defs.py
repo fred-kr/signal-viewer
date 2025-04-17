@@ -1,4 +1,5 @@
 import enum
+from typing import Self
 
 from PySide6 import QtGui
 
@@ -77,59 +78,71 @@ class PeakDetectionAlgorithm(enum.StrEnum):
     Available peak detection algorithms.
     """
 
-    # PPG methods
-    PPG_Elgendi = "ppg_elgendi"
-    """
-    Implementation of Elgendi M, Norton I, Brearley M, Abbott D, Schuurmans D (2013) Systolic Peak Detection in
-    Acceleration Photoplethysmograms Measured from Emergency Responders in Tropical Conditions. PLoS ONE 8(10): e76585.
-    doi:10.1371/journal.pone.0076585.
-    """
-    # ECG methods
-    ECG_Emrich_2023 = "emrich2023"
-    """
-    FastNVG Algorithm by Emrich et al. (2023) based on the visibility graph detector of Koka et al. (2022). Provides
-    fast and sample-accurate R-peak detection. The algorithm transforms the ecg into a graph representation and extracts
-    exact R-peak positions using graph metrics.
-    """
-    ECG_NeuroKit = "neurokit"
-    """
-    QRS complexes are detected based on the steepness of the absolute gradient of the ECG signal. Subsequently, R-peaks
-    are detected as local maxima in the QRS complexes. The method is unpublished, but see: (i)
-    https://github.com/neuropsychology/NeuroKit/issues/476 for discussion of this algorithm; and (ii)
-    https://doi.org/10.21105/joss.02621 for the original validation of this algorithm.
-    """
-    ECG_Gamboa_2008 = "gamboa2008"
-    """Algorithm by Gamboa (2008)."""
-    ECG_Promac = "promac"
-    """
-    ProMAC combines the result of several R-peak detectors in a probabilistic way. For a given peak detector, the binary
-    signal representing the peak locations is convolved with a Gaussian distribution, resulting in a probabilistic
-    representation of each peak location. This procedure is repeated for all selected methods and the resulting signals
-    are accumulated. Finally, a threshold is used to accept or reject the peak locations. See this discussion for more
-    information on the origins of the method: https://github.com/neuropsychology/NeuroKit/issues/222
-    """
-    ECG_XQRS = "wfdb_xqrs"
-    # below methods dont have any adjustable parameters
-    ECG_PanTompkins_1985 = "pantompkins"
-    """Algorithm by Pan & Tompkins (1985)."""
-    ECG_Hamilton_2002 = "hamilton2002"
-    """Algorithm by Hamilton (2002)."""
-    ECG_Martinez_2004 = "martinez2004"
-    """Algorithm by Martinez et al. (2004)."""
-    ECG_Christov_2004 = "christov2004"
-    """Algorithm by Christov (2004)."""
-    ECG_Nabian_2018 = "nabian2018"
-    """Algorithm by Nabian et al. (2018) based on the Pan-Tompkins algorithm."""
-    ECG_EngzeeMod_2012 = "engzee2012"
-    """Original algorithm by Engelse & Zeelenberg (1979) modified by Lourenço et al. (2012)."""
-    ECG_Manikandan_2012 = "manikandan2012"
-    """Algorithm by Manikandan & Soman (2012) based on the Shannon energy envelope (SEE)."""
-    ECG_Elgendi_2010 = "elgendi2010"
-    """Algorithm by Elgendi et al. (2010)."""
-    ECG_Kalidas_2017 = "kalidas2017"
-    """Algorithm by Kalidas et al. (2017)."""
-    ECG_Rodrigues_2021 = "rodrigues2021"
-    """Adaptation of the work by Sadhukhan & Mitra (2012) and Gutiérrez-Rivas et al. (2015) by Rodrigues et al. (2021)."""
+    def __new__(cls, value: str, docstr: str = "") -> Self:
+        member = str.__new__(cls, value)
+        member._value_ = value
+        member.__doc__ = docstr.strip()
+        return member
+
+    PPG_Elgendi = (
+        "ppg_elgendi",
+        """
+        Implementation of Elgendi M, Norton I, Brearley M, Abbott D, Schuurmans D (2013)
+        Systolic Peak Detection in Acceleration Photoplethysmograms Measured from Emergency Responders in Tropical Conditions.
+        PLoS ONE 8(10): e76585. doi:10.1371/journal.pone.0076585.
+        """,
+    )
+    ECG_Emrich_2023 = (
+        "emrich2023",
+        """
+        FastNVG Algorithm by Emrich et al. (2023) based on the visibility graph detector of Koka et al. (2022). 
+        Provides fast and sample-accurate R-peak detection.
+        The algorithm transforms the ecg into a graph representation and extracts exact R-peak positions using graph metrics.
+        """,
+    )
+    ECG_NeuroKit = (
+        "neurokit",
+        """
+        QRS complexes are detected based on the steepness of the absolute gradient of the ECG signal. Subsequently, R-peaks
+        are detected as local maxima in the QRS complexes. The method is unpublished, but see: (i)
+        https://github.com/neuropsychology/NeuroKit/issues/476 for discussion of this algorithm; and (ii)
+        https://doi.org/10.21105/joss.02621 for the original validation of this algorithm.
+        """,
+    )
+    ECG_Gamboa_2008 = ("gamboa2008", """Algorithm by Gamboa (2008).""")
+    ECG_Promac = (
+        "promac",
+        """
+        ProMAC combines the result of several R-peak detectors in a probabilistic way. 
+        For a given peak detector, the binary signal representing the peak locations is convolved with a Gaussian distribution,
+        resulting in a probabilistic representation of each peak location. This procedure is repeated for all selected
+        methods and the resulting signals are accumulated. Finally, a threshold is used to accept or reject the peak locations.
+        See this discussion for more information on the origins of the method: https://github.com/neuropsychology/NeuroKit/issues/222
+        """,
+    )
+    ECG_XQRS = (
+        "wfdb_xqrs",
+        """Implementation of the XQRS algorithm from the WFDB package (https://physionet.org/physiobank/).""",
+    )
+    ECG_PanTompkins_1985 = "pantompkins", """Algorithm by Pan & Tompkins (1985)."""
+    ECG_Hamilton_2002 = "hamilton2002", """Algorithm by Hamilton (2002)."""
+    ECG_Martinez_2004 = "martinez2004", """Algorithm by Martinez et al. (2004)."""
+    ECG_Christov_2004 = "christov2004", """Algorithm by Christov (2004)."""
+    ECG_Nabian_2018 = "nabian2018", """Algorithm by Nabian et al. (2018) based on the Pan-Tompkins algorithm."""
+    ECG_EngzeeMod_2012 = (
+        "engzee2012",
+        """Original algorithm by Engelse & Zeelenberg (1979) modified by Lourenço et al. (2012).""",
+    )
+    ECG_Manikandan_2012 = (
+        "manikandan2012",
+        """Algorithm by Manikandan & Soman (2012) based on the Shannon energy envelope (SEE).""",
+    )
+    ECG_Elgendi_2010 = "elgendi2010", """Algorithm by Elgendi et al. (2010)."""
+    ECG_Kalidas_2017 = "kalidas2017", """Algorithm by Kalidas et al. (2017)."""
+    ECG_Rodrigues_2021 = (
+        "rodrigues2021",
+        """Adaptation of the work by Sadhukhan & Mitra (2012) and Gutiérrez-Rivas et al. (2015) by Rodrigues et al. (2021).""",
+    )
     # Other methods
     LocalMaxima = "local_maxima"
     LocalMinima = "local_minima"

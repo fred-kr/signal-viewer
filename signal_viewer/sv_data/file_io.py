@@ -11,6 +11,10 @@ from loguru import logger
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION
 from signal_viewer.type_defs import CompleteResultDict
 
+INTEGER_DTYPES = frozenset(
+    [pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.Int128, pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64]
+)
+
 
 def _infer_time_column(lf: pl.LazyFrame, contains: Sequence[str] | None = None) -> list[str]:
     if contains is None:
@@ -47,11 +51,11 @@ def _get_target_for_time_unit(
 ) -> int | float | datetime.datetime:
     if time_unit == "s" and time_col_dtype.is_float():
         return 1.0
-    if time_unit == "ms" and time_col_dtype in (pl.INTEGER_DTYPES | {pl.Duration("ms")}):
+    if time_unit == "ms" and time_col_dtype in (INTEGER_DTYPES | {pl.Duration("ms")}):
         return 1_000
-    if time_unit == "us" and time_col_dtype in (pl.INTEGER_DTYPES | {pl.Duration("us")}):
+    if time_unit == "us" and time_col_dtype in (INTEGER_DTYPES | {pl.Duration("us")}):
         return 1_000_000
-    if time_unit == "ns" and time_col_dtype in (pl.INTEGER_DTYPES | {pl.Duration("ns")}):
+    if time_unit == "ns" and time_col_dtype in (INTEGER_DTYPES | {pl.Duration("ns")}):
         return 1_000_000_000
     if time_unit == "datetime" and time_col_dtype.base_type().is_(pl.Datetime) and start_val is not None:
         return start_val + datetime.timedelta(seconds=1)
@@ -149,7 +153,9 @@ def read_edf(
             # Find the last row with a non-zero value in the column
             try:
                 last_non_zero = out.with_row_index().filter(pl.col(data_channel) != 0).get_column("index").item(-1)
-                logger.info(f"Found section of continuous zeros from row {last_non_zero + 1} to the end of the column.")
+                logger.info(
+                    f"Found section of continuous zeros from row {last_non_zero + 1} to the end of the column, removing."
+                )
                 out = out.head(last_non_zero + 1)
             except IndexError:
                 logger.info("No section of continuous zeros found, keeping all rows.")

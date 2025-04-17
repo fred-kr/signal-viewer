@@ -10,6 +10,7 @@ def gui() -> None:
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
     parser.add_argument("--no-opengl", action="store_false", help="Don't use OpenGL for rendering")
     parser.add_argument("-c", "--console", action="store_true", help="Enable Jupyter console")
+    parser.add_argument("--reset-settings", action="store_true", help="Cleans stored settings and resets to defaults")
     args = parser.parse_args()
 
     from loguru import logger
@@ -28,6 +29,19 @@ def gui() -> None:
     QtWidgets.QApplication.setOrganizationName(org_name)
     QtWidgets.QApplication.setApplicationName(app_name)
     QtWidgets.QApplication.setStyle("Fusion")
+
+    if args.reset_settings:
+        log_id = logger.add(sys.stderr, colorize=True, backtrace=True, diagnose=True)
+        logger.info(f"Removing stored settings for {org_name} - {app_name}...")
+        try:
+            import pyside_config
+
+            pyside_config.clean()
+            logger.success("Cleanup successful, app will use default settings.")
+        except ImportError:
+            logger.error("Error importing pyside_config module. Unable to reset settings.")
+        logger.remove(log_id)
+
     use_opengl = args.no_opengl
     if use_opengl:
         os.environ["QSG_RHI_BACKEND"] = "opengl"

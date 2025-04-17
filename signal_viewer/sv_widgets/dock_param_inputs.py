@@ -1,5 +1,6 @@
 import decimal
 import enum
+import inspect
 
 from PySide6 import QtCore, QtGui, QtWidgets
 from pyside_widgets import AnimatedToggleSwitch, DecimalSpinBox, ToggleSwitch
@@ -59,6 +60,10 @@ def _setup_spinbox(
     dec_sb.setDecimals(precision)
     dec_sb.setProperty("defaultValue", default)
     _restore_default(dec_sb)
+
+
+def _set_tooltip(obj: object) -> str:
+    return inspect.getdoc(obj) or ""
 
 
 class ParameterInputs(QtWidgets.QWidget):
@@ -158,7 +163,7 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.std_window_size, 5, 999_999, 2, 100, 0)
 
         # Peak Detection
-        self.ui.peak_method.set_enum_class(PeakDetectionAlgorithm)
+        self.ui.peak_method.set_enum_class(PeakDetectionAlgorithm, doc_data=_set_tooltip)
         self.ui.peak_method.currentIndexChanged.connect(self._on_peak_method_changed)
 
         self.ui.peak_xqrs_direction.set_enum_class(WFDBPeakDirection)
