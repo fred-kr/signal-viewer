@@ -193,7 +193,6 @@ class Ui_MainWindow(object):
 
         self.line_edit_active_file = QLineEdit(self.container_file_information)
         self.line_edit_active_file.setObjectName(u"line_edit_active_file")
-        self.line_edit_active_file.setFrame(False)
         self.line_edit_active_file.setReadOnly(True)
 
         self.gridLayout.addWidget(self.line_edit_active_file, 1, 1, 1, 2)
@@ -488,7 +487,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         self.tab_widget_main.setCurrentIndex(0)
-        self.tab_widget_result_views.setCurrentIndex(1)
+        self.tab_widget_result_views.setCurrentIndex(0)
 
     # setupUi
 

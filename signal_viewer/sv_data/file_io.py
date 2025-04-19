@@ -166,7 +166,7 @@ def read_edf(
 
 @logger.catch
 def write_hdf5(file_path: Path, data: CompleteResultDict) -> None:
-    raise NotImplementedError("Needs to be updated to work with new peak algorithm structure.")
+    raise NotImplementedError("Needs to be updated to work with new result structure.")
     # fp = file_path.resolve().as_posix()
     # with tb.open_file(fp, "w", title=f"Results_{file_path.stem}") as h5f:
     #     # Root level metadata

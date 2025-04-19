@@ -44,7 +44,7 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tab_import" native="true">
+      <widget class="QWidget" name="tab_import">
        <attribute name="title">
         <string>Import &amp;&amp; Data</string>
        </attribute>
@@ -112,9 +112,6 @@
            </item>
            <item row="1" column="1" colspan="2">
             <widget class="QLineEdit" name="line_edit_active_file">
-             <property name="frame">
-              <bool>false</bool>
-             </property>
              <property name="readOnly">
               <bool>true</bool>
              </property>
@@ -355,7 +352,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_edit" native="true">
+      <widget class="QWidget" name="tab_edit">
        <attribute name="title">
         <string>View &amp;&amp; Edit</string>
        </attribute>
@@ -365,7 +362,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_export" native="true">
+      <widget class="QWidget" name="tab_export">
        <attribute name="title">
         <string>Results &amp;&amp; Export</string>
        </attribute>
@@ -393,7 +390,7 @@
         <item row="1" column="0" colspan="4">
          <widget class="QTabWidget" name="tab_widget_result_views">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_result_peaks_info">
            <attribute name="title">
