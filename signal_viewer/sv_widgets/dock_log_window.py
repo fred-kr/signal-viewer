@@ -15,7 +15,6 @@ class LoggingWindow(QtWidgets.QTextEdit):
         self.setReadOnly(True)
         self.setLineWrapMode(QtWidgets.QTextEdit.LineWrapMode.NoWrap)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        # self.setFont(QtGui.QFont("Roboto Mono", 10))
         logger.add(
             self.append_html,
             format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {message}",

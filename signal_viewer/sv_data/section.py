@@ -320,6 +320,10 @@ class Section:
         return self.data.get_column(self.processed_signal_name)
 
     @property
+    def info_data(self) -> pl.Series | None:
+        return None if self.info_name is None else self.data.get_column(self.info_name)
+
+    @property
     def is_filtered(self) -> bool:
         """Flag indicating if the section values were processed using a custom filter."""
         return self._is_filtered

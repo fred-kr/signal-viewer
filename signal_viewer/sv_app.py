@@ -109,83 +109,85 @@ class SVApp(QtCore.QObject):
 
         self.thread_pool = QtCore.QThreadPool.globalInstance()
 
-        self.recent_files = FileListModel(Config.internal.recent_files, parent=self)
-        self.gui.ui.list_view_recent_files.setModel(self.recent_files)
+        self.recent_data_files = FileListModel(Config.internal.recent_files, parent=self)
+        self.gui.ui.lview_data_files.setModel(self.recent_data_files)
+
+        self.recent_annotations_files = FileListModel(Config.internal.recent_annotation_files, parent=self)
+        self.gui.ui.lview_annotation_files.setModel(self.recent_annotations_files)
 
         self._connect_signals()
 
     def _connect_signals(self) -> None:
-        self.sig_peaks_updated.connect(self.refresh_peak_data)
+        self.sig_peaks_updated.connect(self._on_sig_peaks_updated)
 
-        self.gui.ui.action_show_settings.triggered.connect(self._on_action_show_settings)
-        self.gui.ui.action_open_file.triggered.connect(self.open_file)
+        self.gui.ui.action_show_settings.triggered.connect(self._on_show_settings)
+        self.gui.ui.action_open_file.triggered.connect(self._on_open_file)
         self.gui.ui.action_edit_metadata.triggered.connect(lambda: self.show_metadata_dialog([]))
         self.gui.ui.action_about_qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self.gui.ui.action_close_file.triggered.connect(self.close_file)
-        self.gui.ui.action_show_user_guide.triggered.connect(self.show_user_guide)
+        self.gui.ui.action_show_user_guide.triggered.connect(self._on_show_user_guide)
 
         self.gui.dialog_meta.sig_property_has_changed.connect(self.update_metadata)
 
         self.gui.ui.btn_load_data.clicked.connect(self.read_data)
-        self.gui.ui.btn_open_file.clicked.connect(self.open_file)
-        self.gui.ui.btn_close_file.clicked.connect(self.close_file)
 
         self.gui.ui.combo_box_signal_column_import_page.currentTextChanged.connect(self.update_signal_column)
         self.gui.ui.combo_box_info_column_import_page.currentTextChanged.connect(self.update_info_column)
-
         self.gui.ui.spin_box_sampling_rate_import_page.editingFinished.connect(self.update_sampling_rate)
 
-        self.gui.ui.list_view_recent_files.doubleClicked.connect(self._open_recent_file)
+        self.gui.ui.lview_data_files.doubleClicked.connect(self._open_recent_file)
 
-        self.gui.sig_table_refresh_requested.connect(self.refresh_data_view)
-        self.gui.sig_export_requested.connect(self.export_result)
+        self.gui.sig_refresh_table.connect(self.refresh_data_view)
+        self.gui.sig_export_result.connect(self.export_result)
 
         # Section actions
-        self.gui.ui.action_create_new_section.toggled.connect(self.maybe_new_section)
-        self.gui.ui.action_confirm_section.triggered.connect(self._on_confirm_new_section)
-        self.gui.ui.action_cancel_section.triggered.connect(self._on_cancel_new_section)
+        self.gui.ui.action_create_new_section.toggled.connect(self._on_create_new_section)
+        self.gui.dock_sections.btn_confirm.clicked.connect(self._on_confirm_section)
+        self.gui.dock_sections.btn_cancel.clicked.connect(self._on_cancel_section)
         self.gui.ui.action_show_section_overview.toggled.connect(self.plot.update_regions)
 
         self.gui.ui.action_toggle_auto_scaling.toggled.connect(self.plot.toggle_auto_scaling)
 
-        self.gui.dock_sections.list_view.sig_delete_current_item.connect(self.delete_section)
+        self.gui.dock_sections.list_view.sig_delete_item.connect(self.delete_section)
         self.gui.dock_sections.list_view.sig_show_summary.connect(self.show_section_summary)
         self.gui.ui.action_mark_section_done.triggered.connect(self._lock_section)
         self.gui.ui.action_unlock_section.triggered.connect(self._unlock_section)
 
-        self.gui.dock_parameters.ui.sig_run_filter.connect(self.filter_active_signal)
-        self.gui.dock_parameters.ui.sig_run_pipeline.connect(self.run_preprocess_pipeline)
-        self.gui.dock_parameters.ui.sig_run_standardization.connect(self.standardize_active_signal)
-        self.gui.dock_parameters.ui.sig_reset_data.connect(self.restore_original_signal)
-        self.gui.dock_parameters.ui.sig_run_peak_detection.connect(self.run_peak_detection_worker)
-        self.gui.dock_parameters.ui.sig_clear_peaks.connect(self.clear_peaks)
+        self.gui.dock_parameters.ui.sig_run_filter.connect(self._on_sig_run_filter)
+        self.gui.dock_parameters.ui.sig_run_pipeline.connect(self._on_sig_run_pipeline)
+        self.gui.dock_parameters.ui.sig_run_standardization.connect(self._on_sig_run_standardization)
+        self.gui.dock_parameters.ui.sig_reset_data.connect(self._on_sig_reset_data)
+        self.gui.dock_parameters.ui.sig_run_peak_detection.connect(self._on_sig_run_peak_detection)
+        self.gui.dock_parameters.ui.sig_clear_peaks.connect(self._on_sig_clear_peaks)
 
-        self.gui.ui.action_find_peaks_in_selection.triggered.connect(self.find_peaks_in_selection)
+        self.gui.ui.action_find_peaks_in_selection.triggered.connect(self._on_find_peaks_in_selection)
         self.gui.ui.action_remove_peaks_in_selection.triggered.connect(self.plot.remove_peaks_in_selection)
 
-        self.plot.sig_scatter_data_changed.connect(self.handle_peak_edit)
-        self.plot.sig_section_clicked.connect(self.set_active_section_from_int)
+        self.plot.sig_scatter_data_changed.connect(self._on_sig_scatter_data_changed)
+        self.plot.sig_section_clicked.connect(self._on_sig_section_clicked)
+
+    #### Event handlers ==========
 
     @QtCore.Slot()
-    def show_user_guide(self) -> None:
+    def _on_show_user_guide(self) -> None:
         self.help.show_page("index.html")
 
     @QtCore.Slot()
-    def _on_action_show_settings(self) -> None:
+    def _on_show_settings(self) -> None:
         snapshot = qconfig.create_snapshot()
 
-        settings_dlg = qconfig.create_editor(self.gui, exclude=["InternalConfig"])
+        settings_dlg = qconfig.create_editor(self.gui, exclude=["Internal"])
         settings_dlg.accepted.connect(self.apply_settings)
         settings_dlg.rejected.connect(lambda: qconfig.restore_snapshot(snapshot))
         settings_dlg.open()
 
     @QtCore.Slot()
-    def clear_peaks(self) -> None:
+    def _on_sig_clear_peaks(self) -> None:
         self.plot.clear_peaks()
         self.data.active_section.reset_peaks()
 
     @QtCore.Slot()
-    def find_peaks_in_selection(self) -> None:
+    def _on_find_peaks_in_selection(self) -> None:
         rect = self.plot.get_selection_area()
         if rect is None or self.plot.block_clicks:
             self.plot.remove_selection_rect()
@@ -216,13 +218,13 @@ class SVApp(QtCore.QObject):
         self.sig_peaks_updated.emit()
 
     @QtCore.Slot(str, object)
-    def handle_peak_edit(self, action: UpdatePeaksAction, indices: npt.NDArray[np.intp]) -> None:
+    def _on_sig_scatter_data_changed(self, action: UpdatePeaksAction, indices: npt.NDArray[np.intp]) -> None:
         rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
         self.data.active_section.update_peaks(action, indices, rr_params=rolling_rate_kwargs)
         self.sig_peaks_updated.emit()
 
     @QtCore.Slot()
-    def refresh_peak_data(self) -> None:
+    def _on_sig_peaks_updated(self) -> None:
         cas = self.data.active_section
         pos = cas.get_peak_pos()
         self.plot.set_peak_data(pos.get_column(SECTION_INDEX_COL), pos.get_column(cas.processed_signal_name))
@@ -242,26 +244,26 @@ class SVApp(QtCore.QObject):
         self.gui.dock_parameters.ui.ui.status_standardization.setChecked(self.data.active_section.is_standardized)
 
     @QtCore.Slot(dict)
-    def filter_active_signal(self, filter_params: SignalFilterKwargs) -> None:
+    def _on_sig_run_filter(self, filter_params: SignalFilterKwargs) -> None:
         self.data.active_section.filter_signal(pipeline=None, **filter_params)
         self.refresh_plot_data()
 
     @QtCore.Slot()
-    def restore_original_signal(self) -> None:
+    def _on_sig_reset_data(self) -> None:
         self.data.active_section.reset_signal()
         self.refresh_plot_data()
         self.plot.clear_peaks()
         self.update_status_indicators()
 
     @QtCore.Slot(object)
-    def run_preprocess_pipeline(self, pipeline: PreprocessPipeline) -> None:
+    def _on_sig_run_pipeline(self, pipeline: PreprocessPipeline) -> None:
         if pipeline not in PreprocessPipeline:
             return
         self.data.active_section.filter_signal(pipeline)
         self.refresh_plot_data()
 
     @QtCore.Slot(dict)
-    def standardize_active_signal(self, standardization_params: SignalStandardizeKwargs) -> None:
+    def _on_sig_run_standardization(self, standardization_params: SignalStandardizeKwargs) -> None:
         method = standardization_params.pop("method")
         window_size = standardization_params.pop("window_size")
         robust = method == StandardizationMethod.ZScoreRobust
@@ -273,14 +275,13 @@ class SVApp(QtCore.QObject):
         self.update_status_indicators()
 
     @QtCore.Slot(enum.StrEnum, dict)
-    def run_peak_detection_worker(
+    def _on_sig_run_peak_detection(
         self, method: PeakDetectionAlgorithm, params: PeakDetectionAlgorithmParameters
     ) -> None:
         rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
         worker = PeakDetectionWorker(self.data.active_section, method, params, rr_params=rolling_rate_kwargs)
-        worker.signals.sig_success.connect(self.refresh_peak_data)
+        worker.signals.sig_success.connect(self._on_sig_peaks_updated)
         worker.signals.sig_finished.connect(self._on_worker_finished)
-        # worker.signals.sig_failed.connect(self.gui.ui.sb_progress.error)
         self._on_worker_started("Detecting peaks...")
         self.thread_pool.start(worker)
 
@@ -322,7 +323,7 @@ class SVApp(QtCore.QObject):
         safe_multi_disconnect(sender, signal_slot_pairs)
 
     @QtCore.Slot(bool)
-    def maybe_new_section(self, checked: bool) -> None:
+    def _on_create_new_section(self, checked: bool) -> None:
         self.gui.show_section_confirm_cancel(checked)
         if not checked:
             self.plot.hide_region_selector()
@@ -331,7 +332,7 @@ class SVApp(QtCore.QObject):
         self.plot.show_region_selector(bounds)
 
     @QtCore.Slot()
-    def _on_confirm_new_section(self) -> None:
+    def _on_confirm_section(self) -> None:
         if self.plot.region_selector is None:
             return
         if not self.plot.region_selector.isVisible():
@@ -344,7 +345,7 @@ class SVApp(QtCore.QObject):
         self.plot.mark_region(start, stop)
 
     @QtCore.Slot()
-    def _on_cancel_new_section(self) -> None:
+    def _on_cancel_section(self) -> None:
         self.plot.hide_region_selector()
         self.gui.show_section_confirm_cancel(False)
         self.gui.ui.action_create_new_section.setChecked(False)
@@ -394,13 +395,12 @@ class SVApp(QtCore.QObject):
             self.update_result_views()
 
     @QtCore.Slot(int)
-    def set_active_section_from_int(self, index: int) -> None:
+    def _on_sig_section_clicked(self, index: int) -> None:
         self.data.set_active_section(self.data.sections.index(index))
         self.gui.dock_sections.list_view.setCurrentIndex(self.data.sections.index(index))
 
     @QtCore.Slot()
     def refresh_data_view(self) -> None:
-        # TODO: Make this generic so any table view can be connected to this slot
         self.data.active_section_model.set_df(self.data.active_section.data)
 
     @QtCore.Slot(dict)
@@ -503,7 +503,7 @@ class SVApp(QtCore.QObject):
         self.gui.data_tree_widget_additional_metadata.clear()
 
     @QtCore.Slot()
-    def open_file(self) -> None:
+    def _on_open_file(self) -> None:
         default_data_dir = Config.internal.last_input_dir
         file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self.gui,
@@ -512,6 +512,7 @@ class SVApp(QtCore.QObject):
             filter="Supported Files (*.csv *.txt *.tsv *.xls *.xlsx *.feather *.edf)",
         )
         if not file_path:
+            logger.info("File selection cancelled by user.")
             return
 
         self.close_file()
@@ -520,7 +521,9 @@ class SVApp(QtCore.QObject):
         self._on_file_opened(file_path)
 
     def _on_file_opened(self, file_path: str) -> None:
-        self.gui.ui.line_edit_active_file.setText(Path(file_path).name)
+        fname = Path(file_path).name
+        self.gui.ui.line_edit_active_file.setText(fname)
+        self.gui.setWindowTitle(f"SignalViewer - {fname}")
 
         self.gui.ui.action_close_file.setEnabled(True)
         self.gui.ui.action_edit_metadata.setEnabled(True)
@@ -533,14 +536,14 @@ class SVApp(QtCore.QObject):
         self.gui.ui.table_view_result_rate.setModel(self.data.result_model_rate)
 
         self._set_column_models()
-        self.recent_files.add_file(file_path)
+        self.recent_data_files.add_file(file_path)
         self.gui.switch_to(self.gui.ui.tab_import)
 
         logger.info(f"Opened file: {file_path}")
 
     @QtCore.Slot(QtCore.QModelIndex)
     def _open_recent_file(self, index: QtCore.QModelIndex) -> None:
-        file_path = self.recent_files.data(index, QtCore.Qt.ItemDataRole.UserRole)
+        file_path = self.recent_data_files.data(index, QtCore.Qt.ItemDataRole.UserRole)
         self.close_file()
         self._on_file_opened(file_path)
 
@@ -605,6 +608,7 @@ class SVApp(QtCore.QObject):
         self.gui.dialog_meta.spin_box_sampling_rate.setEnabled(True)
         self.gui.dialog_meta.combo_box_signal_column.setEnabled(True)
         self.gui.dialog_meta.combo_box_info_column.setEnabled(True)
+        self.gui.setWindowTitle("SignalViewer")
 
         logger.info("Closed file")
 

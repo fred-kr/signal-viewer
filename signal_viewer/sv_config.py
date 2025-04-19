@@ -15,36 +15,8 @@ from signal_viewer.utils import get_app_dir, search_enum
 app_dir = get_app_dir()
 
 
-@qconfig.config
+@qconfig.config(group_name="Plot")
 class PlotConfig:
-    # background_color: QtGui.QColor = attrs.field(
-    #     default=QtGui.QColor("#000000"),
-    #     converter=make_qcolor,
-    #     metadata={
-    #         "editor": qconfig.EditorWidgetInfo(
-    #             label="Background Color",
-    #             widget_factory=functools.partial(ColorPickerButton, color=QtGui.QColor("#000000")),
-    #             sig_value_changed="sig_color_changed",
-    #             set_value_method="set_color",
-    #         ),
-    #         "description": "Plot background color.",
-    #         qconfig.QTYPE_KEY: QtGui.QColor,
-    #     },
-    # )
-    # foreground_color: QtGui.QColor = attrs.field(
-    #     default=QtGui.QColor("#969696"),
-    #     converter=make_qcolor,
-    #     metadata={
-    #         "editor": qconfig.EditorWidgetInfo(
-    #             label="Foreground Color",
-    #             widget_factory=functools.partial(ColorPickerButton, color=QtGui.QColor("#969696")),
-    #             sig_value_changed="sig_color_changed",
-    #             set_value_method="set_color",
-    #         ),
-    #         "description": "Plot foreground color.",
-    #         qconfig.QTYPE_KEY: QtGui.QColor,
-    #     },
-    # )
     line_click_width: int = attrs.field(
         default=70,
         converter=int,
@@ -56,6 +28,7 @@ class PlotConfig:
                 maximum=1_000,
                 singleStep=1,
                 suffix=" px",
+                hasFrame=True,
             ),
             "description": "The width in pixels orthogonal to the curve that will respond to a mouse click.",
         },
@@ -70,17 +43,21 @@ class PlotConfig:
                 minimum=0,
                 maximum=1_000,
                 singleStep=1,
-                suffix=" samples",
+                suffix=" px",
+                hasFrame=True,
             ),
-            "description": "The radius in pixels around a click that will be searched for an extreme point when manually adding peaks / valleys.",
+            "description": (
+                "The radius in pixels around a click that will be searched for an extreme point when\n"
+                "manually adding peaks / valleys."
+            ),
         },
     )
 
 
-plot: PlotConfig = qconfig.get_config("PlotConfig")
+plot: PlotConfig = qconfig.get_config("Plot")
 
 
-@qconfig.config
+@qconfig.config(group_name="Processing")
 class EditingConfig:
     filter_stacking: bool = attrs.field(
         default=False,
@@ -110,10 +87,10 @@ class EditingConfig:
     )
 
 
-editing: EditingConfig = qconfig.get_config("EditingConfig")
+editing: EditingConfig = qconfig.get_config("Processing")
 
 
-@qconfig.config
+@qconfig.config(group_name="Data")
 class DataConfig:
     float_precision: int = attrs.field(
         default=3,
@@ -144,10 +121,10 @@ class DataConfig:
     )
 
 
-data: DataConfig = qconfig.get_config("DataConfig")
+data: DataConfig = qconfig.get_config("Data")
 
 
-@qconfig.config
+@qconfig.config(group_name="Internal")
 class InternalConfig:
     last_input_dir: str = attrs.field(
         default=app_dir,
@@ -172,6 +149,12 @@ class InternalConfig:
         factory=list,
         metadata={
             "description": "List of recently opened files.",
+        },
+    )
+    recent_annotation_files: list[str] = attrs.field(
+        factory=list,
+        metadata={
+            "description": "List of recently opened annotation files.",
         },
     )
     last_signal_column: str = attrs.field(
@@ -200,7 +183,7 @@ class InternalConfig:
     )
 
 
-internal: InternalConfig = qconfig.get_config("InternalConfig")
+internal: InternalConfig = qconfig.get_config("Internal")
 
 
 class Config(NamedTuple):

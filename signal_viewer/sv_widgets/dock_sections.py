@@ -4,7 +4,7 @@ from signal_viewer.utils import set_font
 
 
 class SectionListView(QtWidgets.QListView):
-    sig_delete_current_item = QtCore.Signal(QtCore.QModelIndex)
+    sig_delete_item = QtCore.Signal(QtCore.QModelIndex)
     sig_show_summary = QtCore.Signal(QtCore.QModelIndex)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
@@ -22,17 +22,21 @@ class SectionListView(QtWidgets.QListView):
         QtWidgets.QWidget.mousePressEvent(self, event)
 
     @QtCore.Slot()
-    def emit_delete_current_request(self) -> None:
-        index = self.currentIndex()
-        self.sig_delete_current_item.emit(index)
+    def emit_sig_delete_item(self) -> None:
+        """
+        Emit `sig_delete_item` signal with the current (selected) item index
+        """
+        self.sig_delete_item.emit(self.currentIndex())
 
     @QtCore.Slot()
-    def emit_show_summary_request(self) -> None:
-        index = self.currentIndex()
-        self.sig_show_summary.emit(index)
+    def emit_sig_show_summary(self) -> None:
+        """
+        Emit `sig_show_summary` signal with the current (selected) item index
+        """
+        self.sig_show_summary.emit(self.currentIndex())
 
 
-class SectionListWidget(QtWidgets.QWidget):
+class SectionsWidget(QtWidgets.QWidget):
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
 
@@ -46,34 +50,34 @@ class SectionListWidget(QtWidgets.QWidget):
         self.btn_confirm = QtWidgets.QPushButton("Confirm")
         self.btn_cancel = QtWidgets.QPushButton("Cancel")
 
-        l_btn_container = QtWidgets.QHBoxLayout()
-        l_btn_container.setContentsMargins(0, 0, 0, 0)
-        l_btn_container.addWidget(self.btn_confirm)
-        l_btn_container.addWidget(self.btn_cancel)
+        btns_layout = QtWidgets.QHBoxLayout()
+        btns_layout.setContentsMargins(0, 0, 0, 0)
+        btns_layout.addWidget(self.btn_confirm)
+        btns_layout.addWidget(self.btn_cancel)
         self.btn_container = QtWidgets.QWidget()
-        self.btn_container.setLayout(l_btn_container)
+        self.btn_container.setLayout(btns_layout)
         layout.addWidget(self.btn_container)
 
         self.label_active_section = QtWidgets.QLabel("Active Section:")
         set_font(self.label_active_section, font_size=14, weight=QtGui.QFont.Weight.DemiBold)
         layout.addWidget(self.label_active_section)
 
-        self.section_list = SectionListView()
-        layout.addWidget(self.section_list)
+        self.section_list_view = SectionListView()
+        layout.addWidget(self.section_list_view)
 
         self.setLayout(layout)
 
 
-class SectionListDock(QtWidgets.QDockWidget):
+class SectionsDock(QtWidgets.QDockWidget):
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
         self.setVisible(False)
-        self.setObjectName("SectionListDock")
-        self.setWindowTitle("Section List")
-        self.setWindowIcon(QtGui.QIcon("://icons/fancy_icon2.png"))
+        self.setObjectName("SectionsDock")
+        self.setWindowTitle("Sections")
+        self.setWindowIcon(QtGui.QIcon("://icons/app_icon.png"))
 
-        self._widget = SectionListWidget()
-        self.list_view = self._widget.section_list
+        self._widget = SectionsWidget()
+        self.list_view = self._widget.section_list_view
         self.command_bar = self._widget.command_bar_section_list
         self.label_active_section = self._widget.label_active_section
         self.btn_confirm = self._widget.btn_confirm

@@ -21,6 +21,7 @@ def gui() -> None:
         logger.add(sys.stderr, colorize=True, backtrace=True, diagnose=True)
         logger.add("debug.log")
         app_name = "SignalViewer - Debug"
+        os.environ["QT_LOGGING_RULES"] = "qt.pyside.libpyside.warning=true" # shows missing slot decorator warnings
     else:
         app_name = "SignalViewer"
     org_name = "QuackTech"

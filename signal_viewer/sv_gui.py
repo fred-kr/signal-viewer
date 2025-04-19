@@ -14,7 +14,7 @@ from signal_viewer.sv_config import Config
 from signal_viewer.sv_widgets.dlg_metadata import MetadataDialog
 from signal_viewer.sv_widgets.dock_log_window import StatusMessageDock
 from signal_viewer.sv_widgets.dock_param_inputs import InputsDock
-from signal_viewer.sv_widgets.dock_sections import SectionListDock
+from signal_viewer.sv_widgets.dock_sections import SectionsDock
 from signal_viewer.type_defs import LogRecordDict, SectionSummaryDict
 from signal_viewer.utils import get_app
 
@@ -23,9 +23,8 @@ if TYPE_CHECKING:
 
 
 class SVGUI(QtWidgets.QMainWindow):
-    sig_metadata_changed = QtCore.Signal(dict)
-    sig_table_refresh_requested = QtCore.Signal()
-    sig_export_requested = QtCore.Signal(str)
+    sig_refresh_table = QtCore.Signal()
+    sig_export_result = QtCore.Signal(str)
 
     def __init__(self, sv_app: "SVApp", version: str = "0.0.0") -> None:
         super().__init__()
@@ -53,7 +52,7 @@ class SVGUI(QtWidgets.QMainWindow):
 
     def _setup_window(self) -> None:
         self.setWindowTitle("SignalViewer")
-        self.setWindowIcon(QtGui.QIcon("://icons/fancy_icon2.png"))
+        self.setWindowIcon(QtGui.QIcon("://icons/app_icon.png"))
 
         desktop = QtWidgets.QApplication.primaryScreen().availableGeometry()
         w, h = desktop.width(), desktop.height()
@@ -95,7 +94,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dialog_meta.container_additional_metadata.setLayout(layout)
         self.data_tree_widget_additional_metadata = data_tree_widget
 
-        self.ui.btn_export_all_results.clicked.connect(lambda: self.sig_export_requested.emit("hdf5"))
+        self.ui.btn_export_all_results.clicked.connect(lambda: self.sig_export_result.emit("hdf5"))
 
         self.ui.tab_widget_main.setCurrentIndex(0)
 
@@ -106,7 +105,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.addDockWidget(dwa.BottomDockWidgetArea, dock_status)
         self.dock_status_log = dock_status
 
-        dock_sections = SectionListDock()
+        dock_sections = SectionsDock()
         self.addDockWidget(dwa.RightDockWidgetArea, dock_sections)
         self.dock_sections = dock_sections
         self.dock_sections.setEnabled(False)
@@ -172,8 +171,8 @@ class SVGUI(QtWidgets.QMainWindow):
 
         self.command_bar_section_list = self.dock_sections.command_bar
 
-        self.ui.action_remove_section.triggered.connect(self.dock_sections.list_view.emit_delete_current_request)
-        self.action_show_section_summary.triggered.connect(self.dock_sections.list_view.emit_show_summary_request)
+        self.ui.action_remove_section.triggered.connect(self.dock_sections.list_view.emit_sig_delete_item)
+        self.action_show_section_summary.triggered.connect(self.dock_sections.list_view.emit_sig_show_summary)
         self.dock_sections.list_view.customContextMenuRequested.connect(self.show_section_list_context_menu)
 
     def _setup_toolbar(self, name: str, actions: list[QtGui.QAction], movable: bool = False) -> QtWidgets.QToolBar:
@@ -243,13 +242,13 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dialog_meta.combo_box_signal_column.currentTextChanged.connect(self._on_dialog_signal_column_changed)
 
         self.dock_status_log.log_text_box.sig_log_message.connect(self.maybe_show_error_dialog)
-        self.dock_sections.btn_confirm.clicked.connect(self.ui.action_confirm_section.trigger)
-        self.dock_sections.btn_cancel.clicked.connect(self.ui.action_cancel_section.trigger)
+        # self.dock_sections.btn_confirm.clicked.connect(self.ui.action_confirm_section.trigger)
+        # self.dock_sections.btn_cancel.clicked.connect(self.ui.action_cancel_section.trigger)
 
-        self.action_export_to_csv.triggered.connect(lambda: self.sig_export_requested.emit("csv"))
-        self.action_export_to_xlsx.triggered.connect(lambda: self.sig_export_requested.emit("xlsx"))
-        self.ui.btn_export_to_excel.clicked.connect(lambda: self.sig_export_requested.emit("xlsx"))
-        self.action_export_to_hdf5.triggered.connect(lambda: self.sig_export_requested.emit("hdf5"))
+        self.action_export_to_csv.triggered.connect(lambda: self.sig_export_result.emit("csv"))
+        self.action_export_to_xlsx.triggered.connect(lambda: self.sig_export_result.emit("xlsx"))
+        self.ui.btn_export_to_excel.clicked.connect(lambda: self.sig_export_result.emit("xlsx"))
+        self.action_export_to_hdf5.triggered.connect(lambda: self.sig_export_result.emit("hdf5"))
 
     @QtCore.Slot(int)
     def _on_dialog_sampling_rate_changed(self, value: int) -> None:
@@ -278,7 +277,7 @@ class SVGUI(QtWidgets.QMainWindow):
     def show_data_view_context_menu(self, pos: QtCore.QPoint) -> None:
         menu = QtWidgets.QMenu(parent=self.ui.table_view_import_data)
         action = QtGui.QAction(QtGui.QIcon("://icons/ArrowSync"), "Refresh", self.ui.table_view_import_data)
-        action.triggered.connect(self.sig_table_refresh_requested.emit)
+        action.triggered.connect(self.sig_refresh_table.emit)
         menu.addAction(action)
         menu.exec(QtGui.QCursor.pos())
 
