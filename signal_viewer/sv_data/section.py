@@ -26,7 +26,7 @@ from signal_viewer.type_defs import (
     ManualPeakEditsDict,
     PeakDetectionAlgorithmParameters,
     ProcessingParametersDict,
-    RollingRateKwargsDict,
+    RollingRateKwargs,
     SectionMetadataDict,
     SectionResultDict,
     SectionSummaryDict,
@@ -455,7 +455,7 @@ class Section:
         method: PeakDetectionAlgorithm,
         method_parameters: PeakDetectionAlgorithmParameters,
         *,
-        rr_params: RollingRateKwargsDict | None = None,
+        rr_params: RollingRateKwargs | None = None,
     ) -> None:
         """
         Find peaks in the processed signal using the specified method and parameters.
@@ -484,7 +484,7 @@ class Section:
         peaks: npt.NDArray[np.intp],
         update_rate: bool = True,
         *,
-        rr_params: RollingRateKwargsDict | None = None,
+        rr_params: RollingRateKwargs | None = None,
     ) -> None:
         """
         Sets the `is_peak` column in `self.data` to 1 at the indices provided in `peaks`, and to 0
@@ -520,7 +520,7 @@ class Section:
         peaks: npt.NDArray[np.intp],
         update_rate: bool = True,
         *,
-        rr_params: RollingRateKwargsDict | None = None,
+        rr_params: RollingRateKwargs | None = None,
     ) -> None:
         """
         Updates the `is_peak` column in `self.data` at the given indices according to the provided
@@ -569,7 +569,7 @@ class Section:
             self.update_rate_data(rr_params=rr_params)
 
     def update_rate_data(
-        self, full_info: bool = False, force: bool = False, *, rr_params: RollingRateKwargsDict | None = None
+        self, full_info: bool = False, force: bool = False, *, rr_params: RollingRateKwargs | None = None
     ) -> None:
         """
         Recalculates the signal rate based on the current peaks.
@@ -752,7 +752,7 @@ class Section:
             .collect()
         )
 
-    def lock_result(self, *, rr_params: RollingRateKwargsDict | None = None) -> None:
+    def lock_result(self, *, rr_params: RollingRateKwargs | None = None) -> None:
         self.update_peak_data(include_global=True, include_info=True)
         self.update_rate_data(full_info=True, force=True, rr_params=rr_params)
         self.set_locked(True)

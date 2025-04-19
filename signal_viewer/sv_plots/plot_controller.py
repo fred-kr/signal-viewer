@@ -111,35 +111,6 @@ class PlotController(QtCore.QObject):
         self.signal_curve.setParent(None)
         self.signal_curve = None
 
-    def _setup_region_selector(self) -> None:
-        brush_col = SVGColors.LimeGreen.qcolor()
-        hover_brush_col = brush_col
-        hover_brush_col.setAlpha(90)
-
-        brush = make_qbrush(brush_col)
-        line_pen = make_qpen(SVGColors.DarkGreen, width=3)
-
-        hover_brush = make_qbrush(hover_brush_col)
-        hover_pen = make_qpen(SVGColors.GreenYellow, width=5)
-        self.region_selector = pg.LinearRegionItem(
-            brush=brush,
-            pen=line_pen,
-            hoverBrush=hover_brush,
-            hoverPen=hover_pen,
-        )
-        self.region_selector.setVisible(False)
-        self.region_selector.setZValue(1e3)
-        for line in self.region_selector.lines:
-            line.addMarker("<|>", position=0.5, size=15)
-
-        self.pw_main.addItem(self.region_selector)
-
-    def _remove_region_selector(self) -> None:
-        if self.region_selector:
-            self.pw_main.removeItem(self.region_selector)
-            self.region_selector.setParent(None)
-            self.region_selector = None
-
     def _setup_peak_scatter(self) -> None:
         brush = make_qbrush(SVGColors.GoldenRod)
         hover_brush = make_qbrush(SVGColors.Red)
@@ -190,6 +161,35 @@ class PlotController(QtCore.QObject):
         self.rate_curve.setParent(None)
         self.rate_curve = None
 
+    def _setup_region_selector(self) -> None:
+        brush_col = SVGColors.LimeGreen.qcolor()
+        hover_brush_col = brush_col
+        hover_brush_col.setAlpha(90)
+
+        brush = make_qbrush(brush_col)
+        line_pen = make_qpen(SVGColors.DarkGreen, width=3)
+
+        hover_brush = make_qbrush(hover_brush_col)
+        hover_pen = make_qpen(SVGColors.GreenYellow, width=5)
+        self.region_selector = pg.LinearRegionItem(
+            brush=brush,
+            pen=line_pen,
+            hoverBrush=hover_brush,
+            hoverPen=hover_pen,
+        )
+        self.region_selector.setVisible(False)
+        self.region_selector.setZValue(1e3)
+        for line in self.region_selector.lines:
+            line.addMarker("<|>", position=0.5, size=15)
+
+        self.pw_main.addItem(self.region_selector)
+
+    def _remove_region_selector(self) -> None:
+        if self.region_selector:
+            self.pw_main.removeItem(self.region_selector)
+            self.region_selector.setParent(None)
+            self.region_selector = None
+
     @QtCore.Slot(int)
     def update_time_axis_scale(self, sampling_rate: int) -> None:
         if sampling_rate == 0:
@@ -201,6 +201,14 @@ class PlotController(QtCore.QObject):
 
     @QtCore.Slot(object)
     def set_view_limits(self, plt_data_item: pg.PlotDataItem) -> None:
+        """
+        Sets the plot view limits to fit the data.
+
+        Parameters
+        ----------
+        plt_data_item : pg.PlotDataItem
+            The plot data item used to determine the view limits.
+        """
         if plt_data_item.xData is None or plt_data_item.xData.size == 0:
             return
         len_data = plt_data_item.xData.size

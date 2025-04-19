@@ -29,7 +29,7 @@ from signal_viewer.sv_plots.plot_controller import PlotController
 from signal_viewer.type_defs import (
     MetadataDict,
     PeakDetectionAlgorithmParameters,
-    RollingRateKwargsDict,
+    RollingRateKwargs,
     SignalFilterKwargs,
     SignalStandardizeKwargs,
     UpdatePeaksAction,
@@ -54,7 +54,7 @@ class PeakDetectionWorker(QtCore.QRunnable):
         method: PeakDetectionAlgorithm,
         method_parameters: PeakDetectionAlgorithmParameters,
         *,
-        rr_params: RollingRateKwargsDict | None = None,
+        rr_params: RollingRateKwargs | None = None,
     ) -> None:
         super().__init__()
         self.section = section
@@ -76,7 +76,7 @@ class PeakDetectionWorker(QtCore.QRunnable):
 
 
 class SectionResultWorker(QtCore.QRunnable):
-    def __init__(self, section: "Section", *, rr_params: RollingRateKwargsDict | None = None) -> None:
+    def __init__(self, section: "Section", *, rr_params: RollingRateKwargs | None = None) -> None:
         super().__init__()
         self.section = section
         self.rr_params = rr_params

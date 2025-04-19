@@ -199,7 +199,7 @@ class LogRecordDict(TypedDict):
     time: datetime.datetime
 
 
-class RollingRateKwargsDict(TypedDict, total=False):
+class RollingRateKwargs(TypedDict, total=False):
     sec_new_window_every: int
     sec_window_length: int
     incomplete_window_method: IncompleteWindowMethod

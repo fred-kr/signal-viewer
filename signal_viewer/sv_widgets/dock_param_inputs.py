@@ -24,7 +24,7 @@ from signal_viewer.type_defs import (
     PeaksLocalMaxima,
     PeaksLocalMinima,
     PeaksPPGElgendi,
-    RollingRateKwargsDict,
+    RollingRateKwargs,
     SignalFilterKwargs,
     SignalStandardizeKwargs,
 )
@@ -62,7 +62,7 @@ def _setup_spinbox(
     _restore_default(dec_sb)
 
 
-def _set_tooltip(obj: object) -> str:
+def _get_docstring(obj: object) -> str:
     return inspect.getdoc(obj) or ""
 
 
@@ -80,8 +80,8 @@ class ParameterInputs(QtWidgets.QWidget):
         self.ui = Ui_containerParamInputs()
         self.ui.setupUi(self)
 
-        self.setup_actions()
-        self.finish_setup()
+        self._setup_actions()
+        self._setup_widgets()
         self._on_peak_method_changed(0)
 
     @property
@@ -101,7 +101,7 @@ class ParameterInputs(QtWidgets.QWidget):
             self.ui.std_window_size,
         ]
 
-    def setup_actions(self) -> None:
+    def _setup_actions(self) -> None:
         # Signal Filter
         self.action_sf_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Process Signal", self)
         self.action_sf_run.setToolTip("Apply the selected processing steps to the signal data.")
@@ -125,7 +125,7 @@ class ParameterInputs(QtWidgets.QWidget):
         self.action_peak_reset_data.setToolTip("Remove all peaks. Does not reset the signal data.")
         self.action_peak_reset_data.triggered.connect(self.clear_peaks)
 
-    def finish_setup(self) -> None:
+    def _setup_widgets(self) -> None:
         # Signal Filter
         self.ui.sf_pipeline.setAllowNone(True)
         self.ui.sf_pipeline.set_enum_class(PreprocessPipeline)
@@ -163,7 +163,7 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.std_window_size, 5, 999_999, 2, 100, 0)
 
         # Peak Detection
-        self.ui.peak_method.set_enum_class(PeakDetectionAlgorithm, doc_data=_set_tooltip)
+        self.ui.peak_method.set_enum_class(PeakDetectionAlgorithm, doc_data=_get_docstring)
         self.ui.peak_method.currentIndexChanged.connect(self._on_peak_method_changed)
 
         self.ui.peak_xqrs_direction.set_enum_class(WFDBPeakDirection)
@@ -423,12 +423,12 @@ class ParameterInputs(QtWidgets.QWidget):
 
         return peak_params
 
-    def get_rate_params(self) -> RollingRateKwargsDict:
-        return {
-            "sec_new_window_every": self.ui.rate_every.intValue(),
-            "sec_window_length": self.ui.rate_period.intValue(),
-            "incomplete_window_method": IncompleteWindowMethod(self.ui.rate_handle_incomplete.currentData()),
-        }
+    def get_rate_params(self) -> RollingRateKwargs:
+        return RollingRateKwargs(
+            sec_new_window_every=self.ui.rate_every.intValue(),
+            sec_window_length=self.ui.rate_period.intValue(),
+            incomplete_window_method=IncompleteWindowMethod(self.ui.rate_handle_incomplete.currentData()),
+        )
 
 
 class InputsDock(QtWidgets.QDockWidget):
