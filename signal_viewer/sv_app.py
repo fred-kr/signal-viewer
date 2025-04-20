@@ -21,7 +21,7 @@ from signal_viewer.enum_defs import (
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_controller import DataController
 from signal_viewer.sv_data.data_models import FileListModel
-from signal_viewer.sv_data.file_io import write_hdf5
+from signal_viewer.sv_data.file_io import read_annotation_file, write_hdf5
 from signal_viewer.sv_data.peak_detection import find_peaks
 from signal_viewer.sv_gui import SVGUI
 from signal_viewer.sv_help import HelpController
@@ -122,6 +122,7 @@ class SVApp(QtCore.QObject):
 
         self.gui.ui.action_show_settings.triggered.connect(self._on_show_settings)
         self.gui.ui.action_open_file.triggered.connect(self._on_open_file)
+        self.gui.ui.action_open_annotation_file.triggered.connect(self._load_annotations)
         self.gui.ui.action_edit_metadata.triggered.connect(lambda: self.show_metadata_dialog([]))
         self.gui.ui.action_about_qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self.gui.ui.action_close_file.triggered.connect(self.close_file)
@@ -167,6 +168,16 @@ class SVApp(QtCore.QObject):
         self.plot.sig_section_clicked.connect(self._on_sig_section_clicked)
 
     #### Event handlers ==========
+
+    @QtCore.Slot()
+    def _load_annotations(self) -> None:
+        file, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self.gui, "Open Annotation File", "", filter="Annotation Files (*.txt)"
+        )
+        if not file:
+            return
+        self.gui.ui.table_annotations.setData(read_annotation_file(Path(file), self.data.active_section.sampling_rate))
+        self.recent_annotations_files.add_file(file)
 
     @QtCore.Slot()
     def _on_show_user_guide(self) -> None:

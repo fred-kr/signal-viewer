@@ -21,9 +21,10 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QForm
     QHeaderView, QLabel, QLineEdit, QListView,
     QMainWindow, QMenu, QMenuBar, QPushButton,
     QSizePolicy, QSpacerItem, QSpinBox, QStatusBar,
-    QTabWidget, QTableView, QToolBar, QTreeView,
-    QVBoxLayout, QWidget)
+    QTabWidget, QTableView, QTableWidgetItem, QToolBar,
+    QTreeView, QVBoxLayout, QWidget)
 
+from pyqtgraph import TableWidget
 from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
 
 class Ui_MainWindow(object):
@@ -140,6 +141,9 @@ class Ui_MainWindow(object):
         icon15.addFile(u"://icons/LockOpen.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.action_unlock_section.setIcon(icon15)
         self.action_unlock_section.setMenuRole(QAction.MenuRole.NoRole)
+        self.action_open_annotation_file = QAction(MainWindow)
+        self.action_open_annotation_file.setObjectName(u"action_open_annotation_file")
+        self.action_open_annotation_file.setMenuRole(QAction.MenuRole.NoRole)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setStyleSheet(u"")
@@ -332,17 +336,10 @@ class Ui_MainWindow(object):
         self.tab_annotation_file.setObjectName(u"tab_annotation_file")
         self.verticalLayout_5 = QVBoxLayout(self.tab_annotation_file)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.tview_annotation_file = QTableView(self.tab_annotation_file)
-        self.tview_annotation_file.setObjectName(u"tview_annotation_file")
-        self.tview_annotation_file.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.tview_annotation_file.setProperty(u"showDropIndicator", False)
-        self.tview_annotation_file.setDragDropOverwriteMode(False)
-        self.tview_annotation_file.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tview_annotation_file.setWordWrap(False)
-        self.tview_annotation_file.setCornerButtonEnabled(False)
-        self.tview_annotation_file.horizontalHeader().setCascadingSectionResizes(True)
+        self.table_annotations = TableWidget(self.tab_annotation_file)
+        self.table_annotations.setObjectName(u"table_annotations")
 
-        self.verticalLayout_5.addWidget(self.tview_annotation_file)
+        self.verticalLayout_5.addWidget(self.table_annotations)
 
         self.tabwidget_data_view.addTab(self.tab_annotation_file, "")
 
@@ -495,6 +492,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menu_settings.menuAction())
         self.menubar.addAction(self.menu_help.menuAction())
         self.menu_file.addAction(self.action_open_file)
+        self.menu_file.addAction(self.action_open_annotation_file)
         self.menu_file.addAction(self.action_close_file)
         self.menu_file.addSeparator()
         self.menu_file.addAction(self.action_edit_metadata)
@@ -604,6 +602,7 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(tooltip)
         self.action_unlock_section.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Make a section marked as &quot;Done&quot; editable again.</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
+        self.action_open_annotation_file.setText(QCoreApplication.translate("MainWindow", u"Open Annotation File", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:10pt; font-weight:700;\">Recent Data Files</span></p></body></html>", None))
 #if QT_CONFIG(tooltip)
         self.lview_data_files.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Double-click on a filename to open it</p></body></html>", None))

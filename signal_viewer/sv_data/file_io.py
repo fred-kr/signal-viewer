@@ -1,7 +1,7 @@
 import datetime
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import mne.io
 import polars as pl
@@ -164,6 +164,24 @@ def read_edf(
     return out.with_row_index(offset=start)
 
 
+def read_annotation_file(
+    file_path: Path,
+    sampling_rate: int,
+    separator: str = "\t",
+    time_column: str = "time_seconds",
+    comment_column: str = "comment_text",
+) -> list[dict[str, Any]]:
+    return (
+        pl.read_csv(file_path, separator=separator)
+        .select(
+            (pl.col(time_column) * sampling_rate).cast(pl.UInt32).alias("index"),
+            pl.col(time_column),
+            pl.col(comment_column),
+        )
+        .to_dicts()
+    )
+
+
 @logger.catch
 def write_hdf5(file_path: Path, data: CompleteResultDict) -> None:
     raise NotImplementedError("Needs to be updated to work with new result structure.")
@@ -237,3 +255,96 @@ def write_hdf5(file_path: Path, data: CompleteResultDict) -> None:
     #         rate_group = h5f.create_group(processing_group, "rate_computation", "Rate Computation Method")
     #         rate_method = section_data["metadata"]["processing_parameters"]["rate_computation_method"]
     #         h5f.set_node_attr(rate_group, "method", rate_method)
+
+
+# def _read_edf(filename: str) -> tuple[dict[str, Any], pl.DataFrame]:
+#     with open(filename, "rb") as f:
+#         header_bytes = f.read(256)
+#         version = header_bytes[:8].decode().strip()
+#         patient_id = header_bytes[8:88].decode().strip()
+#         recording_id = header_bytes[88:168].decode().strip()
+#         start_date = header_bytes[168:176].decode().strip()
+#         start_time = header_bytes[176:184].decode().strip()
+#         header_bytes[184:192]
+#         num_data_records = int(header_bytes[236:244].decode().strip())
+#         record_duration = float(header_bytes[244:252].decode().strip())
+#         n_signals = int(header_bytes[252:256].decode().strip())
+
+#         labels = [f.read(16).decode().strip() for _ in range(n_signals)]
+#         transducers = [f.read(80).decode().strip() for _ in range(n_signals)]
+#         phys_dims = [f.read(8).decode().strip() for _ in range(n_signals)]
+#         phys_mins = [float(f.read(8).decode().strip()) for _ in range(n_signals)]
+#         phys_maxs = [float(f.read(8).decode().strip()) for _ in range(n_signals)]
+#         dig_mins = [int(f.read(8).decode().strip()) for _ in range(n_signals)]
+#         dig_maxs = [int(f.read(8).decode().strip()) for _ in range(n_signals)]
+#         prefilters = [f.read(80).decode().strip() for _ in range(n_signals)]
+#         samples_per_record = [int(f.read(8).decode().strip()) for _ in range(n_signals)]
+#         _ = f.read(32 * n_signals)  # reserved
+
+#         header = {
+#             "version": version,
+#             "patient_id": patient_id,
+#             "recording_id": recording_id,
+#             "start_date": start_date,
+#             "start_time": start_time,
+#             "num_data_records": num_data_records,
+#             "record_duration": record_duration,
+#             "n_signals": n_signals,
+#             "labels": labels,
+#             "transducers": transducers,
+#             "physical_dimensions": phys_dims,
+#             "physical_min": phys_mins,
+#             "physical_max": phys_maxs,
+#             "digital_min": dig_mins,
+#             "digital_max": dig_maxs,
+#             "prefiltering": prefilters,
+#             "samples_per_record": samples_per_record,
+#         }
+
+#         total_samples = sum(samples_per_record) * num_data_records
+#         all_data = []
+
+#         scaling = [(phys_maxs[i] - phys_mins[i]) / (dig_maxs[i] - dig_mins[i]) for i in range(n_signals)]
+#         offsets = [phys_mins[i] - dig_mins[i] * scaling[i] for i in range(n_signals)]
+
+#         for _ in range(num_data_records):
+#             for i in range(n_signals):
+#                 n_samp = samples_per_record[i]
+#                 raw = f.read(2 * n_samp)
+#                 fmt = "<" + "h" * n_samp
+#                 vals = struct.unpack(fmt, raw)
+#                 phys = [v * scaling[i] + offsets[i] for v in vals]
+#                 all_data.append((labels[i], phys))
+
+#         # reorganize into columns
+#         cols = {}
+#         for label, phys in all_data:
+#             cols.setdefault(label, []).extend(phys)
+
+#         df = pl.DataFrame(cols)
+#         sample_rate = sum(samples_per_record) / record_duration
+#         times = [i / sample_rate for i in range(df.height)]
+#         df = df.with_columns(pl.Series("time", times))
+
+#         return header, df
+
+
+# def _read_edf_header(fname: Path, exclude: Sequence[str] = (), infer_types: bool = True, include: Sequence[str] | None = None, exclude_after_unique: bool = False):
+#     edf_info = {}
+
+#     with open(fname, "rb") as f:
+#         f.read(8)  # version of this data format
+#         f.read(80)  # patient identification
+#         f.read(80)  # recording identification
+
+#         start_date = f.read(8).decode("latin-1")  # start date `dd.mm.yy`
+#         day, month, year = (int(x) for x in start_date.split("."))
+#         year = year + 2000 if year < 85 else year + 1900
+#         meas_date = datetime.datetime(year, month, day)
+
+#         start_time = f.read(8).decode("latin-1")  # start time `hh.mm.ss`
+#         hour, minute, second = (int(x) for x in start_time.split("."))
+#         meas_date.replace(hour=hour, minute=minute, second=second, tzinfo=datetime.timezone.utc)
+
+#         f.read(8)  # number of bytes in header record
+#         f.read(44)  # reserved

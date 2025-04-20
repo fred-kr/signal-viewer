@@ -155,7 +155,6 @@ class DataController(QtCore.QObject):
         if file_path.suffix not in InputFileFormat:
             logger.error(f"Unsupported file format: {file_path.suffix}. Allowed formats: {', '.join(InputFileFormat)}")
 
-        # last_sampling_rate = config.internal.LastSamplingRate
         last_signal_col = Config.internal.last_signal_column
         last_info_col = Config.internal.last_info_column
 
