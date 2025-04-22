@@ -31,7 +31,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1660, 937)
+        MainWindow.resize(1656, 929)
         MainWindow.setDockNestingEnabled(True)
         MainWindow.setDockOptions(QMainWindow.DockOption.AllowNestedDocks|QMainWindow.DockOption.AllowTabbedDocks|QMainWindow.DockOption.AnimatedDocks|QMainWindow.DockOption.VerticalTabs)
         self.action_open_file = QAction(MainWindow)
@@ -334,12 +334,22 @@ class Ui_MainWindow(object):
         self.tabwidget_data_view.addTab(self.tab_data_file, "")
         self.tab_annotation_file = QWidget()
         self.tab_annotation_file.setObjectName(u"tab_annotation_file")
-        self.verticalLayout_5 = QVBoxLayout(self.tab_annotation_file)
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.gridLayout_5 = QGridLayout(self.tab_annotation_file)
+        self.gridLayout_5.setObjectName(u"gridLayout_5")
+        self.cb_section_start_text = QComboBox(self.tab_annotation_file)
+        self.cb_section_start_text.setObjectName(u"cb_section_start_text")
+
+        self.gridLayout_5.addWidget(self.cb_section_start_text, 0, 0, 1, 1)
+
+        self.cb_section_stop_text = QComboBox(self.tab_annotation_file)
+        self.cb_section_stop_text.setObjectName(u"cb_section_stop_text")
+
+        self.gridLayout_5.addWidget(self.cb_section_stop_text, 0, 1, 1, 1)
+
         self.table_annotations = TableWidget(self.tab_annotation_file)
         self.table_annotations.setObjectName(u"table_annotations")
 
-        self.verticalLayout_5.addWidget(self.table_annotations)
+        self.gridLayout_5.addWidget(self.table_annotations, 1, 0, 1, 2)
 
         self.tabwidget_data_view.addTab(self.tab_annotation_file, "")
 
@@ -450,7 +460,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1660, 21))
+        self.menubar.setGeometry(QRect(0, 0, 1656, 33))
         self.menubar.setNativeMenuBar(False)
         self.menu_file = QMenu(self.menubar)
         self.menu_file.setObjectName(u"menu_file")

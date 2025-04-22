@@ -217,20 +217,20 @@ class DetailedSectionResult:
 
 class Section:
     __slots__ = (
-        "signal_name",
-        "processed_signal_name",
-        "info_name",
-        "section_id",
         "_is_filtered",
         "_is_standardized",
         "_is_processed",
-        "data",
-        "sampling_rate",
-        "global_bounds",
         "_result_data",
         "_rate_is_synced",
         "_processing_parameters",
         "_manual_peak_edits",
+        "signal_name",
+        "processed_signal_name",
+        "info_name",
+        "section_id",
+        "data",
+        "sampling_rate",
+        "global_bounds",
     )
 
     def __init__(self, data: pl.DataFrame, signal_name: str, info_column: str | None = None) -> None:

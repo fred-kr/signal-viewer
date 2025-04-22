@@ -102,6 +102,7 @@ class DataConfig:
                 minimum=0,
                 maximum=10,
                 singleStep=1,
+                hasFrame=True,
             ),
             "description": "Amount of decimal places to display when displaying data in tables.",
         },

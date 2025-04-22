@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1660</width>
-    <height>937</height>
+    <width>1656</width>
+    <height>929</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -385,8 +385,14 @@
            <attribute name="title">
             <string>Annotations</string>
            </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <item>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="0" column="0">
+             <widget class="QComboBox" name="cb_section_start_text"/>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="cb_section_stop_text"/>
+            </item>
+            <item row="1" column="0" colspan="2">
              <widget class="TableWidget" name="table_annotations"/>
             </item>
            </layout>
@@ -544,8 +550,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1660</width>
-     <height>21</height>
+     <width>1656</width>
+     <height>33</height>
     </rect>
    </property>
    <property name="nativeMenuBar">
