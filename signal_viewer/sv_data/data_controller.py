@@ -81,6 +81,8 @@ class DataController(QtCore.QObject):
             ".txt": functools.partial(pl.scan_csv, separator=self._txt_separator),
             ".tsv": functools.partial(pl.scan_csv, separator=TextFileSeparator.Tab),
             ".feather": pl.scan_ipc,
+            ".arrow": pl.scan_ipc,
+            ".ipc": pl.scan_ipc,
         }
 
     @property
@@ -165,7 +167,7 @@ class DataController(QtCore.QObject):
             sampling_rate = int(edf_info.info["sfreq"])
             column_names: list[str] = edf_info.ch_names  # type: ignore
             other_info = dict(edf_info.info)
-        elif file_path.suffix in {".feather", ".csv", ".txt", ".tsv"}:
+        elif file_path.suffix in {".feather", ".arrow", ".ipc", ".csv", ".txt", ".tsv"}:
             lf = self._reader_funcs[file_path.suffix](file_path)
             column_names = lf.collect_schema().names()
             try:
