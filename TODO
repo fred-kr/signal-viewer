@@ -1,8 +1,0 @@
-
-Todo:
-  ☐ add functionality to load comments from separate file
-  ✔ replace input widget highlighting in metadata dialog (stylesheets don't work well) @done(25-04-19 14:46)
-    set `background-color` via style sheet as that doesn't affect anythying else apparently
-  ☐ write documentation
-  ☐ try to get rid of neurokit2 dependency by reimplementing relevant functions
-  ☐ check out `polars_list_utils` package for signal processing in polars
