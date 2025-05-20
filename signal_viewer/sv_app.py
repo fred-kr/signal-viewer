@@ -154,11 +154,11 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_mark_section_done.triggered.connect(self._lock_section)
         self.gui.ui.action_unlock_section.triggered.connect(self._unlock_section)
 
-        self.gui.dock_parameters.ui.sig_run_filter.connect(self._on_sig_run_filter)
-        self.gui.dock_parameters.ui.sig_run_pipeline.connect(self._on_sig_run_pipeline)
-        self.gui.dock_parameters.ui.sig_run_standardization.connect(self._on_sig_run_standardization)
-        self.gui.dock_parameters.ui.sig_reset_data.connect(self._on_sig_reset_data)
-        self.gui.dock_parameters.ui.sig_run_peak_detection.connect(self._on_sig_run_peak_detection)
+        self.gui.dock_parameters.ui.sig_run_filter.connect(self.run_filter)
+        self.gui.dock_parameters.ui.sig_run_pipeline.connect(self.run_pipeline)
+        self.gui.dock_parameters.ui.sig_run_standardization.connect(self.run_standardization)
+        self.gui.dock_parameters.ui.sig_reset_data.connect(self.reset_signal_data)
+        self.gui.dock_parameters.ui.sig_run_peak_detection.connect(self.run_peak_detection)
         self.gui.dock_parameters.ui.sig_clear_peaks.connect(self._on_sig_clear_peaks)
 
         self.gui.ui.action_find_peaks_in_selection.triggered.connect(self._on_find_peaks_in_selection)
@@ -172,7 +172,7 @@ class SVApp(QtCore.QObject):
     @QtCore.Slot()
     def _load_annotations(self) -> None:
         file, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self.gui, "Open Annotation File", "", filter="Annotation Files (*.txt)"
+            self.gui, "Open Annotation File", "", filter="Annotation Files (*.csv)"
         )
         if not file:
             return
@@ -255,26 +255,26 @@ class SVApp(QtCore.QObject):
         self.gui.dock_parameters.ui.ui.status_standardization.setChecked(self.data.active_section.is_standardized)
 
     @QtCore.Slot(dict)
-    def _on_sig_run_filter(self, filter_params: SignalFilterKwargs) -> None:
+    def run_filter(self, filter_params: SignalFilterKwargs) -> None:
         self.data.active_section.filter_signal(pipeline=None, **filter_params)
         self.refresh_plot_data()
 
     @QtCore.Slot()
-    def _on_sig_reset_data(self) -> None:
+    def reset_signal_data(self) -> None:
         self.data.active_section.reset_signal()
         self.refresh_plot_data()
         self.plot.clear_peaks()
         self.update_status_indicators()
 
     @QtCore.Slot(object)
-    def _on_sig_run_pipeline(self, pipeline: PreprocessPipeline) -> None:
+    def run_pipeline(self, pipeline: PreprocessPipeline) -> None:
         if pipeline not in PreprocessPipeline:
             return
         self.data.active_section.filter_signal(pipeline)
         self.refresh_plot_data()
 
     @QtCore.Slot(dict)
-    def _on_sig_run_standardization(self, standardization_params: SignalStandardizeKwargs) -> None:
+    def run_standardization(self, standardization_params: SignalStandardizeKwargs) -> None:
         method = standardization_params.pop("method")
         window_size = standardization_params.pop("window_size")
         robust = method == StandardizationMethod.ZScoreRobust
@@ -286,9 +286,7 @@ class SVApp(QtCore.QObject):
         self.update_status_indicators()
 
     @QtCore.Slot(enum.StrEnum, dict)
-    def _on_sig_run_peak_detection(
-        self, method: PeakDetectionAlgorithm, params: PeakDetectionAlgorithmParameters
-    ) -> None:
+    def run_peak_detection(self, method: PeakDetectionAlgorithm, params: PeakDetectionAlgorithmParameters) -> None:
         rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
         worker = PeakDetectionWorker(self.data.active_section, method, params, rr_params=rolling_rate_kwargs)
         worker.signals.sig_success.connect(self._on_sig_peaks_updated)

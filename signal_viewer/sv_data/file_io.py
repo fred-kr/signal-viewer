@@ -6,6 +6,7 @@ from typing import Any, Literal
 import mne.io
 import polars as pl
 import polars.selectors as cs
+import tables
 from loguru import logger
 
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION
@@ -167,19 +168,32 @@ def read_edf(
 def read_annotation_file(
     file_path: Path,
     sampling_rate: int,
-    separator: str = "\t",
-    time_column: str = "time_seconds",
-    comment_column: str = "comment_text",
 ) -> list[dict[str, Any]]:
     return (
-        pl.read_csv(file_path, separator=separator)
-        .select(
-            (pl.col(time_column) * sampling_rate).cast(pl.UInt32).alias("index"),
-            pl.col(time_column),
-            pl.col(comment_column),
+        pl.read_csv(file_path)
+        .with_columns(
+            (pl.col("start") * sampling_rate).cast(pl.Int32).alias("start_index"),
+            (pl.col("stop") * sampling_rate).cast(pl.Int32).alias("stop_index"),
         )
         .to_dicts()
     )
+
+
+def edf_to_h5(
+    edf_path: Path, data_channel: str, info_channel: str | None, annotation_path: Path, sampling_rate: int, h5_path: str
+) -> None:
+    data = read_edf(edf_path, data_channel, info_channel)
+    annotations = pl.read_csv(
+        annotation_path, schema={"id": pl.Utf8, "section": pl.Int8, "start": pl.Float64, "stop": pl.Float64}
+    ).with_columns(
+        (pl.col("start") * sampling_rate).cast(pl.Int32).alias("start_index"),
+        (pl.col("stop") * sampling_rate).cast(pl.Int32).alias("stop_index"),
+    )
+    h5_file = tables.open_file(h5_path, "w", title=edf_path.stem)
+    h5_file.create_table(h5_file.root, "data", data.to_numpy(structured=True))
+    h5_file.create_table(h5_file.root, "annotations", annotations.to_numpy(structured=True))
+    h5_file.set_node_attr(h5_file.root, "sampling_rate", sampling_rate)
+    h5_file.close()
 
 
 @logger.catch

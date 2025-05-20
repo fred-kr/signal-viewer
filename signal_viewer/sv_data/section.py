@@ -1,5 +1,6 @@
 import pprint
-import re
+
+# import re
 from collections.abc import Sequence
 from typing import Literal, Unpack
 
@@ -128,10 +129,10 @@ class ManualPeakEdits:
 
 
 class SectionID(str):
-    def __init__(self, value: str) -> None:
-        if not re.match(r"^Section_[a-zA-Z0-9]+_[0-9]{3}$", value):
-            raise ValueError(f"SectionID must be of the form 'Section_<signal_name>_000', got '{value}'")
-        super().__init__()
+    # def __init__(self, value: str) -> None:
+    #     if not re.match(r"^Section_[a-zA-Z0-9]+_[0-9]{3}$", value):
+    #         raise ValueError(f"SectionID must be of the form 'Section_<signal_name>_000', got '{value}'")
+    #     super().__init__()
 
     @staticmethod
     def default() -> "SectionID":
