@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import numpy.typing as npt
+import polars as pl
 import pyside_config as qconfig
 import xlsxwriter
 from loguru import logger
@@ -679,6 +680,12 @@ class SVApp(QtCore.QObject):
         elif format == "xlsx":
             df_peaks = self.data.active_section.peak_data
             df_rate = self.data.active_section.rate_data
+            df_global_bounds = pl.DataFrame(
+                {
+                    "start": [self.data.active_section.global_bounds[0]],
+                    "end": [self.data.active_section.global_bounds[1]],
+                }
+            )
 
             with xlsxwriter.Workbook(out_path) as wb:
                 df_peaks.write_excel(
@@ -688,6 +695,10 @@ class SVApp(QtCore.QObject):
                 df_rate.write_excel(
                     workbook=wb,
                     worksheet="Rate Data",
+                )
+                df_global_bounds.write_excel(
+                    workbook=wb,
+                    worksheet="Global Bounds",
                 )
 
         else:
