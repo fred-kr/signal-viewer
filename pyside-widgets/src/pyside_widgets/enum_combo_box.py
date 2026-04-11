@@ -120,7 +120,7 @@ class EnumComboBox[T: enum.Enum](QtWidgets.QComboBox):
         # if enum_member is not None:
         self.sig_current_enum_changed.emit(self.current_enum())
 
-    allowNone = QtCore.Property(bool, allowNone, setAllowNone)
+    allowNone = QtCore.Property(bool, allowNone, setAllowNone)  # type: ignore
 
 
 DOM_XML = """

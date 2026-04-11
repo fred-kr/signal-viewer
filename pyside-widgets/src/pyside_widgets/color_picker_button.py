@@ -110,9 +110,9 @@ class ColorPickerButton(QtWidgets.QPushButton):
             new_color = QtWidgets.QColorDialog.getColor(self._color, self)
         self.set_color(new_color)
 
-    showAlphaChannel = QtCore.Property(bool, showAlphaChannel, setShowAlphaChannel)
-    showAsIcon = QtCore.Property(bool, showAsIcon, setShowAsIcon)
-    showText = QtCore.Property(bool, showText, setShowText)
+    showAlphaChannel = QtCore.Property(bool, showAlphaChannel, setShowAlphaChannel)  # type: ignore
+    showAsIcon = QtCore.Property(bool, showAsIcon, setShowAsIcon)  # type: ignore
+    showText = QtCore.Property(bool, showText, setShowText)  # type: ignore
 
 
 DOM_XML = """

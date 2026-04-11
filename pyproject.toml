@@ -40,8 +40,12 @@ dev = [
     "pyinstaller-hooks-contrib>=2026.4",
 ]
 
-# [project.scripts]
-# signal-viewer = "signal_viewer.start:gui"
+[project.scripts]
+signal-viewer = "signal_viewer.start:gui"
+sv = "signal_viewer.start:gui"
+
+[tool.uv]
+package = true
 
 [tool.uv.sources]
 pyside-config = { workspace = true }

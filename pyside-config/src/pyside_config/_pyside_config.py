@@ -343,7 +343,7 @@ def _create_editor(self: ConfigInstance, **kwargs: Any) -> QtWidgets.QScrollArea
         if editor_widget_properties is not None:
             editor_widget_properties.apply_to_widget(editor_widget)
 
-        description = field.metadata.get("description", None)
+        description = field.metadata.get("description", "")
 
         default_value = _get_field_default(field)
 

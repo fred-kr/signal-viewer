@@ -161,7 +161,8 @@ class OverlayWidget(QtWidgets.QWidget):
         self._layout_content = QtWidgets.QVBoxLayout(self._content)
         self._layout_content.setSpacing(12)
 
-        font = self.parentWidget().font()
+        font = QtWidgets.QApplication.font()
+        # font = self.parentWidget().font()
         font.setPointSize(28)
         font.setWeight(QtGui.QFont.Weight.DemiBold)
 

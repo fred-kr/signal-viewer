@@ -124,7 +124,7 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_show_settings.triggered.connect(self._on_show_settings)
         self.gui.ui.action_open_file.triggered.connect(self._on_open_file)
         self.gui.ui.action_open_annotation_file.triggered.connect(self._load_annotations)
-        self.gui.ui.action_edit_metadata.triggered.connect(lambda: self.show_metadata_dialog([]))
+        self.gui.ui.action_edit_metadata.triggered.connect(lambda: self.show_metadata_dialog([]))  # type: ignore
         self.gui.ui.action_about_qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self.gui.ui.action_close_file.triggered.connect(self.close_file)
         self.gui.ui.action_show_user_guide.triggered.connect(self._on_show_user_guide)

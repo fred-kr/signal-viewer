@@ -15,9 +15,13 @@ dependencies = [
     "qtconsole>=5.7.2",
 ]
 
+[project.scripts]
+designer = "pyside_widgets.examples.run_qt_designer:run_qt_designer"
+
 [tool.uv.sources]
 pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }
 
 [build-system]
 requires = ["uv_build>=0.11.6,<0.12.0"]
 build-backend = "uv_build"
+
