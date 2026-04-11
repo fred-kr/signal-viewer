@@ -1,53 +1,55 @@
 [project]
 name = "signal-viewer"
-version = "0.1.0.dev0"
+version = "0.2.0"
 description = "A GUI for working with (biological) signal data."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
+authors = [
+    { name = "devduck", email = "frederik.kraemer@dev-duck.dev" }
+]
 dependencies = [
-    "attrs>=25.3.0",
+    "attrs>=26.1.0",
     "loguru>=0.7.3",
-    "mne>=1.9.0",
-    "numexpr>=2.10.2",
-    "numpy>=2.2.5",
-    "polars[excel]>=1.27.1",
-    "pyarrow>=19.0.1",
-    "pyjanitor>=0.31.0",
-    "pyopengl>=3.1.9",
-    "pyopengl-accelerate>=3.1.9",
-    "pyside6>=6.9.0",
-    "pywavelets>=1.8.0",
-    "scipy>=1.15.2",
-    "tables>=3.10.2",
-    "wfdb>=4.3.0",
-    "scikit-learn>=1.6.1",
-    "neurokit2>=0.2.10",
+    "mne>=1.12.0",
+    "numexpr>=2.14.1",
+    "numpy>=2.4.4",
+    "polars[excel]>=1.39.3",
+    "pyarrow>=23.0.1",
+    "pyopengl>=3.1.10",
+    "pyopengl-accelerate>=3.1.10",
+    "pyside6>=6.11.0",
+    "pywavelets>=1.9.0",
+    "scipy>=1.17.1",
+    "tables>=3.11.1",
+    "wfdb>=4.3.1",
+    "scikit-learn>=1.8.0",
+    "neurokit2>=0.2.13",
     "pyqtgraph",
     "pyside-widgets",
     "pyside-config",
     "ts2vg>=1.2.4",
 ]
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+# [build-system]
+# requires = ["uv_build>=0.11.6,<0.12.0"]
+# build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "pyinstaller>=6.13.0",
-    "pyinstaller-hooks-contrib>=2025.3",
+    "pyinstaller>=6.19.0",
+    "pyinstaller-hooks-contrib>=2026.4",
 ]
 
-[project.scripts]
-signal-viewer = "signal_viewer.start:gui"
-
-[tool.hatch.build]
-include = [
-    "pyproject.toml",
-    "signal_viewer/**/*",
-]
+# [project.scripts]
+# signal-viewer = "signal_viewer.start:gui"
 
 [tool.uv.sources]
-pyside-config = { git = "https://github.com/fred-kr/pyside-config.git" }
+pyside-config = { workspace = true }
+pyside-widgets = { workspace = true }
 pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }
-pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets.git" }
+
+[tool.uv.workspace]
+members = [
+    "pyside-widgets",
+    "pyside-config",
+]

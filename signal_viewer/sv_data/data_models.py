@@ -3,7 +3,8 @@ from pathlib import Path
 from typing import Any
 
 import polars as pl
-from janitor.polars.clean_names import _clean_column_names
+
+# from janitor.polars.clean_names import _clean_column_names
 from PySide6 import QtCore, QtGui
 
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION, RESERVED_COLUMN_NAMES
@@ -11,7 +12,7 @@ from signal_viewer.enum_defs import InputFileFormat
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.section import Section, SectionID
 from signal_viewer.type_defs import MetadataDict
-from signal_viewer.utils import format_file_path, human_readable_timedelta
+from signal_viewer.utils import _clean_column_names, format_file_path, human_readable_timedelta
 
 ItemDataRole = QtCore.Qt.ItemDataRole
 type ModelIndex = QtCore.QModelIndex | QtCore.QPersistentModelIndex

@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="More">icons/MoreHorizontal.svg</file>
+        <file alias="Reset">icons/ArrowReset.svg</file>
+        <file alias="Settings">icons/Settings.svg</file>
+    </qresource>
+</RCC>

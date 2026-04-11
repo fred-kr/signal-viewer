@@ -1,9 +1,11 @@
 import datetime
 import enum
+import re
 import sys
+import unicodedata
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Unpack
+from typing import TYPE_CHECKING, Any, Literal, Unpack
 
 import numpy as np
 import numpy.typing as npt
@@ -194,3 +196,85 @@ def find_nearest_extrema[T: IsPlottable](
         extrema_val = extrema_val_y
 
     return x_data[extrema_idx], extrema_val
+
+
+def _clean_column_names(
+    obj: str,
+    strip_underscores: Literal["left", "right", "both", "l", "r", True] | None,
+    case_type: str,
+    remove_special: bool,
+    strip_accents: bool,
+    truncate_limit: int,
+) -> str:
+    """
+    Function to clean the column names of a polars DataFrame.
+    """
+    obj = _change_case(obj=obj, case_type=case_type)
+    obj = _normalize_1(obj=obj)
+    if remove_special:
+        obj = _remove_special(obj=obj)
+    if strip_accents:
+        obj = _strip_accents(obj=obj)
+    obj = re.sub(pattern="_+", repl="_", string=obj)
+    obj = _strip_underscores_func(
+        obj,
+        strip_underscores=strip_underscores,
+    )
+    obj = obj[:truncate_limit]
+    return obj
+
+
+def _change_case(obj: str, case_type: str) -> str:
+    case_types = {"preserve", "upper", "lower"}
+    if case_type not in case_types:
+        raise ValueError(f"type must be one of: {case_types}")
+    if case_type == "preserve":
+        return obj
+    if case_type == "upper":
+        return obj.upper()
+    if case_type == "lower":
+        return obj.lower()
+    # Implementation taken from: https://gist.github.com/jaytaylor/3660565
+    # by @jtaylor
+    return obj.replace(r"(.)([A-Z][a-z]+)", r"\1_\2").replace(r"([a-z0-9])([A-Z])", r"\1_\2").lower()
+
+
+def _normalize_1(obj: str) -> str:
+    FIXES = [(r"[ /:,?()\.-]", "_"), (r"['’]", ""), (r"[\xa0]", "_")]
+    for search, replace in FIXES:
+        obj = re.sub(pattern=search, repl=replace, string=obj)
+    return obj
+
+
+def _remove_special(obj: str) -> str:
+    return re.sub(pattern="[^A-Za-z_\\d]", repl="", string=obj).strip("_")
+
+
+def _strip_accents(obj: str) -> str:
+    """Remove accents from the labels in obj.
+
+    Inspired from [StackOverflow][so].
+
+    [so]: https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-strin
+    """  # noqa: E501
+    # TODO: possible implementation in Rust
+    # or use a pyarrow implementation?
+    # https://github.com/pola-rs/polars/issues/11455
+    return "".join(letter for letter in unicodedata.normalize("NFD", obj) if not unicodedata.combining(letter))
+
+
+def _strip_underscores_func(
+    obj: str,
+    strip_underscores: Literal["left", "right", "both", "l", "r", True] | None = None,
+) -> str:
+    """Strip underscores from obj."""
+    underscore_options = {None, "left", "right", "both", "l", "r", True}
+    if strip_underscores not in underscore_options:
+        raise ValueError(f"strip_underscores must be one of: {underscore_options}")
+    if strip_underscores in {"left", "l"}:
+        return obj.strip("_")
+    if strip_underscores in {"right", "r"}:
+        return obj.rstrip("_")
+    if strip_underscores in {True, "both"}:
+        return obj.strip("_")
+    return obj
