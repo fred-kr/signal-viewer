@@ -1,7 +1,7 @@
 [project]
 name = "pyside-widgets"
 version = "0.1.0"
-description = "Add your description here"
+description = "Widgets created during the development of the Signal Viewer GUI."
 readme = "README.md"
 authors = [
     { name = "devduck", email = "frederik.kraemer@dev-duck.dev" }
@@ -18,8 +18,8 @@ dependencies = [
 [project.scripts]
 designer = "pyside_widgets.examples.run_qt_designer:run_qt_designer"
 
-[tool.uv.sources]
-pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }
+# [tool.uv.sources]
+# pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }
 
 [build-system]
 requires = ["uv_build>=0.11.6,<0.12.0"]

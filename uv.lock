@@ -1302,11 +1302,14 @@ wheels = [
 
 [[package]]
 name = "pyqtgraph"
-version = "0.15.0.dev0"
-source = { git = "https://github.com/pyqtgraph/pyqtgraph?rev=master#d588dd3ec30915e61c8496a0fe1db21fc25e4da5" }
+version = "0.14.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama" },
     { name = "numpy" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/32/36/4c242f81fdcbfa4fb62a5645f6af79191f4097a0577bd5460c24f19cc4ef/pyqtgraph-0.14.0-py3-none-any.whl", hash = "sha256:7abb7c3e17362add64f8711b474dffac5e7b0e9245abdf992e9a44119b7aa4f5", size = 1924755, upload-time = "2025-11-16T19:43:22.251Z" },
 ]
 
 [[package]]
@@ -1346,7 +1349,7 @@ dependencies = [
 requires-dist = [
     { name = "darkdetect", specifier = ">=0.8.0" },
     { name = "numpy", specifier = ">=2.4.4" },
-    { name = "pyqtgraph", git = "https://github.com/pyqtgraph/pyqtgraph?rev=master" },
+    { name = "pyqtgraph", specifier = ">=0.14.0" },
     { name = "pyside6", specifier = ">=6.11.0" },
     { name = "qtconsole", specifier = ">=5.7.2" },
 ]
@@ -1656,7 +1659,7 @@ requires-dist = [
     { name = "pyarrow", specifier = ">=23.0.1" },
     { name = "pyopengl", specifier = ">=3.1.10" },
     { name = "pyopengl-accelerate", specifier = ">=3.1.10" },
-    { name = "pyqtgraph", git = "https://github.com/pyqtgraph/pyqtgraph?rev=master" },
+    { name = "pyqtgraph", specifier = ">=0.14.0" },
     { name = "pyside-config", editable = "pyside-config" },
     { name = "pyside-widgets", editable = "pyside-widgets" },
     { name = "pyside6", specifier = ">=6.11.0" },

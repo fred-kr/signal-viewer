@@ -24,7 +24,7 @@ dependencies = [
     "wfdb>=4.3.1",
     "scikit-learn>=1.8.0",
     "neurokit2>=0.2.13",
-    "pyqtgraph",
+    "pyqtgraph>=0.14.0",
     "pyside-widgets",
     "pyside-config",
     "ts2vg>=1.2.4",
@@ -50,7 +50,7 @@ package = true
 [tool.uv.sources]
 pyside-config = { workspace = true }
 pyside-widgets = { workspace = true }
-pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }
+# pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }
 
 [tool.uv.workspace]
 members = [
