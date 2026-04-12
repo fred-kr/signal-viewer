@@ -2,5 +2,8 @@
 echo Installing uv...
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 
+sleep 3
+
+SET "PATH=%PATH%;%USERPROFILE%\.local\bin"
 echo Done, starting Signal Viewer...
 powershell -ExecutionPolicy ByPass -NoProfile -Command "Start-Process -WindowStyle Hidden -FilePath 'uv' -ArgumentList 'run sv'"
