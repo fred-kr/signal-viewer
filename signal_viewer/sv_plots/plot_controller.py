@@ -201,12 +201,12 @@ class PlotController(QtCore.QObject):
         self.rate_curve = None
 
     def _setup_region_selector(self) -> None:
-        brush_col = SVGColors.LimeGreen.qcolor()
+        brush_col = SVGColors.LightGrey.qcolor()
         hover_brush_col = brush_col
-        hover_brush_col.setAlpha(90)
+        hover_brush_col.setAlpha(60)
 
         brush = make_qbrush(brush_col)
-        line_pen = make_qpen(SVGColors.DarkGreen, width=3)
+        line_pen = make_qpen(SVGColors.DarkGrey, width=3)
 
         hover_brush = make_qbrush(hover_brush_col)
         hover_pen = make_qpen(SVGColors.GreenYellow, width=5)
@@ -307,7 +307,9 @@ class PlotController(QtCore.QObject):
         """Emits the `sig_section_clicked` signal when a region is clicked."""
         self.sig_section_clicked.emit(section_id)
 
-    def show_region_selector(self, bounds: tuple[float, float]) -> None:
+    def show_region_selector(
+        self, bounds: tuple[float, float], selected_range: tuple[float, float] | None = None
+    ) -> None:
         """
         Shows the region selector.
 
@@ -315,6 +317,8 @@ class PlotController(QtCore.QObject):
         ----------
         bounds : tuple[float, float]
             The min and max boundaries in plot coordinates in which the region selector is allowed.
+        selected_range : tuple[float, float] | None, optional
+            The initial selected region, defaults to the lower third of the plot's x-axis.
         """
         if not self.region_selector:
             return
@@ -322,7 +326,7 @@ class PlotController(QtCore.QObject):
         self.region_selector.setBounds(bounds)
         view_range = self.pw_main.plotItem.vb.viewRange()[0]
         span = view_range[1] - view_range[0]
-        initial_region = (view_range[0], view_range[0] + 0.33 * span)
+        initial_region = selected_range or (view_range[0], view_range[0] + 0.33 * span)
         self.region_selector.setRegion(initial_region)
         if self.region_selector not in self.pw_main.plotItem.items:
             self.pw_main.addItem(self.region_selector)

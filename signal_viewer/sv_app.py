@@ -339,7 +339,10 @@ class SVApp(QtCore.QObject):
             self.plot.hide_region_selector()
             return
         bounds = (0, self.data.base_df.height - 1)
-        self.plot.show_region_selector(bounds)
+        initial_range = None
+        if len(self.data.sections.editable_sections) > 0:
+            initial_range = (self.data.sections.editable_sections[-1].global_bounds[1] + 1, bounds[1])
+        self.plot.show_region_selector(bounds, initial_range)
 
     @QtCore.Slot()
     def _on_confirm_section(self) -> None:
@@ -647,6 +650,7 @@ class SVApp(QtCore.QObject):
         self.data.active_section.set_locked(False)
         self._on_worker_finished()
 
+    @logger.catch()
     @QtCore.Slot(str)
     def export_result(self, format: str) -> None:
         dir_path = (
@@ -678,25 +682,40 @@ class SVApp(QtCore.QObject):
             write_hdf5(Path(out_path), result.to_dict())
 
         elif format == "xlsx":
-            df_peaks = self.data.active_section.peak_data
-            df_rate = self.data.active_section.rate_data
-            df_global_bounds = pl.DataFrame(
-                {
-                    "start": [self.data.active_section.global_bounds[0]],
-                    "end": [self.data.active_section.global_bounds[1]],
-                }
+            combined_peak_df = pl.DataFrame(
+                schema={"section_id": pl.Int32, **self.data.sections.editable_sections[0].peak_data.schema}
             )
+            combined_rate_df = pl.DataFrame(
+                schema={"section_id": pl.Int32, **self.data.sections.editable_sections[0].rate_data.schema}
+            )
+            combined_bounds_df = pl.DataFrame(schema={"section_id": pl.Int32, "start": pl.Int64, "end": pl.Int64})
+
+            for i, section in enumerate(self.data.sections.editable_sections, start=1):
+                peak_df = section.peak_data.insert_column(0, pl.lit(i).cast(pl.Int32).alias("section_id"))
+                rate_df = section.rate_data.insert_column(0, pl.lit(i).cast(pl.Int32).alias("section_id"))
+                bounds_df = pl.DataFrame(
+                    {
+                        "section_id": [i],
+                        "start": [section.global_bounds[0]],
+                        "end": [section.global_bounds[1]],
+                    },
+                    schema_overrides={"section_id": pl.Int32, "start": pl.Int64, "end": pl.Int64},
+                )
+
+                combined_peak_df.extend(peak_df)
+                combined_rate_df.extend(rate_df)
+                combined_bounds_df.extend(bounds_df)
 
             with xlsxwriter.Workbook(out_path) as wb:
-                df_peaks.write_excel(
+                combined_peak_df.write_excel(
                     workbook=wb,
                     worksheet="Detected Peaks",
                 )
-                df_rate.write_excel(
+                combined_rate_df.write_excel(
                     workbook=wb,
                     worksheet="Rate Data",
                 )
-                df_global_bounds.write_excel(
+                combined_bounds_df.write_excel(
                     workbook=wb,
                     worksheet="Global Bounds",
                 )

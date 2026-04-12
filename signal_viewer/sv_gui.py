@@ -375,7 +375,13 @@ class SVGUI(QtWidgets.QMainWindow):
             parent = self.dialog_meta
 
         msg_box = QtWidgets.QMessageBox(parent)
+        msg_box.setWindowTitle("Error")
         msg_box.setText(record_dict["level"].name)
+
+        # Set the size policy of the central widget to include a horizontal stretch
+        central_widget = msg_box.findChild(QtWidgets.QWidget)
+        if central_widget:
+            central_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         msg_box.setDetailedText(message)
 
         if msg_log_level >= threshold:
