@@ -1,5 +1,11 @@
 # How to run Signal Viewer
 
+Download the [ZIP archive](https://github.com/fred-kr/signal-viewer/archive/refs/heads/master.zip) and extract it to a folder of your choice.
+
+Inside the folder is a `run_sv_<operating_system>` file. Double-click it install the necessary dependencies and run the Signal Viewer application.
+
+If this doesn't work, see below.
+
 ## Requirements
 
 For now, `uv` is the easiest method to run the Signal Viewer application.
