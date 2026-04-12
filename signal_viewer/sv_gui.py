@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pyside_config as qconfig
 from loguru import logger
 from PySide6 import QtCore, QtGui, QtWidgets
-from pyside_widgets import OverlayWidget, SearchableDataTreeWidget
+from pyside_widgets import OverlayWidget, ResizableMessageBox, SearchableDataTreeWidget
 
 from signal_viewer.constants import INDEX_COL
 from signal_viewer.enum_defs import LogLevel
@@ -356,6 +356,38 @@ class SVGUI(QtWidgets.QMainWindow):
 
         return super().closeEvent(event)
 
+    # @QtCore.Slot(str, int, str)
+    # def maybe_show_error_dialog(
+    #     self,
+    #     message: str,
+    #     msg_log_level: LogLevel,
+    #     record_dict: LogRecordDict,
+    #     threshold: LogLevel = LogLevel.WARNING,
+    # ) -> None:
+    #     if os.environ.get("DEBUG") == "1":
+    #         threshold = LogLevel.DEBUG
+
+    #     if msg_log_level < threshold:
+    #         return
+
+    #     parent = self
+    #     if self.dialog_meta.isVisible():
+    #         parent = self.dialog_meta
+
+    #     msg_box = QtWidgets.QMessageBox(parent)
+    #     msg_box.setWindowTitle("Error")
+    #     msg_box.setText(record_dict["level"].name)
+    #     msg_box.setDetailedText(message)
+
+    #     if msg_log_level >= threshold:
+    #         traceback_text = []
+    #         if record_dict["exception"] is not None:
+    #             traceback_text = traceback.format_exception_only(record_dict["exception"][1])
+
+    #         traceback_text = "".join(traceback_text)
+    #         msg_box.setInformativeText(traceback_text)
+
+    #     msg_box.exec()
     @QtCore.Slot(str, int, str)
     def maybe_show_error_dialog(
         self,
@@ -374,25 +406,31 @@ class SVGUI(QtWidgets.QMainWindow):
         if self.dialog_meta.isVisible():
             parent = self.dialog_meta
 
-        msg_box = QtWidgets.QMessageBox(parent)
-        msg_box.setWindowTitle("Error")
-        msg_box.setText(record_dict["level"].name)
+        # Map log level to dialog icon
+        if msg_log_level >= LogLevel.ERROR:
+            icon = ResizableMessageBox.Icon.Critical
+        elif msg_log_level >= LogLevel.WARNING:
+            icon = ResizableMessageBox.Icon.Warning
+        else:
+            icon = ResizableMessageBox.Icon.Information
 
-        # Set the size policy of the central widget to include a horizontal stretch
-        central_widget = msg_box.findChild(QtWidgets.QWidget)
-        if central_widget:
-            central_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
-        msg_box.setDetailedText(message)
+        # Build detail text: log message + exception traceback (if present)
+        detail_parts = [message]
+        if record_dict["exception"] is not None:
+            tb = "".join(traceback.format_exception(*record_dict["exception"]))
+            detail_parts.append(tb)
+        detail_text = "\n\n".join(detail_parts)
 
-        if msg_log_level >= threshold:
-            traceback_text = []
-            if record_dict["exception"] is not None:
-                traceback_text = traceback.format_exception_only(record_dict["exception"][1])
-
-            traceback_text = "".join(traceback_text)
-            msg_box.setInformativeText(traceback_text)
-
-        msg_box.exec()
+        dlg = ResizableMessageBox(
+            icon=icon,
+            title="Error",
+            text=f"{record_dict['level'].name}: {record_dict['message']}",
+            buttons=QtWidgets.QDialogButtonBox.StandardButton.Ok,
+            default_button=QtWidgets.QDialogButtonBox.StandardButton.Ok,
+            parent=parent,
+            detail_text=detail_text,
+        )
+        dlg.exec()
 
     def set_active_section_label(self, label_text: str) -> None:
         self.dock_sections.label_active_section.setText(f"Active Section: {label_text}")

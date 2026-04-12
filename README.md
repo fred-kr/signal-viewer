@@ -20,7 +20,9 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 ```sh
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
-or
+
+or, if `curl` isn't available:
+
 ```sh
 wget -qO- https://astral.sh/uv/install.sh | sh
 ```

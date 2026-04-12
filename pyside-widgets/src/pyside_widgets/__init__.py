@@ -6,6 +6,7 @@ from pyside_widgets.enum_combo_box import EnumComboBox
 from pyside_widgets.grouped_combo_box import GroupedComboBox
 from pyside_widgets.jupyter_console_widget import JupyterConsoleWindow
 from pyside_widgets.labeled_slider import LabeledSlider
+from pyside_widgets.message_box import ResizableMessageBox
 from pyside_widgets.overlay_widget import OverlayWidget
 from pyside_widgets.setting_card_widget import SettingCard
 from pyside_widgets.toggle_switch import AnimatedToggleSwitch, ToggleSwitch
@@ -24,4 +25,5 @@ __all__ = [
     "AnimatedToggleSwitch",
     "ToggleSwitch",
     "CommandBar",
+    "ResizableMessageBox",
 ]
