@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'param_inputs.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.0
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -28,7 +28,7 @@ from PySide6.QtWidgets import (
 from pyside_widgets.decimal_spin_box import DecimalSpinBox
 from pyside_widgets.enum_combo_box import EnumComboBox
 
-from .. import rc_resources  # noqa
+from .. import rc_resources  # noqa: F401
 
 
 class Ui_containerParamInputs(object):
@@ -332,16 +332,6 @@ class Ui_containerParamInputs(object):
 
         self.formLayout_5.setWidget(0, QFormLayout.ItemRole.FieldRole, self.peak_localmax_radius)
 
-        self.label_16 = QLabel(self.page_peak_localmax)
-        self.label_16.setObjectName("label_16")
-
-        self.formLayout_5.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_16)
-
-        self.peak_localmax_min_dist = DecimalSpinBox(self.page_peak_localmax)
-        self.peak_localmax_min_dist.setObjectName("peak_localmax_min_dist")
-
-        self.formLayout_5.setWidget(1, QFormLayout.ItemRole.FieldRole, self.peak_localmax_min_dist)
-
         self.stacked_widget_peak.addWidget(self.page_peak_localmax)
         self.page_peak_localmin = QWidget()
         self.page_peak_localmin.setObjectName("page_peak_localmin")
@@ -356,16 +346,6 @@ class Ui_containerParamInputs(object):
         self.peak_localmin_radius.setObjectName("peak_localmin_radius")
 
         self.formLayout_6.setWidget(0, QFormLayout.ItemRole.FieldRole, self.peak_localmin_radius)
-
-        self.label_18 = QLabel(self.page_peak_localmin)
-        self.label_18.setObjectName("label_18")
-
-        self.formLayout_6.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_18)
-
-        self.peak_localmin_min_dist = DecimalSpinBox(self.page_peak_localmin)
-        self.peak_localmin_min_dist.setObjectName("peak_localmin_min_dist")
-
-        self.formLayout_6.setWidget(1, QFormLayout.ItemRole.FieldRole, self.peak_localmin_min_dist)
 
         self.stacked_widget_peak.addWidget(self.page_peak_localmin)
         self.page_peak_xqrs = QWidget()
@@ -621,7 +601,7 @@ class Ui_containerParamInputs(object):
         self.retranslateUi(containerParamInputs)
 
         self.tab_widget_params.setCurrentIndex(0)
-        self.stacked_widget_peak.setCurrentIndex(4)
+        self.stacked_widget_peak.setCurrentIndex(0)
 
         QMetaObject.connectSlotsByName(containerParamInputs)
 
@@ -646,15 +626,25 @@ class Ui_containerParamInputs(object):
             self.tab_widget_params.indexOf(self.tab_processing),
             QCoreApplication.translate("containerParamInputs", "Preprocessing", None),
         )
+        # if QT_CONFIG(tooltip)
+        self.peak_method.setToolTip("")
+        # endif // QT_CONFIG(tooltip)
+        # if QT_CONFIG(whatsthis)
+        self.peak_method.setWhatsThis("")
+        # endif // QT_CONFIG(whatsthis)
         self.groupBox_2.setTitle(QCoreApplication.translate("containerParamInputs", "Method Parameters", None))
         self.label_11.setText(QCoreApplication.translate("containerParamInputs", "Peak Window", None))
         self.label_12.setText(QCoreApplication.translate("containerParamInputs", "Beat Window", None))
         self.label_13.setText(QCoreApplication.translate("containerParamInputs", "Beat Offset", None))
         self.label_14.setText(QCoreApplication.translate("containerParamInputs", "Minimum Delay", None))
         self.label_15.setText(QCoreApplication.translate("containerParamInputs", "Radius", None))
-        self.label_16.setText(QCoreApplication.translate("containerParamInputs", "Min. Distance", None))
+        # if QT_CONFIG(tooltip)
+        self.peak_localmax_radius.setToolTip("")
+        # endif // QT_CONFIG(tooltip)
+        # if QT_CONFIG(whatsthis)
+        self.peak_localmax_radius.setWhatsThis("")
+        # endif // QT_CONFIG(whatsthis)
         self.label_17.setText(QCoreApplication.translate("containerParamInputs", "Radius", None))
-        self.label_18.setText(QCoreApplication.translate("containerParamInputs", "Min. Distance", None))
         self.label_21.setText(QCoreApplication.translate("containerParamInputs", "Peak Adjustment", None))
         self.label_19.setText(QCoreApplication.translate("containerParamInputs", "Radius", None))
         self.label_20.setText(QCoreApplication.translate("containerParamInputs", "Min. Distance", None))

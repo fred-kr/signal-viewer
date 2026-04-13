@@ -46,8 +46,12 @@ def _find_peaks_local_min(sig: npt.NDArray[np.float64], search_radius: int) -> n
 
 
 def find_extrema(
-    sig: npt.NDArray[np.float64], search_radius: int, direction: Literal["up", "down"], min_peak_distance: int
+    sig: npt.NDArray[np.float64],
+    search_radius: int,
+    direction: Literal["up", "down"],
+    min_peak_distance: int | None = None,
 ) -> npt.NDArray[np.intp]:
+    min_peak_distance = min_peak_distance if min_peak_distance is not None else search_radius
     if direction == "up":
         peaks = _find_peaks_local_max(sig, search_radius)
     else:

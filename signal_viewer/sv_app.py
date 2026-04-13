@@ -585,6 +585,12 @@ class SVApp(QtCore.QObject):
         self.gui.dialog_meta.combo_box_signal_column.setEnabled(False)
         self.gui.dialog_meta.combo_box_info_column.setEnabled(False)
 
+        _sr = self.data.metadata.sampling_rate
+        self.gui.dock_parameters.ui.ui.peak_localmax_radius.setProperty("defaultValue", _sr)
+        self.gui.dock_parameters.ui.ui.peak_localmin_radius.setProperty("defaultValue", _sr)
+        self.gui.dock_parameters.ui.ui.peak_localmax_radius.setValue(_sr)
+        self.gui.dock_parameters.ui.ui.peak_localmin_radius.setValue(_sr)
+
         logger.info(f"Read data from file: {self.data.metadata.file_name}")
 
     @QtCore.Slot()

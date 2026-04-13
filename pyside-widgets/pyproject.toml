@@ -15,8 +15,6 @@ dependencies = [
     "qtconsole>=5.7.2",
 ]
 
-[project.scripts]
-designer = "pyside_widgets.examples.run_qt_designer:run_qt_designer"
 
 # [tool.uv.sources]
 # pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }

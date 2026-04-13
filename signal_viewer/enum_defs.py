@@ -59,13 +59,13 @@ class PreprocessPipeline(enum.StrEnum):
     """
 
     PPG_Elgendi = "ppg_elgendi"
+    ECG_Emrich_2023 = "vg"
     ECG_NeuroKit = "ecg_neurokit2"
     ECG_BioSPPy = "biosppy"
     ECG_PanTompkins_1985 = "pantompkins1985"
     ECG_Hamilton_2002 = "hamilton2002"
     ECG_Elgendi_2010 = "elgendi2010"
     ECG_EngzeeMod_2012 = "engzeemod2012"
-    ECG_Emrich_2023 = "vg"
 
 
 class StandardizationMethod(enum.StrEnum):
@@ -84,6 +84,15 @@ class PeakDetectionAlgorithm(enum.StrEnum):
         member.__doc__ = docstr.strip()
         return member
 
+    LocalMaxima = (
+        "local_maxima",
+        "Returns indices of local maxima. A sample qualifies as a peak if it is the highest value within ±radius samples around it.",
+    )
+
+    LocalMinima = (
+        "local_minima",
+        "Returns indices of local minima. A sample qualifies as a peak if it is the lowest value within ±radius samples around it.",
+    )
     PPG_Elgendi = (
         "ppg_elgendi",
         """
@@ -143,9 +152,6 @@ class PeakDetectionAlgorithm(enum.StrEnum):
         "rodrigues2021",
         """Adaptation of the work by Sadhukhan & Mitra (2012) and Gutiérrez-Rivas et al. (2015) by Rodrigues et al. (2021).""",
     )
-    # Other methods
-    LocalMaxima = "local_maxima"
-    LocalMinima = "local_minima"
 
 
 class WFDBPeakDirection(enum.StrEnum):

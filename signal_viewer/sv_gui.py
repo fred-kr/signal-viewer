@@ -356,38 +356,6 @@ class SVGUI(QtWidgets.QMainWindow):
 
         return super().closeEvent(event)
 
-    # @QtCore.Slot(str, int, str)
-    # def maybe_show_error_dialog(
-    #     self,
-    #     message: str,
-    #     msg_log_level: LogLevel,
-    #     record_dict: LogRecordDict,
-    #     threshold: LogLevel = LogLevel.WARNING,
-    # ) -> None:
-    #     if os.environ.get("DEBUG") == "1":
-    #         threshold = LogLevel.DEBUG
-
-    #     if msg_log_level < threshold:
-    #         return
-
-    #     parent = self
-    #     if self.dialog_meta.isVisible():
-    #         parent = self.dialog_meta
-
-    #     msg_box = QtWidgets.QMessageBox(parent)
-    #     msg_box.setWindowTitle("Error")
-    #     msg_box.setText(record_dict["level"].name)
-    #     msg_box.setDetailedText(message)
-
-    #     if msg_log_level >= threshold:
-    #         traceback_text = []
-    #         if record_dict["exception"] is not None:
-    #             traceback_text = traceback.format_exception_only(record_dict["exception"][1])
-
-    #         traceback_text = "".join(traceback_text)
-    #         msg_box.setInformativeText(traceback_text)
-
-    #     msg_box.exec()
     @QtCore.Slot(str, int, str)
     def maybe_show_error_dialog(
         self,

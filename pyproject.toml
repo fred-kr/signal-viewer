@@ -28,6 +28,7 @@ dependencies = [
     "pyside-widgets",
     "pyside-config",
     "ts2vg>=1.2.4",
+    "pyside6-essentials>=6.11.0",
 ]
 
 # [build-system]
@@ -43,6 +44,8 @@ dev = [
 [project.scripts]
 signal-viewer = "signal_viewer.start:gui"
 sv = "signal_viewer.start:gui"
+ps-designer = "pyside_widgets.examples.run_qt_designer:run_qt_designer"
+gallery = "pyside_widgets.examples.widget_gallery:main"
 
 [tool.uv]
 package = true

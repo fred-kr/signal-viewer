@@ -7,12 +7,13 @@ from PySide6 import QtCore, QtWidgets
 
 def run_qt_designer() -> None:
     main_path = Path(__file__).parent.parent.absolute()
+    # main_path = Path(__file__).parent.absolute()
     env = QtCore.QProcessEnvironment.systemEnvironment()
     env.insert("PYSIDE_DESIGNER_PLUGINS", os.path.join(main_path, "registrars"))
 
-    app = QtWidgets.QApplication(sys.argv)  # type: ignore # noqa: F841
+    app = QtWidgets.QApplication(sys.argv)
     QtWidgets.QMessageBox.information(
-        None,  # type: ignore
+        None,
         "PySide6 Designer",
         f"""<p> This example will attempt to run Qt Designer, including the custom pyside-widgets. </p>
 		<p>After clicking <b>OK</b>, Qt Designer should be started.</p>

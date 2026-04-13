@@ -394,7 +394,14 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="2" column="0">
-        <widget class="EnumComboBox" name="peak_method"/>
+        <widget class="EnumComboBox" name="peak_method">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="whatsThis">
+          <string/>
+         </property>
+        </widget>
        </item>
        <item row="3" column="0">
         <widget class="QGroupBox" name="groupBox_2">
@@ -408,7 +415,7 @@
           <item>
            <widget class="QStackedWidget" name="stacked_widget_peak">
             <property name="currentIndex">
-             <number>4</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_peak_ppg_elgendi">
              <layout class="QFormLayout" name="formLayout">
@@ -464,17 +471,14 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="DecimalSpinBox" name="peak_localmax_radius"/>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_16">
-                <property name="text">
-                 <string>Min. Distance</string>
+               <widget class="DecimalSpinBox" name="peak_localmax_radius">
+                <property name="toolTip">
+                 <string/>
+                </property>
+                <property name="whatsThis">
+                 <string/>
                 </property>
                </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="DecimalSpinBox" name="peak_localmax_min_dist"/>
               </item>
              </layout>
             </widget>
@@ -489,16 +493,6 @@
               </item>
               <item row="0" column="1">
                <widget class="DecimalSpinBox" name="peak_localmin_radius"/>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_18">
-                <property name="text">
-                 <string>Min. Distance</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="DecimalSpinBox" name="peak_localmin_min_dist"/>
               </item>
              </layout>
             </widget>

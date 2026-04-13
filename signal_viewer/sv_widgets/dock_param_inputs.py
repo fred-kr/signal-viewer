@@ -103,33 +103,38 @@ class ParameterInputs(QtWidgets.QWidget):
 
     def _setup_actions(self) -> None:
         # Signal Filter
-        self.action_sf_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Process Signal", self)
-        self.action_sf_run.setToolTip("Apply the selected processing steps to the signal data.")
+        self.action_sf_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Apply to Signal", self)
+        self.action_sf_run.setToolTip("Apply the selected processing steps to the signal.")
         self.action_sf_run.triggered.connect(self.run_processing)
 
         self.action_sf_reset_inputs = QtGui.QAction(QtGui.QIcon("://icons/ArrowReset.svg"), "Restore Defaults", self)
-        self.action_sf_reset_inputs.setToolTip("Reset all inputs to their default values.")
+        self.action_sf_reset_inputs.setToolTip("Restore the default input values for the selected processing steps.")
         self.action_sf_reset_inputs.triggered.connect(self.reset_inputs)
         self.action_sf_reset_data = QtGui.QAction(QtGui.QIcon("://icons/Broom.svg"), "Reset Signal", self)
-        self.action_sf_reset_data.setToolTip("Reset the signal data to its original, unprocessed state.")
+        self.action_sf_reset_data.setToolTip(
+            "Reset the signal data. Any applied processing steps and detected peaks will be removed."
+        )
         self.action_sf_reset_data.triggered.connect(self.reset_data)
 
         # Peak Detection
-        self.action_peak_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Detect Peaks", self)
-        self.action_peak_run.setToolTip("Run the selected peak detection algorithm.")
+        self.action_peak_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Run detection", self)
+        self.action_peak_run.setToolTip("Apply the selected peak detection algorithm to the signal.")
         self.action_peak_run.triggered.connect(self.run_peak_detection)
         self.action_peak_reset_inputs = QtGui.QAction(QtGui.QIcon("://icons/ArrowReset.svg"), "Restore Defaults", self)
-        self.action_peak_reset_inputs.setToolTip("Reset all inputs to their default values.")
+        self.action_peak_reset_inputs.setToolTip(
+            "Restore the default input values for the selected peak detection algorithm."
+        )
         self.action_peak_reset_inputs.triggered.connect(self.reset_inputs)
         self.action_peak_reset_data = QtGui.QAction(QtGui.QIcon("://icons/Broom.svg"), "Reset Peaks", self)
-        self.action_peak_reset_data.setToolTip("Remove all peaks. Does not reset the signal data.")
+        self.action_peak_reset_data.setToolTip("Remove all peaks, but keep the applied processing steps.")
         self.action_peak_reset_data.triggered.connect(self.clear_peaks)
 
     def _setup_widgets(self) -> None:
         # Signal Filter
         self.ui.sf_pipeline.setAllowNone(True)
-        self.ui.sf_pipeline.set_enum_class(PreprocessPipeline)
+        self.ui.sf_pipeline.set_enum_class(PreprocessPipeline, doc_data=_get_docstring)
         self.ui.sf_pipeline.currentIndexChanged.connect(self._on_pipeline_changed)
+        self.ui.sf_pipeline.set_current_enum(PreprocessPipeline.PPG_Elgendi)
 
         self.ui.sf_method.setAllowNone(True)
         self.ui.sf_method.set_enum_class(FilterMethod)
@@ -165,6 +170,7 @@ class ParameterInputs(QtWidgets.QWidget):
         # Peak Detection
         self.ui.peak_method.set_enum_class(PeakDetectionAlgorithm, doc_data=_get_docstring)
         self.ui.peak_method.currentIndexChanged.connect(self._on_peak_method_changed)
+        self.ui.peak_method.set_current_enum(PeakDetectionAlgorithm.LocalMaxima)
 
         self.ui.peak_xqrs_direction.set_enum_class(WFDBPeakDirection)
         _setup_spinbox(self.ui.peak_xqrs_radius, 5, 99_999, 1, 90, 0)
@@ -176,10 +182,10 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.peak_ppg_elgendi_mindelay, 0.0, 10.0, 0.01, 0.3, 2)
 
         _setup_spinbox(self.ui.peak_localmax_radius, 5, 9_999, 1, 111, 0)
-        _setup_spinbox(self.ui.peak_localmax_min_dist, 0, 1_000_000, 1, 15, 0)
+        # _setup_spinbox(self.ui.peak_localmax_min_dist, 0, 1_000_000, 1, 15, 0)
 
         _setup_spinbox(self.ui.peak_localmin_radius, 5, 9_999, 1, 111, 0)
-        _setup_spinbox(self.ui.peak_localmin_min_dist, 0, 1_000_000, 1, 15, 0)
+        # _setup_spinbox(self.ui.peak_localmin_min_dist, 0, 1_000_000, 1, 15, 0)
 
         _setup_spinbox(self.ui.peak_ecg_nk_smoothwindow, 0.01, 10.0, 0.01, 0.01, 2)
         _setup_spinbox(self.ui.peak_ecg_nk_avgwindow, 0.01, 10.0, 0.01, 0.75, 2)
@@ -305,6 +311,9 @@ class ParameterInputs(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def run_processing(self) -> None:
+        # Reset data and clear peaks
+        self.sig_reset_data.emit()
+        self.sig_clear_peaks.emit()
         pipeline: PreprocessPipeline | None = self.ui.sf_pipeline.current_enum()
         if pipeline is not None:
             self.sig_run_pipeline.emit(pipeline)
@@ -342,6 +351,8 @@ class ParameterInputs(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def run_peak_detection(self) -> None:
+        # Clear previous peaks
+        self.sig_clear_peaks.emit()
         peak_method: PeakDetectionAlgorithm | None = self.ui.peak_method.current_enum()
         if peak_method is not None:
             peak_params = self.get_peak_detection_params(peak_method)
@@ -402,13 +413,13 @@ class ParameterInputs(QtWidgets.QWidget):
         elif method == PeakDetectionAlgorithm.LocalMaxima:
             peak_params = PeaksLocalMaxima(
                 search_radius=self.ui.peak_localmax_radius.intValue(),
-                min_distance=self.ui.peak_localmax_min_dist.intValue(),
+                min_distance=self.ui.peak_localmax_radius.intValue(),
             )
 
         elif method == PeakDetectionAlgorithm.LocalMinima:
             peak_params = PeaksLocalMinima(
                 search_radius=self.ui.peak_localmin_radius.intValue(),
-                min_distance=self.ui.peak_localmin_min_dist.intValue(),
+                min_distance=self.ui.peak_localmin_radius.intValue(),
             )
 
         elif method == PeakDetectionAlgorithm.ECG_XQRS:
