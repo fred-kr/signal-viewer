@@ -5,15 +5,14 @@ from pathlib import Path
 from PySide6 import QtCore, QtWidgets
 
 
-def run_qt_designer() -> None:
+def main() -> None:
     main_path = Path(__file__).parent.parent.absolute()
-    # main_path = Path(__file__).parent.absolute()
     env = QtCore.QProcessEnvironment.systemEnvironment()
     env.insert("PYSIDE_DESIGNER_PLUGINS", os.path.join(main_path, "registrars"))
 
     app = QtWidgets.QApplication(sys.argv)
     QtWidgets.QMessageBox.information(
-        None,
+        app.activeWindow(),
         "PySide6 Designer",
         f"""<p> This example will attempt to run Qt Designer, including the custom pyside-widgets. </p>
 		<p>After clicking <b>OK</b>, Qt Designer should be started.</p>
@@ -38,7 +37,7 @@ def run_qt_designer() -> None:
     if not designer_process.waitForStarted():
         print("Designer process failed to start")
         QtWidgets.QMessageBox.critical(
-            None,  # type: ignore
+            app.activeWindow(),  # type: ignore
             "PySide6 Designer",
             f"<p>Qt Designer (pyside6-designer) could not be started.  Please check that it is "
             f"installed and that the <tt>designer</tt> executable is in your "
@@ -54,4 +53,4 @@ def run_qt_designer() -> None:
 
 
 if __name__ == "__main__":
-    run_qt_designer()
+    main()

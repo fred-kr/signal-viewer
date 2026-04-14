@@ -13,4 +13,4 @@ compile_doc.ps1
 testing_stuff.py
 TODO.md
 *.code-workspace
-.vscode
+.vscode/
