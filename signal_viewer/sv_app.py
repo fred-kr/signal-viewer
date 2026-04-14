@@ -127,7 +127,7 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_edit_metadata.triggered.connect(lambda: self.show_metadata_dialog([]))  # type: ignore
         self.gui.ui.action_about_qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self.gui.ui.action_close_file.triggered.connect(self.close_file)
-        self.gui.ui.action_show_user_guide.triggered.connect(self._on_show_user_guide)
+        # self.gui.ui.action_show_user_guide.triggered.connect(self._on_show_user_guide)
 
         self.gui.dialog_meta.sig_property_has_changed.connect(self.update_metadata)
 
@@ -180,9 +180,9 @@ class SVApp(QtCore.QObject):
         self.gui.ui.table_annotations.setData(read_annotation_file(Path(file), self.data.active_section.sampling_rate))
         self.recent_annotations_files.add_file(file)
 
-    @QtCore.Slot()
-    def _on_show_user_guide(self) -> None:
-        self.help.show_page("index.html")
+    # @QtCore.Slot()
+    # def _on_show_user_guide(self) -> None:
+    #     self.help.show_page("index.html")
 
     @QtCore.Slot()
     def _on_show_settings(self) -> None:
@@ -288,25 +288,24 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(enum.StrEnum, dict)
     def run_peak_detection(self, method: PeakDetectionAlgorithm, params: PeakDetectionAlgorithmParameters) -> None:
+        self.gui.overlay_widget.show_overlay("Detection running...")
+
         rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
         worker = PeakDetectionWorker(self.data.active_section, method, params, rr_params=rolling_rate_kwargs)
         worker.signals.sig_success.connect(self._on_sig_peaks_updated)
         worker.signals.sig_finished.connect(self._on_worker_finished)
-        self._on_worker_started("Detecting peaks...")
         self.thread_pool.start(worker)
-
-    def _on_worker_started(self, overlay_text: str = "Calculating...") -> None:
-        self.gui.overlay_widget.show_overlay(overlay_text)
 
     @QtCore.Slot()
     def _on_worker_finished(self) -> None:
-        self.gui.overlay_widget.hide_overlay()
         is_locked = self.data.active_section.is_locked
         self.gui.dock_parameters.setEnabled(not is_locked)
         self.gui.ui.action_remove_section.setEnabled(not is_locked)
         self.gui.ui.action_mark_section_done.setEnabled(not is_locked)
         self.gui.ui.action_unlock_section.setEnabled(is_locked)
         self.plot.block_clicks = is_locked
+
+        self.gui.overlay_widget.hide_overlay()
 
     @QtCore.Slot()
     def _on_sig_new_data(self) -> None:
@@ -341,7 +340,10 @@ class SVApp(QtCore.QObject):
         bounds = (0, self.data.base_df.height - 1)
         initial_range = None
         if len(self.data.sections.editable_sections) > 0:
-            initial_range = (self.data.sections.editable_sections[-1].global_bounds[1] + 1, bounds[1])
+            prev_section = self.data.sections.editable_sections[-1]
+            range_start = prev_section.global_bounds[1] + 1
+            range_end = min(range_start + prev_section.data.height, bounds[1])
+            initial_range = (range_start, range_end)
         self.plot.show_region_selector(bounds, initial_range)
 
     @QtCore.Slot()
@@ -646,13 +648,14 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def _lock_section(self) -> None:
+        self.gui.overlay_widget.show_overlay("Creating section result...")
+
         rate_params = self.gui.dock_parameters.ui.get_rate_params()
 
         worker = SectionResultWorker(self.data.active_section, rr_params=rate_params)
         worker.signals.sig_success.connect(self.update_result_views)
         worker.signals.sig_finished.connect(self._on_worker_finished)
 
-        self._on_worker_started("Creating section result...")
         self.thread_pool.start(worker)
 
     @QtCore.Slot()
@@ -695,7 +698,7 @@ class SVApp(QtCore.QObject):
             text, ok = QtWidgets.QInputDialog.getText(
                 self.gui,
                 "Add grouping column?",
-                "Optional label for a 'group_var' column. Useful when combining results from multiple files, e.g. to perform further analysis in R.",
+                "Optional label for a 'group_var' column.<br>Useful when combining results from multiple files,<br>e.g. to perform further analysis in R.",
             )
             if ok:
                 group_var = text

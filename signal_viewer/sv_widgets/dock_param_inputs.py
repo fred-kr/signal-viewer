@@ -414,15 +414,17 @@ class ParameterInputs(QtWidgets.QWidget):
                 accelerated=self.ui.peak_ecg_emrich_accelerated.isChecked(),
             )
         elif method == PeakDetectionAlgorithm.LocalMaxima:
+            radius = min_distance = self.ui.peak_localmax_radius.intValue()
             peak_params = PeaksLocalMaxima(
-                search_radius=self.ui.peak_localmax_radius.intValue(),
-                min_distance=self.ui.peak_localmax_radius.intValue(),
+                search_radius=radius,
+                min_distance=min_distance,
             )
 
         elif method == PeakDetectionAlgorithm.LocalMinima:
+            radius = min_distance = self.ui.peak_localmin_radius.intValue()
             peak_params = PeaksLocalMinima(
-                search_radius=self.ui.peak_localmin_radius.intValue(),
-                min_distance=self.ui.peak_localmin_radius.intValue(),
+                search_radius=radius,
+                min_distance=min_distance,
             )
 
         elif method == PeakDetectionAlgorithm.ECG_XQRS:
