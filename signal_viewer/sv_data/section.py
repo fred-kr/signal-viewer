@@ -2,7 +2,7 @@ import pprint
 
 # import re
 from collections.abc import Sequence
-from typing import Literal, Unpack
+from typing import Any, Literal, Unpack
 
 import attrs
 import neurokit2 as nk
@@ -286,6 +286,16 @@ class Section:
             return
         self._result_data.rate_data = value
 
+    def get_simple_result(self, step_size: int, group_var: Any | None = None) -> pl.DataFrame:
+        r_data = self._result_data.rate_data.clone()
+        return r_data.select(
+            ((pl.int_range(pl.len(), dtype=pl.Int32) * (step_size * self.sampling_rate)) + self.global_bounds[0]).alias(
+                "index"
+            ),
+            pl.col("rate_bpm").alias("rate_bpm"),
+            pl.lit(group_var).alias("group_var"),
+        )
+
     @property
     def peak_data(self) -> pl.DataFrame:
         return self._result_data.peak_data.clone()
@@ -307,7 +317,7 @@ class Section:
                 "global_start": [self.global_bounds[0]],
                 "global_end": [self.global_bounds[1]],
             },
-            schema={"section_id": pl.Int32, "global_start": pl.Int64, "global_end": pl.Int64},
+            schema={"section_id": pl.Int32, "global_start": pl.Int32, "global_end": pl.Int32},
         )
 
     @property
@@ -721,6 +731,17 @@ class Section:
 
     def get_mean_rate_per_temperature(self) -> pl.DataFrame:
         info_col = self.info_name
+        if info_col is None:
+            return pl.DataFrame(
+                {
+                    "rate_mean": [np.nan],
+                    "rate_median": [np.nan],
+                    "rate_std": [np.nan],
+                    "rate_min": [np.nan],
+                    "rate_max": [np.nan],
+                },
+                nan_to_null=True,
+            )
         return (
             self.rate_data.group_by(pl.col(f"{info_col}_mean").round(1))
             .agg(

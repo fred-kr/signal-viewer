@@ -185,10 +185,10 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.peak_ppg_elgendi_beatoffset, 0.0, 1.0, 0.01, 0.02, 2)
         _setup_spinbox(self.ui.peak_ppg_elgendi_mindelay, 0.0, 10.0, 0.01, 0.3, 2)
 
-        _setup_spinbox(self.ui.peak_localmax_radius, 1, 10_000, 20, 111, 0)
+        _setup_spinbox(self.ui.peak_localmax_radius, 1, 10_000, 10, 111, 0)
         # _setup_spinbox(self.ui.peak_localmax_min_dist, 0, 1_000_000, 1, 15, 0)
 
-        _setup_spinbox(self.ui.peak_localmin_radius, 1, 10_000, 20, 111, 0)
+        _setup_spinbox(self.ui.peak_localmin_radius, 1, 10_000, 10, 111, 0)
         # _setup_spinbox(self.ui.peak_localmin_min_dist, 0, 1_000_000, 1, 15, 0)
 
         _setup_spinbox(self.ui.peak_ecg_nk_smoothwindow, 0.01, 10.0, 0.01, 0.01, 2)

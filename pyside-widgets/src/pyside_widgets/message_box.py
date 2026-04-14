@@ -8,7 +8,7 @@ import sys
 import traceback
 
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QIcon
 from PySide6.QtWidgets import (
     QApplication,
     QDialog,
@@ -32,8 +32,8 @@ class ResizableMessageBox(QDialog):
         Critical = 3
         Question = 4
 
-    _DETAIL_BTN_SHOW = "Show Details ▾"
-    _DETAIL_BTN_HIDE = "Hide Details ▴"
+    _DETAIL_BTN_SHOW = "Show Details"
+    _DETAIL_BTN_HIDE = "Hide Details"
 
     def __init__(
         self,
@@ -101,10 +101,11 @@ class ResizableMessageBox(QDialog):
         btn_row.setContentsMargins(0, 0, 0, 0)
 
         self._detail_toggle = QPushButton(self._DETAIL_BTN_SHOW)
+        self._detail_toggle.setIcon(QIcon("://icons/More"))
         self._detail_toggle.setFlat(True)
         self._detail_toggle.setVisible(False)
         self._detail_toggle.clicked.connect(self._toggle_detail)
-        btn_row.addWidget(self._detail_toggle, 0, Qt.AlignmentFlag.AlignLeft)
+        btn_row.addWidget(self._detail_toggle, 0)
 
         btn_row.addStretch(1)
 
@@ -134,7 +135,7 @@ class ResizableMessageBox(QDialog):
         ed.setMinimumHeight(120)
 
         mono = QFont("Monospace")
-        mono.setStyleHint(QFont.StyleHint.TypeWriter)
+        mono.setStyleHint(QFont.StyleHint.Monospace)
         mono.setPointSize(9)
         ed.setFont(mono)
 

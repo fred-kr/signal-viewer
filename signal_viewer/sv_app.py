@@ -691,7 +691,7 @@ class SVApp(QtCore.QObject):
             df.write_csv(out_path)
 
         elif format == "hdf5":
-            result = self.data.get_complete_result()
+            result = self.data.assemble_result(detailed=True)
             write_hdf5(Path(out_path), result.to_dict())
 
         elif format == "xlsx":
@@ -705,37 +705,35 @@ class SVApp(QtCore.QObject):
             else:
                 group_var = None
 
+            step_size = self.gui.dock_parameters.ui.ui.rate_every.intValue()
+
             combined_peak_df = pl.DataFrame(
                 schema={"section_id": pl.Int32, **self.data.sections.editable_sections[0].peak_data.schema}
             )
             combined_rate_df = pl.DataFrame(
                 schema={"section_id": pl.Int32, **self.data.sections.editable_sections[0].rate_data.schema}
             )
-            combined_bounds_df = pl.DataFrame(
-                schema={"section_id": pl.Int32, "global_start": pl.Int64, "global_end": pl.Int64}
+            combined_bounds_df = self.data.sections.editable_sections[0].global_bounds_df.clear()
+
+            combined_r_data = (
+                self.data.sections.editable_sections[0]
+                .get_simple_result(step_size=step_size, group_var=group_var)
+                .clear()
             )
 
             for i, section in enumerate(self.data.sections.editable_sections, start=1):
                 peak_df = section.peak_data.insert_column(0, pl.lit(i).cast(pl.Int32).alias("section_id"))
                 rate_df = section.rate_data.insert_column(0, pl.lit(i).cast(pl.Int32).alias("section_id"))
                 bounds_df = section.global_bounds_df
+                r_data = section.get_simple_result(step_size=step_size, group_var=group_var)
 
                 combined_peak_df.extend(peak_df)
                 combined_rate_df.extend(rate_df)
                 combined_bounds_df.extend(bounds_df)
-
-            step_size = self.data.active_section.sampling_rate * self.gui.dock_parameters.ui.ui.rate_every.intValue()
-            rate_df_for_r = combined_rate_df.select(
-                pl.int_range(
-                    pl.len(),
-                    step=step_size,
-                    dtype=pl.Int64,
-                ),
-                pl.lit(group_var).alias("group_var"),
-            )
+                combined_r_data.extend(r_data)
 
             with xlsxwriter.Workbook(out_path) as wb:
-                rate_df_for_r.write_excel(
+                combined_r_data.write_excel(
                     workbook=wb,
                     worksheet="r_data",
                 )

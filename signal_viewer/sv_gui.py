@@ -386,7 +386,6 @@ class SVGUI(QtWidgets.QMainWindow):
         else:
             icon = ResizableMessageBox.Icon.Information
 
-        # Build detail text: log message + exception traceback (if present)
         detail_parts = [message]
         if record_dict["exception"] is not None:
             tb = "".join(traceback.format_exception(*record_dict["exception"]))

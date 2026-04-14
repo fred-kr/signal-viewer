@@ -259,7 +259,7 @@ class DataController(QtCore.QObject):
         self.sections.remove_section(idx)
         self.set_active_section(self.base_section_index)
 
-    def get_complete_result(self) -> CompleteResult:
+    def assemble_result(self, detailed: bool = False) -> CompleteResult:
         base_df = self.get_base_section().data
 
         section_results = {s.section_id: s.get_result() for s in self.sections.editable_sections}
