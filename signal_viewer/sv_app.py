@@ -148,7 +148,7 @@ class SVApp(QtCore.QObject):
         self.gui.dock_sections.btn_cancel.clicked.connect(self._on_cancel_section)
         self.gui.ui.action_show_section_overview.toggled.connect(self.plot.update_regions)
 
-        self.gui.ui.action_toggle_auto_scaling.toggled.connect(self.plot.toggle_auto_scaling)
+        self.gui.ui.action_toggle_auto_scaling.triggered.connect(self.plot.fit_y_axis)
 
         self.gui.dock_sections.list_view.sig_delete_item.connect(self.delete_section)
         self.gui.dock_sections.list_view.sig_show_summary.connect(self.show_section_summary)
@@ -407,6 +407,8 @@ class SVApp(QtCore.QObject):
         if is_locked_or_base:
             self.update_result_views()
 
+        self.plot.fit_y_axis()
+
     @QtCore.Slot(int)
     def _on_sig_section_clicked(self, index: int) -> None:
         self.data.set_active_section(self.data.sections.index(index))
@@ -585,13 +587,15 @@ class SVApp(QtCore.QObject):
         self.gui.dialog_meta.combo_box_signal_column.setEnabled(False)
         self.gui.dialog_meta.combo_box_info_column.setEnabled(False)
 
-        _sr = self.data.metadata.sampling_rate
-        self.gui.dock_parameters.ui.ui.peak_localmax_radius.setProperty("defaultValue", _sr)
-        self.gui.dock_parameters.ui.ui.peak_localmin_radius.setProperty("defaultValue", _sr)
-        self.gui.dock_parameters.ui.ui.peak_localmax_radius.setValue(_sr)
-        self.gui.dock_parameters.ui.ui.peak_localmin_radius.setValue(_sr)
+        _val = self.data.metadata.sampling_rate // 2
+        self.gui.dock_parameters.ui.ui.peak_localmax_radius.setProperty("defaultValue", _val)
+        self.gui.dock_parameters.ui.ui.peak_localmin_radius.setProperty("defaultValue", _val)
+        self.gui.dock_parameters.ui.ui.peak_localmax_radius.setValue(_val)
+        self.gui.dock_parameters.ui.ui.peak_localmin_radius.setValue(_val)
 
         logger.info(f"Read data from file: {self.data.metadata.file_name}")
+
+        self.gui.switch_to(self.gui.ui.tab_edit)
 
     @QtCore.Slot()
     def close_file(self) -> None:
@@ -688,6 +692,16 @@ class SVApp(QtCore.QObject):
             write_hdf5(Path(out_path), result.to_dict())
 
         elif format == "xlsx":
+            text, ok = QtWidgets.QInputDialog.getText(
+                self.gui,
+                "Add grouping column?",
+                "Optional label for a 'group_var' column. Useful when combining results from multiple files, e.g. to perform further analysis in R.",
+            )
+            if ok:
+                group_var = text
+            else:
+                group_var = None
+
             combined_peak_df = pl.DataFrame(
                 schema={"section_id": pl.Int32, **self.data.sections.editable_sections[0].peak_data.schema}
             )
@@ -712,7 +726,15 @@ class SVApp(QtCore.QObject):
                 combined_rate_df.extend(rate_df)
                 combined_bounds_df.extend(bounds_df)
 
+            rate_df_for_r = combined_rate_df.select(["temperature_c_mean", "rate_bpm"]).with_columns(
+                pl.lit(group_var).alias("group_var")
+            )
+
             with xlsxwriter.Workbook(out_path) as wb:
+                rate_df_for_r.write_excel(
+                    workbook=wb,
+                    worksheet="r_data",
+                )
                 combined_peak_df.write_excel(
                     workbook=wb,
                     worksheet="Detected Peaks",

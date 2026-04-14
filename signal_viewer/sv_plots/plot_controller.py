@@ -619,10 +619,10 @@ class PlotController(QtCore.QObject):
         """
         return self.pw_main.plotItem.vb.mapped_selection_rect  # type: ignore
 
-    @QtCore.Slot(bool)
-    def toggle_auto_scaling(self, state: bool) -> None:
+    @QtCore.Slot()
+    def fit_y_axis(self) -> None:
         # TODO: Update implementation so that scaling and panning are independent and correctly communicated to the user
-        enable = 0.99 if state else state
-        self.pw_main.getPlotItem().getViewBox().enableAutoRange(pg.ViewBox.YAxis, enable=enable)  # type: ignore
-        self.pw_main.getPlotItem().getViewBox().setAutoPan(y=True)
-        self.pw_main.plotItem.vb.menu.autoRange()
+        # enable = 0.99
+        # self.pw_main.getPlotItem().getViewBox().enableAutoRange(pg.ViewBox.YAxis, enable=enable)  # type: ignore
+        self.pw_main.getPlotItem().getViewBox().autoRange()
+        # self.pw_main.plotItem.vb.menu.autoRange()

@@ -39,13 +39,10 @@
     <item>
      <widget class="QTabWidget" name="tab_widget_main">
       <property name="tabPosition">
-       <enum>QTabWidget::TabPosition::West</enum>
+       <enum>QTabWidget::TabPosition::North</enum>
       </property>
       <property name="currentIndex">
        <number>0</number>
-      </property>
-      <property name="documentMode">
-       <bool>true</bool>
       </property>
       <widget class="QWidget" name="tab_import">
        <attribute name="title">
@@ -482,6 +479,9 @@
            </layout>
           </widget>
           <widget class="QWidget" name="tab_result_mpl_widget">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <attribute name="title">
             <string>Plot View</string>
            </attribute>
@@ -505,6 +505,9 @@
            </layout>
           </widget>
           <widget class="QWidget" name="tab_result_metadata">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <attribute name="title">
             <string>Metadata</string>
            </attribute>
@@ -592,7 +595,6 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="action_show_user_guide"/>
     <addaction name="separator"/>
     <addaction name="action_about_app"/>
     <addaction name="action_about_qt"/>
@@ -742,18 +744,18 @@
    </property>
   </action>
   <action name="action_toggle_auto_scaling">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset>
      <normaloff>://icons/AutoFitHeight.svg</normaloff>://icons/AutoFitHeight.svg</iconset>
    </property>
    <property name="text">
-    <string>Auto-Scaling</string>
+    <string>Scale y-axis</string>
    </property>
    <property name="toolTip">
-    <string>Automatically adjust the y-axis limits to the visible data range</string>
+    <string>Automatically scale the y-axis to fit the currently visible data</string>
+   </property>
+   <property name="whatsThis">
+    <string>Automatically scale the y-axis limits to the currently visible data</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -820,7 +822,13 @@
     <string>Remove Peaks in Selection</string>
    </property>
    <property name="toolTip">
-    <string>Deletes all peaks inside the selected area</string>
+    <string>Select an area of the plot by pressing Ctrl and dragging your mouse while holding left-click. Then, press Ctrl+D to remove all peaks inside that area.</string>
+   </property>
+   <property name="statusTip">
+    <string/>
+   </property>
+   <property name="whatsThis">
+    <string>Select an area of the plot by pressing Ctrl and dragging your mouse while holding left-click. Then, press Ctrl+D to remove all peaks inside that area.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
@@ -838,7 +846,10 @@
     <string>Find Peaks in Selection</string>
    </property>
    <property name="toolTip">
-    <string>Detect peaks in just the selected area instead of the entire signal</string>
+    <string>Select an area of the plot by pressing Ctrl and dragging your mouse while holding left-click. Then, press Ctrl+F to search that area for peaks.</string>
+   </property>
+   <property name="whatsThis">
+    <string>Select an area of the plot by pressing Ctrl and dragging your mouse while holding left-click. Then, press Ctrl+F to search that area for peaks.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>

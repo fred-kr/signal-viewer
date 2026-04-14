@@ -21,6 +21,8 @@ from PySide6.QtWidgets import (
     QSpacerItem,
     QStackedWidget,
     QTabWidget,
+    QTextBrowser,
+    QTextEdit,
     QToolButton,
     QVBoxLayout,
     QWidget,
@@ -332,6 +334,12 @@ class Ui_containerParamInputs(object):
 
         self.formLayout_5.setWidget(0, QFormLayout.ItemRole.FieldRole, self.peak_localmax_radius)
 
+        self.textBrowser = QTextBrowser(self.page_peak_localmax)
+        self.textBrowser.setObjectName("textBrowser")
+        self.textBrowser.setLineWrapMode(QTextEdit.LineWrapMode.WidgetWidth)
+
+        self.formLayout_5.setWidget(1, QFormLayout.ItemRole.SpanningRole, self.textBrowser)
+
         self.stacked_widget_peak.addWidget(self.page_peak_localmax)
         self.page_peak_localmin = QWidget()
         self.page_peak_localmin.setObjectName("page_peak_localmin")
@@ -346,6 +354,11 @@ class Ui_containerParamInputs(object):
         self.peak_localmin_radius.setObjectName("peak_localmin_radius")
 
         self.formLayout_6.setWidget(0, QFormLayout.ItemRole.FieldRole, self.peak_localmin_radius)
+
+        self.textBrowser_2 = QTextBrowser(self.page_peak_localmin)
+        self.textBrowser_2.setObjectName("textBrowser_2")
+
+        self.formLayout_6.setWidget(1, QFormLayout.ItemRole.SpanningRole, self.textBrowser_2)
 
         self.stacked_widget_peak.addWidget(self.page_peak_localmin)
         self.page_peak_xqrs = QWidget()
@@ -644,7 +657,50 @@ class Ui_containerParamInputs(object):
         # if QT_CONFIG(whatsthis)
         self.peak_localmax_radius.setWhatsThis("")
         # endif // QT_CONFIG(whatsthis)
+        self.textBrowser.setMarkdown(
+            QCoreApplication.translate(
+                "containerParamInputs",
+                "Defaults to **half the sampling rate** of the signal. If this doesn't produce\n"
+                "good results, try out  different values **between a quarter and triple**  the\n"
+                "sampling rate, or **using a different preprocessing pipeline** (sometimes **not\n"
+                "preprocessing** actually  produces better peak detection results, so try that  as\n"
+                "well)\n"
+                "\n"
+                "",
+                None,
+            )
+        )
+        self.textBrowser.setHtml(
+            QCoreApplication.translate(
+                "containerParamInputs",
+                '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
+                '<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">\n'
+                "p, li { white-space: pre-wrap; }\n"
+                "hr { height: 1px; border-width: 0; }\n"
+                'li.unchecked::marker { content: "\\2610"; }\n'
+                'li.checked::marker { content: "\\2612"; }\n'
+                "</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+                '<p style=" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Defaults to <span style=" font-weight:700;">half the sampling rate</span> of the signal. If this doesn\'t produce good results, try out  different values <span style=" font-weight:700;">between a quarter and triple</span>  the sampling rate, or <span style=" font-weight:700;">using a different preprocessing pipeline</span> (sometimes <span style=" font-weight:700;">not preprocessing</span> actu'
+                "ally  produces better peak detection results, so try that  as well)</p></body></html>",
+                None,
+            )
+        )
         self.label_17.setText(QCoreApplication.translate("containerParamInputs", "Radius", None))
+        self.textBrowser_2.setHtml(
+            QCoreApplication.translate(
+                "containerParamInputs",
+                '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
+                '<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">\n'
+                "p, li { white-space: pre-wrap; }\n"
+                "hr { height: 1px; border-width: 0; }\n"
+                'li.unchecked::marker { content: "\\2610"; }\n'
+                'li.checked::marker { content: "\\2612"; }\n'
+                "</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Defaults to <span style=" font-weight:700;">half the sampling rate</span> of the signal. If this doesn\'t produce good results, try out  different values <span style=" font-weight:700;">between a quarter and triple</span>  the sampling rate, or <span style=" font-weight:700;">using a different preprocessing pipeline</span> (sometimes <span style=" font-weight:700;">not preprocessing</span> actu'
+                "ally  produces better peak detection results, so try that  as well)</p></body></html>",
+                None,
+            )
+        )
         self.label_21.setText(QCoreApplication.translate("containerParamInputs", "Peak Adjustment", None))
         self.label_19.setText(QCoreApplication.translate("containerParamInputs", "Radius", None))
         self.label_20.setText(QCoreApplication.translate("containerParamInputs", "Min. Distance", None))

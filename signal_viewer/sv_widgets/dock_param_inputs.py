@@ -35,7 +35,10 @@ type SupportsDecimal = int | float | D
 
 def _restore_default(w: QtWidgets.QWidget | QtCore.QObject) -> None:
     if isinstance(w, QtWidgets.QComboBox):
-        w.setCurrentIndex(0)
+        if default_idx := w.property("defaultValue"):
+            w.setCurrentIndex(default_idx)
+        else:
+            w.setCurrentIndex(0)
         return
 
     if default_value := w.property("defaultValue"):
@@ -134,6 +137,7 @@ class ParameterInputs(QtWidgets.QWidget):
         self.ui.sf_pipeline.setAllowNone(True)
         self.ui.sf_pipeline.set_enum_class(PreprocessPipeline, doc_data=_get_docstring)
         self.ui.sf_pipeline.currentIndexChanged.connect(self._on_pipeline_changed)
+        self.ui.sf_pipeline.setProperty("defaultValue", 1)
         self.ui.sf_pipeline.set_current_enum(PreprocessPipeline.PPG_Elgendi)
 
         self.ui.sf_method.setAllowNone(True)
@@ -170,7 +174,6 @@ class ParameterInputs(QtWidgets.QWidget):
         # Peak Detection
         self.ui.peak_method.set_enum_class(PeakDetectionAlgorithm, doc_data=_get_docstring)
         self.ui.peak_method.currentIndexChanged.connect(self._on_peak_method_changed)
-        self.ui.peak_method.set_current_enum(PeakDetectionAlgorithm.LocalMaxima)
 
         self.ui.peak_xqrs_direction.set_enum_class(WFDBPeakDirection)
         _setup_spinbox(self.ui.peak_xqrs_radius, 5, 99_999, 1, 90, 0)

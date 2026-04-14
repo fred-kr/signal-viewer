@@ -56,7 +56,10 @@ class SVGUI(QtWidgets.QMainWindow):
 
         desktop = QtWidgets.QApplication.primaryScreen().availableGeometry()
         w, h = desktop.width(), desktop.height()
-        self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
+        if w < 1600 or h < 900:
+            self.setWindowState(QtCore.Qt.WindowState.WindowMaximized)
+        else:
+            self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
 
     def switch_to(self, widget: QtWidgets.QWidget) -> None:
         self.ui.tab_widget_main.setCurrentWidget(widget)
@@ -98,7 +101,7 @@ class SVGUI(QtWidgets.QMainWindow):
 
         self.ui.tab_widget_main.setCurrentIndex(0)
 
-    def _setup_docks(self) -> None:  # sourcery skip: extract-duplicate-method
+    def _setup_docks(self) -> None:
         dwa = QtCore.Qt.DockWidgetArea
 
         dock_status = StatusMessageDock()
@@ -147,7 +150,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.action_export_to_xlsx = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to XLSX")
         self.action_export_to_hdf5 = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to HDF5")
 
-        self.ui.action_toggle_auto_scaling.setChecked(True)
+        # self.ui.action_toggle_auto_scaling.setChecked(False)
 
     def _setup_toolbars(self) -> None:
         self.tool_bar_editing = self._setup_toolbar(
@@ -155,7 +158,8 @@ class SVGUI(QtWidgets.QMainWindow):
         )
 
         self.tool_bar_help = self._setup_toolbar(
-            "tool_bar_help", [self.ui.action_show_user_guide, self.action_toggle_whats_this_mode]
+            "tool_bar_help",
+            [self.action_toggle_whats_this_mode],  # self.ui.action_show_user_guide
         )
 
         self.dock_sections.command_bar.addActions(
@@ -205,7 +209,7 @@ class SVGUI(QtWidgets.QMainWindow):
 
         self.ui.menu_help.addSeparator()
         self.ui.menu_help.addAction(self.dock_status_log.toggleViewAction())
-        self.ui.menu_help.insertAction(self.ui.action_show_user_guide, self.action_toggle_whats_this_mode)
+        self.ui.menu_help.addAction(self.action_toggle_whats_this_mode)  # self.ui.action_show_user_guide,
 
         self.menu_export = QtWidgets.QMenu()
         self.menu_export.addActions([self.action_export_to_csv, self.action_export_to_xlsx, self.action_export_to_hdf5])
