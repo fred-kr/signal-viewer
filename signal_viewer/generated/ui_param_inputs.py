@@ -30,7 +30,7 @@ from PySide6.QtWidgets import (
 from pyside_widgets.decimal_spin_box import DecimalSpinBox
 from pyside_widgets.enum_combo_box import EnumComboBox
 
-from .. import rc_resources  # noqa: F401
+from . import rc_resources  # noqa: F401
 
 
 class Ui_containerParamInputs(object):
@@ -43,7 +43,6 @@ class Ui_containerParamInputs(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.tab_widget_params = QTabWidget(containerParamInputs)
         self.tab_widget_params.setObjectName("tab_widget_params")
-        self.tab_widget_params.setDocumentMode(False)
         self.tab_processing = QWidget()
         self.tab_processing.setObjectName("tab_processing")
         self.gridLayout = QGridLayout(self.tab_processing)
@@ -621,7 +620,9 @@ class Ui_containerParamInputs(object):
     # setupUi
 
     def retranslateUi(self, containerParamInputs):
-        containerParamInputs.setWindowTitle(QCoreApplication.translate("containerParamInputs", "Form", None))
+        containerParamInputs.setWindowTitle(
+            QCoreApplication.translate("containerParamInputs", "Parameter Inputs", None)
+        )
         self.label_8.setText(QCoreApplication.translate("containerParamInputs", "Standardization Method", None))
         self.groupBox.setTitle(QCoreApplication.translate("containerParamInputs", "Filter Parameters", None))
         self.label_3.setText(QCoreApplication.translate("containerParamInputs", "Lower cutoff", None))
@@ -642,18 +643,12 @@ class Ui_containerParamInputs(object):
         # if QT_CONFIG(tooltip)
         self.peak_method.setToolTip("")
         # endif // QT_CONFIG(tooltip)
-        # if QT_CONFIG(whatsthis)
-        self.peak_method.setWhatsThis("")
-        # endif // QT_CONFIG(whatsthis)
         self.groupBox_2.setTitle(QCoreApplication.translate("containerParamInputs", "Method Parameters", None))
         self.label_11.setText(QCoreApplication.translate("containerParamInputs", "Peak Window", None))
         self.label_12.setText(QCoreApplication.translate("containerParamInputs", "Beat Window", None))
         self.label_13.setText(QCoreApplication.translate("containerParamInputs", "Beat Offset", None))
         self.label_14.setText(QCoreApplication.translate("containerParamInputs", "Minimum Delay", None))
         self.label_15.setText(QCoreApplication.translate("containerParamInputs", "Radius", None))
-        # if QT_CONFIG(tooltip)
-        self.peak_localmax_radius.setToolTip("")
-        # endif // QT_CONFIG(tooltip)
         # if QT_CONFIG(whatsthis)
         self.peak_localmax_radius.setWhatsThis("")
         # endif // QT_CONFIG(whatsthis)

@@ -275,7 +275,7 @@ class Section:
 
     @property
     def rate_data(self) -> pl.DataFrame:
-        return self._result_data.rate_data
+        return self._result_data.rate_data.clone()
 
     @rate_data.setter
     def rate_data(self, value: pl.DataFrame) -> None:
@@ -288,7 +288,7 @@ class Section:
 
     @property
     def peak_data(self) -> pl.DataFrame:
-        return self._result_data.peak_data
+        return self._result_data.peak_data.clone()
 
     @peak_data.setter
     def peak_data(self, value: pl.DataFrame) -> None:
@@ -298,6 +298,17 @@ class Section:
             )
             return
         self._result_data.peak_data = value
+
+    @property
+    def global_bounds_df(self) -> pl.DataFrame:
+        return pl.DataFrame(
+            {
+                "section_id": [self.section_id.as_num()],
+                "global_start": [self.global_bounds[0]],
+                "global_end": [self.global_bounds[1]],
+            },
+            schema={"section_id": pl.Int32, "global_start": pl.Int64, "global_end": pl.Int64},
+        )
 
     @property
     def is_locked(self) -> bool:

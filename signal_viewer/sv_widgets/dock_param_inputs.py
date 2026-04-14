@@ -86,6 +86,7 @@ class ParameterInputs(QtWidgets.QWidget):
         self._setup_actions()
         self._setup_widgets()
         self._on_peak_method_changed(0)
+        # self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Minimum)
 
     @property
     def sf_widgets(self) -> list[QtWidgets.QWidget]:
@@ -184,10 +185,10 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.peak_ppg_elgendi_beatoffset, 0.0, 1.0, 0.01, 0.02, 2)
         _setup_spinbox(self.ui.peak_ppg_elgendi_mindelay, 0.0, 10.0, 0.01, 0.3, 2)
 
-        _setup_spinbox(self.ui.peak_localmax_radius, 5, 9_999, 1, 111, 0)
+        _setup_spinbox(self.ui.peak_localmax_radius, 1, 10_000, 20, 111, 0)
         # _setup_spinbox(self.ui.peak_localmax_min_dist, 0, 1_000_000, 1, 15, 0)
 
-        _setup_spinbox(self.ui.peak_localmin_radius, 5, 9_999, 1, 111, 0)
+        _setup_spinbox(self.ui.peak_localmin_radius, 1, 10_000, 20, 111, 0)
         # _setup_spinbox(self.ui.peak_localmin_min_dist, 0, 1_000_000, 1, 15, 0)
 
         _setup_spinbox(self.ui.peak_ecg_nk_smoothwindow, 0.01, 10.0, 0.01, 0.01, 2)

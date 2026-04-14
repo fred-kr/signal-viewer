@@ -63,7 +63,7 @@ class SectionsWidget(QtWidgets.QWidget):
         layout.addWidget(self.label_active_section)
 
         self.section_list_view = SectionListView()
-        layout.addWidget(self.section_list_view)
+        layout.addWidget(self.section_list_view, stretch=1)
 
         self.setLayout(layout)
 

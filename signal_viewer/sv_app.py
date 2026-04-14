@@ -711,26 +711,27 @@ class SVApp(QtCore.QObject):
             combined_rate_df = pl.DataFrame(
                 schema={"section_id": pl.Int32, **self.data.sections.editable_sections[0].rate_data.schema}
             )
-            combined_bounds_df = pl.DataFrame(schema={"section_id": pl.Int32, "start": pl.Int64, "end": pl.Int64})
+            combined_bounds_df = pl.DataFrame(
+                schema={"section_id": pl.Int32, "global_start": pl.Int64, "global_end": pl.Int64}
+            )
 
             for i, section in enumerate(self.data.sections.editable_sections, start=1):
                 peak_df = section.peak_data.insert_column(0, pl.lit(i).cast(pl.Int32).alias("section_id"))
                 rate_df = section.rate_data.insert_column(0, pl.lit(i).cast(pl.Int32).alias("section_id"))
-                bounds_df = pl.DataFrame(
-                    {
-                        "section_id": [i],
-                        "start": [section.global_bounds[0]],
-                        "end": [section.global_bounds[1]],
-                    },
-                    schema_overrides={"section_id": pl.Int32, "start": pl.Int64, "end": pl.Int64},
-                )
+                bounds_df = section.global_bounds_df
 
                 combined_peak_df.extend(peak_df)
                 combined_rate_df.extend(rate_df)
                 combined_bounds_df.extend(bounds_df)
 
-            rate_df_for_r = combined_rate_df.select(["temperature_c_mean", "rate_bpm"]).with_columns(
-                pl.lit(group_var).alias("group_var")
+            step_size = self.data.active_section.sampling_rate * self.gui.dock_parameters.ui.ui.rate_every.intValue()
+            rate_df_for_r = combined_rate_df.select(
+                pl.int_range(
+                    pl.len(),
+                    step=step_size,
+                    dtype=pl.Int64,
+                ),
+                pl.lit(group_var).alias("group_var"),
             )
 
             with xlsxwriter.Workbook(out_path) as wb:
