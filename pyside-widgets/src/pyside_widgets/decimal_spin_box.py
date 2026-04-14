@@ -25,6 +25,7 @@ class DecimalSpinBox(QtWidgets.QAbstractSpinBox):
         self.lineEdit().setText(self._formatted_value())
         self.lineEdit().editingFinished.connect(self._on_editing_finished)
         self.lineEdit().textChanged.connect(self._on_text_changed)
+        self.setKeyboardTracking(True)
 
     def setDecimals(self, prec: int) -> None:
         """Sets the number of decimal places to display."""
@@ -145,6 +146,9 @@ class DecimalSpinBox(QtWidgets.QAbstractSpinBox):
         """Handles the text changed event to mimic `QDoubleSpinBox.textChanged`."""
         full_text = f"{self._prefix}{text}{self._suffix}"
         self.textChanged.emit(full_text)
+        if not self.keyboardTracking():
+            return
+        self.setValue(self.valueFromText(text))
 
     def _updateDisplay(self) -> None:
         """Updates the displayed value."""
