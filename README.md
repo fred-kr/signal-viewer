@@ -1,51 +1,33 @@
-# Getting Started
-
-## Windows
+# Getting started
 
 Download [Signal Viewer](https://github.com/fred-kr/signal-viewer/archive/refs/heads/master.zip) and extract the ZIP archive to a folder of your choice.
 
-Navigate to the `signal-viewer-master` folder and open the `run_sv_windows.cmd` file by double-clicking on it (the `.cmd` part may not be visible, depending on your settings).
+Running *Signal Viewer* requires *uv* to be installed on your system.
 
-Confirm the warning message that pops up, and then wait until the required dependencies have been installed. 
-This can take a few minutes when starting the application for the first time, but subsequent runs should be much quicker.
+## Installation
 
-If everything worked, the Signal Viewer application should open. If not, try manually installing the required dependencies (see below).
+**Windows**:
+If you are on a windows machine, you can run the `run_sv_windows.cmd` file located inside the downloaded `signal-viewer-master` folder by double-clicking it and accepting the warning that pops up.
 
-## MacOS (possibly Linux, not tested)
+The script will first download *uv*, and then use *uv* to install the dependencies required for *Signal Viewer*. This might take a few minutes when running for the first time.
 
-[uv](https://docs.astral.sh/uv/getting-started/installation/) is required to run the Signal Viewer application. To install uv, run the following command in a command prompt or terminal window:
+Once everything is installed, the Signal Viewer application should open automatically.
 
-*Windows*
-```bat
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
+Running the script with *uv* already installed skips the installation and immediately opens *Signal Viewer*.
 
-*macOS and Linux*
-```sh
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-or, if `curl` isn't available:
-
-```sh
-wget -qO- https://astral.sh/uv/install.sh | sh
-```
+**macOS/Linux**:
+If you are on a macOS/Linux machine, you will need to download *uv* yourself by following the instructions on their website: [Install *uv*](https://docs.astral.sh/uv/getting-started/installation/)
 
 Wait until the installation has finished, then close the terminal window and go to the next step.
 
-## Download ZIP Archive
-
-If you haven't already, download [Signal Viewer](https://github.com/fred-kr/signal-viewer/archive/refs/heads/master.zip) and extract the ZIP archive to a folder of your choice.
-
 ## Run Signal Viewer
 
-Open a terminal (on Windows: press the Windows key + R, then type "cmd" and press enter) and navigate to the `signal-viewer-master` folder.
+**Windows**:
+On windows, just double-click the `run_sv_windows.cmd` file inside the downloaded folder, and the app should start after a few seconds.
 
-If you didn't change the defaults, the folder should be located at `C:\Users\%USERNAME%\Downloads\signal-viewer-master\signal-viewer-master` on Windows.
+If it doesn't, open a command prompt (Press `Windows key + R`, then type `cmd` and hit enter), then navigate to the downloaded `signal-viewer-master` folder by typing `cd C:\path\to\signal-viewer-master` and hitting enter (replace the drive letter and path with the actual path to the downloaded folder).
 
-Navigate there using `cd` (on Windows: `cd C:\Users\%USERNAME%\Downloads\signal-viewer-master\signal-viewer-master`), and then run the following command:
-```sh
-uv run sv
-```
+Then, type `uv run sv` and press enter. The app should start after a few seconds.
 
-The first time you run the application, it will take a few minutes to install the required dependencies. Once this is done, the Signal Viewer application should open.
+**macOS/Linux**:
+Open a terminal at the downloaded `signal-viewer-master` folder and type `uv run sv`, then press enter. The app should start after a few seconds.
