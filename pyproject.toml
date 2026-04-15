@@ -49,13 +49,13 @@ build-backend = "hatchling.build"
 
 [tool.uv.sources]
 # pyside-config = { workspace = true }
-pyside-config = { path = "./dist/pyside_config-0.1.0-py3-none-any.whl" }
+pyside-config = { git = "https://github.com/fred-kr/pyside-config/releases/download/v0.1.0/pyside_config-0.1.0-py3-none-any.whl" }
 # pyside-widgets = { workspace = true }
-pyside-widgets = { path = "./dist/pyside_widgets-0.1.0-py3-none-any.whl" }
+pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets/releases/download/v0.1.0/pyside_widgets-0.1.0-py3-none-any.whl" }
 # pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }
 
-[tool.uv.workspace]
-members = [
-    "pyside-widgets",
-    "pyside-config",
-]
+# [tool.uv.workspace]
+# members = [
+#     "pyside-widgets",
+#     "pyside-config",
+# ]
