@@ -2,6 +2,13 @@ version = 1
 revision = 3
 requires-python = ">=3.14"
 
+[manifest]
+members = [
+    "pyside-config",
+    "pyside-widgets",
+    "signal-viewer",
+]
+
 [[package]]
 name = "aiohappyeyeballs"
 version = "2.6.1"
@@ -1308,7 +1315,7 @@ wheels = [
 [[package]]
 name = "pyside-config"
 version = "0.1.0"
-source = { path = "dist/pyside_config-0.1.0-py3-none-any.whl" }
+source = { editable = "pyside-config" }
 dependencies = [
     { name = "attrs" },
     { name = "bidict" },
@@ -1316,32 +1323,26 @@ dependencies = [
     { name = "pyside-widgets" },
     { name = "pyside6" },
 ]
-wheels = [
-    { filename = "pyside_config-0.1.0-py3-none-any.whl", hash = "sha256:78cd34735acb2df7e1a661d6292cd42c9297d4a52ef700e8cd651a1b43c0cbad" },
-]
 
 [package.metadata]
 requires-dist = [
     { name = "attrs", specifier = ">=26.1.0" },
     { name = "bidict", specifier = ">=0.23.1" },
     { name = "loguru", specifier = ">=0.7.3" },
-    { name = "pyside-widgets" },
+    { name = "pyside-widgets", editable = "pyside-widgets" },
     { name = "pyside6", specifier = ">=6.11.0" },
 ]
 
 [[package]]
 name = "pyside-widgets"
 version = "0.1.0"
-source = { path = "dist/pyside_widgets-0.1.0-py3-none-any.whl" }
+source = { editable = "pyside-widgets" }
 dependencies = [
     { name = "darkdetect" },
     { name = "numpy" },
     { name = "pyqtgraph" },
     { name = "pyside6" },
     { name = "qtconsole" },
-]
-wheels = [
-    { filename = "pyside_widgets-0.1.0-py3-none-any.whl", hash = "sha256:205e51106e12c285e3e115819d6bedd119fb36d9be93d84296372917bd08fba0" },
 ]
 
 [package.metadata]
@@ -1660,8 +1661,8 @@ requires-dist = [
     { name = "pyopengl", specifier = ">=3.1.10" },
     { name = "pyopengl-accelerate", specifier = ">=3.1.10" },
     { name = "pyqtgraph", specifier = ">=0.14.0" },
-    { name = "pyside-config", path = "dist/pyside_config-0.1.0-py3-none-any.whl" },
-    { name = "pyside-widgets", path = "dist/pyside_widgets-0.1.0-py3-none-any.whl" },
+    { name = "pyside-config", editable = "pyside-config" },
+    { name = "pyside-widgets", editable = "pyside-widgets" },
     { name = "pyside6", specifier = ">=6.11.0" },
     { name = "pyside6-essentials", specifier = ">=6.11.0" },
     { name = "pywavelets", specifier = ">=1.9.0" },

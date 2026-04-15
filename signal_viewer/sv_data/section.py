@@ -288,13 +288,16 @@ class Section:
 
     def get_simple_result(self, step_size: int, group_var: Any | None = None) -> pl.DataFrame:
         r_data = self._result_data.rate_data.clone()
-        return r_data.select(
+        temp_df = r_data.select(
             ((pl.int_range(pl.len(), dtype=pl.Int32) * (step_size * self.sampling_rate)) + self.global_bounds[0]).alias(
                 "index"
             ),
             pl.col("rate_bpm").alias("rate_bpm"),
             pl.lit(group_var).alias("group_var"),
         )
+        if self.info_name is not None:
+            temp_df = temp_df.insert_column(1, r_data.get_column(f"{self.info_name}_mean"))
+        return temp_df
 
     @property
     def peak_data(self) -> pl.DataFrame:
