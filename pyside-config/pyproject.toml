@@ -17,7 +17,7 @@ dependencies = [
 
 [tool.uv.sources]
 # pyside-widgets = { workspace = true }
-pyside-widgets = { path = "../dist/pyside_widgets-0.1.0-py3-none-any.whl" }
+pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets/releases/download/v0.1.0/pyside_widgets-0.1.0-py3-none-any.whl" }
 
 [build-system]
 requires = ["hatchling"]
