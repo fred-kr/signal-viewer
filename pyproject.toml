@@ -52,8 +52,8 @@ pyside-config = { workspace = true }
 pyside-widgets = { workspace = true }
 # pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }
 
-# [tool.uv.workspace]
-# members = [
-#     "pyside-widgets",
-#     "pyside-config",
-# ]
+[tool.uv.workspace]
+members = [
+    "pyside-widgets",
+    "pyside-config",
+]
