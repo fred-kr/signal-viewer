@@ -40,20 +40,12 @@ dev = [
 [project.scripts]
 signal-viewer = "signal_viewer.start:gui"
 sv = "signal_viewer.start:gui"
-ps-designer = "pyside_widgets.examples.run_qt_designer:main"
-gallery = "pyside_widgets.examples.widget_gallery:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.uv.sources]
-pyside-config = { workspace = true }
-pyside-widgets = { workspace = true }
+pyside-config = { git = "https://github.com/fred-kr/pyside-config", branch = "main" }
+pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets", branch = "main" }
 # pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }
-
-[tool.uv.workspace]
-members = [
-    "pyside-widgets",
-    "pyside-config",
-]

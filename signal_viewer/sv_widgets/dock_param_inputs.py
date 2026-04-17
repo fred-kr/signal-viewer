@@ -57,11 +57,15 @@ def _setup_spinbox(
     step: SupportsDecimal,
     default: SupportsDecimal,
     precision: int,
+    correction_mode: DecimalSpinBox.CorrectionMode = DecimalSpinBox.CorrectionMode.CorrectToNearestValue,
+    keyboard_tracking: bool = True,
 ) -> None:
     dec_sb.setRange(min, max)
     dec_sb.setSingleStep(step)
     dec_sb.setDecimals(precision)
     dec_sb.setProperty("defaultValue", default)
+    dec_sb.setCorrectionMode(correction_mode)
+    dec_sb.setKeyboardTracking(keyboard_tracking)
     _restore_default(dec_sb)
 
 

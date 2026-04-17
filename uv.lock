@@ -2,13 +2,6 @@ version = 1
 revision = 3
 requires-python = ">=3.14"
 
-[manifest]
-members = [
-    "pyside-config",
-    "pyside-widgets",
-    "signal-viewer",
-]
-
 [[package]]
 name = "aiohappyeyeballs"
 version = "2.6.1"
@@ -1315,7 +1308,7 @@ wheels = [
 [[package]]
 name = "pyside-config"
 version = "0.1.0"
-source = { editable = "pyside-config" }
+source = { git = "https://github.com/fred-kr/pyside-config?branch=main#596887b1c58c1f23cd3e97d932108ff7a8354a90" }
 dependencies = [
     { name = "attrs" },
     { name = "bidict" },
@@ -1324,34 +1317,16 @@ dependencies = [
     { name = "pyside6" },
 ]
 
-[package.metadata]
-requires-dist = [
-    { name = "attrs", specifier = ">=26.1.0" },
-    { name = "bidict", specifier = ">=0.23.1" },
-    { name = "loguru", specifier = ">=0.7.3" },
-    { name = "pyside-widgets", editable = "pyside-widgets" },
-    { name = "pyside6", specifier = ">=6.11.0" },
-]
-
 [[package]]
 name = "pyside-widgets"
-version = "0.1.0"
-source = { editable = "pyside-widgets" }
+version = "0.3.0"
+source = { git = "https://github.com/fred-kr/pyside-widgets.git?branch=main#05b101e8712a6bc2c13b6433d8fc2d11f55d8783" }
 dependencies = [
     { name = "darkdetect" },
     { name = "numpy" },
     { name = "pyqtgraph" },
     { name = "pyside6" },
     { name = "qtconsole" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "darkdetect", specifier = ">=0.8.0" },
-    { name = "numpy", specifier = ">=2.4.4" },
-    { name = "pyqtgraph", specifier = ">=0.14.0" },
-    { name = "pyside6", specifier = ">=6.11.0" },
-    { name = "qtconsole", specifier = ">=5.7.2" },
 ]
 
 [[package]]
@@ -1661,8 +1636,8 @@ requires-dist = [
     { name = "pyopengl", specifier = ">=3.1.10" },
     { name = "pyopengl-accelerate", specifier = ">=3.1.10" },
     { name = "pyqtgraph", specifier = ">=0.14.0" },
-    { name = "pyside-config", editable = "pyside-config" },
-    { name = "pyside-widgets", editable = "pyside-widgets" },
+    { name = "pyside-config", git = "https://github.com/fred-kr/pyside-config?branch=main" },
+    { name = "pyside-widgets", git = "https://github.com/fred-kr/pyside-widgets?branch=main" },
     { name = "pyside6", specifier = ">=6.11.0" },
     { name = "pyside6-essentials", specifier = ">=6.11.0" },
     { name = "pywavelets", specifier = ">=1.9.0" },
