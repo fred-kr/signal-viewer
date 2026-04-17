@@ -165,9 +165,9 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dock_sections.command_bar.addActions(
             [
                 self.ui.action_create_new_section,
-                self.ui.action_remove_section,
                 self.ui.action_mark_section_done,
                 self.ui.action_unlock_section,
+                self.ui.action_remove_section,
                 self.action_show_section_summary,
                 self.ui.action_show_section_overview,
             ]
