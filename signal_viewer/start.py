@@ -29,7 +29,7 @@ def gui() -> None:
 
     QtWidgets.QApplication.setOrganizationName(org_name)
     QtWidgets.QApplication.setApplicationName(app_name)
-    QtWidgets.QApplication.setStyle("Fusion")
+    # QtWidgets.QApplication.setStyle("Fusion")
 
     if args.reset_settings:
         log_id = logger.add(sys.stderr, colorize=True, backtrace=True, diagnose=True)

@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>SignalViewer</string>
   </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonStyle::ToolButtonFollowStyle</enum>
+  </property>
   <property name="dockNestingEnabled">
    <bool>true</bool>
   </property>
@@ -79,17 +82,20 @@
                 <property name="toolTip">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double-click on a filename to open it&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
+                <property name="showDropIndicator" stdset="0">
+                 <bool>false</bool>
+                </property>
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+                </property>
                 <property name="textElideMode">
                  <enum>Qt::TextElideMode::ElideMiddle</enum>
                 </property>
-                <property name="spacing">
-                 <number>4</number>
-                </property>
-                <property name="uniformItemSizes">
-                 <bool>true</bool>
-                </property>
                 <property name="selectionRectVisible">
                  <bool>true</bool>
+                </property>
+                <property name="itemAlignment">
+                 <set>Qt::AlignmentFlag::AlignLeading</set>
                 </property>
                </widget>
               </item>
@@ -105,17 +111,20 @@
                 <property name="toolTip">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double-click on a filename to open it&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
+                <property name="showDropIndicator" stdset="0">
+                 <bool>false</bool>
+                </property>
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+                </property>
                 <property name="textElideMode">
                  <enum>Qt::TextElideMode::ElideMiddle</enum>
                 </property>
-                <property name="spacing">
-                 <number>4</number>
-                </property>
-                <property name="uniformItemSizes">
-                 <bool>true</bool>
-                </property>
                 <property name="selectionRectVisible">
                  <bool>true</bool>
+                </property>
+                <property name="itemAlignment">
+                 <set>Qt::AlignmentFlag::AlignLeading</set>
                 </property>
                </widget>
               </item>
@@ -124,12 +133,6 @@
            </item>
            <item row="1" column="0">
             <widget class="QPushButton" name="btn_open_file">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
              <property name="whatsThis">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Opens a window allowing you to choose a file to load into the app.&lt;/p&gt;&lt;p&gt;The selected file is searched for available columns or channels of data.&lt;/p&gt;&lt;p&gt;If any are found, their names are made available for selection in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
@@ -140,10 +143,25 @@
               <iconset>
                <normaloff>://icons/FolderOpen.svg</normaloff>://icons/FolderOpen.svg</iconset>
              </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
             </widget>
            </item>
            <item row="1" column="1" colspan="2">
             <widget class="QLineEdit" name="line_edit_active_file">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="frame">
+              <bool>true</bool>
+             </property>
              <property name="readOnly">
               <bool>true</bool>
              </property>
@@ -160,9 +178,6 @@
              <property name="title">
               <string>Required Information </string>
              </property>
-             <property name="flat">
-              <bool>true</bool>
-             </property>
              <layout class="QFormLayout" name="formLayout">
               <item row="0" column="0">
                <widget class="QLabel" name="samplingRateLabel">
@@ -171,6 +186,9 @@
                 </property>
                 <property name="whatsThis">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
                 </property>
                 <property name="text">
                  <string>Sampling Rate</string>
@@ -182,14 +200,17 @@
               </item>
               <item row="0" column="1">
                <widget class="QSpinBox" name="spin_box_sampling_rate_import_page">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="toolTip">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate of the signal values in the file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="whatsThis">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="frame">
-                 <bool>true</bool>
                 </property>
                 <property name="suffix">
                  <string> Hz</string>
@@ -284,6 +305,15 @@
               <iconset>
                <normaloff>://icons/DocumentDismiss.svg</normaloff>://icons/DocumentDismiss.svg</iconset>
              </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+R</string>
+             </property>
             </widget>
            </item>
            <item row="3" column="2">
@@ -303,6 +333,12 @@
              <property name="icon">
               <iconset>
                <normaloff>://icons/DocumentArrowRight.svg</normaloff>://icons/DocumentArrowRight.svg</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
              </property>
             </widget>
            </item>
@@ -412,24 +448,37 @@
        <attribute name="title">
         <string>Results &amp;&amp; Export</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_3" columnstretch="2,1,1,0">
+       <layout class="QGridLayout" name="gridLayout_3" columnstretch="3,2,1,1">
         <item row="0" column="3">
          <widget class="QPushButton" name="btn_export_all_results">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Currently not working</string>
+          </property>
+          <property name="whatsThis">
+           <string>Currently not working</string>
           </property>
           <property name="text">
            <string>Save to HDF5 (detailed)</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources.qrc">
+            <normaloff>:/icons/SaveArrowRight.svg</normaloff>:/icons/SaveArrowRight.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
           </property>
          </widget>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Section Data and Results</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:700;&quot;&gt;Section Data and Results&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
@@ -524,6 +573,12 @@
         </item>
         <item row="0" column="1">
          <widget class="QLabel" name="label_showing_section_result">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Shadow::Sunken</enum>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -531,14 +586,21 @@
         </item>
         <item row="0" column="2">
          <widget class="QPushButton" name="btn_export_to_excel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="text">
            <string>Save to Excel</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources.qrc">
+            <normaloff>:/icons/SaveArrowRight.svg</normaloff>:/icons/SaveArrowRight.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="default">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -585,10 +647,11 @@
     <property name="title">
      <string>Plot</string>
     </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
     <addaction name="action_remove_peaks_in_selection"/>
     <addaction name="action_find_peaks_in_selection"/>
-    <addaction name="separator"/>
-    <addaction name="action_show_section_overview"/>
     <addaction name="action_toggle_auto_scaling"/>
    </widget>
    <widget class="QMenu" name="menu_help">
@@ -605,46 +668,13 @@
    <addaction name="menu_settings"/>
    <addaction name="menu_help"/>
   </widget>
-  <widget class="QToolBar" name="tool_bar_file_actions">
-   <property name="windowTitle">
-    <string>Editing Toolbar</string>
-   </property>
-   <property name="movable">
-    <bool>false</bool>
-   </property>
-   <property name="allowedAreas">
-    <set>Qt::ToolBarArea::TopToolBarArea</set>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>16</width>
-     <height>16</height>
-    </size>
-   </property>
-   <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="action_open_file"/>
-   <addaction name="action_close_file"/>
-   <addaction name="action_edit_metadata"/>
-  </widget>
   <widget class="QStatusBar" name="status_bar"/>
   <action name="action_open_file">
-   <property name="icon">
-    <iconset>
-     <normaloff>://icons/FolderOpen.svg</normaloff>://icons/FolderOpen.svg</iconset>
-   </property>
    <property name="text">
     <string>Open File</string>
    </property>
    <property name="iconVisibleInMenu">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="action_show_settings">
@@ -669,10 +699,6 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>://icons/DocumentEndnote.svg</normaloff>://icons/DocumentEndnote.svg</iconset>
-   </property>
    <property name="text">
     <string>File Metadata</string>
    </property>
@@ -689,10 +715,6 @@
   <action name="action_close_file">
    <property name="enabled">
     <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>://icons/DocumentDismiss.svg</normaloff>://icons/DocumentDismiss.svg</iconset>
    </property>
    <property name="text">
     <string>Close File</string>
@@ -834,7 +856,7 @@
     <string>Ctrl+D</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
+    <enum>QAction::MenuRole::ApplicationSpecificRole</enum>
    </property>
   </action>
   <action name="action_find_peaks_in_selection">
@@ -855,7 +877,7 @@
     <string>Ctrl+F</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
+    <enum>QAction::MenuRole::ApplicationSpecificRole</enum>
    </property>
   </action>
   <action name="action_show_user_guide">
@@ -933,8 +955,8 @@
    <property name="text">
     <string>Open Annotation File</string>
    </property>
-   <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
  </widget>
@@ -966,7 +988,9 @@
   <tabstop>btn_export_all_results</tabstop>
   <tabstop>tab_widget_result_views</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>btn_open_file</sender>
