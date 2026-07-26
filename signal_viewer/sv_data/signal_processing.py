@@ -1,11 +1,13 @@
 # pyright: reportUnknownVariableType=false, reportUnknownArgumentType=false
 
-from typing import NamedTuple, Unpack
+from typing import Literal, NamedTuple, Unpack
 
-import neurokit2 as nk
 import numpy as np
 import numpy.typing as npt
 import polars as pl
+
+# import neurokit2 as nk
+from neurokit2.signal import signal_filter as _nk_signal_filter
 from scipy import signal
 
 from signal_viewer.enum_defs import FilterMethod, PreprocessPipeline
@@ -16,6 +18,32 @@ class CleaningResult(NamedTuple):
     cleaned: npt.NDArray[np.float64]
     parameters: SignalFilterKwargs
     additional_parameters: SignalFilterKwargs | None = None
+
+
+def signal_filter(
+    sig: npt.NDArray[np.float64],
+    sampling_rate: int = 1000,
+    lowcut: float | None = None,
+    highcut: float | None = None,
+    method: str = "butterworth",
+    order: int = 2,
+    window_size: int | Literal["default"] = "default",
+    powerline: float = 50,
+    show: bool = False,
+) -> npt.NDArray[np.float64]:
+    """Typed wrapper around `neurokit2.signal.signal_filter` that casts the return value."""
+    out = _nk_signal_filter(
+        sig,
+        sampling_rate=sampling_rate,
+        lowcut=lowcut,
+        highcut=highcut,
+        method=method,
+        order=order,
+        window_size=window_size,  # pyright: ignore[reportArgumentType]
+        powerline=powerline,  # pyright: ignore[reportArgumentType]
+        show=show,
+    )
+    return np.asarray(out, dtype=np.float64)
 
 
 def rolling_standardize(sig: pl.Series, window_size: int) -> pl.Series:
@@ -46,20 +74,20 @@ def standardize_signal(sig: pl.Series, robust: bool = False, window_size: int | 
 def ecg_clean_neurokit(
     sig: npt.NDArray[np.float64], sampling_rate: int, powerline: int = 50
 ) -> npt.NDArray[np.float64]:
-    clean = nk.signal_filter(
-        signal=sig,
+    clean = signal_filter(
+        sig=sig,
         sampling_rate=sampling_rate,
         lowcut=0.5,
         method=FilterMethod.Butterworth,
         order=5,
     )
-    return nk.signal_filter(clean, sampling_rate=sampling_rate, method=FilterMethod.Powerline, powerline=powerline)
+    return signal_filter(clean, sampling_rate=sampling_rate, method=FilterMethod.Powerline, powerline=powerline)
 
 
 def ppg_clean_elgendi(
     sig: npt.NDArray[np.float64], sampling_rate: int
 ) -> tuple[npt.NDArray[np.float64], SignalFilterKwargs]:
-    return nk.signal_filter(
+    return signal_filter(
         sig,
         sampling_rate=sampling_rate,
         lowcut=0.5,
@@ -93,7 +121,7 @@ def ecg_clean_biosppy(
 def ecg_clean_pantompkins(
     sig: npt.NDArray[np.float64], sampling_rate: int
 ) -> tuple[npt.NDArray[np.float64], SignalFilterKwargs]:
-    return nk.signal_filter(
+    return signal_filter(
         sig,
         sampling_rate=sampling_rate,
         lowcut=5,
@@ -106,7 +134,7 @@ def ecg_clean_pantompkins(
 def ecg_clean_hamilton(
     sig: npt.NDArray[np.float64], sampling_rate: int
 ) -> tuple[npt.NDArray[np.float64], SignalFilterKwargs]:
-    return nk.signal_filter(
+    return signal_filter(
         sig,
         sampling_rate=sampling_rate,
         lowcut=8,
@@ -119,7 +147,7 @@ def ecg_clean_hamilton(
 def ecg_clean_elgendi(
     sig: npt.NDArray[np.float64], sampling_rate: int
 ) -> tuple[npt.NDArray[np.float64], SignalFilterKwargs]:
-    return nk.signal_filter(
+    return signal_filter(
         sig,
         sampling_rate=sampling_rate,
         lowcut=8,
@@ -132,7 +160,7 @@ def ecg_clean_elgendi(
 def ecg_clean_engzee(
     sig: npt.NDArray[np.float64], sampling_rate: int
 ) -> tuple[npt.NDArray[np.float64], SignalFilterKwargs]:
-    return nk.signal_filter(
+    return signal_filter(
         sig,
         sampling_rate=sampling_rate,
         lowcut=52,
@@ -145,7 +173,7 @@ def ecg_clean_engzee(
 def ecg_clean_vgraph(
     sig: npt.NDArray[np.float64], sampling_rate: int
 ) -> tuple[npt.NDArray[np.float64], SignalFilterKwargs]:
-    return nk.signal_filter(
+    return signal_filter(
         sig,
         sampling_rate=sampling_rate,
         lowcut=4,
@@ -165,9 +193,9 @@ def filter_signal(
         kwargs["highcut"] = None
     if lowcut == 0:
         kwargs["lowcut"] = None
-    out = nk.signal_filter(sig, sampling_rate=sampling_rate, **kwargs)  # type: ignore
+    out = signal_filter(sig, sampling_rate=sampling_rate, **kwargs)
 
-    return np.asarray(out, dtype=np.float64), kwargs
+    return out, kwargs
 
 
 def apply_cleaning_pipeline(

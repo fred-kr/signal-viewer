@@ -39,7 +39,7 @@ class SelectedFileMetadata:
 class CompleteResult:
     metadata: SelectedFileMetadata = attrs.field()
     global_dataframe: pl.DataFrame = attrs.field()
-    section_results: dict["SectionID", DetailedSectionResult] = attrs.field()
+    section_results: dict[SectionID, DetailedSectionResult] = attrs.field()
 
     def to_dict(self) -> CompleteResultDict:
         section_results = {k: v.to_dict() for k, v in self.section_results.items()}
@@ -248,7 +248,7 @@ class DataController(QtCore.QObject):
         self.has_data = True
         self.sig_new_data.emit()
 
-    def create_section(self, start: float | int, stop: float | int) -> None:
+    def create_section(self, start: float, stop: float) -> None:
         if self._metadata is None:
             return
         data = self.base_df.filter(pl.col("index").is_between(start, stop))

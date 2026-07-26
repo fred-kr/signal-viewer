@@ -26,7 +26,7 @@ class SVGUI(QtWidgets.QMainWindow):
     sig_refresh_table = QtCore.Signal()
     sig_export_result = QtCore.Signal(str)
 
-    def __init__(self, sv_app: "SVApp", version: str = "0.0.0") -> None:
+    def __init__(self, sv_app: SVApp, version: str = "0.0.0") -> None:
         super().__init__()
 
         self.ui = Ui_MainWindow()
@@ -128,11 +128,11 @@ class SVGUI(QtWidgets.QMainWindow):
             return
 
         console_window = JupyterConsoleWindow(
-            namespace=dict(
-                sv=sv,
-                sv_app=get_app(),
-                sv_gui=self,
-            )
+            namespace={
+                "sv": sv,
+                "sv_app": get_app(),
+                "sv_gui": self,
+            }
         )
         console_window.setVisible(False)
 

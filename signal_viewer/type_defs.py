@@ -1,6 +1,6 @@
 import datetime
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, Literal, TypedDict, Union
+from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 import numpy as np
 import numpy.typing as npt
@@ -15,15 +15,16 @@ from signal_viewer.enum_defs import (
 
 if TYPE_CHECKING:
     from loguru import RecordException, RecordFile, RecordLevel, RecordProcess, RecordThread
-    from PySide6 import QtCore, QtGui
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QBrush, QColor, QPainterPath, QPen
 
     from signal_viewer.sv_data.section import SectionID
 
-type PGColor = Union[str, int, float, tuple[int, int, int], tuple[int, int, int, int], "QtGui.QColor", SVGColors]
-type PGPen = Union[PGColor, "QtGui.QPen", PGPenKwargs, None]
-type PGBrush = Union[PGColor, "QtGui.QBrush", PGBrushKwargs, None]
+type PGColor = str | int | float | tuple[int, int, int] | tuple[int, int, int, int] | QColor | SVGColors
+type PGPen = PGColor | QPen | PGPenKwargs | None
+type PGBrush = PGColor | QBrush | PGBrushKwargs | None
 
-type PGPointSymbols = Union[PointSymbols, "QtGui.QPainterPath", str]
+type PGPointSymbols = PointSymbols | QPainterPath | str
 
 type UpdatePeaksAction = Literal["add", "remove"]
 
@@ -33,7 +34,7 @@ class PGPenKwargs(TypedDict, total=False):
     width: float
     cosmetic: bool
     dash: Sequence[float] | None
-    style: Union["QtCore.Qt.PenStyle", None]
+    style: Qt.PenStyle | None
     hsv: tuple[float, float, float, float]
 
 
@@ -110,16 +111,16 @@ class PeaksECGPromac(TypedDict):
     gaussian_sd: int  # milliseconds
 
 
-type PeakDetectionAlgorithmParameters = Union[
-    PeaksPPGElgendi,
-    PeaksECGNeuroKit,
-    PeaksECGPromac,
-    PeaksECGGamboa,
-    PeaksECGEmrich,
-    PeaksLocalMinima,
-    PeaksLocalMaxima,
-    PeaksECGXQRS,
-]
+type PeakDetectionAlgorithmParameters = (
+    PeaksPPGElgendi
+    | PeaksECGNeuroKit
+    | PeaksECGPromac
+    | PeaksECGGamboa
+    | PeaksECGEmrich
+    | PeaksLocalMinima
+    | PeaksLocalMaxima
+    | PeaksECGXQRS
+)
 
 
 class SelectedFileMetadataDict(TypedDict):
@@ -147,7 +148,7 @@ class ManualPeakEditsDict(TypedDict):
 
 class SectionMetadataDict(TypedDict):
     signal_name: str
-    section_id: "SectionID"
+    section_id: SectionID
     global_bounds: tuple[int, int]
     sampling_rate: int
     processing_parameters: ProcessingParametersDict
@@ -180,22 +181,22 @@ class DetailedSectionResultDict(TypedDict):
 class CompleteResultDict(TypedDict):
     metadata: SelectedFileMetadataDict
     global_dataframe: npt.NDArray[np.void]
-    section_results: dict["SectionID", DetailedSectionResultDict]
+    section_results: dict[SectionID, DetailedSectionResultDict]
 
 
 class LogRecordDict(TypedDict):
     elapsed: datetime.timedelta
-    exception: "RecordException | None"
+    exception: RecordException | None
     extra: dict[str, Any]
-    file: "RecordFile"
+    file: RecordFile
     function: str
-    level: "RecordLevel"
+    level: RecordLevel
     line: int | None
     message: str
     module: str
     name: str | None
-    process: "RecordProcess"
-    thread: "RecordThread"
+    process: RecordProcess
+    thread: RecordThread
     time: datetime.datetime
 
 

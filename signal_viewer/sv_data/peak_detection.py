@@ -9,10 +9,12 @@ modified to fit the needs of this application.
 from collections.abc import Callable
 from typing import Literal, cast
 
-import neurokit2 as nk
+# import neurokit2 as nk
 import numpy as np
 import numpy.typing as npt
 import wfdb.processing as wp
+from neurokit2.ecg import ecg_findpeaks
+from neurokit2.ppg import ppg_findpeaks
 from scipy import ndimage
 
 from signal_viewer.enum_defs import PeakDetectionAlgorithm, WFDBPeakDirection
@@ -232,9 +234,7 @@ def find_peaks(
         )
     elif method == PeakDetectionAlgorithm.PPG_Elgendi:
         method_parameters = cast(PeaksPPGElgendi, method_parameters)
-        peak_dict = nk.ppg_findpeaks(
-            sig, sampling_rate=sampling_rate, method="elgendi", show=False, **method_parameters
-        )
+        peak_dict = ppg_findpeaks(sig, sampling_rate=sampling_rate, method="elgendi", show=False, **method_parameters)
         return np.asarray(peak_dict["PPG_Peaks"], dtype=np.intp)
     elif method == PeakDetectionAlgorithm.ECG_XQRS:
         method_parameters = cast(PeaksECGXQRS, method_parameters)
@@ -247,7 +247,7 @@ def find_peaks(
         )
     elif method == PeakDetectionAlgorithm.ECG_NeuroKit:
         method_parameters = cast(PeaksECGNeuroKit, method_parameters)
-        return nk.ecg_findpeaks(
+        return ecg_findpeaks(
             ecg_cleaned=sig,
             sampling_rate=sampling_rate,
             method=method,
@@ -256,7 +256,7 @@ def find_peaks(
         )["ECG_R_Peaks"]
     elif method == PeakDetectionAlgorithm.ECG_Emrich_2023:
         method_parameters = cast(PeaksECGEmrich, method_parameters)
-        return nk.ecg_findpeaks(
+        return ecg_findpeaks(
             ecg_cleaned=sig,
             sampling_rate=sampling_rate,
             method=method,
@@ -265,7 +265,7 @@ def find_peaks(
         )["ECG_R_Peaks"]
     elif method == PeakDetectionAlgorithm.ECG_Gamboa_2008:
         method_parameters = cast(PeaksECGGamboa, method_parameters)
-        return nk.ecg_findpeaks(
+        return ecg_findpeaks(
             ecg_cleaned=sig,
             sampling_rate=sampling_rate,
             method=method,
@@ -274,7 +274,7 @@ def find_peaks(
         )["ECG_R_Peaks"]
     elif method == PeakDetectionAlgorithm.ECG_Promac:
         method_parameters = cast(PeaksECGPromac, method_parameters)
-        return nk.ecg_findpeaks(
+        return ecg_findpeaks(
             ecg_cleaned=sig,
             sampling_rate=sampling_rate,
             method=method,
@@ -282,7 +282,7 @@ def find_peaks(
             **method_parameters,
         )["ECG_R_Peaks"]
     else:
-        return nk.ecg_findpeaks(
+        return ecg_findpeaks(
             ecg_cleaned=sig,
             sampling_rate=sampling_rate,
             method=method,

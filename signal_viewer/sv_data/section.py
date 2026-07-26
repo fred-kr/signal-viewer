@@ -135,7 +135,7 @@ class SectionID(str):
     #     super().__init__()
 
     @staticmethod
-    def default() -> "SectionID":
+    def default() -> SectionID:
         return SectionID("Section_DEFAULT_000")
 
     def pretty_name(self) -> str:
@@ -200,9 +200,9 @@ class DetailedSectionResult:
     Class containing detailed information about a section. Created when a complete result is requested by the user.
     """
 
-    metadata: "SectionMetadata" = attrs.field()
+    metadata: SectionMetadata = attrs.field()
     section_dataframe: pl.DataFrame = attrs.field()
-    manual_peak_edits: "ManualPeakEdits" = attrs.field()
+    manual_peak_edits: ManualPeakEdits = attrs.field()
     section_result: SectionResult = attrs.field()
     rate_per_temperature: pl.DataFrame = attrs.field()
 
@@ -219,19 +219,19 @@ class DetailedSectionResult:
 class Section:
     __slots__ = (
         "_is_filtered",
-        "_is_standardized",
         "_is_processed",
-        "_result_data",
-        "_rate_is_synced",
-        "_processing_parameters",
+        "_is_standardized",
         "_manual_peak_edits",
-        "signal_name",
-        "processed_signal_name",
-        "info_name",
-        "section_id",
+        "_processing_parameters",
+        "_rate_is_synced",
+        "_result_data",
         "data",
-        "sampling_rate",
         "global_bounds",
+        "info_name",
+        "processed_signal_name",
+        "sampling_rate",
+        "section_id",
+        "signal_name",
     )
 
     def __init__(self, data: pl.DataFrame, signal_name: str, info_column: str | None = None) -> None:

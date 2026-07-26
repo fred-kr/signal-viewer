@@ -51,7 +51,7 @@ class WorkerSignals(QtCore.QObject):
 class PeakDetectionWorker(QtCore.QRunnable):
     def __init__(
         self,
-        section: "Section",
+        section: Section,
         method: PeakDetectionAlgorithm,
         method_parameters: PeakDetectionAlgorithmParameters,
         *,
@@ -77,7 +77,7 @@ class PeakDetectionWorker(QtCore.QRunnable):
 
 
 class SectionResultWorker(QtCore.QRunnable):
-    def __init__(self, section: "Section", *, rr_params: RollingRateKwargs | None = None) -> None:
+    def __init__(self, section: Section, *, rr_params: RollingRateKwargs | None = None) -> None:
         super().__init__()
         self.section = section
         self.rr_params = rr_params
@@ -428,7 +428,7 @@ class SVApp(QtCore.QObject):
         self.data.update_metadata(sampling_rate, signal_col, info_col)
 
     @QtCore.Slot(object)
-    def update_metadata_widgets(self, metadata: "FileMetadata") -> None:
+    def update_metadata_widgets(self, metadata: FileMetadata) -> None:
         self.gui.data_tree_widget_additional_metadata.set_data(metadata.other_info, hide_root=True)
         self.gui.data_tree_widget_additional_metadata.collapseAll()
         self.gui.ui.spin_box_sampling_rate_import_page.setValue(metadata.sampling_rate)

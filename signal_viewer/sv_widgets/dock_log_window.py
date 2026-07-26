@@ -40,8 +40,8 @@ class LoggingWindow(QtWidgets.QTextEdit):
 
         self.sig_log_message.emit(message, level, record_dict)
 
-    @QtCore.Slot(str, int, str)
-    def append(self, message: str, log_level: LogLevel, record_dict: LogRecordDict) -> None:
+    @QtCore.Slot(str)
+    def append(self, message: str) -> None:
         self.moveCursor(QtGui.QTextCursor.MoveOperation.End)
         self.textCursor().insertHtml(f"{message}<br>")
         self.moveCursor(QtGui.QTextCursor.MoveOperation.End)
