@@ -88,9 +88,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         if role == ItemDataRole.DisplayRole:
             if orientation == QtCore.Qt.Orientation.Horizontal:
                 return self.df.columns[section]
-        elif role == ItemDataRole.ToolTipRole:
-            if orientation == QtCore.Qt.Orientation.Horizontal:
-                return str(self.df.schema[self.df.columns[section]])
+        elif role == ItemDataRole.ToolTipRole and orientation == QtCore.Qt.Orientation.Horizontal:
+            return str(self.df.schema[self.df.columns[section]])
         return None
 
 
@@ -203,14 +202,14 @@ class FileListModel(QtCore.QAbstractListModel):
 class SectionListModel(QtCore.QAbstractListModel):
     def __init__(
         self,
-        sections: list["Section"] | None = None,
+        sections: list[Section] | None = None,
         parent: QtCore.QObject | None = None,
     ) -> None:
         super().__init__(parent)
         self._sections = sections or []
 
     @property
-    def editable_sections(self) -> list["Section"]:
+    def editable_sections(self) -> list[Section]:
         return list(self._sections)[1:]
 
     def rowCount(self, parent: ModelIndex | None = None) -> int:
@@ -241,7 +240,7 @@ class SectionListModel(QtCore.QAbstractListModel):
             return QtGui.QIcon(":icons/LockClosed.svg") if section.is_locked else QtGui.QIcon(":icons/LockOpen.svg")
         return None
 
-    def add_section(self, section: "Section") -> None:
+    def add_section(self, section: Section) -> None:
         parent = self.index(0, 0)
         self.beginInsertRows(parent, self.rowCount(), self.rowCount())
         self._sections.append(section)
@@ -256,10 +255,10 @@ class SectionListModel(QtCore.QAbstractListModel):
         self.refresh_section_ids()
         self.endRemoveRows()
 
-    def get_section(self, index: QtCore.QModelIndex) -> "Section | None":
+    def get_section(self, index: QtCore.QModelIndex) -> Section | None:
         return self._sections[index.row()] if index.isValid() else None
 
-    def get_base_section(self) -> "Section | None":
+    def get_base_section(self) -> Section | None:
         return self._sections[0] if self._sections else None
 
     def clear(self) -> None:
@@ -274,14 +273,14 @@ class SectionListModel(QtCore.QAbstractListModel):
 
 class FileMetadata:
     __slots__ = (
-        "required_fields",
-        "file_info",
-        "_sampling_rate",
         "_columns",
-        "_signal_column",
         "_info_column",
+        "_sampling_rate",
+        "_signal_column",
+        "file_info",
         "name_map",
         "other_info",
+        "required_fields",
     )
 
     def __init__(self, file_path: Path | str, columns: list[str], sampling_rate: int) -> None:

@@ -17,6 +17,7 @@ from pyqtgraph.graphicsItems.DateAxisItem import (
     ZoomLevel,
     makeSStepper,
 )
+from pyqtgraph.graphicsItems.ViewBox import ViewBox
 from pyqtgraph.GraphicsScene import mouseEvents
 from pyqtgraph.Point import Point
 from PySide6 import QtCore, QtGui, QtWidgets
@@ -29,7 +30,7 @@ if TYPE_CHECKING:
     from pyqtgraph.GraphicsScene import mouseEvents
 
 
-def _get_button_type(ev: "mouseEvents.MouseDragEvent") -> MouseButtons:
+def _get_button_type(ev: mouseEvents.MouseDragEvent) -> MouseButtons:
     if ev.button() == QtCore.Qt.MouseButton.MiddleButton:
         return MouseButtons.MiddleButton
     elif ev.button() == QtCore.Qt.MouseButton.LeftButton:
@@ -43,9 +44,9 @@ def _get_button_type(ev: "mouseEvents.MouseDragEvent") -> MouseButtons:
         return MouseButtons.Unknown
 
 
-class EditingViewBox(pg.ViewBox):
+class EditingViewBox(ViewBox):
     """
-    `pyqtgraph.ViewBox` that makes selection of data easier.
+    `pyqtgraph.ViewBox.ViewBox` that makes selection of data easier.
     """
 
     def __init__(self, *args: Any, **kargs: Any) -> None:
@@ -79,7 +80,7 @@ class EditingViewBox(pg.ViewBox):
         self.addItem(selection_box, ignoreBounds=True)
         return
 
-    def mouseDragEvent(self, ev: "mouseEvents.MouseDragEvent", axis: int | None = None) -> None:
+    def mouseDragEvent(self, ev: mouseEvents.MouseDragEvent, axis: int | None = None) -> None:
         ev.accept()
 
         pos = ev.pos()
@@ -101,7 +102,7 @@ class EditingViewBox(pg.ViewBox):
                 self.updateSelectionBox(ev.pos(), ev.buttonDownPos())
                 self.mapped_selection_rect = None
         elif button_type == MouseButtons.LeftButton:
-            if self.state["mouseMode"] == pg.ViewBox.RectMode and axis is None:
+            if self.state["mouseMode"] == ViewBox.RectMode and axis is None:
                 if ev.isFinish():
                     self._on_left_mouse_drag_finished(ev, pos)
                 else:
@@ -114,7 +115,7 @@ class EditingViewBox(pg.ViewBox):
     def _on_right_mouse_drag(
         self,
         mask: npt.NDArray[np.float64],
-        ev: "mouseEvents.MouseDragEvent",
+        ev: mouseEvents.MouseDragEvent,
         mouse_enabled: npt.NDArray[np.float64],
     ) -> None:
         if self.state["aspectLocked"] is not False:
@@ -150,7 +151,7 @@ class EditingViewBox(pg.ViewBox):
             self.translateBy(x=x, y=y)
         self.sigRangeChangedManually.emit(self.state["mouseEnabled"])
 
-    def _on_left_mouse_drag_finished(self, ev: "mouseEvents.MouseDragEvent", pos: Point) -> None:
+    def _on_left_mouse_drag_finished(self, ev: mouseEvents.MouseDragEvent, pos: Point) -> None:
         self.rbScaleBox.hide()
         ax = QtCore.QRectF(Point(ev.buttonDownPos(ev.button())), Point(pos))
         ax = self.childGroup.mapRectFromParent(ax)
@@ -183,9 +184,7 @@ class EditingViewBox(pg.ViewBox):
 #         return strings
 
 
-def _format_hms_timedelta(
-    seconds: int | float, show_seconds: bool = False, show_accuracy_warnings: bool = False
-) -> str:
+def _format_hms_timedelta(seconds: float, show_seconds: bool = False, show_accuracy_warnings: bool = False) -> str:
     seconds_whole = int(seconds)
     milliseconds = int((seconds - seconds_whole) * 1000)
 
@@ -205,7 +204,7 @@ def _format_hms_timedelta(
     return f"{hours:02d}:{minutes:02d}"
 
 
-def _format_day_timedelta(seconds: int | float, show_accuracy_warnings: bool = False) -> str:
+def _format_day_timedelta(seconds: float, show_accuracy_warnings: bool = False) -> str:
     hours = int(seconds // (3600 * 24))
     missing_seconds = hours * 3600 * 24 - seconds
     if show_accuracy_warnings and missing_seconds != 0:
@@ -316,14 +315,14 @@ class ClickableRegionItem(pg.LinearRegionItem):
     def section_id(self, value: int) -> None:
         self._section_id = value
 
-    def mouseClickEvent(self, ev: "mouseEvents.MouseClickEvent") -> None:
+    def mouseClickEvent(self, ev: mouseEvents.MouseClickEvent) -> None:
         if ev.button() == QtCore.Qt.MouseButton.LeftButton:
             self.sig_clicked.emit(self._section_id)
             ev.accept()
         else:
             super().mouseClickEvent(ev)
 
-    def hoverEvent(self, ev: "mouseEvents.HoverEvent") -> None:
+    def hoverEvent(self, ev: mouseEvents.HoverEvent) -> None:
         if (not ev.isExit()) and ev.acceptDrags(QtCore.Qt.MouseButton.LeftButton):
             self.setMouseHover(True)
         else:

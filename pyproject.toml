@@ -35,6 +35,7 @@ dependencies = [
 dev = [
     "pyinstaller>=6.21.0",
     "pyinstaller-hooks-contrib>=2026.6",
+    "pyright>=1.1.411",
 ]
 
 [project.scripts]

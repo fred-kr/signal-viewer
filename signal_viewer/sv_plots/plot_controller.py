@@ -7,6 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import pyqtgraph as pg
 from loguru import logger
+from pyqtgraph.graphicsItems.ViewBox import ViewBox
 from PySide6 import QtCore, QtWidgets
 
 from signal_viewer.enum_defs import PointSymbols, SVGColors
@@ -28,7 +29,7 @@ class PlotController(QtCore.QObject):
     sig_scatter_data_changed = QtCore.Signal(str, object)
     sig_section_clicked = QtCore.Signal(int)
 
-    def __init__(self, parent: QtCore.QObject | None, gui: "SVGUI") -> None:
+    def __init__(self, parent: QtCore.QObject | None, gui: SVGUI) -> None:
         super().__init__(parent)
 
         self._gui = gui
@@ -46,7 +47,7 @@ class PlotController(QtCore.QObject):
         widget_layout.setContentsMargins(0, 0, 0, 0)
         widget_layout.setSpacing(2)
         main_plot_widget = pg.PlotWidget(viewBox=EditingViewBox(name="main_plot"))
-        rate_plot_widget = pg.PlotWidget(viewBox=pg.ViewBox(name="rate_plot"))
+        rate_plot_widget = pg.PlotWidget(viewBox=ViewBox(name="rate_plot"))
 
         widget_layout.addWidget(main_plot_widget)
         widget_layout.addWidget(rate_plot_widget)
@@ -54,7 +55,7 @@ class PlotController(QtCore.QObject):
         self.pw_main = main_plot_widget
         self.pw_rate = rate_plot_widget
         self.mpw_result = self._gui.ui.mpl_widget
-        self.vb_info = pg.ViewBox(name="info_vb")
+        self.vb_info = ViewBox(name="info_vb")
 
         self.update_views()
         self.pw_main.plotItem.vb.sigResized.connect(self.update_views)
@@ -78,10 +79,10 @@ class PlotController(QtCore.QObject):
         p_main.getAxis("right").linkToView(self.vb_info)
         self.vb_info.setXLink(p_main)
 
-        self.pw_main.getPlotItem().getViewBox().enableAutoRange(pg.ViewBox.YAxis, enable=0.99)  # type: ignore
+        self.pw_main.getPlotItem().getViewBox().enableAutoRange(ViewBox.YAxis, enable=0.99)  # type: ignore
         self.pw_main.getPlotItem().getViewBox().setAutoPan(y=True)
 
-        self.pw_rate.getPlotItem().getViewBox().enableAutoRange(pg.ViewBox.YAxis, enable=True)
+        self.pw_rate.getPlotItem().getViewBox().enableAutoRange(ViewBox.YAxis, enable=True)
         self.pw_rate.getPlotItem().getViewBox().setAutoVisible(y=False)
 
         self.pw_main.getPlotItem().getViewBox().setXLink("rate_plot")
@@ -477,7 +478,7 @@ class PlotController(QtCore.QObject):
         self,
         sender: pg.ScatterPlotItem,
         points: Sequence[pg.SpotItem],
-        ev: "mouseEvents.MouseClickEvent",
+        ev: mouseEvents.MouseClickEvent,
     ) -> None:
         """
         Handles click events on the peak scatter plot.
@@ -556,7 +557,7 @@ class PlotController(QtCore.QObject):
         return x_pos, y_data[mask][closest_index]
 
     @QtCore.Slot(object, object)
-    def _on_curve_clicked(self, sender: pg.PlotCurveItem, ev: "mouseEvents.MouseClickEvent") -> None:
+    def _on_curve_clicked(self, sender: pg.PlotCurveItem, ev: mouseEvents.MouseClickEvent) -> None:
         """
         Handles click events on the signal curve.
 
