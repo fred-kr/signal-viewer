@@ -50,3 +50,10 @@ build-backend = "hatchling.build"
 pyside-config = { git = "https://github.com/fred-kr/pyside-config", branch = "main" }
 pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets", branch = "main" }
 # pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }
+
+[tool.ruff]
+line-length = 120
+fix = true
+extend-exclude = [
+    "generated"
+]
