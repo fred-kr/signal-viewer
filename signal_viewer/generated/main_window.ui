@@ -139,10 +139,6 @@
              <property name="text">
               <string>Open File</string>
              </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>://icons/FolderOpen.svg</normaloff>://icons/FolderOpen.svg</iconset>
-             </property>
              <property name="iconSize">
               <size>
                <width>24</width>
@@ -301,10 +297,6 @@
              <property name="text">
               <string>Close File</string>
              </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>://icons/DocumentDismiss.svg</normaloff>://icons/DocumentDismiss.svg</iconset>
-             </property>
              <property name="iconSize">
               <size>
                <width>24</width>
@@ -329,10 +321,6 @@
              </property>
              <property name="text">
               <string>Load Data</string>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>://icons/DocumentArrowRight.svg</normaloff>://icons/DocumentArrowRight.svg</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -463,10 +451,6 @@
           <property name="text">
            <string>Save to HDF5 (detailed)</string>
           </property>
-          <property name="icon">
-           <iconset resource="../resources.qrc">
-            <normaloff>:/icons/SaveArrowRight.svg</normaloff>:/icons/SaveArrowRight.svg</iconset>
-          </property>
           <property name="iconSize">
            <size>
             <width>24</width>
@@ -589,10 +573,6 @@
           <property name="text">
            <string>Save to Excel</string>
           </property>
-          <property name="icon">
-           <iconset resource="../resources.qrc">
-            <normaloff>:/icons/SaveArrowRight.svg</normaloff>:/icons/SaveArrowRight.svg</iconset>
-          </property>
           <property name="iconSize">
            <size>
             <width>24</width>
@@ -606,19 +586,27 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_opengl">
+       <attribute name="title">
+        <string>OpenGL</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <widget class="QWidget" name="widget" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QOpenGLWidget" name="openGLWidget"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1656</width>
-     <height>33</height>
-    </rect>
-   </property>
    <property name="nativeMenuBar">
     <bool>false</bool>
    </property>
@@ -678,10 +666,6 @@
    </property>
   </action>
   <action name="action_show_settings">
-   <property name="icon">
-    <iconset>
-     <normaloff>://icons/Settings.svg</normaloff>://icons/Settings.svg</iconset>
-   </property>
    <property name="text">
     <string>Preferences</string>
    </property>
@@ -820,11 +804,6 @@
    <property name="checked">
     <bool>false</bool>
    </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>://icons/EyeHide.svg</normaloff>
-     <normalon>://icons/EyeShow.svg</normalon>://icons/EyeHide.svg</iconset>
-   </property>
    <property name="text">
     <string>Section Overview</string>
    </property>
@@ -836,10 +815,6 @@
    </property>
   </action>
   <action name="action_remove_peaks_in_selection">
-   <property name="icon">
-    <iconset>
-     <normaloff>://icons/Eraser.svg</normaloff>://icons/Eraser.svg</iconset>
-   </property>
    <property name="text">
     <string>Remove Peaks in Selection</string>
    </property>
@@ -860,10 +835,6 @@
    </property>
   </action>
   <action name="action_find_peaks_in_selection">
-   <property name="icon">
-    <iconset>
-     <normaloff>://icons/SearchSquare.svg</normaloff>://icons/SearchSquare.svg</iconset>
-   </property>
    <property name="text">
     <string>Find Peaks in Selection</string>
    </property>
@@ -907,10 +878,6 @@
    </property>
   </action>
   <action name="action_about_app">
-   <property name="icon">
-    <iconset>
-     <normaloff>://icons/BookInformation.svg</normaloff>://icons/BookInformation.svg</iconset>
-   </property>
    <property name="text">
     <string>About App</string>
    </property>
