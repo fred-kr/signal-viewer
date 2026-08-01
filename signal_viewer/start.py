@@ -55,7 +55,7 @@ def gui() -> None:
     pg.setConfigOptions(
         useOpenGL=use_opengl,
         enableExperimental=use_opengl,
-        segmentedLineMode="on",
+        segmentedLineMode="auto",
     )
     from signal_viewer.sv_app import SVApp
 
