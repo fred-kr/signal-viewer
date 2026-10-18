@@ -15,3 +15,5 @@ TODO.md
 *.code-workspace
 .vscode/
 ti
+scratchpad/
+*.log

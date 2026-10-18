@@ -5,12 +5,14 @@ from collections.abc import Sequence
 from typing import Any, Literal, Unpack
 
 import attrs
-import neurokit2 as nk
 import numpy as np
 import numpy.typing as npt
 import polars as pl
 import polars.selectors as ps
 from loguru import logger
+
+# import neurokit2 as
+from neurokit2.signal import signal_rate
 
 from signal_viewer.constants import INDEX_COL, IS_MANUAL_COL, IS_PEAK_COL, SECTION_INDEX_COL
 from signal_viewer.enum_defs import (
@@ -605,11 +607,11 @@ class Section:
 
         Parameters
         ----------
-        full_info : bool, optional
+        full_info : bool, default False
             If True, calculates summary statistics in addition to the rate, by default False
-        force : bool, optional
+        force : bool, default False
             If True, recalculates the rate even if the `_rate_is_synced` flag is True, by default False
-        rr_params : dict, optional
+        rr_params : dict or None, default None
             Additional parameters to pass to the `rolling_rate` function, by default None
         """
         if not force and (self._rate_is_synced or self.is_locked):
@@ -645,7 +647,7 @@ class Section:
             return
         if desired_length is None:
             desired_length = len(self.processed_signal)
-        inst_rate = nk.signal_rate(peaks, sampling_rate=self.sampling_rate, desired_length=desired_length)  # type: ignore
+        inst_rate = signal_rate(peaks, sampling_rate=self.sampling_rate, desired_length=desired_length)
 
         self.rate_data = pl.DataFrame(
             {SECTION_INDEX_COL: self.data.get_column(SECTION_INDEX_COL), "rate_bpm": inst_rate},

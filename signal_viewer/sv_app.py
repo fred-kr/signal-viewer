@@ -352,8 +352,8 @@ class SVApp(QtCore.QObject):
             return
         if not self.plot.region_selector.isVisible():
             return
-        start, stop = self.plot.region_selector.getRegion()
-        self.data.create_section(start, stop)  # type: ignore
+        start, stop = self.plot.get_region_bounds()
+        self.data.create_section(start, stop)
         self.plot.hide_region_selector()
         self.gui.show_section_confirm_cancel(False)
         self.gui.ui.action_create_new_section.setChecked(False)

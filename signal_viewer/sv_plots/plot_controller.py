@@ -72,20 +72,22 @@ class PlotController(QtCore.QObject):
             plt_item.setClipToView(True)
             plt_item.addLegend(colCount=3)
             plt_item.addLegend().anchor(itemPos=(0, 1), parentPos=(0, 1), offset=(5, -5))
-            plt_item.setMouseEnabled(x=True, y=False)  # type: ignore
+            plt_item.setMouseEnabled(x=True, y=False)  # pyright: ignore[reportAttributeAccessIssue]
 
         p_main.showAxis("right")
         p_main.scene().addItem(self.vb_info)
         p_main.getAxis("right").linkToView(self.vb_info)
         self.vb_info.setXLink(p_main)
 
-        self.pw_main.getPlotItem().getViewBox().enableAutoRange(ViewBox.YAxis, enable=0.99)  # type: ignore
-        self.pw_main.getPlotItem().getViewBox().setAutoPan(y=True)
+        # self.pw_main.getPlotItem().getViewBox().enableAutoRange(ViewBox.YAxis, enable=0.99)  # pyright: ignore[reportArgumentType]
+        p_main.vb.enableAutoRange(EditingViewBox.YAxis, enable=True)
+        # self.pw_main.getPlotItem().getViewBox().setAutoPan(y=True)
+        p_main.vb.setAutoPan(y=True)
 
-        self.pw_rate.getPlotItem().getViewBox().enableAutoRange(ViewBox.YAxis, enable=True)
-        self.pw_rate.getPlotItem().getViewBox().setAutoVisible(y=False)
+        p_rate.vb.enableAutoRange(ViewBox.YAxis, enable=True)
+        p_rate.vb.setAutoVisible(y=False)
 
-        self.pw_main.getPlotItem().getViewBox().setXLink("rate_plot")
+        p_main.vb.setXLink("rate_plot")
 
     @QtCore.Slot()
     def update_views(self) -> None:
@@ -156,29 +158,34 @@ class PlotController(QtCore.QObject):
         hover_brush = make_qbrush(SVGColors.Red)
         hover_pen = make_qpen(SVGColors.Black, width=1)
 
-        scatter = pg.ScatterPlotItem(
+        scatter = pg.PlotDataItem(
             pxMode=True,
-            size=10,
+            symbolSize=10,
             pen=None,
-            brush=brush,
+            symbolPen=None,
+            symbolBrush=brush,
             useCache=True,
             name="Peaks",
-            hoverable=True,
-            hoverPen=hover_pen,
-            hoverSymbol=PointSymbols.Cross,
-            hoverBrush=hover_brush,
-            hoverSize=15,
-            tip=None,
+        )
+        scatter.scatter.opts.update(
+            {
+                "hoverable": True,
+                "hoverPen": hover_pen,
+                "hoverSymbol": PointSymbols.Cross,
+                "hoverBrush": hover_brush,
+                "hoverSize": 14,
+                "tip": None,
+            }
         )
         scatter.setZValue(60)
-        scatter.sigClicked.connect(self._on_scatter_clicked)
+        scatter.sigPointsClicked.connect(self._on_scatter_clicked)
         self.peak_scatter = scatter
         self.pw_main.addItem(self.peak_scatter)
 
     def _remove_peak_scatter(self) -> None:
         if self.peak_scatter is None:
             return
-        self.peak_scatter.sigClicked.disconnect(self._on_scatter_clicked)
+        self.peak_scatter.sigPointsClicked.disconnect(self._on_scatter_clicked)
         self.pw_main.removeItem(self.peak_scatter)
         self.peak_scatter.setParent(None)
         self.peak_scatter = None
@@ -318,7 +325,7 @@ class PlotController(QtCore.QObject):
         ----------
         bounds : tuple[float, float]
             The min and max boundaries in plot coordinates in which the region selector is allowed.
-        selected_range : tuple[float, float] | None, optional
+        selected_range : tuple[float, float] | None or None
             The initial selected region, defaults to the lower third of the plot's x-axis.
         """
         if not self.region_selector:
@@ -346,9 +353,9 @@ class PlotController(QtCore.QObject):
 
         Parameters
         ----------
-        x1 : int
+        x1 : float
             Plot coordinate of the start of the region
-        x2 : int
+        x2 : float
             Plot coordinate of the end of the region
         """
         brush_color = SVGColors.Aquamarine.qcolor()
@@ -378,15 +385,27 @@ class PlotController(QtCore.QObject):
         self.hide_region_selector()
         self.update_regions(self._show_regions)
 
+    def get_region_bounds(self) -> tuple[int, int]:
+        """
+        Returns the current bounds of the region selector.
+
+        Returns
+        -------
+        tuple[float, float]
+            The min and max boundaries of the region selector.
+        """
+        x1, x2 = int(self.region_selector.getRegion()[0]), int(self.region_selector.getRegion()[1])  # pyright: ignore[reportArgumentType]
+        return x1, x2
+
     def set_signal_data(self, y_data: npt.ArrayLike, clear: bool = False) -> None:
         """
         Sets the values of the signal curve.
 
         Parameters
         ----------
-        y_data : npt.ArrayLike
+        y_data : ArrayLike
             1D array of signal values
-        clear : bool, optional
+        clear : bool, default False
             Whether to clear the existing signal and peak data before setting, by default False
         """
         if self.signal_curve is None:
@@ -404,9 +423,9 @@ class PlotController(QtCore.QObject):
 
         Parameters
         ----------
-        y_data : npt.ArrayLike
+        y_data : ArrayLike
             1D array of info values
-        clear : bool, optional
+        clear : bool, default False
             Whether to clear the existing info data before setting, by default False
         """
         if self.info_curve is None:
@@ -423,12 +442,12 @@ class PlotController(QtCore.QObject):
 
         Parameters
         ----------
-        y_data : npt.ArrayLike
+        y_data : ArrayLike
             1D array of rate values
-        x_data : npt.ArrayLike, optional
+        x_data : ArrayLike or None, default None
             1D array of same length as `y_data`. If `None`, x is automatically set to `np.arange(len(y_data))`, by
             default `None`
-        clear : bool, optional
+        clear : bool, default False
             If `True`, explicitly calls `clear()` on the rate curve before setting, by default False
         """
         if self.rate_curve is None:
@@ -447,9 +466,9 @@ class PlotController(QtCore.QObject):
 
         Parameters
         ----------
-        x_data : npt.ArrayLike
+        x_data : ArrayLike
             1D array of x-axis positions of the peaks
-        y_data : npt.ArrayLike
+        y_data : ArrayLike
             1D array of y-axis positions of the peaks
         """
         if self.peak_scatter is None:
@@ -476,7 +495,7 @@ class PlotController(QtCore.QObject):
     @QtCore.Slot(object, object, object)
     def _on_scatter_clicked(
         self,
-        sender: pg.ScatterPlotItem,
+        sender: pg.PlotDataItem,
         points: Sequence[pg.SpotItem],
         ev: mouseEvents.MouseClickEvent,
     ) -> None:
@@ -487,7 +506,7 @@ class PlotController(QtCore.QObject):
 
         Parameters
         ----------
-        sender : pg.ScatterPlotItem
+        sender : pg.PlotDataItem
             The scatter plot item that was clicked. Not used.
         points : Sequence[pg.SpotItem]
             A sequence of spot items that were under the cursor when the click occurred.
@@ -502,7 +521,7 @@ class PlotController(QtCore.QObject):
         point_x = int(point.pos().x())
         point_index = point.index()
 
-        scatter_data: npt.NDArray[np.void] = self.peak_scatter.data  # type: ignore
+        scatter_data = self.peak_scatter.scatter.data
         new_x = np.delete(scatter_data["x"], point_index)
         new_y = np.delete(scatter_data["y"], point_index)
         self.peak_scatter.setData(x=new_x, y=new_y)
@@ -551,7 +570,7 @@ class PlotController(QtCore.QObject):
         closest_index = np.argmin(np.abs(y_data[mask] - y))
 
         x_pos = x_data[mask][closest_index]
-        if self.peak_scatter is not None and x_pos in self.peak_scatter.data["x"]:  # type: ignore
+        if self.peak_scatter is not None and x_pos in self.peak_scatter.scatter.data["x"]:
             return None
 
         return x_pos, y_data[mask][closest_index]
@@ -585,7 +604,7 @@ class PlotController(QtCore.QObject):
 
         x_new, y_new = closest_extreme
 
-        self.peak_scatter.addPoints(x=[x_new], y=[y_new])
+        self.peak_scatter.scatter.addPoints(x=[x_new], y=[y_new])
         self.sig_scatter_data_changed.emit("add", np.array([x_new], dtype=np.int32))
 
     @QtCore.Slot()
@@ -601,7 +620,7 @@ class PlotController(QtCore.QObject):
 
         rx, ry, rw, rh = r.x(), r.y(), r.width(), r.height()
 
-        scatter_x, scatter_y = self.peak_scatter.getData()
+        scatter_x, scatter_y = self.peak_scatter.scatter.getData()
 
         mask = (scatter_x < rx) | (scatter_x > rx + rw) | (scatter_y < ry) | (scatter_y > ry + rh)
 
