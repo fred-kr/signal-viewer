@@ -17,6 +17,7 @@ from signal_viewer.sv_data.file_io import read_annotation_file, write_xlsx
 from signal_viewer.sv_gui import SVGUI
 from signal_viewer.sv_help import HelpController
 from signal_viewer.sv_plots.plot_controller import PlotController
+from signal_viewer.sv_plots.result_plot import ResultPlotController
 from signal_viewer.type_defs import (
     MetadataDict,
     PeakDetectionRequest,
@@ -49,6 +50,7 @@ class SVApp(QtCore.QObject):
         self.data: DataController
         self._new_data_controller()
         self.plot = PlotController(self, self.gui)
+        self.result_plot = ResultPlotController(self.gui.ui.mpl_widget, self)
         self.help = HelpController(self)
 
         self.recent_data_files = FileListModel(Config.internal.recent_files, parent=self)
@@ -106,6 +108,10 @@ class SVApp(QtCore.QObject):
 
         self.plot.sig_scatter_data_changed.connect(self._on_sig_scatter_data_changed)
         self.plot.sig_section_clicked.connect(self._on_sig_section_clicked)
+
+        # The result figure is only drawn once its tab is actually shown
+        self.gui.ui.tab_widget_main.currentChanged.connect(self.result_plot.refresh)
+        self.gui.ui.tab_widget_result_views.currentChanged.connect(self.result_plot.refresh)
 
     #### Event handlers ==========
 
@@ -477,6 +483,7 @@ class SVApp(QtCore.QObject):
         if self.data.has_data:
             # Reloading the same file: the controller discards its sections itself, the plot has to follow.
             self.plot.reset()
+            self.result_plot.clear()
 
         self.data.load_data()
         self.gui.ui.table_view_import_data.horizontalHeader().setSectionResizeMode(
@@ -513,6 +520,7 @@ class SVApp(QtCore.QObject):
         self._new_data_controller()
 
         self.plot.reset()
+        self.result_plot.clear()
 
         self.gui.ui.action_close_file.setEnabled(False)
         self.gui.ui.action_edit_metadata.setEnabled(False)
@@ -553,6 +561,7 @@ class SVApp(QtCore.QObject):
     def update_result_views(self) -> None:
         self.data.result_model_peaks.set_df(self.data.active_section.peak_data)
         self.data.result_model_rate.set_df(self.data.active_section.rate_data)
+        self.result_plot.set_section(self.data.active_section)
 
     @QtCore.Slot()
     def _lock_section(self) -> None:

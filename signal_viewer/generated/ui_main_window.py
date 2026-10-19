@@ -395,7 +395,6 @@ class Ui_MainWindow(object):
         self.tab_widget_result_views.addTab(self.tab_result_rate_info, "")
         self.tab_result_mpl_widget = QWidget()
         self.tab_result_mpl_widget.setObjectName(u"tab_result_mpl_widget")
-        self.tab_result_mpl_widget.setEnabled(False)
         self.verticalLayout = QVBoxLayout(self.tab_result_mpl_widget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.mpl_widget = MatplotlibWidget(self.tab_result_mpl_widget)

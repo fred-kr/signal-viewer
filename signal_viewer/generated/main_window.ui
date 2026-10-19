@@ -512,9 +512,6 @@
            </layout>
           </widget>
           <widget class="QWidget" name="tab_result_mpl_widget">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
            <attribute name="title">
             <string>Plot View</string>
            </attribute>

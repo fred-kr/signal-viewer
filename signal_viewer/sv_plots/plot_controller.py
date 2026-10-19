@@ -66,7 +66,6 @@ class PlotController(QtCore.QObject):
         self._gui.ui.plot_container.setLayout(widget_layout)
         self.pw_main = main_plot_widget
         self.pw_rate = rate_plot_widget
-        self.mpw_result = self._gui.ui.mpl_widget
         self.vb_info = ViewBox(name="info_vb")
 
         self.update_views()
@@ -284,8 +283,6 @@ class PlotController(QtCore.QObject):
         self.pw_rate.clear()
         if self.pw_rate.plotItem.legend:
             self.pw_rate.plotItem.legend.clear()
-
-        self.mpw_result.fig.clear()
 
         self.unbind_section_model()
         self.clear_regions()

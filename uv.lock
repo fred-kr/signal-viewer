@@ -1934,6 +1934,7 @@ source = { editable = "." }
 dependencies = [
     { name = "attrs" },
     { name = "loguru" },
+    { name = "matplotlib" },
     { name = "mne" },
     { name = "neurokit2" },
     { name = "numexpr" },
@@ -1968,6 +1969,7 @@ dev = [
 requires-dist = [
     { name = "attrs", specifier = ">=26.1.0" },
     { name = "loguru", specifier = ">=0.7.3" },
+    { name = "matplotlib", specifier = ">=3.10.8" },
     { name = "mne", specifier = ">=1.13.2" },
     { name = "neurokit2", specifier = ">=0.2.13" },
     { name = "numexpr", specifier = ">=2.14.2" },
