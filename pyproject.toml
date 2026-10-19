@@ -10,32 +10,32 @@ authors = [
 dependencies = [
     "attrs>=26.1.0",
     "loguru>=0.7.3",
-    "mne>=1.12.1",
+    "mne>=1.13.2",
     "numexpr>=2.14.2",
-    "numpy>=2.5.1",
-    "polars[excel]>=1.43.2",
-    "pyarrow>=25.0.0",
+    "numpy>=2.5.4",
+    "polars[excel]>=2.0.0",
+    "pyarrow>=26.0.0",
     "pyopengl>=3.1.10",
     "pyopengl-accelerate>=3.1.10",
-    "pyside6>=6.11.1",
-    "pywavelets>=1.9.0",
-    "scipy>=1.18.0",
+    "pyside6>=6.12.0",
+    "pywavelets>=1.10.0",
+    "scipy>=1.18.1",
     "tables>=3.11.1",
     "wfdb>=4.3.1",
-    "scikit-learn>=1.9.0",
+    "scikit-learn>=1.9.1",
     "neurokit2>=0.2.13",
     "pyqtgraph",
     "pyside-widgets",
     "pyside-config",
+    "pyside6-essentials>=6.12.0",
     "ts2vg>=1.2.4",
-    "pyside6-essentials>=6.11.1",
 ]
 
 [dependency-groups]
 dev = [
-    "pyinstaller>=6.21.0",
-    "pyinstaller-hooks-contrib>=2026.6",
-    "pyright>=1.1.411",
+    "pyinstaller>=6.22.3",
+    "pyinstaller-hooks-contrib>=2026.8",
+    "pyright>=1.1.414",
 ]
 
 [project.scripts]
