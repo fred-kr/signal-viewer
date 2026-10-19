@@ -25,6 +25,7 @@ _COLOR_RATE = SVGColors.IndianRed
 _COLOR_INTERVALS = SVGColors.DodgerBlue
 _COLOR_INFO = SVGColors.GoldenRod
 _COLOR_SCATTER = SVGColors.SlateGray
+_COLOR_FIT = SVGColors.DarkSlateGray
 _COLOR_SECTION_BAND = "#000000"
 _GRID_KWARGS = {"color": "#d0d0d0", "linewidth": 0.5}
 _NO_RESULT_TEXT = "No results for the active section.\nMark a section as done to create its result."
@@ -36,6 +37,66 @@ class ResultPlotScope(enum.StrEnum):
 
     ActiveSection = "active"
     AllLockedSections = "all"
+
+
+class ResultFitModel(enum.StrEnum):
+    """Model fitted to the window-level rate against the info-column mean."""
+
+    NoFit = "none"
+    Linear = "linear"
+    """Gaussian GLM with identity link: rate = a + b * x (ordinary least squares)."""
+    LogLinear = "log_linear"
+    """Gamma GLM with log link: rate = exp(a + b * x). The usual shape of a rate-temperature relationship."""
+
+
+@attrs.frozen
+class GLMFit:
+    model: ResultFitModel
+    intercept: float
+    slope: float
+    n_points: int
+
+    def predict(self, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        eta = self.intercept + self.slope * x
+        return np.exp(eta) if self.model == ResultFitModel.LogLinear else eta
+
+    def describe(self, x_name: str) -> list[str]:
+        """Short human-readable lines; `x` stands for the info column named by `x_name`."""
+        if self.model == ResultFitModel.LogLinear:
+            lines = [f"Gamma GLM (log link): rate = exp({self.intercept:.3g} + {self.slope:.3g}\u00b7x)"]
+            if "temp" in x_name.lower():
+                # Q10: factor by which the rate changes per 10 degree increase; exp(10 * slope) under a log link.
+                lines.append(f"Q10 = {np.exp(10 * self.slope):.2f}  (n = {self.n_points})")
+            else:
+                lines.append(f"n = {self.n_points}")
+            return lines
+        return [f"Linear (Gaussian GLM): rate = {self.intercept:.3g} + {self.slope:.3g}\u00b7x", f"n = {self.n_points}"]
+
+
+def fit_glm(x: npt.NDArray[np.float64], y: npt.NDArray[np.float64], model: ResultFitModel) -> GLMFit | None:
+    """
+    Fits a single-predictor GLM of `y` on `x`. Returns None when the fit is not possible (too few points, no
+    spread in `x`, or non-positive responses for the Gamma family).
+
+    Unpenalized, with an intercept. scikit-learn is imported lazily because it is slow to import and only
+    needed here.
+    """
+    mask = np.isfinite(x) & np.isfinite(y)
+    if model == ResultFitModel.LogLinear:
+        mask &= y > 0
+    x, y = x[mask], y[mask]
+    if x.size < 3 or np.ptp(x) == 0:
+        return None
+
+    if model == ResultFitModel.Linear:
+        slope, intercept = np.polyfit(x, y, deg=1)
+        return GLMFit(model, float(intercept), float(slope), int(x.size))
+
+    from sklearn.linear_model import GammaRegressor
+
+    reg = GammaRegressor(alpha=0.0, fit_intercept=True, max_iter=1000)
+    reg.fit(x.reshape(-1, 1), y)
+    return GLMFit(model, float(reg.intercept_), float(reg.coef_[0]), int(x.size))
 
 
 def _format_hms(seconds: float, _pos: int | None = None) -> str:
@@ -132,6 +193,7 @@ class ResultPlotController(QtCore.QObject):
         self._locked_sections_provider = locked_sections_provider
         self._section: Section | None = None
         self._scope = ResultPlotScope.ActiveSection
+        self._fit_model = ResultFitModel.LogLinear
         self._dirty = False
         self._draw_placeholder(_NO_RESULT_TEXT)
 
@@ -154,6 +216,18 @@ class ResultPlotController(QtCore.QObject):
         if scope == self._scope:
             return
         self._scope = scope
+        self.invalidate()
+
+    @property
+    def fit_model(self) -> ResultFitModel:
+        return self._fit_model
+
+    @QtCore.Slot(object)
+    def set_fit_model(self, model: ResultFitModel | str) -> None:
+        model = ResultFitModel(model)
+        if model == self._fit_model:
+            return
+        self._fit_model = model
         self.invalidate()
 
     def invalidate(self) -> None:
@@ -302,12 +376,23 @@ class ResultPlotController(QtCore.QObject):
             info_steps, rate_means = _mean_rate_per_info_step(segments)
             if info_steps.size > 1:
                 ax_scatter.plot(
-                    info_steps, rate_means, color=_COLOR_RATE, linewidth=1.5, label="Mean rate per 0.1 step"
+                    info_steps, rate_means, color=_COLOR_RATE, linewidth=1.2, label="Mean rate per 0.1 step"
                 )
+            scatter_title = f"Rate vs. {info_name}"
+            if self._fit_model != ResultFitModel.NoFit:
+                fit = fit_glm(info_all, rate_all, self._fit_model)
+                if fit is None:
+                    logger.warning(f"Not enough usable points to fit a {self._fit_model.name} model.")
+                else:
+                    x_fit = np.linspace(float(np.nanmin(info_all)), float(np.nanmax(info_all)), 200)
+                    ax_scatter.plot(x_fit, fit.predict(x_fit), color=_COLOR_FIT, linewidth=1.8, label="GLM fit")
+                    # The equation goes into the title: a legend entry that long would cover the data.
+                    scatter_title = "\n".join([scatter_title, *fit.describe(str(info_name))])
+            if ax_scatter.get_legend_handles_labels()[0]:
                 ax_scatter.legend(loc="best", fontsize=8, frameon=False)
             ax_scatter.set_xlabel(f"{info_name} (window mean)")
             ax_scatter.set_ylabel("Rate [bpm]")
-            ax_scatter.set_title(f"Rate vs. {info_name}", fontsize=9, loc="left")
+            ax_scatter.set_title(scatter_title, fontsize=9, loc="left")
             ax_scatter.grid(True, **_GRID_KWARGS)
             ax_scatter.spines[["top", "right"]].set_visible(False)
 

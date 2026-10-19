@@ -117,6 +117,9 @@ class SVApp(QtCore.QObject):
         self.gui.combo_box_result_plot_scope.currentIndexChanged.connect(
             lambda: self.result_plot.set_scope(self.gui.combo_box_result_plot_scope.currentData())
         )
+        self.gui.combo_box_result_plot_fit.currentIndexChanged.connect(
+            lambda: self.result_plot.set_fit_model(self.gui.combo_box_result_plot_fit.currentData())
+        )
 
     #### Event handlers ==========
 

@@ -11,7 +11,7 @@ from signal_viewer.constants import INDEX_COL
 from signal_viewer.enum_defs import LogLevel
 from signal_viewer.generated.ui_main_window import Ui_MainWindow
 from signal_viewer.sv_config import Config
-from signal_viewer.sv_plots.result_plot import ResultPlotScope
+from signal_viewer.sv_plots.result_plot import ResultFitModel, ResultPlotScope
 from signal_viewer.sv_widgets.dlg_metadata import MetadataDialog
 from signal_viewer.sv_widgets.dock_log_window import StatusMessageDock
 from signal_viewer.sv_widgets.dock_param_inputs import InputsDock
@@ -107,6 +107,17 @@ class SVGUI(QtWidgets.QMainWindow):
         scope_row = QtWidgets.QHBoxLayout()
         scope_row.addWidget(QtWidgets.QLabel("Show:"))
         scope_row.addWidget(self.combo_box_result_plot_scope)
+
+        self.combo_box_result_plot_fit = QtWidgets.QComboBox()
+        self.combo_box_result_plot_fit.addItem("Exponential (Gamma GLM, log link)", ResultFitModel.LogLinear)
+        self.combo_box_result_plot_fit.addItem("Linear (Gaussian GLM)", ResultFitModel.Linear)
+        self.combo_box_result_plot_fit.addItem("None", ResultFitModel.NoFit)
+        self.combo_box_result_plot_fit.setToolTip(
+            "Model fitted to the rate against the info column (window means) in the 'Rate vs. ...' panel."
+        )
+        scope_row.addSpacing(12)
+        scope_row.addWidget(QtWidgets.QLabel("Fit:"))
+        scope_row.addWidget(self.combo_box_result_plot_fit)
         scope_row.addStretch()
         self.ui.verticalLayout.insertLayout(0, scope_row)  # the layout of `tab_result_mpl_widget`
 
