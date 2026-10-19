@@ -111,6 +111,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.combo_box_result_plot_fit = QtWidgets.QComboBox()
         self.combo_box_result_plot_fit.addItem("Exponential (Gamma GLM, log link)", ResultFitModel.LogLinear)
         self.combo_box_result_plot_fit.addItem("Linear (Gaussian GLM)", ResultFitModel.Linear)
+        self.combo_box_result_plot_fit.addItem("Smooth (spline GAM, Gamma log link)", ResultFitModel.Spline)
         self.combo_box_result_plot_fit.addItem("None", ResultFitModel.NoFit)
         self.combo_box_result_plot_fit.setToolTip(
             "Model fitted to the rate against the info column (window means) in the 'Rate vs. ...' panel."
