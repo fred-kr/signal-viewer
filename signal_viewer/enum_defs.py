@@ -362,3 +362,19 @@ class IncompleteWindowMethod(enum.StrEnum):
     Drop = "drop"
     Approximate = "approximate"
     RepeatLast = "repeat_last"
+
+
+class SectionChange(enum.Flag):
+    """
+    Which parts of a `Section` a `DataController` mutation touched.
+
+    Carried by `DataController.sig_section_changed` so that subscribers (plot, tables, action states) refresh only
+    what changed. `ALL` is what an activation sends: every view redraws from the newly active section.
+    """
+
+    SIGNAL = enum.auto()  # processed signal column (filter, pipeline, standardization, reset)
+    PEAKS = enum.auto()  # `is_peak` column
+    RATE = enum.auto()  # `rate_data` frame
+    LOCK = enum.auto()  # `is_locked`
+    RESULT = enum.auto()  # `peak_data` / `rate_data` result frames (after locking)
+    ALL = SIGNAL | PEAKS | RATE | LOCK | RESULT

@@ -10,7 +10,8 @@ from loguru import logger
 from pyqtgraph.graphicsItems.ViewBox import ViewBox
 from PySide6 import QtCore, QtWidgets
 
-from signal_viewer.enum_defs import PointSymbols, SVGColors
+from signal_viewer.constants import SECTION_INDEX_COL
+from signal_viewer.enum_defs import PointSymbols, SectionChange, SVGColors
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_plots.graphic_items import (
     ClickableRegionItem,
@@ -22,11 +23,19 @@ from signal_viewer.utils import make_qbrush, make_qpen, safe_disconnect
 if TYPE_CHECKING:
     from pyqtgraph.GraphicsScene import mouseEvents
 
+    from signal_viewer.sv_data.section import Section
     from signal_viewer.sv_gui import SVGUI
 
 
 class PlotController(QtCore.QObject):
-    sig_scatter_data_changed = QtCore.Signal(str, object)
+    """
+    Draws the active section and reports user intent.
+
+    The plot never edits data itself: a click on a peak or on the curve only emits `sig_scatter_data_changed`, and
+    the redraw comes back through `refresh_section` once the model has changed.
+    """
+
+    sig_scatter_data_changed = QtCore.Signal(str, object)  # (UpdatePeaksAction, section indices)
     sig_section_clicked = QtCore.Signal(int)
 
     def __init__(self, parent: QtCore.QObject | None, gui: SVGUI) -> None:
@@ -397,6 +406,29 @@ class PlotController(QtCore.QObject):
         x1, x2 = int(self.region_selector.getRegion()[0]), int(self.region_selector.getRegion()[1])  # pyright: ignore[reportArgumentType]
         return x1, x2
 
+    def refresh_section(self, section: Section, flags: SectionChange) -> None:
+        """
+        Redraws the parts of `section` named by `flags`.
+
+        This is the only entry point `SVApp` uses after a model change; the individual `set_*` methods stay public for
+        tests and for the initial draw.
+        """
+        if SectionChange.SIGNAL in flags:
+            self.set_signal_data(section.processed_signal)
+        if SectionChange.PEAKS in flags:
+            pos = section.get_peak_pos()
+            self.set_peak_data(pos.get_column(SECTION_INDEX_COL), pos.get_column(section.processed_signal_name))
+        if SectionChange.RATE in flags:
+            rate = section.rate_data
+            if rate.is_empty() or "rate_bpm" not in rate.columns:
+                if self.rate_curve is not None:
+                    self.rate_curve.clear()
+            else:
+                self.set_rate_data(x_data=rate.get_column(SECTION_INDEX_COL), y_data=rate.get_column("rate_bpm"))
+        if SectionChange.LOCK in flags:
+            # The base section is created locked, so this also blocks edits on it.
+            self.block_clicks = section.is_locked
+
     def set_signal_data(self, y_data: npt.ArrayLike, clear: bool = False) -> None:
         """
         Sets the values of the signal curve.
@@ -502,7 +534,8 @@ class PlotController(QtCore.QObject):
         """
         Handles click events on the peak scatter plot.
 
-        Removes the clicked point from the scatter plot and emits the `sig_scatter_data_changed` signal.
+        Emits `sig_scatter_data_changed("remove", [x])` for the clicked point. The scatter itself is redrawn by
+        `refresh_section` once the model has removed the peak.
 
         Parameters
         ----------
@@ -517,15 +550,7 @@ class PlotController(QtCore.QObject):
         if not self.peak_scatter or len(points) == 0 or self.block_clicks:
             return
 
-        point = points[0]
-        point_x = int(point.pos().x())
-        point_index = point.index()
-
-        scatter_data = self.peak_scatter.scatter.data
-        new_x = np.delete(scatter_data["x"], point_index)
-        new_y = np.delete(scatter_data["y"], point_index)
-        self.peak_scatter.setData(x=new_x, y=new_y)
-
+        point_x = int(points[0].pos().x())
         self.sig_scatter_data_changed.emit("remove", np.array([point_x], dtype=np.int32))
 
     def _nearest_extreme_point(self, pos: QtCore.QPointF) -> tuple[int | float, int | float] | None:
@@ -580,8 +605,9 @@ class PlotController(QtCore.QObject):
         """
         Handles click events on the signal curve.
 
-        Searches for the nearest peak/valley to the click position. If one is found, adds it to the peak scatter plot
-        and emits the `sig_scatter_data_changed` signal.
+        Searches for the nearest peak/valley to the click position. If one is found, emits
+        `sig_scatter_data_changed("add", [x])`. The scatter is redrawn by `refresh_section` once the model has added
+        the peak.
 
         Parameters
         ----------
@@ -602,16 +628,14 @@ class PlotController(QtCore.QObject):
             logger.info("No peaks found within click radius.")
             return
 
-        x_new, y_new = closest_extreme
-
-        self.peak_scatter.scatter.addPoints(x=[x_new], y=[y_new])
+        x_new, _ = closest_extreme
         self.sig_scatter_data_changed.emit("add", np.array([x_new], dtype=np.int32))
 
     @QtCore.Slot()
     def remove_peaks_in_selection(self) -> None:
         """
-        Removes all peaks in the selection rectangle from the peak scatter plot and emits the `sig_scatter_data_changed`
-        signal.
+        Emits `sig_scatter_data_changed("remove", xs)` for every peak inside the selection rectangle, then clears the
+        rectangle.
         """
         r = self.get_selection_area()
         if r is None or self.peak_scatter is None or self.block_clicks:
@@ -622,11 +646,11 @@ class PlotController(QtCore.QObject):
 
         scatter_x, scatter_y = self.peak_scatter.scatter.getData()
 
-        mask = (scatter_x < rx) | (scatter_x > rx + rw) | (scatter_y < ry) | (scatter_y > ry + rh)
+        inside = (scatter_x >= rx) & (scatter_x <= rx + rw) & (scatter_y >= ry) & (scatter_y <= ry + rh)
 
-        self.peak_scatter.setData(x=scatter_x[mask], y=scatter_y[mask])
-        self.sig_scatter_data_changed.emit("remove", scatter_x[~mask].astype(np.int32))
         self.remove_selection_rect()
+        if np.any(inside):
+            self.sig_scatter_data_changed.emit("remove", scatter_x[inside].astype(np.int32))
 
     def get_selection_area(self) -> QtCore.QRectF | None:
         """

@@ -11,10 +11,15 @@ import polars as pl
 import pytest
 
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION, INDEX_COL
-from signal_viewer.enum_defs import IncompleteWindowMethod
+from signal_viewer.enum_defs import IncompleteWindowMethod, PeakDetectionAlgorithm, PreprocessPipeline, SectionChange
 from signal_viewer.sv_data.data_controller import DataController
 from signal_viewer.sv_data.section import DEFAULT_RATE_PARAMS
-from signal_viewer.type_defs import RollingRateKwargs
+from signal_viewer.type_defs import (
+    PeakDetectionRequest,
+    PeaksLocalMaxima,
+    ProcessingRequest,
+    RollingRateKwargs,
+)
 
 FS = 100
 N = FS * 20
@@ -122,3 +127,126 @@ def test_rate_params_reach_existing_and_new_sections(csv_file: Path) -> None:
 
     dc.create_section(300, 499)
     assert dc.sections.editable_sections[-1].rate_params == params
+
+
+# --- Facade: every mutation goes through the controller and emits one `sig_section_changed` ---------------------------
+
+
+def _loaded_with_section(csv_file: Path) -> tuple[DataController, list[tuple[object, SectionChange]]]:
+    """A controller with one 20 s editable section active, and a recorder for `sig_section_changed`."""
+    dc = DataController()
+    dc.open_file(csv_file)
+    dc.update_metadata(signal_col="Alpha Sig", info_col="Beta Temp")
+    dc.load_data()
+    dc.create_section(0, N - 1)
+    dc.set_active_section(dc.sections.index(1))
+
+    emitted: list[tuple[object, SectionChange]] = []
+    dc.sig_section_changed.connect(lambda section, flags: emitted.append((section, flags)))
+    return dc, emitted
+
+
+def sine_peaks() -> np.ndarray:
+    """Maxima of the fixture's 1 Hz sine: one per second."""
+    return np.arange(25, N, FS)
+
+
+def test_active_section_signal_carries_the_section(csv_file: Path) -> None:
+    dc = DataController()
+    dc.open_file(csv_file)
+    dc.update_metadata(signal_col="Alpha Sig", info_col="Beta Temp")
+    activated: list[object] = []
+    dc.sig_active_section_changed.connect(activated.append)
+
+    dc.load_data()
+    dc.create_section(0, 199)
+    dc.set_active_section(dc.sections.index(1))
+
+    assert activated == [dc.get_base_section(), dc.sections.editable_sections[0]]
+    assert dc.active_section_model.df.height == 200
+
+
+def test_apply_processing_emits_signal_peaks_and_rate(csv_file: Path) -> None:
+    dc, emitted = _loaded_with_section(csv_file)
+    section = dc.active_section
+
+    dc.apply_processing(ProcessingRequest(pipeline=PreprocessPipeline.PPG_Elgendi))
+    assert emitted == [(section, SectionChange.SIGNAL | SectionChange.PEAKS | SectionChange.RATE)]
+    assert section.is_processed
+
+    dc.reset_signal()
+    assert emitted[-1] == (section, SectionChange.SIGNAL | SectionChange.PEAKS | SectionChange.RATE)
+    assert not section.is_processed
+    assert section.processed_signal.equals(section.raw_signal)
+
+
+def test_peak_edits_emit_peaks_and_rate(csv_file: Path) -> None:
+    dc, emitted = _loaded_with_section(csv_file)
+    section = dc.active_section
+    request = PeakDetectionRequest(
+        PeakDetectionAlgorithm.LocalMaxima, PeaksLocalMaxima(search_radius=40, min_distance=40)
+    )
+
+    dc.detect_peaks(request)
+    assert section.peaks_local.to_list() == sine_peaks().tolist()
+    assert emitted[-1] == (section, SectionChange.PEAKS | SectionChange.RATE)
+
+    dc.update_peaks("remove", np.array([25]))
+    assert section.peaks_local.to_list() == sine_peaks().tolist()[1:]
+    assert section.manual_peak_edits.removed == [25]
+    assert emitted[-1] == (section, SectionChange.PEAKS | SectionChange.RATE)
+
+    dc.clear_peaks()
+    assert section.peaks_local.is_empty()
+    assert section.rate_data.is_empty()
+    assert emitted[-1] == (section, SectionChange.PEAKS | SectionChange.RATE)
+
+    dc.detect_peaks_in_range(1000, 1500, request)
+    assert section.peaks_local.to_list() == [1025, 1125, 1225, 1325, 1425]
+    assert emitted[-1] == (section, SectionChange.PEAKS | SectionChange.RATE)
+    assert len(emitted) == 4, "exactly one emission per mutation"
+
+
+def test_lock_and_unlock(csv_file: Path) -> None:
+    dc, emitted = _loaded_with_section(csv_file)
+    section = dc.active_section
+
+    with pytest.raises(RuntimeError, match="at least 3"):
+        dc.lock_active()
+    assert emitted == [], "a failed lock changes nothing and reports nothing"
+    assert not section.is_locked
+
+    dc.update_peaks("add", sine_peaks())
+    dc.lock_active()
+    assert section.is_locked
+    assert not section.peak_data.is_empty()
+    assert emitted[-1] == (section, SectionChange.LOCK | SectionChange.RESULT)
+
+    dc.unlock_active()
+    assert not section.is_locked
+    assert emitted[-1] == (section, SectionChange.LOCK)
+
+
+def test_set_rate_params_recomputes_only_when_peaks_exist(csv_file: Path) -> None:
+    dc, emitted = _loaded_with_section(csv_file)
+    section = dc.active_section
+    params: RollingRateKwargs = {
+        "sec_new_window_every": 2,
+        "sec_window_length": 10,
+        "incomplete_window_method": IncompleteWindowMethod.Drop,
+    }
+
+    dc.set_rate_params(params)
+    assert emitted == [], "no peaks, so there is no rate to recompute"
+
+    dc.update_peaks("add", sine_peaks())
+    emitted.clear()
+    dc.set_rate_params(DEFAULT_RATE_PARAMS)
+    assert emitted == [(section, SectionChange.RATE)]
+    assert section.rate_data.is_empty(), "60 s windows never complete in a 20 s section"
+
+    emitted.clear()
+    dc.set_rate_params(params)
+    assert emitted == [(section, SectionChange.RATE)]
+    # 10 s windows every 2 s in 20 s: starts 0, 2, ..., 10 are complete, each holding 10 peaks.
+    assert section.rate_data.get_column("rate_bpm").to_list() == pytest.approx([60.0] * 6)

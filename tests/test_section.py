@@ -248,3 +248,18 @@ def test_locked_section_rejects_result_updates() -> None:
 
     assert s.is_locked
     assert s.rate_data.equals(before)
+
+
+def test_reset_peaks_empties_result_frames() -> None:
+    """Views redraw from `rate_data`, so discarding the peaks must also discard the rate computed from them."""
+    s = Section(make_df(), "sig", FS, info_column="temp")
+    s.set_peaks(sine_peaks())
+    assert not s.rate_data.is_empty()
+
+    s.reset_peaks()
+    assert s.rate_data.is_empty()
+    assert s.peak_data.is_empty()
+
+    s.set_peaks(sine_peaks())
+    s.reset_signal()
+    assert s.rate_data.is_empty()

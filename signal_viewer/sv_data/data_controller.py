@@ -3,24 +3,35 @@ from pathlib import Path
 from typing import Any
 
 import mne.io
+import numpy as np
+import numpy.typing as npt
 import polars as pl
 from loguru import logger
 from PySide6 import QtCore
 
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION
-from signal_viewer.enum_defs import InputFileFormat, TextFileSeparator
+from signal_viewer.enum_defs import InputFileFormat, SectionChange, TextFileSeparator
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_models import DataFrameModel, FileMetadata, SectionListModel
 from signal_viewer.sv_data.file_io import detect_sampling_rate, read_edf
 from signal_viewer.sv_data.section import DEFAULT_RATE_PARAMS, Section
-from signal_viewer.type_defs import RollingRateKwargs
+from signal_viewer.type_defs import PeakDetectionRequest, ProcessingRequest, RollingRateKwargs, UpdatePeaksAction
 
 
 class DataController(QtCore.QObject):
+    """
+    Owns the loaded file, its metadata, and every `Section`.
+
+    It is the only object that calls mutating methods on a `Section`. Every mutation of the active section ends in
+    exactly one `sig_section_changed(section, flags)` emission, where `flags` is a `SectionChange` naming what
+    changed, so views refresh only the parts named.
+    """
+
     sig_user_input_required = QtCore.Signal(set)
-    sig_new_metadata = QtCore.Signal(object)
+    sig_new_metadata = QtCore.Signal(object)  # FileMetadata
     sig_new_data = QtCore.Signal()
-    sig_active_section_changed = QtCore.Signal(bool)
+    sig_active_section_changed = QtCore.Signal(object)  # the now-active Section
+    sig_section_changed = QtCore.Signal(object, object)  # (Section, SectionChange)
 
     def __init__(self, parent: QtCore.QObject | None = None) -> None:
         super().__init__(parent)
@@ -71,11 +82,25 @@ class DataController(QtCore.QObject):
     def rate_params(self) -> RollingRateKwargs:
         return self._rate_params
 
+    @QtCore.Slot(dict)
     def set_rate_params(self, params: RollingRateKwargs) -> None:
-        """Applies new rolling-rate parameters to every existing section and to sections created later."""
+        """
+        Applies new rolling-rate parameters to every existing section and to sections created later.
+
+        The active section's rate is recomputed right away when it has peaks and is not locked; other sections
+        recompute lazily on their next `update_rate_data` call.
+        """
         self._rate_params = params.copy()
         for section in self.sections.all_sections:
             section.set_rate_params(self._rate_params)
+
+        if not self.has_data:
+            return
+        section = self.active_section
+        if section.is_locked or section.peaks_local.is_empty():
+            return
+        section.update_rate_data()
+        self.sig_section_changed.emit(section, SectionChange.RATE)
 
     def get_base_section(self) -> Section:
         if self._base_section is None:
@@ -103,9 +128,8 @@ class DataController(QtCore.QObject):
         section = self.sections.data(model_index, QtCore.Qt.ItemDataRole.UserRole)
         if isinstance(section, Section):
             self._active_section = section
-            self.active_section_model.set_df(self._active_section.data)
-            has_peak_data = not self._active_section.peaks_local.is_empty()
-            self.sig_active_section_changed.emit(has_peak_data)
+            self.active_section_model.set_df(section.data)
+            self.sig_active_section_changed.emit(section)
 
     @property
     def base_section_index(self) -> QtCore.QModelIndex:
@@ -262,3 +286,64 @@ class DataController(QtCore.QObject):
     def delete_section(self, idx: QtCore.QModelIndex) -> None:
         self.sections.remove_section(idx)
         self.set_active_section(self.base_section_index)
+
+    # --- Active-section mutations ------------------------------------------------------------------------------------
+    # Each method below is the single entry point for one kind of change. It mutates the active section and emits
+    # `sig_section_changed` once with the flags describing what changed. `detect_peaks` and `lock_active` are also
+    # called from worker threads (see `sv_app`); the signal is then delivered queued to the GUI thread.
+
+    @QtCore.Slot(object)
+    def apply_processing(self, request: ProcessingRequest) -> None:
+        """Resets the active section's signal and peaks, then applies `request`."""
+        section = self.active_section
+        section.apply_processing(request)
+        self.sig_section_changed.emit(section, SectionChange.SIGNAL | SectionChange.PEAKS | SectionChange.RATE)
+
+    @QtCore.Slot()
+    def reset_signal(self) -> None:
+        """Restores the raw signal and discards peaks and processing parameters."""
+        self.apply_processing(ProcessingRequest())
+
+    @QtCore.Slot()
+    def clear_peaks(self) -> None:
+        section = self.active_section
+        section.reset_peaks()
+        self.sig_section_changed.emit(section, SectionChange.PEAKS | SectionChange.RATE)
+
+    def detect_peaks(self, request: PeakDetectionRequest) -> None:
+        """Runs peak detection on the whole processed signal and replaces the existing peaks."""
+        section = self.active_section
+        section.detect_peaks(request.method, request.params)
+        self.sig_section_changed.emit(section, SectionChange.PEAKS | SectionChange.RATE)
+
+    def detect_peaks_in_range(self, start: int, stop: int, request: PeakDetectionRequest) -> None:
+        """Runs peak detection on section indices `[start, stop]` and adds the result to the existing peaks."""
+        section = self.active_section
+        section.detect_peaks_in_range(start, stop, request.method, request.params)
+        self.sig_section_changed.emit(section, SectionChange.PEAKS | SectionChange.RATE)
+
+    @QtCore.Slot(str, object)
+    def update_peaks(self, action: UpdatePeaksAction, indices: npt.NDArray[np.intp]) -> None:
+        """Adds or removes single peaks at section indices `indices` (manual edits from the plot)."""
+        section = self.active_section
+        section.update_peaks(action, indices)
+        self.sig_section_changed.emit(section, SectionChange.PEAKS | SectionChange.RATE)
+
+    def lock_active(self) -> None:
+        """
+        Computes the final peak and rate result for the active section and locks it against further edits.
+
+        Raises
+        ------
+        RuntimeError
+            If the section has fewer than three peaks. Nothing is emitted in that case.
+        """
+        section = self.active_section
+        section.lock_result()
+        self.sig_section_changed.emit(section, SectionChange.LOCK | SectionChange.RESULT)
+
+    @QtCore.Slot()
+    def unlock_active(self) -> None:
+        section = self.active_section
+        section.set_locked(False)
+        self.sig_section_changed.emit(section, SectionChange.LOCK)

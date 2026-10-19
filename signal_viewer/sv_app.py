@@ -1,4 +1,6 @@
 import contextlib
+import functools
+from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -10,7 +12,7 @@ import xlsxwriter
 from loguru import logger
 from PySide6 import QtCore, QtWidgets
 
-from signal_viewer.constants import SECTION_INDEX_COL
+from signal_viewer.enum_defs import SectionChange
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_controller import DataController
 from signal_viewer.sv_data.data_models import FileListModel
@@ -33,50 +35,41 @@ if TYPE_CHECKING:
 
 
 class WorkerSignals(QtCore.QObject):
-    sig_success = QtCore.Signal()
     sig_error = QtCore.Signal(object)  # the raised Exception instance
     sig_finished = QtCore.Signal()
 
 
-class PeakDetectionWorker(QtCore.QRunnable):
-    def __init__(self, section: Section, request: PeakDetectionRequest) -> None:
+class FunctionWorker(QtCore.QRunnable):
+    """
+    Runs `fn()` on a `QThreadPool` thread.
+
+    Used for `DataController.detect_peaks` and `DataController.lock_active`. Their `sig_section_changed` emission
+    happens on the worker thread and is delivered queued to the GUI thread, so the refresh runs there. Phase F
+    replaces this with workers that compute without mutating the section.
+    """
+
+    def __init__(self, fn: Callable[[], None]) -> None:
         super().__init__()
-        self.section = section
-        self.request = request
+        self.fn = fn
         self.signals = WorkerSignals()
 
     @QtCore.Slot()
     def run(self) -> None:
         try:
-            self.section.detect_peaks(self.request.method, self.request.params)
+            self.fn()
         except Exception as e:
             self.signals.sig_error.emit(e)
-        else:
-            self.signals.sig_success.emit()
-        finally:
-            self.signals.sig_finished.emit()
-
-
-class SectionResultWorker(QtCore.QRunnable):
-    def __init__(self, section: Section) -> None:
-        super().__init__()
-        self.section = section
-        self.signals = WorkerSignals()
-
-    @QtCore.Slot()
-    def run(self) -> None:
-        try:
-            self.section.lock_result()
-        except Exception as e:
-            self.signals.sig_error.emit(e)
-        else:
-            self.signals.sig_success.emit()
         finally:
             self.signals.sig_finished.emit()
 
 
 class SVApp(QtCore.QObject):
-    sig_peaks_updated = QtCore.Signal()
+    """
+    Routes GUI intent to `DataController` and refreshes views when the controller reports a change.
+
+    Nothing here mutates a `Section` directly. Every data change goes through a `DataController` method, and every
+    refresh comes back through `_on_section_changed`.
+    """
 
     def __init__(self) -> None:
         super().__init__()
@@ -100,8 +93,6 @@ class SVApp(QtCore.QObject):
         self._connect_signals()
 
     def _connect_signals(self) -> None:
-        self.sig_peaks_updated.connect(self._on_sig_peaks_updated)
-
         self.gui.ui.action_show_settings.triggered.connect(self._on_show_settings)
         self.gui.ui.action_open_file.triggered.connect(self._on_open_file)
         self.gui.ui.action_open_annotation_file.triggered.connect(self._load_annotations)
@@ -120,7 +111,6 @@ class SVApp(QtCore.QObject):
 
         self.gui.ui.lview_data_files.doubleClicked.connect(self._open_recent_file)
 
-        self.gui.sig_refresh_table.connect(self.refresh_data_view)
         self.gui.sig_export_result.connect(self.export_result)
 
         # Section actions
@@ -136,10 +126,12 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_mark_section_done.triggered.connect(self._lock_section)
         self.gui.ui.action_unlock_section.triggered.connect(self._unlock_section)
 
+        # GUI -> controller. These go through thin `SVApp` slots rather than straight to `self.data`, because the
+        # controller is replaced on `close_file` and the widgets' connections must survive that.
         self.gui.dock_parameters.ui.sig_run_processing.connect(self.run_processing)
         self.gui.dock_parameters.ui.sig_reset_data.connect(self.reset_signal_data)
         self.gui.dock_parameters.ui.sig_run_peak_detection.connect(self.run_peak_detection)
-        self.gui.dock_parameters.ui.sig_clear_peaks.connect(self._on_sig_clear_peaks)
+        self.gui.dock_parameters.ui.sig_clear_peaks.connect(self.clear_peaks)
         self.gui.dock_parameters.ui.sig_rate_params_changed.connect(self._on_rate_params_changed)
 
         self.gui.ui.action_find_peaks_in_selection.triggered.connect(self._on_find_peaks_in_selection)
@@ -174,9 +166,8 @@ class SVApp(QtCore.QObject):
         settings_dlg.open()
 
     @QtCore.Slot()
-    def _on_sig_clear_peaks(self) -> None:
-        self.plot.clear_peaks()
-        self.data.active_section.reset_peaks()
+    def clear_peaks(self) -> None:
+        self.data.clear_peaks()
 
     @QtCore.Slot()
     def _on_find_peaks_in_selection(self) -> None:
@@ -193,32 +184,48 @@ class SVApp(QtCore.QObject):
             logger.warning("Select a peak detection method first.")
             return
 
-        self.data.active_section.detect_peaks_in_range(left, right, request.method, request.params)
-        self.sig_peaks_updated.emit()
+        self.data.detect_peaks_in_range(left, right, request)
 
     @QtCore.Slot(str, object)
     def _on_sig_scatter_data_changed(self, action: UpdatePeaksAction, indices: npt.NDArray[np.intp]) -> None:
-        self.data.active_section.update_peaks(action, indices)
-        self.sig_peaks_updated.emit()
+        self.data.update_peaks(action, indices)
 
     @QtCore.Slot(dict)
     def _on_rate_params_changed(self, params: RollingRateKwargs) -> None:
         self.data.set_rate_params(params)
-        if not self.data.has_data:
-            return
-        section = self.data.active_section
-        if section.is_locked or section.peaks_local.is_empty():
-            return
-        self.sig_peaks_updated.emit()
 
-    @QtCore.Slot()
-    def _on_sig_peaks_updated(self) -> None:
-        cas = self.data.active_section
-        pos = cas.get_peak_pos()
-        self.plot.set_peak_data(pos.get_column(SECTION_INDEX_COL), pos.get_column(cas.processed_signal_name))
-        cas.update_rate_data()
-        rate_data = cas.rate_data.select(SECTION_INDEX_COL, "rate_bpm")
-        self.plot.set_rate_data(x_data=rate_data.get_column(SECTION_INDEX_COL), y_data=rate_data.get_column("rate_bpm"))
+    @QtCore.Slot(object, object)
+    def _on_section_changed(self, section: Section, flags: SectionChange) -> None:
+        """
+        The single refresh point. Redraws only what `flags` names, and only for the active section.
+
+        Every controller method currently reports the active section; the identity check guards against a future
+        emitter reporting a background one.
+        """
+        if section is not self.data.active_section:
+            return
+
+        self.plot.refresh_section(section, flags)
+
+        if SectionChange.SIGNAL in flags:
+            self.update_status_indicators()
+        if flags & (SectionChange.SIGNAL | SectionChange.PEAKS):
+            # `Section` reassigns `data` on every change, so the table model has to be handed the new frame.
+            self.data.active_section_model.set_df(section.data)
+        if SectionChange.LOCK in flags:
+            self._update_lock_dependent_states(section)
+        if SectionChange.RESULT in flags:
+            self.update_result_views()
+
+    def _update_lock_dependent_states(self, section: Section) -> None:
+        """Enables the editing actions and the parameter dock only for an unlocked, non-base section."""
+        is_base = section is self.data.get_base_section()
+        editable = not is_base and not section.is_locked
+
+        self.gui.ui.action_remove_section.setEnabled(editable)
+        self.gui.ui.action_mark_section_done.setEnabled(editable)
+        self.gui.ui.action_unlock_section.setEnabled(not is_base and section.is_locked)
+        self.gui.dock_parameters.setEnabled(editable)
 
     def update_status_indicators(self) -> None:
         self.gui.dock_parameters.ui.ui.status_filter.setChecked(self.data.active_section.is_filtered)
@@ -229,27 +236,21 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(object)
     def run_processing(self, request: ProcessingRequest) -> None:
-        """Applies one processing request to the active section and refreshes the plot once."""
-        self.data.active_section.apply_processing(request)
-        self.plot.clear_peaks()
-        self.refresh_plot_data()
+        self.data.apply_processing(request)
 
     @QtCore.Slot()
     def reset_signal_data(self) -> None:
-        self.data.active_section.reset_signal()
-        self.plot.clear_peaks()
-        self.refresh_plot_data()
-
-    def refresh_plot_data(self) -> None:
-        self.plot.set_signal_data(self.data.active_section.processed_signal)
-        self.update_status_indicators()
+        self.data.reset_signal()
 
     @QtCore.Slot(object)
     def run_peak_detection(self, request: PeakDetectionRequest) -> None:
-        self.gui.overlay_widget.show_overlay("Detection running...")
+        self._run_in_background("Detection running...", functools.partial(self.data.detect_peaks, request))
 
-        worker = PeakDetectionWorker(self.data.active_section, request)
-        worker.signals.sig_success.connect(self._on_sig_peaks_updated)
+    def _run_in_background(self, overlay_text: str, fn: Callable[[], None]) -> None:
+        """Runs `fn` on the thread pool behind a busy overlay; errors are logged through `_on_worker_error`."""
+        self.gui.overlay_widget.show_overlay(overlay_text)
+
+        worker = FunctionWorker(fn)
         worker.signals.sig_error.connect(self._on_worker_error)
         worker.signals.sig_finished.connect(self._on_worker_finished)
         self.thread_pool.start(worker)
@@ -261,13 +262,7 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def _on_worker_finished(self) -> None:
-        is_locked = self.data.active_section.is_locked
-        self.gui.dock_parameters.setEnabled(not is_locked)
-        self.gui.ui.action_remove_section.setEnabled(not is_locked)
-        self.gui.ui.action_mark_section_done.setEnabled(not is_locked)
-        self.gui.ui.action_unlock_section.setEnabled(is_locked)
-        self.plot.block_clicks = is_locked
-
+        # Action states are handled by `_on_section_changed` (LOCK flag); only the overlay is left to do here.
         self.gui.overlay_widget.hide_overlay()
 
     @QtCore.Slot()
@@ -293,6 +288,7 @@ class SVApp(QtCore.QObject):
         self.data.sig_new_data.connect(self._on_sig_new_data)
         self.gui.dock_sections.list_view.pressed.connect(self.data.set_active_section)
         self.data.sig_active_section_changed.connect(self._on_active_section_changed)
+        self.data.sig_section_changed.connect(self._on_section_changed)
 
     def _disconnect_data_controller_signals(self) -> None:
         sender = self.data
@@ -301,6 +297,7 @@ class SVApp(QtCore.QObject):
             (sender.sig_new_metadata, self._bind_metadata),
             (sender.sig_new_data, self._on_sig_new_data),
             (sender.sig_active_section_changed, self._on_active_section_changed),
+            (sender.sig_section_changed, self._on_section_changed),
             (self.gui.dock_sections.list_view.pressed, sender.set_active_section),
         ]
         safe_multi_disconnect(sender, signal_slot_pairs)
@@ -354,45 +351,24 @@ class SVApp(QtCore.QObject):
         summary = s.get_summary()
         self.gui.show_section_summary_box(summary)
 
-    @QtCore.Slot(bool)
-    def _on_active_section_changed(self, has_peaks: bool) -> None:
-        section = self.data.active_section
+    @QtCore.Slot(object)
+    def _on_active_section_changed(self, section: Section) -> None:
         is_base_section = section is self.data.get_base_section()
-        is_locked = section.is_locked
-        is_locked_or_base = is_locked or is_base_section
 
         self.gui.ui.action_create_new_section.setEnabled(is_base_section)
-        self.gui.ui.action_remove_section.setEnabled(not is_base_section and not is_locked)
-        self.gui.ui.action_mark_section_done.setEnabled(not is_base_section and not is_locked)
-        self.gui.ui.action_unlock_section.setEnabled(not is_base_section and is_locked)
         self.gui.ui.action_show_section_overview.setEnabled(is_base_section)
         self.gui.ui.action_show_section_overview.setChecked(is_base_section)
-        self.gui.dock_parameters.setEnabled(not is_base_section and not is_locked)
-
         self.gui.set_active_section_label(section.section_id.pretty_name())
-
-        self.plot.block_clicks = is_locked_or_base
-        self.plot.set_signal_data(section.processed_signal)
-        self.plot.clear_peaks()
-
-        if has_peaks:
-            self.sig_peaks_updated.emit()
-
-        # Update the table view to show the current sections' data
         self.gui.ui.table_view_import_data.setModel(self.data.active_section_model)
-        if is_locked_or_base:
-            self.update_result_views()
 
+        # A newly active section is a complete change from the viewer's point of view.
+        self._on_section_changed(section, SectionChange.ALL)
         self.plot.fit_y_axis()
 
     @QtCore.Slot(int)
     def _on_sig_section_clicked(self, index: int) -> None:
         self.data.set_active_section(self.data.sections.index(index))
         self.gui.dock_sections.list_view.setCurrentIndex(self.data.sections.index(index))
-
-    @QtCore.Slot()
-    def refresh_data_view(self) -> None:
-        self.data.active_section_model.set_df(self.data.active_section.data)
 
     @QtCore.Slot(dict)
     def update_metadata(self, metadata_dict: MetadataDict) -> None:
@@ -597,19 +573,11 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def _lock_section(self) -> None:
-        self.gui.overlay_widget.show_overlay("Creating section result...")
-
-        worker = SectionResultWorker(self.data.active_section)
-        worker.signals.sig_success.connect(self.update_result_views)
-        worker.signals.sig_error.connect(self._on_worker_error)
-        worker.signals.sig_finished.connect(self._on_worker_finished)
-
-        self.thread_pool.start(worker)
+        self._run_in_background("Creating section result...", self.data.lock_active)
 
     @QtCore.Slot()
     def _unlock_section(self) -> None:
-        self.data.active_section.set_locked(False)
-        self._on_worker_finished()
+        self.data.unlock_active()
 
     def _confirm_xlsx_export(self) -> bool:
         """

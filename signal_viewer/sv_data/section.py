@@ -951,6 +951,7 @@ class Section:
             )
             .collect()
         )
+        self._clear_result_frames()
         self.manual_peak_edits.clear()
         self._rate_is_synced = False
         self._is_filtered = False
@@ -973,9 +974,22 @@ class Section:
             )
             .collect()
         )
+        self._clear_result_frames()
         self.manual_peak_edits.clear()
         self._rate_is_synced = False
         self._processing_parameters.reset(peaks_only=True)
+
+    def _clear_result_frames(self) -> None:
+        """
+        Empties `peak_data` and `rate_data`.
+
+        Called when the peaks are discarded, so that anything redrawing from `rate_data` afterwards shows no rate
+        instead of the rate of the peaks that no longer exist.
+        """
+        if self.is_locked:
+            return
+        self._result_data.peak_data = pl.DataFrame()
+        self._result_data.rate_data = pl.DataFrame()
 
     def get_summary(self) -> SectionSummaryDict:
         return {

@@ -23,7 +23,6 @@ if TYPE_CHECKING:
 
 
 class SVGUI(QtWidgets.QMainWindow):
-    sig_refresh_table = QtCore.Signal()
     sig_export_result = QtCore.Signal(str)
 
     def __init__(self, sv_app: SVApp, version: str = "0.0.0") -> None:
@@ -71,8 +70,6 @@ class SVGUI(QtWidgets.QMainWindow):
             QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
         )
         self.ui.table_view_import_data.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.ui.table_view_import_data.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.table_view_import_data.customContextMenuRequested.connect(self.show_data_view_context_menu)
 
         self.ui.table_view_result_peaks.horizontalHeader().setDefaultAlignment(
             QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter
@@ -262,14 +259,6 @@ class SVGUI(QtWidgets.QMainWindow):
     @QtCore.Slot(str)
     def _on_dialog_signal_column_changed(self, value: str) -> None:
         self.dialog_meta.set_requires_input(self.dialog_meta.combo_box_signal_column, value == INDEX_COL)
-
-    @QtCore.Slot(QtCore.QPoint)
-    def show_data_view_context_menu(self, pos: QtCore.QPoint) -> None:
-        menu = QtWidgets.QMenu(parent=self.ui.table_view_import_data)
-        action = QtGui.QAction(QtGui.QIcon("://icons/ArrowSync"), "Refresh", self.ui.table_view_import_data)
-        action.triggered.connect(self.sig_refresh_table.emit)
-        menu.addAction(action)
-        menu.exec(QtGui.QCursor.pos())
 
     @QtCore.Slot(QtCore.QPoint)
     def show_result_view_context_menu(self, pos: QtCore.QPoint) -> None:
