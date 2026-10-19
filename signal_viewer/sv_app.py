@@ -1,6 +1,4 @@
 import contextlib
-import functools
-from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -34,35 +32,6 @@ if TYPE_CHECKING:
     from signal_viewer.sv_data.section import Section
 
 
-class WorkerSignals(QtCore.QObject):
-    sig_error = QtCore.Signal(object)  # the raised Exception instance
-    sig_finished = QtCore.Signal()
-
-
-class FunctionWorker(QtCore.QRunnable):
-    """
-    Runs `fn()` on a `QThreadPool` thread.
-
-    Used for `DataController.detect_peaks` and `DataController.lock_active`. Their `sig_section_changed` emission
-    happens on the worker thread and is delivered queued to the GUI thread, so the refresh runs there. Phase F
-    replaces this with workers that compute without mutating the section.
-    """
-
-    def __init__(self, fn: Callable[[], None]) -> None:
-        super().__init__()
-        self.fn = fn
-        self.signals = WorkerSignals()
-
-    @QtCore.Slot()
-    def run(self) -> None:
-        try:
-            self.fn()
-        except Exception as e:
-            self.signals.sig_error.emit(e)
-        finally:
-            self.signals.sig_finished.emit()
-
-
 class SVApp(QtCore.QObject):
     """
     Routes GUI intent to `DataController` and refreshes views when the controller reports a change.
@@ -77,12 +46,11 @@ class SVApp(QtCore.QObject):
         self.setObjectName("SVApp")
 
         self.gui = SVGUI(self)
+        self.thread_pool = QtCore.QThreadPool.globalInstance()
         self.data: DataController
         self._new_data_controller()
         self.plot = PlotController(self, self.gui)
         self.help = HelpController(self)
-
-        self.thread_pool = QtCore.QThreadPool.globalInstance()
 
         self.recent_data_files = FileListModel(Config.internal.recent_files, parent=self)
         self.gui.ui.lview_data_files.setModel(self.recent_data_files)
@@ -244,26 +212,12 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(object)
     def run_peak_detection(self, request: PeakDetectionRequest) -> None:
-        self._run_in_background("Detection running...", functools.partial(self.data.detect_peaks, request))
-
-    def _run_in_background(self, overlay_text: str, fn: Callable[[], None]) -> None:
-        """Runs `fn` on the thread pool behind a busy overlay; errors are logged through `_on_worker_error`."""
-        self.gui.overlay_widget.show_overlay(overlay_text)
-
-        worker = FunctionWorker(fn)
-        worker.signals.sig_error.connect(self._on_worker_error)
-        worker.signals.sig_finished.connect(self._on_worker_finished)
-        self.thread_pool.start(worker)
+        self.data.detect_peaks(request)
 
     @QtCore.Slot(object)
-    def _on_worker_error(self, exc: Exception) -> None:
+    def _on_task_failed(self, exc: Exception) -> None:
         # Routed through loguru so the status dock and the error dialog (`SVGUI.maybe_show_error_dialog`) pick it up.
         logger.opt(exception=exc).error(f"Background task failed: {exc}")
-
-    @QtCore.Slot()
-    def _on_worker_finished(self) -> None:
-        # Action states are handled by `_on_section_changed` (LOCK flag); only the overlay is left to do here.
-        self.gui.overlay_widget.hide_overlay()
 
     @QtCore.Slot()
     def _on_sig_new_data(self) -> None:
@@ -278,7 +232,7 @@ class SVApp(QtCore.QObject):
 
         This is the only place a controller is constructed, so the wiring cannot be skipped by a new call path.
         """
-        self.data = DataController(self)
+        self.data = DataController(self, thread_pool=self.thread_pool)
         self._connect_data_controller_signals()
         # Initial sync; later changes arrive through `sig_rate_params_changed`.
         self.data.set_rate_params(self.gui.dock_parameters.ui.get_rate_params())
@@ -290,6 +244,9 @@ class SVApp(QtCore.QObject):
         self.gui.dock_sections.list_view.pressed.connect(self.data.set_active_section)
         self.data.sig_active_section_changed.connect(self._on_active_section_changed)
         self.data.sig_section_changed.connect(self._on_section_changed)
+        self.data.sig_task_started.connect(self.gui.overlay_widget.show_overlay)
+        self.data.sig_task_finished.connect(self.gui.overlay_widget.hide_overlay)
+        self.data.sig_task_failed.connect(self._on_task_failed)
 
     def _disconnect_data_controller_signals(self) -> None:
         sender = self.data
@@ -299,6 +256,9 @@ class SVApp(QtCore.QObject):
             (sender.sig_new_data, self._on_sig_new_data),
             (sender.sig_active_section_changed, self._on_active_section_changed),
             (sender.sig_section_changed, self._on_section_changed),
+            (sender.sig_task_started, self.gui.overlay_widget.show_overlay),
+            (sender.sig_task_finished, self.gui.overlay_widget.hide_overlay),
+            (sender.sig_task_failed, self._on_task_failed),
             (self.gui.dock_sections.list_view.pressed, sender.set_active_section),
         ]
         safe_multi_disconnect(sender, signal_slot_pairs)
@@ -579,7 +539,7 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def _lock_section(self) -> None:
-        self._run_in_background("Creating section result...", self.data.lock_active)
+        self.data.lock_active()
 
     @QtCore.Slot()
     def _unlock_section(self) -> None:

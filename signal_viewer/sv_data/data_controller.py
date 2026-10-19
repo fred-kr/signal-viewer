@@ -15,6 +15,14 @@ from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_models import DataFrameModel, FileMetadata, SectionListModel
 from signal_viewer.sv_data.file_io import detect_sampling_rate, read_edf
 from signal_viewer.sv_data.section import DEFAULT_RATE_PARAMS, Section
+from signal_viewer.sv_data.workers import (
+    PeakDetectionResult,
+    PeakDetectionWorker,
+    SectionResultData,
+    SectionResultWorker,
+    Worker,
+    WorkerRunner,
+)
 from signal_viewer.type_defs import PeakDetectionRequest, ProcessingRequest, RollingRateKwargs, UpdatePeaksAction
 
 
@@ -25,6 +33,10 @@ class DataController(QtCore.QObject):
     It is the only object that calls mutating methods on a `Section`. Every mutation of the active section ends in
     exactly one `sig_section_changed(section, flags)` emission, where `flags` is a `SectionChange` naming what
     changed, so views refresh only the parts named.
+
+    Peak detection and the section result run on `thread_pool` (see `sv_data.workers`). The workers only compute; the
+    result comes back to this object's thread and is applied here, so sections are never touched from two threads.
+    `sig_task_started` / `sig_task_finished` bracket every background run for a busy indicator.
     """
 
     sig_user_input_required = QtCore.Signal(set)
@@ -32,10 +44,16 @@ class DataController(QtCore.QObject):
     sig_new_data = QtCore.Signal()
     sig_active_section_changed = QtCore.Signal(object)  # the now-active Section
     sig_section_changed = QtCore.Signal(object, object)  # (Section, SectionChange)
+    sig_task_started = QtCore.Signal(str)  # description of the background task
+    sig_task_finished = QtCore.Signal()
+    sig_task_failed = QtCore.Signal(object)  # the raised Exception instance
 
-    def __init__(self, parent: QtCore.QObject | None = None) -> None:
+    def __init__(self, parent: QtCore.QObject | None = None, thread_pool: WorkerRunner | None = None) -> None:
         super().__init__(parent)
         self.has_data = False
+        self._thread_pool: WorkerRunner = thread_pool or QtCore.QThreadPool.globalInstance()
+        # Keeps running workers (and their signal objects) alive until `sig_finished` arrives.
+        self._running_workers: set[Worker] = set()
 
         self.data_model = DataFrameModel(self)
 
@@ -289,8 +307,8 @@ class DataController(QtCore.QObject):
 
     # --- Active-section mutations ------------------------------------------------------------------------------------
     # Each method below is the single entry point for one kind of change. It mutates the active section and emits
-    # `sig_section_changed` once with the flags describing what changed. `detect_peaks` and `lock_active` are also
-    # called from worker threads (see `sv_app`); the signal is then delivered queued to the GUI thread.
+    # `sig_section_changed` once with the flags describing what changed. `detect_peaks` and `lock_active` compute on
+    # the thread pool and apply the result in `_on_peaks_detected` / `_on_section_result`.
 
     @QtCore.Slot(object)
     def apply_processing(self, request: ProcessingRequest) -> None:
@@ -311,9 +329,24 @@ class DataController(QtCore.QObject):
         self.sig_section_changed.emit(section, SectionChange.PEAKS | SectionChange.RATE)
 
     def detect_peaks(self, request: PeakDetectionRequest) -> None:
-        """Runs peak detection on the whole processed signal and replaces the existing peaks."""
+        """
+        Starts peak detection on the active section's processed signal in the background.
+
+        The existing peaks are replaced when the result arrives (`_on_peaks_detected`).
+        """
         section = self.active_section
-        section.detect_peaks(request.method, request.params)
+        if section.is_locked:
+            logger.warning("The active section is locked. Unlock it before detecting peaks.")
+            return
+        self._start_worker(PeakDetectionWorker(section, request), "Detection running...")
+
+    @QtCore.Slot(object)
+    def _on_peaks_detected(self, result: PeakDetectionResult) -> None:
+        section = result.section
+        if section.is_locked:
+            logger.warning(f"{section.section_id.pretty_name()} was locked while detection ran; result discarded.")
+            return
+        section.set_detected_peaks(result.peaks, result.request.method, result.request.params)
         self.sig_section_changed.emit(section, SectionChange.PEAKS | SectionChange.RATE)
 
     def detect_peaks_in_range(self, start: int, stop: int, request: PeakDetectionRequest) -> None:
@@ -331,15 +364,20 @@ class DataController(QtCore.QObject):
 
     def lock_active(self) -> None:
         """
-        Computes the final peak and rate result for the active section and locks it against further edits.
+        Computes the final peak and rate result for the active section in the background, then locks it.
 
-        Raises
-        ------
-        RuntimeError
-            If the section has fewer than three peaks. Nothing is emitted in that case.
+        A section with fewer than three peaks cannot be locked; the worker's `RuntimeError` arrives through
+        `sig_task_failed` and nothing changes.
         """
         section = self.active_section
-        section.lock_result()
+        if section.is_locked:
+            return
+        self._start_worker(SectionResultWorker(section), "Creating section result...")
+
+    @QtCore.Slot(object)
+    def _on_section_result(self, result: SectionResultData) -> None:
+        section = result.section
+        section.apply_lock_result(result.peak_data, result.rate_data)
         self.sections.notify_section_changed(section)  # lock icon in the list view
         self.sig_section_changed.emit(section, SectionChange.LOCK | SectionChange.RESULT)
 
@@ -349,3 +387,27 @@ class DataController(QtCore.QObject):
         section.set_locked(False)
         self.sections.notify_section_changed(section)
         self.sig_section_changed.emit(section, SectionChange.LOCK)
+
+    # --- Background workers ------------------------------------------------------------------------------------------
+
+    def _start_worker(self, worker: Worker, description: str) -> None:
+        """Wires `worker` to the result slots below and hands it to the thread pool."""
+        if isinstance(worker, PeakDetectionWorker):
+            worker.signals.sig_result.connect(self._on_peaks_detected)
+        elif isinstance(worker, SectionResultWorker):
+            worker.signals.sig_result.connect(self._on_section_result)
+        worker.signals.sig_error.connect(self._on_worker_error)
+        worker.signals.sig_finished.connect(self._on_worker_finished)
+
+        self._running_workers.add(worker)
+        self.sig_task_started.emit(description)
+        self._thread_pool.start(worker)
+
+    @QtCore.Slot(object)
+    def _on_worker_error(self, exc: Exception) -> None:
+        self.sig_task_failed.emit(exc)
+
+    @QtCore.Slot(object)
+    def _on_worker_finished(self, worker: Worker) -> None:
+        self._running_workers.discard(worker)
+        self.sig_task_finished.emit()

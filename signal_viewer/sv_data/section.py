@@ -41,6 +41,168 @@ from signal_viewer.type_defs import (
 from signal_viewer.utils import sequence_repr
 
 
+def compute_peak_data(
+    data: pl.DataFrame,
+    processed_signal_name: str,
+    sampling_rate: int,
+    info_name: str | None,
+    *,
+    include_global: bool = False,
+    include_times: bool = False,
+    include_intervals: bool = False,
+    include_info: bool = False,
+) -> pl.DataFrame:
+    """
+    One row per peak in `data`, with the section index and the processed signal value, plus the requested columns.
+
+    Pure: reads `data` only, so it can run on a worker thread with a snapshot of a section's frame.
+
+    Raises
+    ------
+    RuntimeError
+        If `data` holds fewer than 3 peaks.
+    """
+    peak_rows = (
+        data.lazy()
+        .filter(pl.col(IS_PEAK_COL) == 1)
+        .select(SECTION_INDEX_COL, INDEX_COL, processed_signal_name)
+        .collect()
+    )
+    section_peaks = peak_rows.get_column(SECTION_INDEX_COL)
+    if section_peaks.len() < 3:
+        raise RuntimeError(f"Need at least 3 detected peaks to create a result, got {section_peaks.len()}")
+
+    peak_df = peak_rows.select(SECTION_INDEX_COL, processed_signal_name)
+    if include_global:
+        peak_df = peak_df.with_columns(peak_rows.get_column(INDEX_COL).alias("global_index"))
+    if include_times:
+        peak_df = peak_df.with_columns((pl.col(SECTION_INDEX_COL) / sampling_rate).alias("seconds_since_section_start"))
+    if include_intervals:
+        peak_df = peak_df.with_columns(section_peaks.diff().fill_null(0).alias("peak_intervals"))
+    if include_info and info_name is not None and info_name in data.columns:
+        peak_df = peak_df.with_columns(data.get_column(info_name).gather(section_peaks).alias(info_name))
+    return peak_df
+
+
+def compute_rate_instant(data: pl.DataFrame, sampling_rate: int, desired_length: int | None = None) -> pl.DataFrame:
+    """
+    Instantaneous rate (per minute) from the peaks in `data`. See `neurokit2.signal_rate`.
+
+    Returns an empty frame when there are fewer than 2 peaks, since no rate exists then.
+    """
+    peaks = data.lazy().filter(pl.col(IS_PEAK_COL) == 1).select(SECTION_INDEX_COL).collect().to_series().to_numpy()
+    if peaks.shape[0] < 2:
+        logger.warning(
+            "The currently selected peak detection method finds less than 2 peaks. "
+            "Please change the current methods parameters (if available), or use "
+            "a different method."
+        )
+        return pl.DataFrame()
+    if desired_length is None:
+        desired_length = data.height
+    inst_rate = signal_rate(peaks, sampling_rate=sampling_rate, desired_length=desired_length)
+    return pl.DataFrame(
+        {SECTION_INDEX_COL: data.get_column(SECTION_INDEX_COL), "rate_bpm": inst_rate},
+        schema_overrides={SECTION_INDEX_COL: pl.Int32, "rate_bpm": pl.Float64},
+    )
+
+
+def compute_rate_rolling(
+    data: pl.DataFrame,
+    sampling_rate: int,
+    info_name: str | None,
+    *,
+    grp_col: str = SECTION_INDEX_COL,
+    sec_new_window_every: int = 10,
+    sec_window_length: int = 60,
+    sec_start_at: int = 0,
+    full_info: bool = False,
+    label: Literal["left", "right", "datapoint"] = "datapoint",
+    incomplete_window_method: IncompleteWindowMethod = IncompleteWindowMethod.Drop,
+) -> pl.DataFrame:
+    """Rate per rolling window (peaks per minute), optionally with summary statistics of the info column."""
+    every = sec_new_window_every * sampling_rate
+    period = sec_window_length * sampling_rate
+    offset = sec_start_at * sampling_rate
+
+    samples_in_minute = 60 * sampling_rate
+    peaks_in_window_to_peaks_per_minute = samples_in_minute / period
+    # Sampling rate: 400 Hz, window length: 90 seconds:
+    # samples_in_minute = 60 * 400 = 24000
+    # period = 90 * 400 = 36000
+    # peaks_in_window_to_peaks_per_minute = 24000 / 36000 = 0.666
+    # rate_bpm = peaks_in_window * 0.666
+
+    rr_df = (
+        data.lazy()
+        .sort(grp_col)
+        .with_columns(pl.col(grp_col).cast(pl.Int64))
+        .group_by_dynamic(
+            pl.col(grp_col),
+            every=f"{every}i",
+            period=f"{period}i",
+            offset=f"{offset}i",
+            label=label,
+        )
+    )
+    if full_info and info_name is not None and info_name in data.columns:
+        rr_df = rr_df.agg(
+            pl.sum(IS_PEAK_COL).alias("peaks_in_window"),
+            pl.len().alias("rows_in_window"),
+            pl.mean(info_name).round(1).name.suffix("_mean"),
+            pl.std(info_name).name.suffix("_std"),
+            pl.min(info_name).name.suffix("_min"),
+            pl.max(info_name).name.suffix("_max"),
+            pl.var(info_name).name.suffix("_var"),
+        )
+    else:
+        rr_df = rr_df.agg(
+            pl.sum(IS_PEAK_COL).alias("peaks_in_window"),
+            pl.len().alias("rows_in_window"),
+        )
+
+    if incomplete_window_method == IncompleteWindowMethod.Drop:
+        rr_df = rr_df.filter(pl.col("rows_in_window") == period).with_columns(
+            (pl.col("peaks_in_window") * peaks_in_window_to_peaks_per_minute).alias("rate_bpm")
+        )
+    elif incomplete_window_method == IncompleteWindowMethod.Approximate:
+        rr_df = rr_df.with_columns(
+            (
+                (pl.col("peaks_in_window") * period / pl.col("rows_in_window")) * peaks_in_window_to_peaks_per_minute
+            ).alias("rate_bpm")
+        )
+    elif incomplete_window_method == IncompleteWindowMethod.RepeatLast:
+        rr_df = rr_df.with_columns(
+            (
+                pl.when(pl.col("rows_in_window") != period).then(None).otherwise(pl.col("peaks_in_window"))
+                * peaks_in_window_to_peaks_per_minute
+            ).alias("rate_bpm")
+        ).with_columns(pl.col("rate_bpm").forward_fill())
+
+    if not full_info:
+        rr_df = rr_df.select(
+            pl.col(grp_col).cast(pl.Int32),
+            pl.col("rate_bpm").cast(pl.Float64),
+        )
+
+    return rr_df.collect().shrink_to_fit()
+
+
+def compute_rate_data(
+    data: pl.DataFrame,
+    sampling_rate: int,
+    info_name: str | None,
+    rate_params: RollingRateKwargs,
+    method: RateComputationMethod,
+    *,
+    full_info: bool = False,
+) -> pl.DataFrame:
+    """Dispatches to the rolling or instantaneous rate according to `method`."""
+    if method == RateComputationMethod.RollingWindow:
+        return compute_rate_rolling(data, sampling_rate, info_name, full_info=full_info, **rate_params)
+    return compute_rate_instant(data, sampling_rate)
+
+
 @attrs.define
 class ProcessingParameters:
     sampling_rate: int = attrs.field()
@@ -552,10 +714,17 @@ class Section:
             method,
             method_parameters,
         )
+        self.set_detected_peaks(peaks, method, method_parameters)
 
+    def set_detected_peaks(
+        self,
+        peaks: npt.NDArray[np.intp],
+        method: PeakDetectionAlgorithm,
+        method_parameters: PeakDetectionAlgorithmParameters | None,
+    ) -> None:
+        """Replaces the peaks with the result of a detection run and records which method produced them."""
         self._processing_parameters.peak_detection_method = method
         self._processing_parameters.peak_detection_method_parameters = method_parameters
-
         self.set_peaks(peaks)
 
     @logger.catch(message="Peak detection in selection failed. Please check the parameters and try again.")
@@ -691,39 +860,15 @@ class Section:
             logger.debug("Rate data is already up to date.")
             return
 
-        method = Config.editing.rate_computation_method
-        if method == RateComputationMethod.RollingWindow:
-            self._calc_rate_rolling(full_info=full_info, **self.rate_params)
-        elif method == RateComputationMethod.Instantaneous:
-            self._calc_rate_instant()
-
-        self._rate_is_synced = True
-
-    def _calc_rate_instant(self, desired_length: int | None = None) -> None:
-        """
-        Calculate signal rate (per minute) from the detected peaks. See `neurokit2.signal_rate` for more details.
-
-        Parameters
-        ----------
-        desired_length : int, optional
-            The desired length of the output array, by default None. See `neurokit2.signal_rate` for more details.
-        """
-        peaks = self.peaks_local.to_numpy()
-        if peaks.shape[0] < 2:
-            logger.warning(
-                "The currently selected peak detection method finds less than 2 peaks. "
-                "Please change the current methods parameters (if available), or use "
-                "a different method."
-            )
-            return
-        if desired_length is None:
-            desired_length = len(self.processed_signal)
-        inst_rate = signal_rate(peaks, sampling_rate=self.sampling_rate, desired_length=desired_length)
-
-        self.rate_data = pl.DataFrame(
-            {SECTION_INDEX_COL: self.data.get_column(SECTION_INDEX_COL), "rate_bpm": inst_rate},
-            schema_overrides={SECTION_INDEX_COL: pl.Int32, "rate_bpm": pl.Float64},
+        self.rate_data = compute_rate_data(
+            self.data,
+            self.sampling_rate,
+            self.info_name,
+            self.rate_params,
+            Config.editing.rate_computation_method,
+            full_info=full_info,
         )
+        self._rate_is_synced = True
 
     def _calc_rate_rolling(
         self,
@@ -735,75 +880,19 @@ class Section:
         label: Literal["left", "right", "datapoint"] = "datapoint",
         incomplete_window_method: IncompleteWindowMethod = IncompleteWindowMethod.Drop,
     ) -> None:
-        sampling_rate = self.sampling_rate
-
-        every = sec_new_window_every * sampling_rate
-        period = sec_window_length * sampling_rate
-        offset = sec_start_at * sampling_rate
-
-        samples_in_minute = 60 * sampling_rate
-        peaks_in_window_to_peaks_per_minute = samples_in_minute / period
-        # Sampling rate: 400 Hz, window length: 90 seconds:
-        # samples_in_minute = 60 * 400 = 24000
-        # period = 90 * 400 = 36000
-        # peaks_in_window_to_peaks_per_minute = 24000 / 36000 = 0.666
-        # rate_bpm = peaks_in_window * 0.666
-
-        rr_df = (
-            self.data.lazy()
-            .sort(grp_col)
-            .with_columns(pl.col(grp_col).cast(pl.Int64))
-            .group_by_dynamic(
-                pl.col(grp_col),
-                every=f"{every}i",
-                period=f"{period}i",
-                offset=f"{offset}i",
-                label=label,
-            )
+        """Assigns `compute_rate_rolling` of the section's own frame to `rate_data`."""
+        self.rate_data = compute_rate_rolling(
+            self.data,
+            self.sampling_rate,
+            self.info_name,
+            grp_col=grp_col,
+            sec_new_window_every=sec_new_window_every,
+            sec_window_length=sec_window_length,
+            sec_start_at=sec_start_at,
+            full_info=full_info,
+            label=label,
+            incomplete_window_method=incomplete_window_method,
         )
-        if (self.info_name in self.data.columns) and full_info:
-            info_col = self.info_name
-            rr_df = rr_df.agg(
-                pl.sum(IS_PEAK_COL).alias("peaks_in_window"),
-                pl.len().alias("rows_in_window"),
-                pl.mean(info_col).round(1).name.suffix("_mean"),
-                pl.std(info_col).name.suffix("_std"),
-                pl.min(info_col).name.suffix("_min"),
-                pl.max(info_col).name.suffix("_max"),
-                pl.var(info_col).name.suffix("_var"),
-            )
-        else:
-            rr_df = rr_df.agg(
-                pl.sum(IS_PEAK_COL).alias("peaks_in_window"),
-                pl.len().alias("rows_in_window"),
-            )
-
-        if incomplete_window_method == IncompleteWindowMethod.Drop:
-            rr_df = rr_df.filter(pl.col("rows_in_window") == period).with_columns(
-                (pl.col("peaks_in_window") * peaks_in_window_to_peaks_per_minute).alias("rate_bpm")
-            )
-        elif incomplete_window_method == IncompleteWindowMethod.Approximate:
-            rr_df = rr_df.with_columns(
-                (
-                    (pl.col("peaks_in_window") * period / pl.col("rows_in_window"))
-                    * peaks_in_window_to_peaks_per_minute
-                ).alias("rate_bpm")
-            )
-        elif incomplete_window_method == IncompleteWindowMethod.RepeatLast:
-            rr_df = rr_df.with_columns(
-                (
-                    pl.when(pl.col("rows_in_window") != period).then(None).otherwise(pl.col("peaks_in_window"))
-                    * peaks_in_window_to_peaks_per_minute
-                ).alias("rate_bpm")
-            ).with_columns(pl.col("rate_bpm").forward_fill())
-
-        if not full_info:
-            rr_df = rr_df.select(
-                pl.col(grp_col).cast(pl.Int32),
-                pl.col("rate_bpm").cast(pl.Float64),
-            )
-
-        self.rate_data = rr_df.collect().shrink_to_fit()
 
     def get_mean_rate_per_temperature(self) -> pl.DataFrame:
         info_col = self.info_name
@@ -866,8 +955,16 @@ class Section:
         )
 
     def lock_result(self) -> None:
+        """Computes the final result synchronously and locks the section. `SectionResultWorker` is the threaded form."""
         self.update_peak_data(include_global=True, include_info=True)
         self.update_rate_data(full_info=True, force=True)
+        self.set_locked(True)
+
+    def apply_lock_result(self, peak_data: pl.DataFrame, rate_data: pl.DataFrame) -> None:
+        """Stores frames computed elsewhere (see `SectionResultWorker`) and locks the section."""
+        self.peak_data = peak_data
+        self.rate_data = rate_data
+        self._rate_is_synced = True
         self.set_locked(True)
 
     def get_result(self) -> DetailedSectionResult:
@@ -912,28 +1009,16 @@ class Section:
         RuntimeError
             If the number of detected peaks is less than 3.
         """
-        section_peaks = self.peaks_local
-
-        if section_peaks.len() < 3:
-            raise RuntimeError(f"Need at least 3 detected peaks to create a result, got {section_peaks.len()}")
-
-        peak_df = self.get_peak_pos()
-
-        if include_global:
-            peak_df = peak_df.with_columns(self.peaks_global.alias("global_index"))
-        if include_times:
-            peak_df = peak_df.with_columns(
-                (pl.col(SECTION_INDEX_COL) / self.sampling_rate).alias("seconds_since_section_start")
-            )
-        if include_intervals:
-            peak_df = peak_df.with_columns(section_peaks.diff().fill_null(0).alias("peak_intervals"))
-
-        if self.info_name in self.data.columns and include_info:
-            peak_df = peak_df.with_columns(
-                self.data.get_column(self.info_name).gather(section_peaks).alias(self.info_name)
-            )
-
-        self.peak_data = peak_df
+        self.peak_data = compute_peak_data(
+            self.data,
+            self.processed_signal_name,
+            self.sampling_rate,
+            self.info_name,
+            include_global=include_global,
+            include_times=include_times,
+            include_intervals=include_intervals,
+            include_info=include_info,
+        )
 
     def reset_signal(self) -> None:
         """

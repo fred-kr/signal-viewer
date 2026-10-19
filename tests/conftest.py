@@ -11,3 +11,14 @@ from PySide6 import QtWidgets
 
 QtWidgets.QApplication.setOrganizationName("QuackTech")
 QtWidgets.QApplication.setApplicationName("SignalViewer-Tests")
+
+
+import pytest
+from PySide6 import QtCore
+
+
+@pytest.fixture(scope="session")
+def qapp() -> QtCore.QCoreApplication:
+    """A `QCoreApplication` for tests that need queued signal delivery (worker threads). No display required."""
+    app = QtCore.QCoreApplication.instance()
+    return app if app is not None else QtCore.QCoreApplication([])

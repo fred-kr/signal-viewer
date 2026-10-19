@@ -14,9 +14,16 @@ from signal_viewer.enum_defs import (
     IncompleteWindowMethod,
     PeakDetectionAlgorithm,
     PreprocessPipeline,
+    RateComputationMethod,
     StandardizationMethod,
 )
-from signal_viewer.sv_data.section import DEFAULT_RATE_PARAMS, Section
+from signal_viewer.sv_data.section import (
+    DEFAULT_RATE_PARAMS,
+    Section,
+    compute_peak_data,
+    compute_rate_data,
+    compute_rate_instant,
+)
 from signal_viewer.type_defs import PeaksLocalMaxima, ProcessingRequest, RollingRateKwargs
 
 FS = 100  # Hz
@@ -263,3 +270,34 @@ def test_reset_peaks_empties_result_frames() -> None:
     s.set_peaks(sine_peaks())
     s.reset_signal()
     assert s.rate_data.is_empty()
+
+
+def test_compute_helpers_are_pure() -> None:
+    """The threaded result worker uses these on a frame snapshot; they must not touch the section."""
+    s = Section(make_df(), "sig", FS, info_column="temp")
+    s.set_peaks(sine_peaks(), update_rate=False)
+    snapshot = s.data
+
+    with pytest.raises(RuntimeError, match="at least 3"):
+        compute_peak_data(make_df().pipe(lambda df: Section(df, "sig", FS).data), "sig_processed", FS, None)
+
+    peak_df = compute_peak_data(snapshot, "sig_processed", FS, "temp", include_global=True, include_info=True)
+    assert peak_df.columns == [SECTION_INDEX_COL, "sig_processed", "global_index", "temp"]
+    assert peak_df.height == len(sine_peaks())
+
+    rate_df = compute_rate_data(
+        snapshot, FS, "temp", s.rate_params, RateComputationMethod.RollingWindow, full_info=True
+    )
+    assert rate_df.height == 7
+    assert "temp_mean" in rate_df.columns
+
+    inst = compute_rate_data(snapshot, FS, "temp", s.rate_params, RateComputationMethod.Instantaneous)
+    assert inst.height == N
+    assert compute_rate_instant(Section(make_df(), "sig", FS).data, FS).is_empty(), "no peaks, no rate"
+
+    assert s.peak_data.is_empty() and s.rate_data.is_empty(), "nothing was assigned to the section"
+    assert s.data is snapshot
+
+    s.apply_lock_result(peak_df, rate_df)
+    assert s.is_locked
+    assert s.peak_data.equals(peak_df) and s.rate_data.equals(rate_df)

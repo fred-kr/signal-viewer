@@ -1,14 +1,20 @@
 """
 End-to-end tests for `DataController` on a real CSV file: open, edit metadata, load, section, reload.
 
-`DataController` is a `QObject`, which works without a running `QApplication`.
+`DataController` is a `QObject`, which works without a running `QApplication`. Background work is run through
+`SyncRunner`, so results are applied before the call returns; `test_workers_deliver_on_the_gui_thread` covers the real
+thread pool.
 """
 
+import threading
+import time
+from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
 import polars as pl
 import pytest
+from PySide6 import QtCore
 
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION, INDEX_COL
 from signal_viewer.enum_defs import IncompleteWindowMethod, PeakDetectionAlgorithm, PreprocessPipeline, SectionChange
@@ -23,6 +29,13 @@ from signal_viewer.type_defs import (
 
 FS = 100
 N = FS * 20
+
+
+class SyncRunner:
+    """Stands in for `QThreadPool`: runs each worker immediately on the calling thread."""
+
+    def start(self, runnable: QtCore.QRunnable, /) -> None:
+        runnable.run()
 
 
 @pytest.fixture
@@ -134,7 +147,7 @@ def test_rate_params_reach_existing_and_new_sections(csv_file: Path) -> None:
 
 def _loaded_with_section(csv_file: Path) -> tuple[DataController, list[tuple[object, SectionChange]]]:
     """A controller with one 20 s editable section active, and a recorder for `sig_section_changed`."""
-    dc = DataController()
+    dc = DataController(thread_pool=SyncRunner())
     dc.open_file(csv_file)
     dc.update_metadata(signal_col="Alpha Sig", info_col="Beta Temp")
     dc.load_data()
@@ -210,17 +223,34 @@ def test_peak_edits_emit_peaks_and_rate(csv_file: Path) -> None:
 def test_lock_and_unlock(csv_file: Path) -> None:
     dc, emitted = _loaded_with_section(csv_file)
     section = dc.active_section
+    tasks: list[str] = []
+    dc.sig_task_started.connect(tasks.append)
+    dc.sig_task_finished.connect(lambda: tasks.append("finished"))
+    failures: list[Exception] = []
+    dc.sig_task_failed.connect(failures.append)
 
-    with pytest.raises(RuntimeError, match="at least 3"):
-        dc.lock_active()
-    assert emitted == [], "a failed lock changes nothing and reports nothing"
+    dc.lock_active()
+    assert len(failures) == 1 and isinstance(failures[0], RuntimeError) and "at least 3" in str(failures[0])
+    assert emitted == [], "a failed lock changes nothing"
     assert not section.is_locked
+    assert tasks == ["Creating section result...", "finished"], "the busy indicator is released on failure too"
 
     dc.update_peaks("add", sine_peaks())
     dc.lock_active()
     assert section.is_locked
     assert not section.peak_data.is_empty()
+    assert "global_index" in section.peak_data.columns and "beta_temp" in section.peak_data.columns
+    assert "beta_temp_mean" in section.rate_data.columns, "the locked rate carries the full info statistics"
     assert emitted[-1] == (section, SectionChange.LOCK | SectionChange.RESULT)
+    assert len(failures) == 1
+
+    # A locked section is not touched by a late detection result or another lock.
+    emitted.clear()
+    dc.detect_peaks(
+        PeakDetectionRequest(PeakDetectionAlgorithm.LocalMaxima, PeaksLocalMaxima(search_radius=40, min_distance=40))
+    )
+    dc.lock_active()
+    assert emitted == []
 
     dc.unlock_active()
     assert not section.is_locked
@@ -250,3 +280,40 @@ def test_set_rate_params_recomputes_only_when_peaks_exist(csv_file: Path) -> Non
     assert emitted == [(section, SectionChange.RATE)]
     # 10 s windows every 2 s in 20 s: starts 0, 2, ..., 10 are complete, each holding 10 peaks.
     assert section.rate_data.get_column("rate_bpm").to_list() == pytest.approx([60.0] * 6)
+
+
+def test_workers_deliver_on_the_gui_thread(csv_file: Path, qapp: QtCore.QCoreApplication) -> None:
+    """With the real thread pool, results are applied on the controller's thread, not the worker's."""
+    dc = DataController()  # global QThreadPool
+    dc.open_file(csv_file)
+    dc.update_metadata(signal_col="Alpha Sig", info_col="Beta Temp")
+    dc.load_data()
+    dc.create_section(0, N - 1)
+    dc.set_active_section(dc.sections.index(1))
+    section = dc.active_section
+
+    seen: list[tuple[int, SectionChange]] = []
+    dc.sig_section_changed.connect(lambda s, f: seen.append((threading.get_ident(), f)))
+    finished: list[bool] = []
+    dc.sig_task_finished.connect(lambda: finished.append(True))
+
+    dc.detect_peaks(
+        PeakDetectionRequest(PeakDetectionAlgorithm.LocalMaxima, PeaksLocalMaxima(search_radius=40, min_distance=40))
+    )
+    _wait_until(qapp, lambda: len(finished) == 1)
+    assert section.peaks_local.to_list() == sine_peaks().tolist()
+    assert seen == [(threading.get_ident(), SectionChange.PEAKS | SectionChange.RATE)]
+
+    dc.lock_active()
+    _wait_until(qapp, lambda: len(finished) == 2)
+    assert section.is_locked
+    assert seen[-1] == (threading.get_ident(), SectionChange.LOCK | SectionChange.RESULT)
+
+
+def _wait_until(qapp: QtCore.QCoreApplication, condition: Callable[[], bool], timeout_s: float = 10.0) -> None:
+    deadline = time.monotonic() + timeout_s
+    while not condition():
+        if time.monotonic() > deadline:
+            raise TimeoutError("background task did not finish in time")
+        qapp.processEvents()
+        time.sleep(0.01)
