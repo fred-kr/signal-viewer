@@ -340,10 +340,12 @@ class DataController(QtCore.QObject):
         """
         section = self.active_section
         section.lock_result()
+        self.sections.notify_section_changed(section)  # lock icon in the list view
         self.sig_section_changed.emit(section, SectionChange.LOCK | SectionChange.RESULT)
 
     @QtCore.Slot()
     def unlock_active(self) -> None:
         section = self.active_section
         section.set_locked(False)
+        self.sections.notify_section_changed(section)
         self.sig_section_changed.emit(section, SectionChange.LOCK)

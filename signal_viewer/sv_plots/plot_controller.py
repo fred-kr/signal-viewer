@@ -23,6 +23,7 @@ from signal_viewer.utils import make_qbrush, make_qpen, safe_disconnect
 if TYPE_CHECKING:
     from pyqtgraph.GraphicsScene import mouseEvents
 
+    from signal_viewer.sv_data.data_models import SectionListModel
     from signal_viewer.sv_data.section import Section
     from signal_viewer.sv_gui import SVGUI
 
@@ -32,11 +33,12 @@ class PlotController(QtCore.QObject):
     Draws the active section and reports user intent.
 
     The plot never edits data itself: a click on a peak or on the curve only emits `sig_scatter_data_changed`, and
-    the redraw comes back through `refresh_section` once the model has changed.
+    the redraw comes back through `refresh_section` once the model has changed. Section regions are driven by the
+    `SectionListModel` passed to `bind_section_model`; nothing else adds or removes them.
     """
 
     sig_scatter_data_changed = QtCore.Signal(str, object)  # (UpdatePeaksAction, section indices)
-    sig_section_clicked = QtCore.Signal(int)
+    sig_section_clicked = QtCore.Signal(object)  # the clicked Section
 
     def __init__(self, parent: QtCore.QObject | None, gui: SVGUI) -> None:
         super().__init__(parent)
@@ -44,6 +46,7 @@ class PlotController(QtCore.QObject):
         self._gui = gui
         self.regions: list[ClickableRegionItem] = []
         self._show_regions = False
+        self._section_model: SectionListModel | None = None
 
         self._setup_plot_widgets()
         self._setup_plot_items()
@@ -284,31 +287,83 @@ class PlotController(QtCore.QObject):
 
         self.mpw_result.fig.clear()
 
+        self.unbind_section_model()
         self.clear_regions()
         self._remove_plot_data_items()
         self._setup_plot_data_items()
 
+    # --- Section regions ---------------------------------------------------------------------------------------------
+
+    def bind_section_model(self, model: SectionListModel) -> None:
+        """
+        Mirrors `model` as regions on the main plot: one region per editable section, kept in sync with the model's
+        row insertions, removals, renames and resets. Replaces any previous binding.
+        """
+        self.unbind_section_model()
+        self._section_model = model
+        model.rowsInserted.connect(self._on_sections_inserted)
+        model.rowsAboutToBeRemoved.connect(self._on_sections_about_to_be_removed)
+        model.modelReset.connect(self.clear_regions)
+        model.dataChanged.connect(self._on_sections_data_changed)
+
+        self.clear_regions()
+        for section in model.editable_sections:
+            self.mark_region(section)
+
+    def unbind_section_model(self) -> None:
+        model = self._section_model
+        if model is None:
+            return
+        safe_disconnect(model, model.rowsInserted, self._on_sections_inserted)
+        safe_disconnect(model, model.rowsAboutToBeRemoved, self._on_sections_about_to_be_removed)
+        safe_disconnect(model, model.modelReset, self.clear_regions)
+        safe_disconnect(model, model.dataChanged, self._on_sections_data_changed)
+        self._section_model = None
+
+    @QtCore.Slot(QtCore.QModelIndex, int, int)
+    def _on_sections_inserted(self, parent: QtCore.QModelIndex, first: int, last: int) -> None:
+        if self._section_model is None:
+            return
+        base = self._section_model.get_base_section()
+        for row in range(first, last + 1):
+            section = self._section_model.get_section(self._section_model.index(row))
+            if section is not None and section is not base:
+                self.mark_region(section)
+
+    @QtCore.Slot(QtCore.QModelIndex, int, int)
+    def _on_sections_about_to_be_removed(self, parent: QtCore.QModelIndex, first: int, last: int) -> None:
+        if self._section_model is None:
+            return
+        for row in range(first, last + 1):
+            section = self._section_model.get_section(self._section_model.index(row))
+            if section is not None:
+                self.remove_region(section)
+
+    @QtCore.Slot(QtCore.QModelIndex, QtCore.QModelIndex, object)
+    def _on_sections_data_changed(
+        self, top_left: QtCore.QModelIndex, bottom_right: QtCore.QModelIndex, roles: object = None
+    ) -> None:
+        for region in self.regions:
+            region.refresh_tooltip()
+
     @QtCore.Slot(bool)
-    def update_regions(self, visible: bool) -> None:
-        """Updates IDs and visibility of regions."""
-        # Start at 1 since section 0 is the base from which all others are added
-        for i, region in enumerate(self.regions, start=1):
-            region.section_id = i
-            region.setToolTip(f"Section {i:03}")
+    def set_regions_visible(self, visible: bool) -> None:
+        for region in self.regions:
             region.setVisible(visible)
         self._show_regions = visible
 
-    def remove_region(self, section_index: QtCore.QModelIndex) -> None:
-        """Removes a region from the plot and list of regions."""
-        if section_index.row() > 0:
-            for region in self.regions:
-                if region.section_id == section_index.row():
-                    safe_disconnect(region, region.sig_clicked, self._on_region_clicked)
-                    region.setParent(None)
-                    self.regions.remove(region)
-                    self.pw_main.removeItem(region)
+    def _find_region(self, section: Section) -> ClickableRegionItem | None:
+        return next((r for r in self.regions if r.section is section), None)
 
-        self.update_regions(self._show_regions)
+    def remove_region(self, section: Section) -> None:
+        """Removes the region marking `section`, if there is one."""
+        region = self._find_region(section)
+        if region is None:
+            return
+        safe_disconnect(region, region.sig_clicked, self._on_region_clicked)
+        self.regions.remove(region)
+        self.pw_main.removeItem(region)
+        region.setParent(None)
 
     def clear_regions(self) -> None:
         """Removes all regions from the plot and list of regions."""
@@ -319,10 +374,9 @@ class PlotController(QtCore.QObject):
                 self.pw_main.removeItem(region)
         self.regions.clear()
 
-    @QtCore.Slot(int)
-    def _on_region_clicked(self, section_id: int) -> None:
-        """Emits the `sig_section_clicked` signal when a region is clicked."""
-        self.sig_section_clicked.emit(section_id)
+    @QtCore.Slot(object)
+    def _on_region_clicked(self, section: Section) -> None:
+        self.sig_section_clicked.emit(section)
 
     def show_region_selector(
         self, bounds: tuple[float, float], selected_range: tuple[float, float] | None = None
@@ -355,18 +409,11 @@ class PlotController(QtCore.QObject):
         if self.region_selector:
             self.region_selector.setVisible(False)
 
-    @QtCore.Slot(int, int)
-    def mark_region(self, x1: int, x2: int) -> None:
-        """
-        Marks a region on the plot.
-
-        Parameters
-        ----------
-        x1 : float
-            Plot coordinate of the start of the region
-        x2 : float
-            Plot coordinate of the end of the region
-        """
+    def mark_region(self, section: Section) -> None:
+        """Draws a region spanning `section.global_bounds` on the main plot. Idempotent per section."""
+        if self._find_region(section) is not None:
+            return
+        x1, x2 = section.global_bounds
         brush_color = SVGColors.Aquamarine.qcolor()
         brush_color.setAlpha(50)
         brush = make_qbrush(brush_color)
@@ -385,14 +432,13 @@ class PlotController(QtCore.QObject):
             pen=pen,
             hoverPen=hover_pen,
             movable=False,
+            section=section,
         )
         marked_region.setVisible(self._show_regions)
         marked_region.setZValue(10)
         marked_region.sig_clicked.connect(self._on_region_clicked)
         self.regions.append(marked_region)
         self.pw_main.addItem(marked_region)
-        self.hide_region_selector()
-        self.update_regions(self._show_regions)
 
     def get_region_bounds(self) -> tuple[int, int]:
         """

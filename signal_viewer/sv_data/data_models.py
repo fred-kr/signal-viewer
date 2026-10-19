@@ -245,20 +245,25 @@ class SectionListModel(QtCore.QAbstractListModel):
             return QtGui.QIcon(":icons/LockClosed.svg") if section.is_locked else QtGui.QIcon(":icons/LockOpen.svg")
         return None
 
+    @staticmethod
+    def _make_id(section: Section, row: int) -> SectionID:
+        return SectionID(f"Section_{section.signal_name}_{row:03}")
+
     def add_section(self, section: Section) -> None:
-        parent = self.index(0, 0)
-        self.beginInsertRows(parent, self.rowCount(), self.rowCount())
+        """Appends `section`, giving it the id for its row before the view sees it."""
+        row = self.rowCount()
+        section.section_id = self._make_id(section, row)
+        self.beginInsertRows(QtCore.QModelIndex(), row, row)
         self._sections.append(section)
-        self.refresh_section_ids()
         self.endInsertRows()
 
     def remove_section(self, index: QtCore.QModelIndex) -> None:
+        """Removes the section at `index` and renumbers the ones after it (see `refresh_section_ids`)."""
         row = index.row()
-        parent = self.index(0, 0)
-        self.beginRemoveRows(parent, row, row)
-        self._sections.remove(self._sections[row])
-        self.refresh_section_ids()
+        self.beginRemoveRows(QtCore.QModelIndex(), row, row)
+        del self._sections[row]
         self.endRemoveRows()
+        self.refresh_section_ids()
 
     def get_section(self, index: QtCore.QModelIndex) -> Section | None:
         return self._sections[index.row()] if index.isValid() else None
@@ -266,14 +271,39 @@ class SectionListModel(QtCore.QAbstractListModel):
     def get_base_section(self) -> Section | None:
         return self._sections[0] if self._sections else None
 
+    def index_of(self, section: Section) -> QtCore.QModelIndex:
+        """The model index of `section`, or an invalid index when it is not in the model."""
+        for row, candidate in enumerate(self._sections):
+            if candidate is section:
+                return self.index(row)
+        return QtCore.QModelIndex()
+
+    def notify_section_changed(self, section: Section) -> None:
+        """Tells the views that a section's display data (name, lock icon) changed."""
+        index = self.index_of(section)
+        if index.isValid():
+            self.dataChanged.emit(index, index)
+
     def clear(self) -> None:
         self.beginResetModel()
         self._sections.clear()
         self.endResetModel()
 
     def refresh_section_ids(self) -> None:
-        for i, section in enumerate(self._sections):
-            section.section_id = SectionID(f"Section_{section.signal_name}_{i:03}")
+        """
+        Re-derives every section id from its row and emits `dataChanged` for the rows whose id changed.
+
+        Ids encode the row number, so deleting a section renames every section after it. Views and plot regions
+        pick up the new names through `dataChanged`.
+        """
+        changed_rows: list[int] = []
+        for row, section in enumerate(self._sections):
+            new_id = self._make_id(section, row)
+            if section.section_id != new_id:
+                section.section_id = new_id
+                changed_rows.append(row)
+        if changed_rows:
+            self.dataChanged.emit(self.index(changed_rows[0]), self.index(changed_rows[-1]))
 
 
 class FileMetadata:

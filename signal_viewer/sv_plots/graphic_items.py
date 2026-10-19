@@ -29,6 +29,8 @@ from signal_viewer.utils import make_qbrush, make_qpen
 if TYPE_CHECKING:
     from pyqtgraph.GraphicsScene import mouseEvents
 
+    from signal_viewer.sv_data.section import Section
+
 
 def _get_button_type(ev: mouseEvents.MouseDragEvent) -> MouseButtons:
     if ev.button() == QtCore.Qt.MouseButton.MiddleButton:
@@ -276,16 +278,13 @@ class TimeDeltaAxisItem(DateAxisItem):
 
 class ClickableRegionItem(pg.LinearRegionItem):
     """
-    A clickable region item for pyqtgraph plots.
+    A clickable region item marking one `Section` on the plot.
 
-    This class extends `pg.LinearRegionItem` to allow for click events on the region.
-
-    Attributes:
-        sig_clicked (QtCore.Signal): Emitted when the region is clicked.
-            The signal carries an integer value representing the section ID.
+    The item holds the `Section` it stands for, so it survives the renumbering of section ids when another section is
+    deleted. `sig_clicked` carries that `Section`.
     """
 
-    sig_clicked = QtCore.Signal(int)
+    sig_clicked = QtCore.Signal(object)  # the Section this region marks
 
     def __init__(
         self,
@@ -300,24 +299,23 @@ class ClickableRegionItem(pg.LinearRegionItem):
         span: Sequence[float] = (0, 1),
         swapMode: Literal["block", "push", "sort"] = "sort",
         clipItem: pg.GraphicsObject | None = None,
+        section: Section | None = None,
     ) -> None:
         super().__init__(
             values, orientation, brush, pen, hoverBrush, hoverPen, movable, bounds, span, swapMode, clipItem
         )
 
-        self._section_id: int = 0
+        self.section = section
+        self.refresh_tooltip()
 
-    @property
-    def section_id(self) -> int:
-        return self._section_id
-
-    @section_id.setter
-    def section_id(self, value: int) -> None:
-        self._section_id = value
+    def refresh_tooltip(self) -> None:
+        """Re-reads the section's id; call after sections were renumbered."""
+        if self.section is not None:
+            self.setToolTip(self.section.section_id.pretty_name())
 
     def mouseClickEvent(self, ev: mouseEvents.MouseClickEvent) -> None:
         if ev.button() == QtCore.Qt.MouseButton.LeftButton:
-            self.sig_clicked.emit(self._section_id)
+            self.sig_clicked.emit(self.section)
             ev.accept()
         else:
             super().mouseClickEvent(ev)

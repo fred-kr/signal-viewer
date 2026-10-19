@@ -117,7 +117,7 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_create_new_section.toggled.connect(self._on_create_new_section)
         self.gui.dock_sections.btn_confirm.clicked.connect(self._on_confirm_section)
         self.gui.dock_sections.btn_cancel.clicked.connect(self._on_cancel_section)
-        self.gui.ui.action_show_section_overview.toggled.connect(self.plot.update_regions)
+        self.gui.ui.action_show_section_overview.toggled.connect(self.plot.set_regions_visible)
 
         self.gui.ui.action_toggle_auto_scaling.triggered.connect(self.plot.fit_y_axis)
 
@@ -269,6 +269,7 @@ class SVApp(QtCore.QObject):
     def _on_sig_new_data(self) -> None:
         self.gui.dock_sections.list_view.setModel(self.data.sections)
         self.gui.dock_sections.list_view.setCurrentIndex(self.data.base_section_index)
+        self.plot.bind_section_model(self.data.sections)
         self.plot.update_time_axis_scale(self.data.metadata.sampling_rate)
 
     def _new_data_controller(self) -> None:
@@ -324,11 +325,10 @@ class SVApp(QtCore.QObject):
         if not self.plot.region_selector.isVisible():
             return
         start, stop = self.plot.get_region_bounds()
-        self.data.create_section(start, stop)
+        self.data.create_section(start, stop)  # the plot draws the region from the model's rowsInserted
         self.plot.hide_region_selector()
         self.gui.show_section_confirm_cancel(False)
         self.gui.ui.action_create_new_section.setChecked(False)
-        self.plot.mark_region(start, stop)
 
     @QtCore.Slot()
     def _on_cancel_section(self) -> None:
@@ -338,10 +338,13 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(QtCore.QModelIndex)
     def delete_section(self, index: QtCore.QModelIndex) -> None:
-        self.plot.remove_region(index)
-        self.data.delete_section(index)
+        section = self.data.sections.get_section(index)
+        if section is None or section is self.data.get_base_section():
+            return
+        name = section.section_id.pretty_name()
+        self.data.delete_section(index)  # the plot removes the region from the model's rowsAboutToBeRemoved
         self.gui.dock_sections.list_view.setCurrentIndex(self.data.base_section_index)
-        logger.info(f"Deleted section {index.row():03}")
+        logger.info(f"Deleted {name}")
 
     @QtCore.Slot(QtCore.QModelIndex)
     def show_section_summary(self, index: QtCore.QModelIndex) -> None:
@@ -365,10 +368,13 @@ class SVApp(QtCore.QObject):
         self._on_section_changed(section, SectionChange.ALL)
         self.plot.fit_y_axis()
 
-    @QtCore.Slot(int)
-    def _on_sig_section_clicked(self, index: int) -> None:
-        self.data.set_active_section(self.data.sections.index(index))
-        self.gui.dock_sections.list_view.setCurrentIndex(self.data.sections.index(index))
+    @QtCore.Slot(object)
+    def _on_sig_section_clicked(self, section: Section) -> None:
+        index = self.data.sections.index_of(section)
+        if not index.isValid():
+            return
+        self.data.set_active_section(index)
+        self.gui.dock_sections.list_view.setCurrentIndex(index)
 
     @QtCore.Slot(dict)
     def update_metadata(self, metadata_dict: MetadataDict) -> None:
