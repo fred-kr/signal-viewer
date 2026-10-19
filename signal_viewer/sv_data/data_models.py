@@ -1,6 +1,6 @@
 import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 
 import polars as pl
 
@@ -30,12 +30,15 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self.df = df
         self.endResetModel()
 
+    @override
     def rowCount(self, parent: ModelIndex | None = None) -> int:
         return self.df.height
 
+    @override
     def columnCount(self, parent: ModelIndex | None = None) -> int:
         return self.df.width
 
+    @override
     def data(
         self,
         index: ModelIndex,
@@ -77,6 +80,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         return None
 
+    @override
     def headerData(
         self,
         section: int,
@@ -112,9 +116,11 @@ class FileListModel(QtCore.QAbstractListModel):
         if validate_files:
             self.validate_files()
 
+    @override
     def rowCount(self, parent: ModelIndex | None = None) -> int:
         return len(self._recent_files)
 
+    @override
     def data(self, index: ModelIndex, role: int = ItemDataRole.DisplayRole) -> Any:
         if not index.isValid() or not self._recent_files:
             return None
@@ -131,6 +137,7 @@ class FileListModel(QtCore.QAbstractListModel):
             return file_path
         return None
 
+    @override
     def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: int = ItemDataRole.DisplayRole) -> Any:
         if role != ItemDataRole.DisplayRole:
             return None
@@ -217,9 +224,11 @@ class SectionListModel(QtCore.QAbstractListModel):
     def editable_sections(self) -> list[Section]:
         return list(self._sections)[1:]
 
+    @override
     def rowCount(self, parent: ModelIndex | None = None) -> int:
         return len(self._sections)
 
+    @override
     def data(
         self,
         index: ModelIndex,

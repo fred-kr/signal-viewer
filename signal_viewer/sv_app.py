@@ -1,4 +1,5 @@
 import contextlib
+from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -248,7 +249,7 @@ class SVApp(QtCore.QObject):
 
     def _disconnect_data_controller_signals(self) -> None:
         sender = self.data
-        signal_slot_pairs = [
+        signal_slot_pairs: list[tuple[QtCore.SignalInstance, QtCore.Slot | Callable[..., Any]]] = [
             (sender.sig_user_input_required, self.show_metadata_dialog),
             (sender.sig_new_metadata, self._bind_metadata),
             (sender.sig_new_data, self._on_sig_new_data),

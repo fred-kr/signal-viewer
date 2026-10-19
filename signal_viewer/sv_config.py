@@ -1,5 +1,3 @@
-# pyright: reportAssignmentType=false
-
 import functools
 from typing import NamedTuple
 

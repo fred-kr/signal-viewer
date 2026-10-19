@@ -225,28 +225,10 @@ class SVGUI(QtWidgets.QMainWindow):
 
     def _connect_signals(self) -> None:
         self.ui.tab_widget_main.currentChanged.connect(self._on_page_changed)
-
-        # self.ui.spin_box_sampling_rate_import_page.valueChanged.connect(
-        #     self.dialog_meta.spin_box_sampling_rate.setValue
-        # )
-        # self.ui.combo_box_info_column_import_page.currentTextChanged.connect(
-        #     self.dialog_meta.combo_box_info_column.setCurrentText
-        # )
-        # self.ui.combo_box_signal_column_import_page.currentTextChanged.connect(
-        #     self.dialog_meta.combo_box_signal_column.setCurrentText
-        # )
-
-        # self.dialog_meta.spin_box_sampling_rate.valueChanged.connect(self._on_dialog_sampling_rate_changed)
-        # self.dialog_meta.combo_box_info_column.currentTextChanged.connect(
-        #     self.ui.combo_box_info_column_import_page.setCurrentText
-        # )
-        # self.dialog_meta.combo_box_signal_column.currentTextChanged.connect(self._on_dialog_signal_column_changed)
         self.dialog_meta.spin_box_sampling_rate.valueChanged.connect(self._on_dialog_sampling_rate_changed)
         self.dialog_meta.combo_box_signal_column.currentTextChanged.connect(self._on_dialog_signal_column_changed)
 
         self.dock_status_log.log_text_box.sig_log_message.connect(self.maybe_show_error_dialog)
-        # self.dock_sections.btn_confirm.clicked.connect(self.ui.action_confirm_section.trigger)
-        # self.dock_sections.btn_cancel.clicked.connect(self.ui.action_cancel_section.trigger)
 
         self.action_export_to_csv.triggered.connect(lambda: self.sig_export_result.emit("csv"))
         self.action_export_to_xlsx.triggered.connect(lambda: self.sig_export_result.emit("xlsx"))
@@ -273,7 +255,7 @@ class SVGUI(QtWidgets.QMainWindow):
         action_copy_table = QtGui.QAction(
             QtGui.QIcon("://icons/Copy"),
             "Copy to Clipboard",
-            triggered=lambda: table_view.model().df.write_clipboard(),  # type: ignore
+            triggered=lambda: table_view.model().df.write_clipboard(),
         )
         menu.addAction(action_copy_table)
         menu.addAction(self.action_export_to_csv)

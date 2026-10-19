@@ -136,7 +136,7 @@ def search_enum[T: enum.Enum](value: Any, enum_class: type[T]) -> T:
         return enum_class(value)
 
 
-def get_app() -> "SVApp":
+def get_app() -> SVApp:
     """
     Get a reference to the `SVApp` instance.
     """
@@ -147,7 +147,7 @@ def get_app() -> "SVApp":
         raise RuntimeError("SVApp instance not found. Ensure the GUI is running and the SVGUI widget is present.")
 
 
-def get_gui() -> "SVGUI":
+def get_gui() -> SVGUI:
     """Get a reference to the `SVGUI` (main window) instance."""
     return get_app().gui
 
@@ -172,7 +172,7 @@ type IsPlottable = np.float64 | np.intp | np.uintp
 def find_nearest_extrema[T: IsPlottable](
     x_data: npt.NDArray[T],
     y_data: npt.NDArray[T],
-    cursor_pos: "Point | QtCore.QPoint | QtCore.QPointF",
+    cursor_pos: Point | QtCore.QPoint | QtCore.QPointF,
     search_radius: int,
 ) -> tuple[T, T] | None:
     cursor_x, cursor_y = cursor_pos.x(), cursor_pos.y()
@@ -256,7 +256,7 @@ def _strip_accents(obj: str) -> str:
     Inspired from [StackOverflow][so].
 
     [so]: https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-strin
-    """  # noqa: E501
+    """
     # TODO: possible implementation in Rust
     # or use a pyarrow implementation?
     # https://github.com/pola-rs/polars/issues/11455
