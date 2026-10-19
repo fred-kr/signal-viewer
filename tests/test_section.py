@@ -301,3 +301,25 @@ def test_compute_helpers_are_pure() -> None:
     s.apply_lock_result(peak_df, rate_df)
     assert s.is_locked
     assert s.peak_data.equals(peak_df) and s.rate_data.equals(rate_df)
+
+
+def test_peaks_local_is_cached_and_invalidated() -> None:
+    s = Section(make_df(), "sig", FS, info_column="temp")
+    assert s.peaks_local.is_empty()
+    assert s.peaks_local is s.peaks_local, "repeated reads reuse the cached series"
+
+    s.set_peaks(sine_peaks(), update_rate=False)
+    assert s.peaks_local.to_list() == sine_peaks().tolist()
+
+    s.update_peaks("remove", np.array([25]), update_rate=False)
+    assert s.peaks_local.to_list() == sine_peaks().tolist()[1:]
+
+    s.update_peaks("add", np.array([25]), update_rate=False)
+    assert s.peaks_local.to_list() == sine_peaks().tolist()
+
+    s.reset_peaks()
+    assert s.peaks_local.is_empty()
+
+    s.set_peaks(sine_peaks(), update_rate=False)
+    s.reset_signal()
+    assert s.peaks_local.is_empty()

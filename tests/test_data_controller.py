@@ -17,7 +17,14 @@ import pytest
 from PySide6 import QtCore
 
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION, INDEX_COL
-from signal_viewer.enum_defs import IncompleteWindowMethod, PeakDetectionAlgorithm, PreprocessPipeline, SectionChange
+from signal_viewer.enum_defs import (
+    IncompleteWindowMethod,
+    PeakDetectionAlgorithm,
+    PreprocessPipeline,
+    RateComputationMethod,
+    SectionChange,
+)
+from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_controller import DataController
 from signal_viewer.sv_data.section import DEFAULT_RATE_PARAMS
 from signal_viewer.type_defs import (
@@ -112,6 +119,11 @@ def test_create_section_and_reload(csv_file: Path) -> None:
     assert section.data.height == 200
     assert section.signal_name == "alpha_sig"
     assert not section.is_locked
+    # A section is a slice of the base data, not a filtered copy.
+    base = dc.get_base_section()
+    assert section.raw_signal.equals(base.raw_signal.slice(100, 200))
+    assert section.data.get_column(INDEX_COL).to_list() == list(range(100, 300))
+    assert dc.base_df.height == base.data.height, "base_df is a view on the base section"
 
     # Loading again discards sections but keeps the user's metadata choices.
     dc.load_data()
@@ -317,3 +329,43 @@ def _wait_until(qapp: QtCore.QCoreApplication, condition: Callable[[], bool], ti
             raise TimeoutError("background task did not finish in time")
         qapp.processEvents()
         time.sleep(0.01)
+
+
+def test_recompute_rate_all_follows_the_configured_method(csv_file: Path) -> None:
+    dc, emitted = _loaded_with_section(csv_file)
+    section = dc.active_section
+    dc.update_peaks("add", sine_peaks())
+    assert section.rate_data.is_empty(), "rolling 60 s windows never complete in 20 s"
+
+    previous = Config.editing.rate_computation_method
+    try:
+        Config.editing.rate_computation_method = RateComputationMethod.Instantaneous
+        emitted.clear()
+        dc.recompute_rate_all()
+        assert section.rate_data.height == N, "instantaneous rate has one value per sample"
+        assert emitted == [(section, SectionChange.RATE)]
+    finally:
+        Config.editing.rate_computation_method = previous
+
+    emitted.clear()
+    dc.recompute_rate_all()
+    assert section.rate_data.is_empty()
+    assert emitted == [(section, SectionChange.RATE)]
+
+    # Locked sections are left alone.
+    dc.lock_active()
+    emitted.clear()
+    dc.recompute_rate_all()
+    assert emitted == []
+
+
+def test_refresh_table_models_keeps_frames(csv_file: Path) -> None:
+    dc, _ = _loaded_with_section(csv_file)
+    before = dc.active_section_model.df
+    resets: list[bool] = []
+    dc.active_section_model.modelReset.connect(lambda: resets.append(True))
+
+    dc.refresh_table_models()
+
+    assert dc.active_section_model.df is before
+    assert resets == [True]

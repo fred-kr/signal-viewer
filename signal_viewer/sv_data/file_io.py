@@ -1,14 +1,18 @@
 import datetime
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import mne.io
 import polars as pl
 import polars.selectors as cs
+import xlsxwriter
 from loguru import logger
 
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION
+
+if TYPE_CHECKING:
+    from signal_viewer.sv_data.section import Section
 
 INTEGER_DTYPES = frozenset(
     [pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.Int128, pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64]
@@ -175,3 +179,38 @@ def read_annotation_file(
         )
         .to_dicts()
     )
+
+
+def write_xlsx(sections: Sequence[Section], path: Path | str, group_var: str | None = None) -> None:
+    """
+    Writes the results of `sections` to one workbook with the sheets `r_data`, `Detected Peaks`, `Rate Data` and
+    `Global Bounds`.
+
+    The `section_id` column in the first three sheets is the 1-based position in `sections`. The window step of
+    `r_data` is each section's own `rate_params`. Sections without a result (not locked) contribute no rows; their
+    missing columns are filled with nulls so one unlocked section does not break the export.
+
+    Raises
+    ------
+    ValueError
+        If `sections` is empty.
+    """
+    if not sections:
+        raise ValueError("Nothing to export: no sections were given.")
+
+    def numbered(df: pl.DataFrame, i: int) -> pl.DataFrame:
+        if df.height == 0:
+            # A literal broadcasts to one row on an empty frame, which would invent a result row.
+            return pl.DataFrame(schema={"section_id": pl.Int32, **df.schema})
+        return df.insert_column(0, pl.lit(i).cast(pl.Int32).alias("section_id"))
+
+    peak_frames = [numbered(s.peak_data, i) for i, s in enumerate(sections, start=1)]
+    rate_frames = [numbered(s.rate_data, i) for i, s in enumerate(sections, start=1)]
+    bounds_frames = [s.global_bounds_df for s in sections]
+    r_data_frames = [s.get_simple_result(group_var=group_var) for s in sections]
+
+    with xlsxwriter.Workbook(path) as wb:
+        pl.concat(r_data_frames, how="diagonal_relaxed").write_excel(workbook=wb, worksheet="r_data")
+        pl.concat(peak_frames, how="diagonal_relaxed").write_excel(workbook=wb, worksheet="Detected Peaks")
+        pl.concat(rate_frames, how="diagonal_relaxed").write_excel(workbook=wb, worksheet="Rate Data")
+        pl.concat(bounds_frames, how="diagonal_relaxed").write_excel(workbook=wb, worksheet="Global Bounds")

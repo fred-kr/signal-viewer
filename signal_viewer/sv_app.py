@@ -1,12 +1,10 @@
 import contextlib
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import numpy.typing as npt
-import polars as pl
 import pyside_config as qconfig
-import xlsxwriter
 from loguru import logger
 from PySide6 import QtCore, QtWidgets
 
@@ -14,7 +12,7 @@ from signal_viewer.enum_defs import SectionChange
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_controller import DataController
 from signal_viewer.sv_data.data_models import FileListModel
-from signal_viewer.sv_data.file_io import read_annotation_file
+from signal_viewer.sv_data.file_io import read_annotation_file, write_xlsx
 from signal_viewer.sv_gui import SVGUI
 from signal_viewer.sv_help import HelpController
 from signal_viewer.sv_plots.plot_controller import PlotController
@@ -129,7 +127,7 @@ class SVApp(QtCore.QObject):
         snapshot = qconfig.create_snapshot()
 
         settings_dlg = qconfig.create_editor(self.gui, exclude=["Internal"])
-        settings_dlg.accepted.connect(self.apply_settings)
+        settings_dlg.accepted.connect(lambda: self.apply_settings(snapshot))
         settings_dlg.rejected.connect(lambda: qconfig.restore_snapshot(snapshot))
         settings_dlg.open()
 
@@ -458,7 +456,7 @@ class SVApp(QtCore.QObject):
         self.gui.ui.btn_load_data.setEnabled(True)
 
         self.data.open_file(file_path)  # fills the metadata widgets through sig_new_metadata -> _bind_metadata
-        self.gui.ui.table_view_import_data.setModel(self.data.data_model)
+        self.gui.ui.table_view_import_data.setModel(self.data.active_section_model)  # filled by `load_data`
         self.gui.ui.table_view_result_peaks.setModel(self.data.result_model_peaks)
         self.gui.ui.table_view_result_rate.setModel(self.data.result_model_rate)
 
@@ -528,9 +526,27 @@ class SVApp(QtCore.QObject):
 
         logger.info("Closed file")
 
-    @QtCore.Slot()
-    def apply_settings(self) -> None:
-        logger.debug("Implementation pending")
+    def apply_settings(self, previous: dict[str, Any]) -> None:
+        """
+        Applies the settings that changed since `previous` (a `qconfig.create_snapshot()` taken before the dialog).
+
+        Only settings that are read once and cached need handling here; the rest are read from `Config` on use.
+        """
+        current = qconfig.create_snapshot()
+        changed = {
+            (group, key)
+            for group, values in current.items()
+            for key, value in values.items()
+            if previous.get(group, {}).get(key) != value
+        }
+        if not changed:
+            return
+        logger.info("Settings changed: " + ", ".join(f"{group}.{key}" for group, key in sorted(changed)))
+
+        if ("Processing", "rate_computation_method") in changed:
+            self.data.recompute_rate_all()
+        if ("Data", "float_precision") in changed:
+            self.data.refresh_table_models()
 
     @QtCore.Slot()
     def update_result_views(self) -> None:
@@ -605,49 +621,8 @@ class SVApp(QtCore.QObject):
                 "Add grouping column?",
                 "Optional label for a 'group_var' column.<br>Useful when combining results from multiple files,<br>e.g. to perform further analysis in R.",
             )
-            if ok:
-                group_var = text
-            else:
-                group_var = None
-
-            combined_peak_df = pl.DataFrame(
-                schema={"section_id": pl.Int32, **self.data.sections.editable_sections[0].peak_data.schema}
-            )
-            combined_rate_df = pl.DataFrame(
-                schema={"section_id": pl.Int32, **self.data.sections.editable_sections[0].rate_data.schema}
-            )
-            combined_bounds_df = self.data.sections.editable_sections[0].global_bounds_df.clear()
-
-            combined_r_data = self.data.sections.editable_sections[0].get_simple_result(group_var=group_var).clear()
-
-            for i, section in enumerate(self.data.sections.editable_sections, start=1):
-                peak_df = section.peak_data.insert_column(0, pl.lit(i).cast(pl.Int32).alias("section_id"))
-                rate_df = section.rate_data.insert_column(0, pl.lit(i).cast(pl.Int32).alias("section_id"))
-                bounds_df = section.global_bounds_df
-                r_data = section.get_simple_result(group_var=group_var)
-
-                combined_peak_df.extend(peak_df)
-                combined_rate_df.extend(rate_df)
-                combined_bounds_df.extend(bounds_df)
-                combined_r_data.extend(r_data)
-
-            with xlsxwriter.Workbook(out_path) as wb:
-                combined_r_data.write_excel(
-                    workbook=wb,
-                    worksheet="r_data",
-                )
-                combined_peak_df.write_excel(
-                    workbook=wb,
-                    worksheet="Detected Peaks",
-                )
-                combined_rate_df.write_excel(
-                    workbook=wb,
-                    worksheet="Rate Data",
-                )
-                combined_bounds_df.write_excel(
-                    workbook=wb,
-                    worksheet="Global Bounds",
-                )
+            group_var = text if ok else None
+            write_xlsx(self.data.sections.editable_sections, out_path, group_var)
 
         else:
             raise NotImplementedError

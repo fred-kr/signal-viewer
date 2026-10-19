@@ -394,6 +394,7 @@ class Section:
         "_is_processed",
         "_is_standardized",
         "_manual_peak_edits",
+        "_peaks_local",
         "_processing_parameters",
         "_rate_is_synced",
         "_result_data",
@@ -454,6 +455,7 @@ class Section:
         )
 
         self._rate_is_synced = False
+        self._peaks_local: pl.Series | None = None  # cache, see `peaks_local`
         # Parameters for the rolling-window rate. Owned by the section so rate computation never has to ask the GUI.
         self.rate_params: RollingRateKwargs = rate_params.copy() if rate_params else DEFAULT_RATE_PARAMS.copy()
 
@@ -464,7 +466,8 @@ class Section:
 
     @property
     def rate_data(self) -> pl.DataFrame:
-        return self._result_data.rate_data.clone()
+        # Polars frames are immutable, so handing out the stored frame is safe without a clone.
+        return self._result_data.rate_data
 
     @rate_data.setter
     def rate_data(self, value: pl.DataFrame) -> None:
@@ -484,7 +487,10 @@ class Section:
         """
         if step_size is None:
             step_size = self.rate_params.get("sec_new_window_every", 10)
-        r_data = self._result_data.rate_data.clone()
+        r_data = self._result_data.rate_data
+        if "rate_bpm" not in r_data.columns:
+            # No rate yet (section not locked): an empty frame with the export schema, so it concatenates cleanly.
+            return pl.DataFrame(schema={INDEX_COL: pl.Int32, "rate_bpm": pl.Float64, "group_var": pl.String})
         temp_df = r_data.select(
             ((pl.int_range(pl.len(), dtype=pl.Int32) * (step_size * self.sampling_rate)) + self.global_bounds[0]).alias(
                 "index"
@@ -500,7 +506,7 @@ class Section:
 
     @property
     def peak_data(self) -> pl.DataFrame:
-        return self._result_data.peak_data.clone()
+        return self._result_data.peak_data
 
     @peak_data.setter
     def peak_data(self, value: pl.DataFrame) -> None:
@@ -564,14 +570,24 @@ class Section:
 
     @property
     def peaks_local(self) -> pl.Series:
-        """Returns the indices of the peaks in the processed signal."""
-        return (
-            self.data.lazy()
-            .filter(pl.col(IS_PEAK_COL) == 1)
-            .select(SECTION_INDEX_COL)
-            .collect()
-            .get_column(SECTION_INDEX_COL)
-        )
+        """
+        The section indices of the peaks.
+
+        Cached: every method that changes the `is_peak` column calls `_invalidate_peaks()`, so repeated reads between
+        edits do not re-filter the frame.
+        """
+        if self._peaks_local is None:
+            self._peaks_local = (
+                self.data.lazy()
+                .filter(pl.col(IS_PEAK_COL) == 1)
+                .select(SECTION_INDEX_COL)
+                .collect()
+                .get_column(SECTION_INDEX_COL)
+            )
+        return self._peaks_local
+
+    def _invalidate_peaks(self) -> None:
+        self._peaks_local = None
 
     @property
     def peaks_global(self) -> pl.Series:
@@ -787,6 +803,7 @@ class Section:
             .cast(pl.Int8)
             .alias(IS_PEAK_COL)
         )
+        self._invalidate_peaks()
 
         self.manual_peak_edits.clear()
         self._rate_is_synced = False
@@ -835,6 +852,7 @@ class Section:
         changed_indices = pl.arg_where(updated_data != self.data.get_column(IS_PEAK_COL), eager=True)
 
         self.data = self.data.with_columns(is_peak=updated_data)
+        self._invalidate_peaks()
 
         if action == "add":
             self.manual_peak_edits.new_added(changed_indices)
@@ -1036,6 +1054,7 @@ class Section:
             )
             .collect()
         )
+        self._invalidate_peaks()
         self._clear_result_frames()
         self.manual_peak_edits.clear()
         self._rate_is_synced = False
@@ -1059,6 +1078,7 @@ class Section:
             )
             .collect()
         )
+        self._invalidate_peaks()
         self._clear_result_frames()
         self.manual_peak_edits.clear()
         self._rate_is_synced = False

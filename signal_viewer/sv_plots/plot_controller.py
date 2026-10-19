@@ -641,8 +641,10 @@ class PlotController(QtCore.QObject):
         closest_index = np.argmin(np.abs(y_data[mask] - y))
 
         x_pos = x_data[mask][closest_index]
-        if self.peak_scatter is not None and x_pos in self.peak_scatter.scatter.data["x"]:
-            return None
+        if self.peak_scatter is not None:
+            peak_x, _ = self.peak_scatter.getOriginalDataset()
+            if peak_x is not None and x_pos in peak_x:
+                return None
 
         return x_pos, y_data[mask][closest_index]
 
@@ -690,7 +692,12 @@ class PlotController(QtCore.QObject):
 
         rx, ry, rw, rh = r.x(), r.y(), r.width(), r.height()
 
-        scatter_x, scatter_y = self.peak_scatter.scatter.getData()
+        # The full peak set, not `self.peak_scatter.scatter.getData()`: the child scatter holds the auto-downsampled
+        # points, so when zoomed out it misses most peaks inside the rectangle.
+        scatter_x, scatter_y = self.peak_scatter.getOriginalDataset()
+        if scatter_x is None or scatter_y is None:
+            self.remove_selection_rect()
+            return
 
         inside = (scatter_x >= rx) & (scatter_x <= rx + rw) & (scatter_y >= ry) & (scatter_y <= ry + rh)
 

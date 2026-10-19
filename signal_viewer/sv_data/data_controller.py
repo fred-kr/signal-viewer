@@ -9,7 +9,7 @@ import polars as pl
 from loguru import logger
 from PySide6 import QtCore
 
-from signal_viewer.constants import COMBO_BOX_NO_SELECTION
+from signal_viewer.constants import COMBO_BOX_NO_SELECTION, INDEX_COL
 from signal_viewer.enum_defs import InputFileFormat, SectionChange, TextFileSeparator
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_models import DataFrameModel, FileMetadata, SectionListModel
@@ -55,8 +55,6 @@ class DataController(QtCore.QObject):
         # Keeps running workers (and their signal objects) alive until `sig_finished` arrives.
         self._running_workers: set[Worker] = set()
 
-        self.data_model = DataFrameModel(self)
-
         self._metadata: FileMetadata | None = None
 
         self._sections = SectionListModel(parent=self)
@@ -84,7 +82,14 @@ class DataController(QtCore.QObject):
 
     @property
     def base_df(self) -> pl.DataFrame:
-        return self.data_model.df
+        """
+        The loaded columns (`index`, signal, info) of the whole file.
+
+        A column selection on the base section's frame, so no second copy of the data exists.
+        """
+        base = self.get_base_section()
+        columns = [INDEX_COL, base.signal_name] + ([base.info_name] if base.info_name is not None else [])
+        return base.data.select(columns)
 
     @property
     def sections(self) -> SectionListModel:
@@ -122,17 +127,7 @@ class DataController(QtCore.QObject):
 
     def get_base_section(self) -> Section:
         if self._base_section is None:
-            try:
-                self._base_section = Section(
-                    self.base_df,
-                    signal_name=self.metadata.data_signal_column,
-                    sampling_rate=self.metadata.sampling_rate,
-                    info_column=self.metadata.data_info_column,
-                    rate_params=self._rate_params,
-                )
-                self._base_section.set_locked(True)
-            except Exception as e:
-                raise ValueError("No data available. Select a valid file to load, and try again.") from e
+            raise ValueError("No data available. Select a valid file to load, and try again.")
         return self._base_section
 
     @property
@@ -251,7 +246,7 @@ class DataController(QtCore.QObject):
         columns = [signal_col]
         if info_col != COMBO_BOX_NO_SELECTION:
             columns.append(info_col)
-        row_index_col = "index"
+        row_index_col = INDEX_COL
         if row_index_col in columns:
             logger.exception("Column name 'index' is reserved for internal use and cannot be used as a column name.")
             return
@@ -281,17 +276,27 @@ class DataController(QtCore.QObject):
         df = df.rename(self.metadata.name_map, strict=False)
 
         self._reset_sections()
-        self.data_model.set_df(df)
-        self._base_section = self.get_base_section()
+        # The base section owns the only copy of the raw data; `base_df` and every other section are views on it.
+        self._base_section = Section(
+            df,
+            signal_name=self.metadata.data_signal_column,
+            sampling_rate=self.metadata.sampling_rate,
+            info_column=self.metadata.data_info_column,
+            rate_params=self._rate_params,
+        )
+        self._base_section.set_locked(True)
         self.sections.add_section(self._base_section)
         self.set_active_section(self.base_section_index)
         self.has_data = True
         self.sig_new_data.emit()
 
-    def create_section(self, start: float, stop: float) -> None:
-        if self._metadata is None:
+    def create_section(self, start: int, stop: int) -> None:
+        """Creates a section covering the global indices `[start, stop]` and appends it to the list."""
+        if self._metadata is None or self._base_section is None:
             return
-        data = self.base_df.filter(pl.col("index").is_between(start, stop))
+        start, stop = int(start), int(stop)
+        # `index` is the row number, so the row offset equals the index value; a slice is a zero-copy view.
+        data = self.base_df.slice(start, stop - start + 1)
         section = Section(
             data,
             self.metadata.data_signal_column,
@@ -387,6 +392,28 @@ class DataController(QtCore.QObject):
         section.set_locked(False)
         self.sections.notify_section_changed(section)
         self.sig_section_changed.emit(section, SectionChange.LOCK)
+
+    # --- Settings ----------------------------------------------------------------------------------------------------
+
+    def recompute_rate_all(self) -> None:
+        """
+        Recomputes the rate of every unlocked section that has peaks, after the rate computation method changed.
+
+        Locked sections keep the result they were locked with; unlock and lock again to recompute those.
+        """
+        if not self.has_data:
+            return
+        for section in self.sections.editable_sections:
+            if section.is_locked or section.peaks_local.is_empty():
+                continue
+            section.update_rate_data(force=True)
+            if section is self.active_section:
+                self.sig_section_changed.emit(section, SectionChange.RATE)
+
+    def refresh_table_models(self) -> None:
+        """Re-applies the display settings (float precision) by resetting each table model with its current frame."""
+        for model in (self.active_section_model, self.result_model_peaks, self.result_model_rate):
+            model.set_df(model.df)
 
     # --- Background workers ------------------------------------------------------------------------------------------
 
