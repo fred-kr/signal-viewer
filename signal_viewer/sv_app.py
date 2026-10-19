@@ -311,7 +311,7 @@ class SVApp(QtCore.QObject):
     def _on_sig_new_data(self) -> None:
         self.gui.dock_sections.list_view.setModel(self.data.sections)
         self.gui.dock_sections.list_view.setCurrentIndex(self.data.base_section_index)
-        self.update_sampling_rate()
+        self.plot.update_time_axis_scale(self.data.metadata.sampling_rate)
 
     def _connect_data_controller_signals(self) -> None:
         self.data.sig_user_input_required.connect(self.show_metadata_dialog)
@@ -431,9 +431,13 @@ class SVApp(QtCore.QObject):
     def update_metadata_widgets(self, metadata: FileMetadata) -> None:
         self.gui.data_tree_widget_additional_metadata.set_data(metadata.other_info, hide_root=True)
         self.gui.data_tree_widget_additional_metadata.collapseAll()
-        self.gui.ui.spin_box_sampling_rate_import_page.setValue(metadata.sampling_rate)
-        self.gui.ui.combo_box_signal_column_import_page.setCurrentText(metadata.signal_column)
-        self.gui.ui.combo_box_info_column_import_page.setCurrentText(metadata.info_column)
+        with QtCore.QSignalBlocker(self.gui.ui.spin_box_sampling_rate_import_page):
+            self.gui.ui.spin_box_sampling_rate_import_page.setValue(metadata.sampling_rate)
+        with QtCore.QSignalBlocker(self.gui.ui.combo_box_signal_column_import_page):
+            self.gui.ui.combo_box_signal_column_import_page.setCurrentText(metadata.signal_column)
+        with QtCore.QSignalBlocker(self.gui.ui.combo_box_info_column_import_page):
+            self.gui.ui.combo_box_info_column_import_page.setCurrentText(metadata.info_column)
+        self.plot.update_time_axis_scale(metadata.sampling_rate)
 
     @QtCore.Slot(set)
     def show_metadata_dialog(self, required_fields: set[str]) -> None:
@@ -481,7 +485,6 @@ class SVApp(QtCore.QObject):
     def update_sampling_rate(self) -> None:
         sampling_rate = self.gui.ui.spin_box_sampling_rate_import_page.value()
         self.data.update_metadata(sampling_rate=sampling_rate)
-        self.plot.update_time_axis_scale(sampling_rate)
         logger.info(f"Sampling rate set to {sampling_rate} Hz.")
 
     @QtCore.Slot(str)

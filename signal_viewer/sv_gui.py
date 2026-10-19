@@ -229,20 +229,22 @@ class SVGUI(QtWidgets.QMainWindow):
     def _connect_signals(self) -> None:
         self.ui.tab_widget_main.currentChanged.connect(self._on_page_changed)
 
-        self.ui.spin_box_sampling_rate_import_page.valueChanged.connect(
-            self.dialog_meta.spin_box_sampling_rate.setValue
-        )
-        self.ui.combo_box_info_column_import_page.currentTextChanged.connect(
-            self.dialog_meta.combo_box_info_column.setCurrentText
-        )
-        self.ui.combo_box_signal_column_import_page.currentTextChanged.connect(
-            self.dialog_meta.combo_box_signal_column.setCurrentText
-        )
+        # self.ui.spin_box_sampling_rate_import_page.valueChanged.connect(
+        #     self.dialog_meta.spin_box_sampling_rate.setValue
+        # )
+        # self.ui.combo_box_info_column_import_page.currentTextChanged.connect(
+        #     self.dialog_meta.combo_box_info_column.setCurrentText
+        # )
+        # self.ui.combo_box_signal_column_import_page.currentTextChanged.connect(
+        #     self.dialog_meta.combo_box_signal_column.setCurrentText
+        # )
 
+        # self.dialog_meta.spin_box_sampling_rate.valueChanged.connect(self._on_dialog_sampling_rate_changed)
+        # self.dialog_meta.combo_box_info_column.currentTextChanged.connect(
+        #     self.ui.combo_box_info_column_import_page.setCurrentText
+        # )
+        # self.dialog_meta.combo_box_signal_column.currentTextChanged.connect(self._on_dialog_signal_column_changed)
         self.dialog_meta.spin_box_sampling_rate.valueChanged.connect(self._on_dialog_sampling_rate_changed)
-        self.dialog_meta.combo_box_info_column.currentTextChanged.connect(
-            self.ui.combo_box_info_column_import_page.setCurrentText
-        )
         self.dialog_meta.combo_box_signal_column.currentTextChanged.connect(self._on_dialog_signal_column_changed)
 
         self.dock_status_log.log_text_box.sig_log_message.connect(self.maybe_show_error_dialog)
@@ -264,7 +266,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dialog_meta.spin_box_sampling_rate.style().polish(self.dialog_meta.spin_box_sampling_rate)
         self.dialog_meta.spin_box_sampling_rate.update()
 
-        self.ui.spin_box_sampling_rate_import_page.setValue(value)
+        # self.ui.spin_box_sampling_rate_import_page.setValue(value)
 
     @QtCore.Slot(str)
     def _on_dialog_signal_column_changed(self, value: str) -> None:
@@ -275,7 +277,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dialog_meta.combo_box_signal_column.style().unpolish(self.dialog_meta.combo_box_signal_column)
         self.dialog_meta.combo_box_signal_column.style().polish(self.dialog_meta.combo_box_signal_column)
         self.dialog_meta.combo_box_signal_column.update()
-        self.ui.combo_box_signal_column_import_page.setCurrentText(value)
+        # self.ui.combo_box_signal_column_import_page.setCurrentText(value)
 
     @QtCore.Slot(QtCore.QPoint)
     def show_data_view_context_menu(self, pos: QtCore.QPoint) -> None:

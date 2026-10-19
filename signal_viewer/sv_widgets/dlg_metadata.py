@@ -5,39 +5,39 @@ from signal_viewer.sv_config import Config
 
 STYLE_SHEET_SPIN_BOX = """
 QSpinBox[requiresInput="false"] {
-    background-color: rgba(0, 255, 100, 0.5);
+    background-color: rgba(0, 200, 100, 0.3);
 }
 QSpinBox[requiresInput="false"]:focus {
-    background-color: rgba(0, 255, 100, 0.5);
+    background-color: rgba(0, 200, 100, 0.3);
 }
 
 QSpinBox[requiresInput="true"] {
-    background-color: rgba(255, 0, 0, 0.5);
+    background-color: rgba(200, 0, 100, 0.3);
 }
 QSpinBox[requiresInput="true"]:focus {
-    background-color: rgba(255, 0, 0, 0.5);
+    background-color: rgba(200, 0, 100, 0.3);
 }
 """
 STYLE_SHEET_COMBO_BOX = """
 QComboBox[requiresInput="false"] {
-    background-color: rgba(0, 255, 100, 0.5);
+    background-color: rgba(0, 200, 100, 0.3);
 }
 QComboBox[requiresInput="true"] {
-    background-color: rgba(255, 0, 0, 0.5);
+    background-color: rgba(200, 0, 100, 0.3);
 }
 
 QComboBox[requiresInput="false"]:hover {
-    background-color: rgba(0, 255, 100, 0.5);
+    background-color: rgba(0, 200, 100, 0.3);
 }
 QComboBox[requiresInput="true"]:hover {
-    background-color: rgba(255, 0, 0, 0.5);
+    background-color: rgba(200, 0, 100, 0.3);
 }
 
 QComboBox[requiresInput="false"]:pressed {
-    background-color: rgba(0, 255, 100, 0.5);
+    background-color: rgba(0, 200, 100, 0.3);
 }
 QComboBox[requiresInput="true"]:pressed {
-    background-color: rgba(255, 0, 0, 0.5);
+    background-color: rgba(200, 0, 100, 0.3);
 }
 
 QComboBox:disabled {
