@@ -2,12 +2,15 @@ import datetime
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
+import attrs
 import numpy as np
 import numpy.typing as npt
 
 from signal_viewer.enum_defs import (
     IncompleteWindowMethod,
+    PeakDetectionAlgorithm,
     PointSymbols,
+    PreprocessPipeline,
     StandardizationMethod,
     SVGColors,
     WFDBPeakDirection,
@@ -190,3 +193,25 @@ class RollingRateKwargs(TypedDict, total=False):
     sec_new_window_every: int
     sec_window_length: int
     incomplete_window_method: IncompleteWindowMethod
+
+
+@attrs.frozen
+class ProcessingRequest:
+    """
+    What the "Apply to Signal" button asks for, as one object.
+
+    A `pipeline` takes precedence over `filter` and `standardize`, mirroring the parameter dock, which disables the
+    custom inputs while a pipeline is selected. All three `None` means "reset the signal".
+    """
+
+    pipeline: PreprocessPipeline | None = None
+    filter: SignalFilterKwargs | None = None
+    standardize: SignalStandardizeKwargs | None = None
+
+
+@attrs.frozen
+class PeakDetectionRequest:
+    """What the "Run detection" button asks for."""
+
+    method: PeakDetectionAlgorithm
+    params: PeakDetectionAlgorithmParameters | None = None

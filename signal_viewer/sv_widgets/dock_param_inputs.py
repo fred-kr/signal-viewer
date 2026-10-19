@@ -1,5 +1,4 @@
 import decimal
-import enum
 import inspect
 
 from PySide6 import QtCore, QtGui, QtWidgets
@@ -16,6 +15,7 @@ from signal_viewer.enum_defs import (
 from signal_viewer.generated.ui_param_inputs import Ui_containerParamInputs
 from signal_viewer.type_defs import (
     PeakDetectionAlgorithmParameters,
+    PeakDetectionRequest,
     PeaksECGEmrich,
     PeaksECGGamboa,
     PeaksECGNeuroKit,
@@ -24,6 +24,7 @@ from signal_viewer.type_defs import (
     PeaksLocalMaxima,
     PeaksLocalMinima,
     PeaksPPGElgendi,
+    ProcessingRequest,
     RollingRateKwargs,
     SignalFilterKwargs,
     SignalStandardizeKwargs,
@@ -74,13 +75,14 @@ def _get_docstring(obj: object) -> str:
 
 
 class ParameterInputs(QtWidgets.QWidget):
-    sig_run_pipeline = QtCore.Signal(enum.StrEnum)  # PreprocessPipeline
-    sig_run_filter = QtCore.Signal(dict)  # SignalFilterParameters
-    sig_run_standardization = QtCore.Signal(dict)  # StandardizationParameters
+    # Each user action maps to exactly one signal carrying everything the action needs.
+    sig_run_processing = QtCore.Signal(object)  # ProcessingRequest
     sig_reset_data = QtCore.Signal()
 
-    sig_run_peak_detection = QtCore.Signal(enum.StrEnum, dict)
+    sig_run_peak_detection = QtCore.Signal(object)  # PeakDetectionRequest
     sig_clear_peaks = QtCore.Signal()
+
+    sig_rate_params_changed = QtCore.Signal(dict)  # RollingRateKwargs, emitted whenever a rate input changes
 
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
@@ -232,6 +234,14 @@ class ParameterInputs(QtWidgets.QWidget):
         self.ui.rate_handle_incomplete.set_enum_class(IncompleteWindowMethod)
         _setup_spinbox(self.ui.rate_period, 1, 10_000, 1, 60, 0)
         _setup_spinbox(self.ui.rate_every, 1, 600, 1, 10, 0)
+        self.ui.rate_period.valueChanged.connect(self._emit_rate_params)
+        self.ui.rate_every.valueChanged.connect(self._emit_rate_params)
+        self.ui.rate_handle_incomplete.sig_current_enum_changed.connect(self._emit_rate_params)
+
+    @QtCore.Slot()
+    @QtCore.Slot(object)
+    def _emit_rate_params(self, _value: object = None) -> None:
+        self.sig_rate_params_changed.emit(self.get_rate_params())
 
     @QtCore.Slot()
     def reset_data(self) -> None:
@@ -319,22 +329,20 @@ class ParameterInputs(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def run_processing(self) -> None:
-        # Reset data and clear peaks
-        self.sig_reset_data.emit()
-        self.sig_clear_peaks.emit()
+        """Collects the selected processing steps into one `ProcessingRequest` and emits it."""
         pipeline: PreprocessPipeline | None = self.ui.sf_pipeline.current_enum()
         if pipeline is not None:
-            self.sig_run_pipeline.emit(pipeline)
-        else:
-            sf_method = self.ui.sf_method.current_enum()
-            if sf_method is not None:
-                sf_params = self.get_filter_params(sf_method)
-                self.sig_run_filter.emit(sf_params)
+            self.sig_run_processing.emit(ProcessingRequest(pipeline=pipeline))
+            return
 
-            std_method = self.ui.std_method.current_enum()
-            if std_method is not None:
-                std_params = self.get_std_params(std_method)
-                self.sig_run_standardization.emit(std_params)
+        sf_method: FilterMethod | None = self.ui.sf_method.current_enum()
+        std_method: StandardizationMethod | None = self.ui.std_method.current_enum()
+        self.sig_run_processing.emit(
+            ProcessingRequest(
+                filter=self.get_filter_params(sf_method) if sf_method is not None else None,
+                standardize=self.get_std_params(std_method) if std_method is not None else None,
+            )
+        )
 
     def get_filter_params(self, sf_method: FilterMethod) -> SignalFilterKwargs:
         window = self.ui.sf_window_size
@@ -354,17 +362,25 @@ class ParameterInputs(QtWidgets.QWidget):
     def get_std_params(self, std_method: StandardizationMethod) -> SignalStandardizeKwargs:
         return {
             "method": std_method,
+            "robust": std_method == StandardizationMethod.ZScoreRobust,
             "window_size": self.ui.std_window_size.intValue() if self.ui.std_rolling_window.isChecked() else None,
         }
 
     @QtCore.Slot()
     def run_peak_detection(self) -> None:
-        # Clear previous peaks
-        self.sig_clear_peaks.emit()
         peak_method: PeakDetectionAlgorithm | None = self.ui.peak_method.current_enum()
-        if peak_method is not None:
-            peak_params = self.get_peak_detection_params(peak_method)
-            self.sig_run_peak_detection.emit(peak_method, peak_params)
+        if peak_method is None:
+            return
+        self.sig_run_peak_detection.emit(
+            PeakDetectionRequest(method=peak_method, params=self.get_peak_detection_params(peak_method))
+        )
+
+    def get_peak_detection_request(self) -> PeakDetectionRequest | None:
+        """The currently selected peak detection method and its parameters, or `None` if no method is selected."""
+        peak_method: PeakDetectionAlgorithm | None = self.ui.peak_method.current_enum()
+        if peak_method is None:
+            return None
+        return PeakDetectionRequest(method=peak_method, params=self.get_peak_detection_params(peak_method))
 
     @QtCore.Slot(int)
     def _on_peak_method_changed(self, index: int) -> None:

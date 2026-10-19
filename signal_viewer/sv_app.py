@@ -1,5 +1,4 @@
 import contextlib
-import enum
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -12,26 +11,18 @@ from loguru import logger
 from PySide6 import QtCore, QtWidgets
 
 from signal_viewer.constants import SECTION_INDEX_COL
-from signal_viewer.enum_defs import (
-    PeakDetectionAlgorithm,
-    PreprocessPipeline,
-    RateComputationMethod,
-    StandardizationMethod,
-)
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_controller import DataController
 from signal_viewer.sv_data.data_models import FileListModel
 from signal_viewer.sv_data.file_io import read_annotation_file
-from signal_viewer.sv_data.peak_detection import find_peaks
 from signal_viewer.sv_gui import SVGUI
 from signal_viewer.sv_help import HelpController
 from signal_viewer.sv_plots.plot_controller import PlotController
 from signal_viewer.type_defs import (
     MetadataDict,
-    PeakDetectionAlgorithmParameters,
+    PeakDetectionRequest,
+    ProcessingRequest,
     RollingRateKwargs,
-    SignalFilterKwargs,
-    SignalStandardizeKwargs,
     UpdatePeaksAction,
 )
 from signal_viewer.utils import safe_multi_disconnect
@@ -48,25 +39,16 @@ class WorkerSignals(QtCore.QObject):
 
 
 class PeakDetectionWorker(QtCore.QRunnable):
-    def __init__(
-        self,
-        section: Section,
-        method: PeakDetectionAlgorithm,
-        method_parameters: PeakDetectionAlgorithmParameters,
-        *,
-        rr_params: RollingRateKwargs | None = None,
-    ) -> None:
+    def __init__(self, section: Section, request: PeakDetectionRequest) -> None:
         super().__init__()
         self.section = section
-        self.method = method
-        self.method_parameters = method_parameters
-        self.rr_params = rr_params
+        self.request = request
         self.signals = WorkerSignals()
 
     @QtCore.Slot()
     def run(self) -> None:
         try:
-            self.section.detect_peaks(self.method, self.method_parameters, rr_params=self.rr_params)
+            self.section.detect_peaks(self.request.method, self.request.params)
         except Exception as e:
             self.signals.sig_error.emit(e)
         else:
@@ -76,16 +58,15 @@ class PeakDetectionWorker(QtCore.QRunnable):
 
 
 class SectionResultWorker(QtCore.QRunnable):
-    def __init__(self, section: Section, *, rr_params: RollingRateKwargs | None = None) -> None:
+    def __init__(self, section: Section) -> None:
         super().__init__()
         self.section = section
-        self.rr_params = rr_params
         self.signals = WorkerSignals()
 
     @QtCore.Slot()
     def run(self) -> None:
         try:
-            self.section.lock_result(rr_params=self.rr_params)
+            self.section.lock_result()
         except Exception as e:
             self.signals.sig_error.emit(e)
         else:
@@ -155,12 +136,11 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_mark_section_done.triggered.connect(self._lock_section)
         self.gui.ui.action_unlock_section.triggered.connect(self._unlock_section)
 
-        self.gui.dock_parameters.ui.sig_run_filter.connect(self.run_filter)
-        self.gui.dock_parameters.ui.sig_run_pipeline.connect(self.run_pipeline)
-        self.gui.dock_parameters.ui.sig_run_standardization.connect(self.run_standardization)
+        self.gui.dock_parameters.ui.sig_run_processing.connect(self.run_processing)
         self.gui.dock_parameters.ui.sig_reset_data.connect(self.reset_signal_data)
         self.gui.dock_parameters.ui.sig_run_peak_detection.connect(self.run_peak_detection)
         self.gui.dock_parameters.ui.sig_clear_peaks.connect(self._on_sig_clear_peaks)
+        self.gui.dock_parameters.ui.sig_rate_params_changed.connect(self._on_rate_params_changed)
 
         self.gui.ui.action_find_peaks_in_selection.triggered.connect(self._on_find_peaks_in_selection)
         self.gui.ui.action_remove_peaks_in_selection.triggered.connect(self.plot.remove_peaks_in_selection)
@@ -205,34 +185,30 @@ class SVApp(QtCore.QObject):
             self.plot.remove_selection_rect()
             return
 
-        active_section = self.data.active_section
         left, right = int(rect.left()), int(rect.right())
         self.plot.remove_selection_rect()
 
-        peak_method = PeakDetectionAlgorithm(self.gui.dock_parameters.ui.ui.peak_method.currentData())
-        param_dock = self.gui.dock_parameters
-        peak_params = param_dock.ui.get_peak_detection_params(peak_method)
-        rolling_rate_params = param_dock.ui.get_rate_params()
+        request = self.gui.dock_parameters.ui.get_peak_detection_request()
+        if request is None:
+            logger.warning("Select a peak detection method first.")
+            return
 
-        edge_buffer = 10
-        b_left = max(left + edge_buffer, 0)
-        b_right = min(right - edge_buffer, active_section.processed_signal.len())
-        b_length = b_right - b_left
-        data = active_section.processed_signal.slice(b_left, b_length).to_numpy(allow_copy=False)
-        peaks = find_peaks(
-            data,
-            sampling_rate=active_section.sampling_rate,
-            method=peak_method,
-            method_parameters=peak_params,
-        )
-        peaks = peaks + b_left
-        active_section.update_peaks("add", peaks, rr_params=rolling_rate_params)
+        self.data.active_section.detect_peaks_in_range(left, right, request.method, request.params)
         self.sig_peaks_updated.emit()
 
     @QtCore.Slot(str, object)
     def _on_sig_scatter_data_changed(self, action: UpdatePeaksAction, indices: npt.NDArray[np.intp]) -> None:
-        rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
-        self.data.active_section.update_peaks(action, indices, rr_params=rolling_rate_kwargs)
+        self.data.active_section.update_peaks(action, indices)
+        self.sig_peaks_updated.emit()
+
+    @QtCore.Slot(dict)
+    def _on_rate_params_changed(self, params: RollingRateKwargs) -> None:
+        self.data.set_rate_params(params)
+        if not self.data.has_data:
+            return
+        section = self.data.active_section
+        if section.is_locked or section.peaks_local.is_empty():
+            return
         self.sig_peaks_updated.emit()
 
     @QtCore.Slot()
@@ -240,11 +216,7 @@ class SVApp(QtCore.QObject):
         cas = self.data.active_section
         pos = cas.get_peak_pos()
         self.plot.set_peak_data(pos.get_column(SECTION_INDEX_COL), pos.get_column(cas.processed_signal_name))
-        if Config.editing.rate_computation_method == RateComputationMethod.RollingWindow:
-            rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
-            cas.update_rate_data(rr_params=rolling_rate_kwargs)
-        else:
-            cas.update_rate_data()
+        cas.update_rate_data()
         rate_data = cas.rate_data.select(SECTION_INDEX_COL, "rate_bpm")
         self.plot.set_rate_data(x_data=rate_data.get_column(SECTION_INDEX_COL), y_data=rate_data.get_column("rate_bpm"))
 
@@ -255,43 +227,28 @@ class SVApp(QtCore.QObject):
         self.gui.dock_parameters.ui.ui.status_pipeline.setChecked(self.data.active_section.is_processed)
         self.gui.dock_parameters.ui.ui.status_standardization.setChecked(self.data.active_section.is_standardized)
 
-    @QtCore.Slot(dict)
-    def run_filter(self, filter_params: SignalFilterKwargs) -> None:
-        self.data.active_section.filter_signal(pipeline=None, **filter_params)
+    @QtCore.Slot(object)
+    def run_processing(self, request: ProcessingRequest) -> None:
+        """Applies one processing request to the active section and refreshes the plot once."""
+        self.data.active_section.apply_processing(request)
+        self.plot.clear_peaks()
         self.refresh_plot_data()
 
     @QtCore.Slot()
     def reset_signal_data(self) -> None:
         self.data.active_section.reset_signal()
-        self.refresh_plot_data()
         self.plot.clear_peaks()
-        self.update_status_indicators()
-
-    @QtCore.Slot(object)
-    def run_pipeline(self, pipeline: PreprocessPipeline) -> None:
-        if pipeline not in PreprocessPipeline:
-            return
-        self.data.active_section.filter_signal(pipeline)
-        self.refresh_plot_data()
-
-    @QtCore.Slot(dict)
-    def run_standardization(self, standardization_params: SignalStandardizeKwargs) -> None:
-        method = standardization_params.pop("method")
-        window_size = standardization_params.pop("window_size")
-        robust = method == StandardizationMethod.ZScoreRobust
-        self.data.active_section.standardize_signal(method=method, robust=robust, window_size=window_size)
         self.refresh_plot_data()
 
     def refresh_plot_data(self) -> None:
         self.plot.set_signal_data(self.data.active_section.processed_signal)
         self.update_status_indicators()
 
-    @QtCore.Slot(enum.StrEnum, dict)
-    def run_peak_detection(self, method: PeakDetectionAlgorithm, params: PeakDetectionAlgorithmParameters) -> None:
+    @QtCore.Slot(object)
+    def run_peak_detection(self, request: PeakDetectionRequest) -> None:
         self.gui.overlay_widget.show_overlay("Detection running...")
 
-        rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
-        worker = PeakDetectionWorker(self.data.active_section, method, params, rr_params=rolling_rate_kwargs)
+        worker = PeakDetectionWorker(self.data.active_section, request)
         worker.signals.sig_success.connect(self._on_sig_peaks_updated)
         worker.signals.sig_error.connect(self._on_worker_error)
         worker.signals.sig_finished.connect(self._on_worker_finished)
@@ -327,6 +284,8 @@ class SVApp(QtCore.QObject):
         """
         self.data = DataController(self)
         self._connect_data_controller_signals()
+        # Initial sync; later changes arrive through `sig_rate_params_changed`.
+        self.data.set_rate_params(self.gui.dock_parameters.ui.get_rate_params())
 
     def _connect_data_controller_signals(self) -> None:
         self.data.sig_user_input_required.connect(self.show_metadata_dialog)
@@ -640,9 +599,7 @@ class SVApp(QtCore.QObject):
     def _lock_section(self) -> None:
         self.gui.overlay_widget.show_overlay("Creating section result...")
 
-        rate_params = self.gui.dock_parameters.ui.get_rate_params()
-
-        worker = SectionResultWorker(self.data.active_section, rr_params=rate_params)
+        worker = SectionResultWorker(self.data.active_section)
         worker.signals.sig_success.connect(self.update_result_views)
         worker.signals.sig_error.connect(self._on_worker_error)
         worker.signals.sig_finished.connect(self._on_worker_finished)
@@ -719,8 +676,6 @@ class SVApp(QtCore.QObject):
             else:
                 group_var = None
 
-            step_size = self.gui.dock_parameters.ui.ui.rate_every.intValue()
-
             combined_peak_df = pl.DataFrame(
                 schema={"section_id": pl.Int32, **self.data.sections.editable_sections[0].peak_data.schema}
             )
@@ -729,17 +684,13 @@ class SVApp(QtCore.QObject):
             )
             combined_bounds_df = self.data.sections.editable_sections[0].global_bounds_df.clear()
 
-            combined_r_data = (
-                self.data.sections.editable_sections[0]
-                .get_simple_result(step_size=step_size, group_var=group_var)
-                .clear()
-            )
+            combined_r_data = self.data.sections.editable_sections[0].get_simple_result(group_var=group_var).clear()
 
             for i, section in enumerate(self.data.sections.editable_sections, start=1):
                 peak_df = section.peak_data.insert_column(0, pl.lit(i).cast(pl.Int32).alias("section_id"))
                 rate_df = section.rate_data.insert_column(0, pl.lit(i).cast(pl.Int32).alias("section_id"))
                 bounds_df = section.global_bounds_df
-                r_data = section.get_simple_result(step_size=step_size, group_var=group_var)
+                r_data = section.get_simple_result(group_var=group_var)
 
                 combined_peak_df.extend(peak_df)
                 combined_rate_df.extend(rate_df)

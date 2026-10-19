@@ -29,6 +29,7 @@ from signal_viewer.type_defs import (
     ManualPeakEditsDict,
     PeakDetectionAlgorithmParameters,
     ProcessingParametersDict,
+    ProcessingRequest,
     RollingRateKwargs,
     SectionMetadataDict,
     SectionResultDict,
@@ -218,6 +219,13 @@ class DetailedSectionResult:
         )
 
 
+DEFAULT_RATE_PARAMS: RollingRateKwargs = {
+    "sec_new_window_every": 10,
+    "sec_window_length": 60,
+    "incomplete_window_method": IncompleteWindowMethod.Drop,
+}
+
+
 class Section:
     __slots__ = (
         "_is_filtered",
@@ -231,6 +239,7 @@ class Section:
         "global_bounds",
         "info_name",
         "processed_signal_name",
+        "rate_params",
         "sampling_rate",
         "section_id",
         "signal_name",
@@ -242,6 +251,7 @@ class Section:
         signal_name: str,
         sampling_rate: int,
         info_column: str | None = None,
+        rate_params: RollingRateKwargs | None = None,
     ) -> None:
         if signal_name not in data.columns:
             raise ValueError(f"Signal column '{signal_name}' not found in data. Available: {data.columns}")
@@ -282,6 +292,8 @@ class Section:
         )
 
         self._rate_is_synced = False
+        # Parameters for the rolling-window rate. Owned by the section so rate computation never has to ask the GUI.
+        self.rate_params: RollingRateKwargs = rate_params.copy() if rate_params else DEFAULT_RATE_PARAMS.copy()
 
         self._result_data = SectionResult()
 
@@ -301,7 +313,15 @@ class Section:
             return
         self._result_data.rate_data = value
 
-    def get_simple_result(self, step_size: int, group_var: Any | None = None) -> pl.DataFrame:
+    def get_simple_result(self, step_size: int | None = None, group_var: Any | None = None) -> pl.DataFrame:
+        """
+        Rate per window with a global `index` column, for the flat export table.
+
+        `step_size` (seconds between windows) defaults to the section's own rolling-rate parameters, which is what
+        produced `rate_data` in the first place.
+        """
+        if step_size is None:
+            step_size = self.rate_params.get("sec_new_window_every", 10)
         r_data = self._result_data.rate_data.clone()
         temp_df = r_data.select(
             ((pl.int_range(pl.len(), dtype=pl.Int32) * (step_size * self.sampling_rate)) + self.global_bounds[0]).alias(
@@ -310,8 +330,10 @@ class Section:
             pl.col("rate_bpm").alias("rate_bpm"),
             pl.lit(group_var).alias("group_var"),
         )
-        if self.info_name is not None:
-            temp_df = temp_df.insert_column(1, r_data.get_column(f"{self.info_name}_mean"))
+        # The info mean exists only when the rate was computed with `full_info=True` (as `lock_result` does).
+        info_mean_col = f"{self.info_name}_mean"
+        if self.info_name is not None and info_mean_col in r_data.columns:
+            temp_df = temp_df.insert_column(1, r_data.get_column(info_mean_col))
         return temp_df
 
     @property
@@ -493,13 +515,26 @@ class Section:
 
         self._processing_parameters.standardization_parameters = kwargs
 
+    def apply_processing(self, request: ProcessingRequest) -> None:
+        """
+        Resets the signal and peaks, then applies the requested processing steps in one call.
+
+        See `ProcessingRequest` for the precedence between pipeline and custom steps.
+        """
+        self.reset_signal()
+        if request.pipeline is not None:
+            self.filter_signal(request.pipeline)
+            return
+        if request.filter is not None:
+            self.filter_signal(pipeline=None, **request.filter)
+        if request.standardize is not None:
+            self.standardize_signal(**request.standardize)
+
     @logger.catch(message="Peak detection failed. Please check the parameters and try again.")
     def detect_peaks(
         self,
         method: PeakDetectionAlgorithm,
-        method_parameters: PeakDetectionAlgorithmParameters,
-        *,
-        rr_params: RollingRateKwargs | None = None,
+        method_parameters: PeakDetectionAlgorithmParameters | None,
     ) -> None:
         """
         Find peaks in the processed signal using the specified method and parameters.
@@ -521,15 +556,46 @@ class Section:
         self._processing_parameters.peak_detection_method = method
         self._processing_parameters.peak_detection_method_parameters = method_parameters
 
-        self.set_peaks(peaks, rr_params=rr_params)
+        self.set_peaks(peaks)
 
-    def set_peaks(
+    @logger.catch(message="Peak detection in selection failed. Please check the parameters and try again.")
+    def detect_peaks_in_range(
         self,
-        peaks: npt.NDArray[np.intp],
-        update_rate: bool = True,
+        start: int,
+        stop: int,
+        method: PeakDetectionAlgorithm,
+        method_parameters: PeakDetectionAlgorithmParameters | None,
         *,
-        rr_params: RollingRateKwargs | None = None,
+        edge_buffer: int = 10,
     ) -> None:
+        """
+        Runs peak detection on the section indices `[start, stop]` only and adds the result to the existing peaks.
+
+        `edge_buffer` samples are trimmed from both ends of the selection so that boundary effects do not produce
+        spurious peaks at the selection borders.
+        """
+        b_left = max(start + edge_buffer, 0)
+        b_right = min(stop - edge_buffer, self.processed_signal.len())
+        if b_right <= b_left:
+            logger.warning(f"Selection [{start}, {stop}] is too small for peak detection.")
+            return
+
+        data = self.processed_signal.slice(b_left, b_right - b_left).to_numpy(allow_copy=True)
+        peaks = find_peaks(data, self.sampling_rate, method, method_parameters) + b_left
+
+        self._processing_parameters.peak_detection_method = method
+        self._processing_parameters.peak_detection_method_parameters = method_parameters
+
+        self.update_peaks("add", peaks)
+
+    def set_rate_params(self, params: RollingRateKwargs) -> None:
+        """Stores new rolling-rate parameters. The rate is recomputed on the next `update_rate_data` call."""
+        if params == self.rate_params:
+            return
+        self.rate_params = params.copy()
+        self._rate_is_synced = False
+
+    def set_peaks(self, peaks: npt.NDArray[np.intp], update_rate: bool = True) -> None:
         """
         Sets the `is_peak` column in `self.data` to 1 at the indices provided in `peaks`, and to 0
         everywhere else.
@@ -556,15 +622,13 @@ class Section:
         self.manual_peak_edits.clear()
         self._rate_is_synced = False
         if update_rate:
-            self.update_rate_data(rr_params=rr_params)
+            self.update_rate_data()
 
     def update_peaks(
         self,
         action: UpdatePeaksAction,
         peaks: npt.NDArray[np.intp],
         update_rate: bool = True,
-        *,
-        rr_params: RollingRateKwargs | None = None,
     ) -> None:
         """
         Updates the `is_peak` column in `self.data` at the given indices according to the provided
@@ -610,13 +674,11 @@ class Section:
 
         self._rate_is_synced = False
         if update_rate and self.peaks_local.len() > 3:
-            self.update_rate_data(rr_params=rr_params)
+            self.update_rate_data()
 
-    def update_rate_data(
-        self, full_info: bool = False, force: bool = False, *, rr_params: RollingRateKwargs | None = None
-    ) -> None:
+    def update_rate_data(self, full_info: bool = False, force: bool = False) -> None:
         """
-        Recalculates the signal rate based on the current peaks.
+        Recalculates the signal rate based on the current peaks, using `rate_params` for the rolling method.
 
         Parameters
         ----------
@@ -624,8 +686,6 @@ class Section:
             If True, calculates summary statistics in addition to the rate, by default False
         force : bool, default False
             If True, recalculates the rate even if the `_rate_is_synced` flag is True, by default False
-        rr_params : dict or None, default None
-            Additional parameters to pass to the `rolling_rate` function, by default None
         """
         if not force and (self._rate_is_synced or self.is_locked):
             logger.debug("Rate data is already up to date.")
@@ -633,9 +693,7 @@ class Section:
 
         method = Config.editing.rate_computation_method
         if method == RateComputationMethod.RollingWindow:
-            if rr_params is None:
-                rr_params = {}
-            self._calc_rate_rolling(full_info=full_info, **rr_params)
+            self._calc_rate_rolling(full_info=full_info, **self.rate_params)
         elif method == RateComputationMethod.Instantaneous:
             self._calc_rate_instant()
 
@@ -807,9 +865,9 @@ class Section:
             .collect()
         )
 
-    def lock_result(self, *, rr_params: RollingRateKwargs | None = None) -> None:
+    def lock_result(self) -> None:
         self.update_peak_data(include_global=True, include_info=True)
-        self.update_rate_data(full_info=True, force=True, rr_params=rr_params)
+        self.update_rate_data(full_info=True, force=True)
         self.set_locked(True)
 
     def get_result(self) -> DetailedSectionResult:
@@ -894,6 +952,7 @@ class Section:
             .collect()
         )
         self.manual_peak_edits.clear()
+        self._rate_is_synced = False
         self._is_filtered = False
         self._is_standardized = False
         self._is_processed = False
@@ -915,6 +974,7 @@ class Section:
             .collect()
         )
         self.manual_peak_edits.clear()
+        self._rate_is_synced = False
         self._processing_parameters.reset(peaks_only=True)
 
     def get_summary(self) -> SectionSummaryDict:

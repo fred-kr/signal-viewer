@@ -209,6 +209,11 @@ class SectionListModel(QtCore.QAbstractListModel):
         self._sections = sections or []
 
     @property
+    def all_sections(self) -> list[Section]:
+        """Base section first, then the user-created sections in creation order."""
+        return list(self._sections)
+
+    @property
     def editable_sections(self) -> list[Section]:
         return list(self._sections)[1:]
 

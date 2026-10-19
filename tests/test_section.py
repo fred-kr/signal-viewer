@@ -9,7 +9,15 @@ import polars as pl
 import pytest
 
 from signal_viewer.constants import INDEX_COL, IS_MANUAL_COL, IS_PEAK_COL, SECTION_INDEX_COL
-from signal_viewer.sv_data.section import Section
+from signal_viewer.enum_defs import (
+    FilterMethod,
+    IncompleteWindowMethod,
+    PeakDetectionAlgorithm,
+    PreprocessPipeline,
+    StandardizationMethod,
+)
+from signal_viewer.sv_data.section import DEFAULT_RATE_PARAMS, Section
+from signal_viewer.type_defs import PeaksLocalMaxima, ProcessingRequest, RollingRateKwargs
 
 FS = 100  # Hz
 SECONDS = 120
@@ -147,6 +155,86 @@ def test_rolling_rate_with_and_without_info() -> None:
     per_temp = s.get_mean_rate_per_temperature()
     assert per_temp.height == 7
     assert per_temp.get_column("rate_mean").to_list() == pytest.approx([60.0] * 7)
+
+
+def test_apply_processing_resets_then_applies_steps() -> None:
+    s = Section(make_df(), "sig", FS, info_column="temp")
+    s.set_peaks(sine_peaks(), update_rate=False)
+
+    s.apply_processing(ProcessingRequest(pipeline=PreprocessPipeline.PPG_Elgendi))
+    assert s.is_processed
+    assert not s.is_filtered
+    assert s.peaks_local.is_empty(), "processing starts from a clean signal, so peaks are dropped"
+
+    s.apply_processing(
+        ProcessingRequest(
+            filter={"lowcut": 0.5, "highcut": 8.0, "method": FilterMethod.Butterworth, "order": 3},
+            standardize={"method": StandardizationMethod.ZScore, "robust": False, "window_size": None},
+        )
+    )
+    assert s.is_filtered
+    assert s.is_standardized
+    assert not s.is_processed
+    mean = s.processed_signal.mean()
+    assert isinstance(mean, float)
+    assert abs(mean) < 1e-6
+
+    s.apply_processing(ProcessingRequest())
+    assert not (s.is_filtered or s.is_standardized or s.is_processed)
+    assert s.processed_signal.equals(s.raw_signal)
+
+
+def test_detect_peaks_in_range_adds_to_existing_peaks() -> None:
+    s = Section(make_df(), "sig", FS, info_column="temp")
+    s.set_peaks(np.array([25, 125]), update_rate=False)
+
+    s.detect_peaks_in_range(
+        1000,
+        2000,
+        PeakDetectionAlgorithm.LocalMaxima,
+        PeaksLocalMaxima(search_radius=40, min_distance=40),
+    )
+
+    peaks = s.peaks_local.to_list()
+    assert peaks[:2] == [25, 125]
+    # Sine maxima inside [1010, 1990) after trimming the 10-sample edge buffer.
+    assert peaks[2:] == list(range(1025, 2000, 100))
+    assert s.manual_peak_edits.added == peaks[2:]
+
+
+def test_rate_params_live_on_the_section() -> None:
+    s = Section(make_df(), "sig", FS, info_column="temp")
+    assert s.rate_params == DEFAULT_RATE_PARAMS
+    s.set_peaks(sine_peaks(), update_rate=False)
+
+    s._calc_rate_rolling(**s.rate_params)
+    assert s.rate_data.height == 7
+
+    s._rate_is_synced = True
+    new_params: RollingRateKwargs = {
+        "sec_new_window_every": 5,
+        "sec_window_length": 30,
+        "incomplete_window_method": IncompleteWindowMethod.Drop,
+    }
+    s.set_rate_params(new_params)
+    assert s.rate_params == new_params
+    assert s.rate_params is not new_params, "the section keeps its own copy"
+    assert not s._rate_is_synced, "changing parameters invalidates the computed rate"
+
+    s._calc_rate_rolling(**s.rate_params)
+    # 30 s windows every 5 s over 120 s: starts 0, 5, ..., 90 are complete.
+    assert s.rate_data.height == 19
+    assert s.rate_data.get_column("rate_bpm").to_list() == pytest.approx([60.0] * 19)
+
+    # Without the full-info rate there is no info mean to attach; with it there is.
+    simple = s.get_simple_result()
+    assert simple.columns == [INDEX_COL, "rate_bpm", "group_var"]
+    assert simple.get_column(INDEX_COL).to_list()[:3] == [0, 500, 1000], "step defaults to the section's params"
+
+    s._calc_rate_rolling(full_info=True, **s.rate_params)
+    simple = s.get_simple_result(group_var="A")
+    assert simple.columns == [INDEX_COL, "temp_mean", "rate_bpm", "group_var"]
+    assert simple.get_column("group_var").to_list() == ["A"] * 19
 
 
 def test_locked_section_rejects_result_updates() -> None:

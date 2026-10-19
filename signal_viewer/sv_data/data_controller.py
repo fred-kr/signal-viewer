@@ -12,7 +12,8 @@ from signal_viewer.enum_defs import InputFileFormat, TextFileSeparator
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_models import DataFrameModel, FileMetadata, SectionListModel
 from signal_viewer.sv_data.file_io import detect_sampling_rate, read_edf
-from signal_viewer.sv_data.section import Section
+from signal_viewer.sv_data.section import DEFAULT_RATE_PARAMS, Section
+from signal_viewer.type_defs import RollingRateKwargs
 
 
 class DataController(QtCore.QObject):
@@ -35,6 +36,9 @@ class DataController(QtCore.QObject):
         self._base_section: Section | None = None
         self.result_model_peaks = DataFrameModel(self)
         self.result_model_rate = DataFrameModel(self)
+
+        # Rolling-rate parameters shared by every section. The GUI pushes changes here via `set_rate_params`.
+        self._rate_params: RollingRateKwargs = DEFAULT_RATE_PARAMS.copy()
 
         try:
             self._txt_separator = Config.data.text_file_separator
@@ -63,6 +67,16 @@ class DataController(QtCore.QObject):
             raise ValueError("No data available.")
         return self._metadata
 
+    @property
+    def rate_params(self) -> RollingRateKwargs:
+        return self._rate_params
+
+    def set_rate_params(self, params: RollingRateKwargs) -> None:
+        """Applies new rolling-rate parameters to every existing section and to sections created later."""
+        self._rate_params = params.copy()
+        for section in self.sections.all_sections:
+            section.set_rate_params(self._rate_params)
+
     def get_base_section(self) -> Section:
         if self._base_section is None:
             try:
@@ -71,6 +85,7 @@ class DataController(QtCore.QObject):
                     signal_name=self.metadata.data_signal_column,
                     sampling_rate=self.metadata.sampling_rate,
                     info_column=self.metadata.data_info_column,
+                    rate_params=self._rate_params,
                 )
                 self._base_section.set_locked(True)
             except Exception as e:
@@ -240,6 +255,7 @@ class DataController(QtCore.QObject):
             self.metadata.data_signal_column,
             sampling_rate=self.metadata.sampling_rate,
             info_column=self.metadata.data_info_column,
+            rate_params=self._rate_params,
         )
         self.sections.add_section(section)
 

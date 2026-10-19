@@ -11,7 +11,10 @@ import polars as pl
 import pytest
 
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION, INDEX_COL
+from signal_viewer.enum_defs import IncompleteWindowMethod
 from signal_viewer.sv_data.data_controller import DataController
+from signal_viewer.sv_data.section import DEFAULT_RATE_PARAMS
+from signal_viewer.type_defs import RollingRateKwargs
 
 FS = 100
 N = FS * 20
@@ -98,3 +101,24 @@ def test_create_section_and_reload(csv_file: Path) -> None:
     assert dc.sections.editable_sections == []
     assert dc.metadata.signal_column == "Alpha Sig"
     assert dc.active_section is dc.get_base_section()
+
+
+def test_rate_params_reach_existing_and_new_sections(csv_file: Path) -> None:
+    dc = DataController()
+    dc.open_file(csv_file)
+    dc.update_metadata(signal_col="Alpha Sig", info_col="Beta Temp")
+    dc.load_data()
+    dc.create_section(100, 299)
+    assert all(s.rate_params == DEFAULT_RATE_PARAMS for s in dc.sections.all_sections)
+
+    params: RollingRateKwargs = {
+        "sec_new_window_every": 5,
+        "sec_window_length": 30,
+        "incomplete_window_method": IncompleteWindowMethod.Approximate,
+    }
+    dc.set_rate_params(params)
+    assert dc.rate_params == params
+    assert all(s.rate_params == params for s in dc.sections.all_sections)
+
+    dc.create_section(300, 499)
+    assert dc.sections.editable_sections[-1].rate_params == params
