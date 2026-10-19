@@ -236,7 +236,20 @@ class Section:
         "signal_name",
     )
 
-    def __init__(self, data: pl.DataFrame, signal_name: str, info_column: str | None = None) -> None:
+    def __init__(
+        self,
+        data: pl.DataFrame,
+        signal_name: str,
+        sampling_rate: int,
+        info_column: str | None = None,
+    ) -> None:
+        if signal_name not in data.columns:
+            raise ValueError(f"Signal column '{signal_name}' not found in data. Available: {data.columns}")
+        if info_column is not None and info_column not in data.columns:
+            raise ValueError(
+                f"Info column '{info_column}' not found in data. Pass `None` when there is no info column. "
+                f"Available: {data.columns}"
+            )
         self.signal_name = signal_name
         self.processed_signal_name = f"{self.signal_name}_processed"
         self.info_name = info_column
@@ -262,7 +275,7 @@ class Section:
             .collect()
         )
 
-        self.sampling_rate = Config.internal.last_sampling_rate
+        self.sampling_rate = sampling_rate
         self.global_bounds: tuple[int, int] = (
             self.data.item(0, INDEX_COL),
             self.data.item(-1, INDEX_COL),
@@ -421,9 +434,9 @@ class Section:
             logger.warning(
                 "Applying filter to raw signal. To apply to already processed signal, enable\n\n'Settings > Preferences > Editing > FilterStacking'."
             )
-            sig_data = self.raw_signal.to_numpy(allow_copy=False)
+            sig_data = self.raw_signal.to_numpy(allow_copy=True)
         else:
-            sig_data = self.processed_signal.to_numpy(allow_copy=False)
+            sig_data = self.processed_signal.to_numpy(allow_copy=True)
         method = kwargs.get("method", None)
         filter_params: SignalFilterKwargs = {}
         additional_params: SignalFilterKwargs | None = None
@@ -499,7 +512,7 @@ class Section:
             The parameters to use for the peak detection method
         """
         peaks = find_peaks(
-            self.processed_signal.to_numpy(allow_copy=False),
+            self.processed_signal.to_numpy(allow_copy=True),
             self.sampling_rate,
             method,
             method_parameters,
@@ -533,7 +546,7 @@ class Section:
         pl_peaks = pl.Series("", peaks, pl.Int32)
 
         self.data = self.data.with_columns(
-            pl.when(pl.col(SECTION_INDEX_COL).is_in(pl_peaks))
+            pl.when(pl.col(SECTION_INDEX_COL).is_in(pl_peaks.implode()))
             .then(pl.lit(1))
             .otherwise(pl.lit(0))
             .cast(pl.Int8)
@@ -576,7 +589,7 @@ class Section:
         updated_data = (
             self.data.lazy()
             .select(
-                pl.when(pl.col(SECTION_INDEX_COL).is_in(pl_peaks))
+                pl.when(pl.col(SECTION_INDEX_COL).is_in(pl_peaks.implode()))
                 .then(pl.lit(then_value))
                 .otherwise(pl.col(IS_PEAK_COL))
                 .cast(pl.Int8)
@@ -764,9 +777,9 @@ class Section:
         pl_removed = pl.Series("removed", self.manual_peak_edits.removed, pl.Int32)
 
         self.data = self.data.with_columns(
-            pl.when(pl.col(SECTION_INDEX_COL).is_in(pl_added))
+            pl.when(pl.col(SECTION_INDEX_COL).is_in(pl_added.implode()))
             .then(pl.lit(1))
-            .when(pl.col(SECTION_INDEX_COL).is_in(pl_removed))
+            .when(pl.col(SECTION_INDEX_COL).is_in(pl_removed.implode()))
             .then(pl.lit(-1))
             .otherwise(pl.lit(0))
             .cast(pl.Int8)

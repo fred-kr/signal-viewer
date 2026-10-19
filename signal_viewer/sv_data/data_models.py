@@ -374,6 +374,16 @@ class FileMetadata:
             value = COMBO_BOX_NO_SELECTION
         self._info_column = value
 
+    @property
+    def info_column_or_none(self) -> str | None:
+        """
+        The info column as the data layer expects it: `None` when the user made no selection.
+
+        `info_column` keeps the `COMBO_BOX_NO_SELECTION` sentinel because the combo boxes display it. Everything that
+        builds a `Section` must use this property instead so the sentinel never reaches the data frame.
+        """
+        return None if self._info_column == COMBO_BOX_NO_SELECTION else self._info_column
+
     def apply_name_map(self) -> None:
         old_signal_name = self.signal_column
         self.signal_column = self.name_map[old_signal_name]

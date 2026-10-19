@@ -123,14 +123,6 @@ type PeakDetectionAlgorithmParameters = (
 )
 
 
-class SelectedFileMetadataDict(TypedDict):
-    file_name: str
-    file_format: str
-    sampling_rate: int
-    name_signal_column: str
-    name_info_column: str | None
-
-
 class ProcessingParametersDict(TypedDict):
     sampling_rate: int
     processing_pipeline: str
@@ -176,12 +168,6 @@ class DetailedSectionResultDict(TypedDict):
     manual_peak_edits: ManualPeakEditsDict
     section_result: SectionResultDict
     rate_per_temperature: npt.NDArray[np.void]
-
-
-class CompleteResultDict(TypedDict):
-    metadata: SelectedFileMetadataDict
-    global_dataframe: npt.NDArray[np.void]
-    section_results: dict[SectionID, DetailedSectionResultDict]
 
 
 class LogRecordDict(TypedDict):

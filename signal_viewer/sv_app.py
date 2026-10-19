@@ -1,6 +1,5 @@
 import contextlib
 import enum
-import traceback
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -22,7 +21,7 @@ from signal_viewer.enum_defs import (
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_controller import DataController
 from signal_viewer.sv_data.data_models import FileListModel
-from signal_viewer.sv_data.file_io import read_annotation_file, write_hdf5
+from signal_viewer.sv_data.file_io import read_annotation_file
 from signal_viewer.sv_data.peak_detection import find_peaks
 from signal_viewer.sv_gui import SVGUI
 from signal_viewer.sv_help import HelpController
@@ -44,7 +43,7 @@ if TYPE_CHECKING:
 
 class WorkerSignals(QtCore.QObject):
     sig_success = QtCore.Signal()
-    sig_error = QtCore.Signal(tuple)  # (type(Exception), Exception, traceback.format_exc())
+    sig_error = QtCore.Signal(object)  # the raised Exception instance
     sig_finished = QtCore.Signal()
 
 
@@ -69,7 +68,7 @@ class PeakDetectionWorker(QtCore.QRunnable):
         try:
             self.section.detect_peaks(self.method, self.method_parameters, rr_params=self.rr_params)
         except Exception as e:
-            self.signals.sig_error.emit((type(e), e, traceback.format_exc()))
+            self.signals.sig_error.emit(e)
         else:
             self.signals.sig_success.emit()
         finally:
@@ -104,7 +103,8 @@ class SVApp(QtCore.QObject):
         self.setObjectName("SVApp")
 
         self.gui = SVGUI(self)
-        self.data = DataController(self)
+        self.data: DataController
+        self._new_data_controller()
         self.plot = PlotController(self, self.gui)
         self.help = HelpController(self)
 
@@ -293,8 +293,14 @@ class SVApp(QtCore.QObject):
         rolling_rate_kwargs = self.gui.dock_parameters.ui.get_rate_params()
         worker = PeakDetectionWorker(self.data.active_section, method, params, rr_params=rolling_rate_kwargs)
         worker.signals.sig_success.connect(self._on_sig_peaks_updated)
+        worker.signals.sig_error.connect(self._on_worker_error)
         worker.signals.sig_finished.connect(self._on_worker_finished)
         self.thread_pool.start(worker)
+
+    @QtCore.Slot(object)
+    def _on_worker_error(self, exc: Exception) -> None:
+        # Routed through loguru so the status dock and the error dialog (`SVGUI.maybe_show_error_dialog`) pick it up.
+        logger.opt(exception=exc).error(f"Background task failed: {exc}")
 
     @QtCore.Slot()
     def _on_worker_finished(self) -> None:
@@ -312,6 +318,15 @@ class SVApp(QtCore.QObject):
         self.gui.dock_sections.list_view.setModel(self.data.sections)
         self.gui.dock_sections.list_view.setCurrentIndex(self.data.base_section_index)
         self.plot.update_time_axis_scale(self.data.metadata.sampling_rate)
+
+    def _new_data_controller(self) -> None:
+        """
+        Replaces `self.data` with a fresh `DataController` and wires its signals.
+
+        This is the only place a controller is constructed, so the wiring cannot be skipped by a new call path.
+        """
+        self.data = DataController(self)
+        self._connect_data_controller_signals()
 
     def _connect_data_controller_signals(self) -> None:
         self.data.sig_user_input_required.connect(self.show_metadata_dialog)
@@ -617,8 +632,7 @@ class SVApp(QtCore.QObject):
             self._disconnect_data_controller_signals()
             self.data.setParent(None)
 
-        self.data = DataController(self)
-        self._connect_data_controller_signals()
+        self._new_data_controller()
 
         self.plot.reset()
 
@@ -657,6 +671,7 @@ class SVApp(QtCore.QObject):
 
         worker = SectionResultWorker(self.data.active_section, rr_params=rate_params)
         worker.signals.sig_success.connect(self.update_result_views)
+        worker.signals.sig_error.connect(self._on_worker_error)
         worker.signals.sig_finished.connect(self._on_worker_finished)
 
         self.thread_pool.start(worker)
@@ -666,9 +681,36 @@ class SVApp(QtCore.QObject):
         self.data.active_section.set_locked(False)
         self._on_worker_finished()
 
+    def _confirm_xlsx_export(self) -> bool:
+        """
+        Checks that there is something to export and warns about unlocked sections.
+
+        Returns `False` when the export should be aborted.
+        """
+        sections = self.data.sections.editable_sections
+        if not sections:
+            logger.warning("Nothing to export. Create at least one section, detect peaks, and lock it first.")
+            return False
+
+        unlocked = [s.section_id.pretty_name() for s in sections if not s.is_locked]
+        if not unlocked:
+            return True
+
+        answer = QtWidgets.QMessageBox.question(
+            self.gui,
+            "Unlocked sections",
+            "The following sections are not locked. Their peak and rate results are incomplete or missing:\n\n"
+            + "\n".join(unlocked)
+            + "\n\nExport anyway?",
+        )
+        return answer == QtWidgets.QMessageBox.StandardButton.Yes
+
     @logger.catch()
     @QtCore.Slot(str)
     def export_result(self, format: str) -> None:
+        if format == "xlsx" and not self._confirm_xlsx_export():
+            return
+
         dir_path = (
             Path(Config.internal.last_output_dir)
             / f"Result_{self.data.active_section.signal_name.title()}_{Path(self.data.metadata.file_path).stem}"
@@ -692,10 +734,6 @@ class SVApp(QtCore.QObject):
                 raise NotImplementedError
 
             df.write_csv(out_path)
-
-        elif format == "hdf5":
-            result = self.data.assemble_result(detailed=True)
-            write_hdf5(Path(out_path), result.to_dict())
 
         elif format == "xlsx":
             text, ok = QtWidgets.QInputDialog.getText(

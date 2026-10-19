@@ -97,7 +97,8 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dialog_meta.container_additional_metadata.setLayout(layout)
         self.data_tree_widget_additional_metadata = data_tree_widget
 
-        self.ui.btn_export_all_results.clicked.connect(lambda: self.sig_export_result.emit("hdf5"))
+        # HDF5 export has no writer yet; hide the button rather than offer a dead action.
+        self.ui.btn_export_all_results.setVisible(False)
 
         self.ui.tab_widget_main.setCurrentIndex(0)
 
@@ -148,7 +149,6 @@ class SVGUI(QtWidgets.QMainWindow):
 
         self.action_export_to_csv = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to CSV")
         self.action_export_to_xlsx = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to XLSX")
-        self.action_export_to_hdf5 = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to HDF5")
 
         # self.ui.action_toggle_auto_scaling.setChecked(False)
 
@@ -212,7 +212,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.ui.menu_help.addAction(self.action_toggle_whats_this_mode)  # self.ui.action_show_user_guide,
 
         self.menu_export = QtWidgets.QMenu()
-        self.menu_export.addActions([self.action_export_to_csv, self.action_export_to_xlsx, self.action_export_to_hdf5])
+        self.menu_export.addActions([self.action_export_to_csv, self.action_export_to_xlsx])
 
     def hide_all_docks(self) -> None:
         self.dock_status_log.hide()
@@ -254,7 +254,6 @@ class SVGUI(QtWidgets.QMainWindow):
         self.action_export_to_csv.triggered.connect(lambda: self.sig_export_result.emit("csv"))
         self.action_export_to_xlsx.triggered.connect(lambda: self.sig_export_result.emit("xlsx"))
         self.ui.btn_export_to_excel.clicked.connect(lambda: self.sig_export_result.emit("xlsx"))
-        self.action_export_to_hdf5.triggered.connect(lambda: self.sig_export_result.emit("hdf5"))
 
     @QtCore.Slot(int)
     def _on_dialog_sampling_rate_changed(self, value: int) -> None:

@@ -36,6 +36,7 @@ dev = [
     "pyinstaller>=6.22.3",
     "pyinstaller-hooks-contrib>=2026.8",
     "pyright>=1.1.414",
+    "pytest>=9.1.1",
 ]
 
 [project.scripts]
@@ -50,6 +51,9 @@ build-backend = "hatchling.build"
 pyside-config = { git = "https://github.com/fred-kr/pyside-config", branch = "main" }
 pyside-widgets = { git = "https://github.com/fred-kr/pyside-widgets", branch = "main" }
 pyqtgraph = { git = "https://github.com/pyqtgraph/pyqtgraph", rev = "master" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 120

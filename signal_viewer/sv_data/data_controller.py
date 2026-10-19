@@ -2,7 +2,6 @@ import functools
 from pathlib import Path
 from typing import Any
 
-import attrs
 import mne.io
 import polars as pl
 from loguru import logger
@@ -13,42 +12,7 @@ from signal_viewer.enum_defs import InputFileFormat, TextFileSeparator
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_models import DataFrameModel, FileMetadata, SectionListModel
 from signal_viewer.sv_data.file_io import detect_sampling_rate, read_edf
-from signal_viewer.sv_data.section import DetailedSectionResult, Section, SectionID
-from signal_viewer.type_defs import CompleteResultDict, SelectedFileMetadataDict
-
-
-@attrs.define(frozen=True, repr=True)
-class SelectedFileMetadata:
-    file_name: str = attrs.field()
-    file_format: str = attrs.field()
-    sampling_rate: int = attrs.field()
-    name_signal_column: str = attrs.field()
-    name_info_column: str | None = attrs.field(default=None)
-
-    def to_dict(self) -> SelectedFileMetadataDict:
-        return SelectedFileMetadataDict(
-            file_name=self.file_name,
-            file_format=self.file_format,
-            sampling_rate=self.sampling_rate,
-            name_signal_column=self.name_signal_column,
-            name_info_column=self.name_info_column,
-        )
-
-
-@attrs.define(frozen=True, repr=True)
-class CompleteResult:
-    metadata: SelectedFileMetadata = attrs.field()
-    global_dataframe: pl.DataFrame = attrs.field()
-    section_results: dict[SectionID, DetailedSectionResult] = attrs.field()
-
-    def to_dict(self) -> CompleteResultDict:
-        section_results = {k: v.to_dict() for k, v in self.section_results.items()}
-
-        return CompleteResultDict(
-            metadata=self.metadata.to_dict(),
-            global_dataframe=self.global_dataframe.to_numpy(structured=True),
-            section_results=section_results,
-        )
+from signal_viewer.sv_data.section import Section
 
 
 class DataController(QtCore.QObject):
@@ -103,7 +67,10 @@ class DataController(QtCore.QObject):
         if self._base_section is None:
             try:
                 self._base_section = Section(
-                    self.base_df, signal_name=self.metadata.signal_column, info_column=self.metadata.info_column
+                    self.base_df,
+                    signal_name=self.metadata.signal_column,
+                    sampling_rate=self.metadata.sampling_rate,
+                    info_column=self.metadata.info_column_or_none,
                 )
                 self._base_section.set_locked(True)
             except Exception as e:
@@ -252,47 +219,14 @@ class DataController(QtCore.QObject):
         if self._metadata is None:
             return
         data = self.base_df.filter(pl.col("index").is_between(start, stop))
-        section = Section(data, self.metadata.signal_column, info_column=self.metadata.info_column)
+        section = Section(
+            data,
+            self.metadata.signal_column,
+            sampling_rate=self.metadata.sampling_rate,
+            info_column=self.metadata.info_column_or_none,
+        )
         self.sections.add_section(section)
 
     def delete_section(self, idx: QtCore.QModelIndex) -> None:
         self.sections.remove_section(idx)
         self.set_active_section(self.base_section_index)
-
-    def assemble_result(self, detailed: bool = False) -> CompleteResult:
-        base_df = self.get_base_section().data
-
-        section_results = {s.section_id: s.get_result() for s in self.sections.editable_sections}
-
-        section_dfs: list[pl.DataFrame] = []
-        for s in self.sections.editable_sections:
-            section_df = s.data.with_columns(
-                pl.col("is_peak").cast(pl.Int8),
-                pl.col("is_manual").cast(pl.Int8),
-            )
-            section_dfs.append(section_df)
-
-        combined_section_df = pl.concat(section_dfs)
-        global_df = (
-            base_df.lazy()
-            .update(combined_section_df.lazy(), on=["index", self.metadata.signal_column], how="full")
-            .drop("section_index")
-        )
-
-        info_col = self.metadata.info_column
-        if info_col == COMBO_BOX_NO_SELECTION:
-            info_col = None
-
-        metadata = SelectedFileMetadata(
-            file_name=self.metadata.file_name,
-            file_format=str(self.metadata.file_format),
-            sampling_rate=self.metadata.sampling_rate,
-            name_signal_column=self.metadata.signal_column,
-            name_info_column=self.metadata.info_column,
-        )
-
-        return CompleteResult(
-            metadata=metadata,
-            global_dataframe=global_df.collect(),
-            section_results=section_results,
-        )
