@@ -11,6 +11,7 @@ from signal_viewer.constants import INDEX_COL
 from signal_viewer.enum_defs import LogLevel
 from signal_viewer.generated.ui_main_window import Ui_MainWindow
 from signal_viewer.sv_config import Config
+from signal_viewer.sv_plots.result_plot import ResultPlotScope
 from signal_viewer.sv_widgets.dlg_metadata import MetadataDialog
 from signal_viewer.sv_widgets.dock_log_window import StatusMessageDock
 from signal_viewer.sv_widgets.dock_param_inputs import InputsDock
@@ -96,6 +97,18 @@ class SVGUI(QtWidgets.QMainWindow):
 
         # HDF5 export has no writer yet; hide the button rather than offer a dead action.
         self.ui.btn_export_all_results.setVisible(False)
+
+        self.combo_box_result_plot_scope = QtWidgets.QComboBox()
+        self.combo_box_result_plot_scope.addItem("Active section", ResultPlotScope.ActiveSection)
+        self.combo_box_result_plot_scope.addItem("All locked sections", ResultPlotScope.AllLockedSections)
+        self.combo_box_result_plot_scope.setToolTip(
+            "Show the result of the active section only, or of every locked section on the file's time axis."
+        )
+        scope_row = QtWidgets.QHBoxLayout()
+        scope_row.addWidget(QtWidgets.QLabel("Show:"))
+        scope_row.addWidget(self.combo_box_result_plot_scope)
+        scope_row.addStretch()
+        self.ui.verticalLayout.insertLayout(0, scope_row)  # the layout of `tab_result_mpl_widget`
 
         self.ui.tab_widget_main.setCurrentIndex(0)
 

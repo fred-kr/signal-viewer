@@ -50,7 +50,9 @@ class SVApp(QtCore.QObject):
         self.data: DataController
         self._new_data_controller()
         self.plot = PlotController(self, self.gui)
-        self.result_plot = ResultPlotController(self.gui.ui.mpl_widget, self)
+        self.result_plot = ResultPlotController(
+            self.gui.ui.mpl_widget, lambda: self.data.sections.editable_sections, parent=self
+        )
         self.help = HelpController(self)
 
         self.recent_data_files = FileListModel(Config.internal.recent_files, parent=self)
@@ -112,6 +114,9 @@ class SVApp(QtCore.QObject):
         # The result figure is only drawn once its tab is actually shown
         self.gui.ui.tab_widget_main.currentChanged.connect(self.result_plot.refresh)
         self.gui.ui.tab_widget_result_views.currentChanged.connect(self.result_plot.refresh)
+        self.gui.combo_box_result_plot_scope.currentIndexChanged.connect(
+            lambda: self.result_plot.set_scope(self.gui.combo_box_result_plot_scope.currentData())
+        )
 
     #### Event handlers ==========
 
@@ -187,6 +192,7 @@ class SVApp(QtCore.QObject):
             self.data.active_section_model.set_df(section.data)
         if SectionChange.LOCK in flags:
             self._update_lock_dependent_states(section)
+            self.result_plot.invalidate()
         if SectionChange.RESULT in flags:
             self.update_result_views()
 
@@ -308,6 +314,7 @@ class SVApp(QtCore.QObject):
             return
         name = section.section_id.pretty_name()
         self.data.delete_section(index)  # the plot removes the region from the model's rowsAboutToBeRemoved
+        self.result_plot.invalidate()
         self.gui.dock_sections.list_view.setCurrentIndex(self.data.base_section_index)
         logger.info(f"Deleted {name}")
 
