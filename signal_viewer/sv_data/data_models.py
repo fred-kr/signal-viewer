@@ -384,13 +384,21 @@ class FileMetadata:
         """
         return None if self._info_column == COMBO_BOX_NO_SELECTION else self._info_column
 
-    def apply_name_map(self) -> None:
-        old_signal_name = self.signal_column
-        self.signal_column = self.name_map[old_signal_name]
+    @property
+    def data_signal_column(self) -> str:
+        """
+        Name of the signal column inside the loaded data frame.
 
-        old_info_name = self.info_column
-        if old_info_name != COMBO_BOX_NO_SELECTION:
-            self.info_column = self.name_map[old_info_name]
+        `signal_column` is the name as it appears in the file and in the combo boxes. `DataController.load_data`
+        renames every column through `name_map`, so the data layer must address columns by this cleaned name.
+        """
+        return self.name_map.get(self._signal_column, self._signal_column)
+
+    @property
+    def data_info_column(self) -> str | None:
+        """Cleaned name of the info column inside the loaded data frame, or `None` when none is selected."""
+        info = self.info_column_or_none
+        return None if info is None else self.name_map.get(info, info)
 
     def to_dict(self) -> MetadataDict:
         return {

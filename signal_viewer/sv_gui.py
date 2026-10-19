@@ -257,26 +257,11 @@ class SVGUI(QtWidgets.QMainWindow):
 
     @QtCore.Slot(int)
     def _on_dialog_sampling_rate_changed(self, value: int) -> None:
-        if value > 0:
-            self.dialog_meta.spin_box_sampling_rate.setProperty("requiresInput", False)
-        else:
-            self.dialog_meta.spin_box_sampling_rate.setProperty("requiresInput", True)
-        self.dialog_meta.spin_box_sampling_rate.style().unpolish(self.dialog_meta.spin_box_sampling_rate)
-        self.dialog_meta.spin_box_sampling_rate.style().polish(self.dialog_meta.spin_box_sampling_rate)
-        self.dialog_meta.spin_box_sampling_rate.update()
-
-        # self.ui.spin_box_sampling_rate_import_page.setValue(value)
+        self.dialog_meta.set_requires_input(self.dialog_meta.spin_box_sampling_rate, value <= 0)
 
     @QtCore.Slot(str)
     def _on_dialog_signal_column_changed(self, value: str) -> None:
-        if value != INDEX_COL:
-            self.dialog_meta.combo_box_signal_column.setProperty("requiresInput", False)
-        else:
-            self.dialog_meta.combo_box_signal_column.setProperty("requiresInput", True)
-        self.dialog_meta.combo_box_signal_column.style().unpolish(self.dialog_meta.combo_box_signal_column)
-        self.dialog_meta.combo_box_signal_column.style().polish(self.dialog_meta.combo_box_signal_column)
-        self.dialog_meta.combo_box_signal_column.update()
-        # self.ui.combo_box_signal_column_import_page.setCurrentText(value)
+        self.dialog_meta.set_requires_input(self.dialog_meta.combo_box_signal_column, value == INDEX_COL)
 
     @QtCore.Slot(QtCore.QPoint)
     def show_data_view_context_menu(self, pos: QtCore.QPoint) -> None:

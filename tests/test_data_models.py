@@ -41,26 +41,28 @@ def test_info_column_or_none_hides_the_sentinel(csv_file: Path) -> None:
     assert md.info_column_or_none == "Beta Temp"
 
 
-def test_name_map_and_apply(csv_file: Path) -> None:
+def test_data_column_names_are_cleaned_but_file_names_are_kept(csv_file: Path) -> None:
     md = FileMetadata(csv_file, COLUMNS, sampling_rate=100)
     md.signal_column = "Alpha Sig"
     md.info_column = "Beta Temp"
 
     assert md.name_map == {"Alpha Sig": "alpha_sig", "Beta Temp": "beta_temp"}
 
-    md.apply_name_map()
-    assert md.signal_column == "alpha_sig"
-    assert md.info_column == "beta_temp"
+    # What the combo boxes show stays as in the file; what the data layer uses is cleaned.
+    assert md.signal_column == "Alpha Sig"
+    assert md.info_column == "Beta Temp"
+    assert md.data_signal_column == "alpha_sig"
+    assert md.data_info_column == "beta_temp"
 
 
-def test_apply_name_map_leaves_no_selection_alone(csv_file: Path) -> None:
+def test_data_info_column_is_none_without_selection(csv_file: Path) -> None:
     md = FileMetadata(csv_file, COLUMNS, sampling_rate=100)
     md.signal_column = "Alpha Sig"
     md.info_column = None
 
-    md.apply_name_map()
     assert md.info_column == COMBO_BOX_NO_SELECTION
     assert md.info_column_or_none is None
+    assert md.data_info_column is None
 
 
 def test_required_fields_track_sampling_rate(csv_file: Path) -> None:

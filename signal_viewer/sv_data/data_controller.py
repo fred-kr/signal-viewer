@@ -68,9 +68,9 @@ class DataController(QtCore.QObject):
             try:
                 self._base_section = Section(
                     self.base_df,
-                    signal_name=self.metadata.signal_column,
+                    signal_name=self.metadata.data_signal_column,
                     sampling_rate=self.metadata.sampling_rate,
-                    info_column=self.metadata.info_column_or_none,
+                    info_column=self.metadata.data_info_column,
                 )
                 self._base_section.set_locked(True)
             except Exception as e:
@@ -124,9 +124,6 @@ class DataController(QtCore.QObject):
         if file_path.suffix not in InputFileFormat:
             logger.error(f"Unsupported file format: {file_path.suffix}. Allowed formats: {', '.join(InputFileFormat)}")
 
-        last_signal_col = Config.internal.last_signal_column
-        last_info_col = Config.internal.last_info_column
-
         other_info: dict[str, Any] = {}
 
         if file_path.suffix == ".edf":
@@ -153,25 +150,44 @@ class DataController(QtCore.QObject):
         else:
             raise ValueError(f"Unsupported file format: {file_path.suffix}. Please select a valid file format.")
 
+        # `FileMetadata.__init__` pre-selects the columns and sampling rate remembered in `Config.internal`.
         metadata = FileMetadata(file_path, column_names, sampling_rate)
-        if last_signal_col in metadata.valid_columns:
-            metadata.signal_column = last_signal_col
-        if last_info_col in metadata.valid_columns:
-            metadata.info_column = last_info_col
-
         metadata.other_info = other_info
         self._metadata = metadata
-        if self.metadata.required_fields:
-            self.sig_user_input_required.emit(self.metadata.required_fields)
 
+        # Widgets are filled first, so the dialog opened by the second signal already shows the current values.
         self.sig_new_metadata.emit(self.metadata)
+        if self.metadata.required_fields:
+            self.sig_user_input_required.emit(set(self.metadata.required_fields))
+
+    def _reset_sections(self) -> None:
+        """Drops every section and result so `load_data` can be called again on the same file."""
+        self.sections.clear()
+        self._base_section = None
+        self._active_section = None
+        self.active_section_model.set_df(pl.DataFrame())
+        self.result_model_peaks.set_df(pl.DataFrame())
+        self.result_model_rate.set_df(pl.DataFrame())
+        self.has_data = False
 
     def load_data(self) -> None:
+        """
+        Reads the selected columns from the file described by `metadata` and creates the base section.
+
+        Safe to call repeatedly: an earlier load of the same file is discarded first. The metadata itself is not
+        modified, so the user's column and sampling-rate choices survive a reload.
+        """
         if self._metadata is None:
             return
         suffix = self.metadata.file_format
         file_path = self.metadata.file_path
         separator = Config.data.text_file_separator
+
+        # The only place the "last used" values are persisted. They hold the raw file column names so they can be
+        # matched against the next file's columns.
+        Config.internal.last_signal_column = self.metadata.signal_column
+        Config.internal.last_info_column = self.metadata.info_column
+        Config.internal.last_sampling_rate = self.metadata.sampling_rate
 
         signal_col = self.metadata.signal_column
         info_col = self.metadata.info_column
@@ -206,8 +222,8 @@ class DataController(QtCore.QObject):
             raise NotImplementedError(f"Unsupported file format: {suffix}.")
 
         df = df.rename(self.metadata.name_map, strict=False)
-        self.metadata.apply_name_map()
 
+        self._reset_sections()
         self.data_model.set_df(df)
         self._base_section = self.get_base_section()
         self.sections.add_section(self._base_section)
@@ -221,9 +237,9 @@ class DataController(QtCore.QObject):
         data = self.base_df.filter(pl.col("index").is_between(start, stop))
         section = Section(
             data,
-            self.metadata.signal_column,
+            self.metadata.data_signal_column,
             sampling_rate=self.metadata.sampling_rate,
-            info_column=self.metadata.info_column_or_none,
+            info_column=self.metadata.data_info_column,
         )
         self.sections.add_section(section)
 

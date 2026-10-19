@@ -124,7 +124,7 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_show_settings.triggered.connect(self._on_show_settings)
         self.gui.ui.action_open_file.triggered.connect(self._on_open_file)
         self.gui.ui.action_open_annotation_file.triggered.connect(self._load_annotations)
-        self.gui.ui.action_edit_metadata.triggered.connect(lambda: self.show_metadata_dialog([]))  # type: ignore
+        self.gui.ui.action_edit_metadata.triggered.connect(self.show_metadata_dialog)
         self.gui.ui.action_about_qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self.gui.ui.action_close_file.triggered.connect(self.close_file)
         # self.gui.ui.action_show_user_guide.triggered.connect(self._on_show_user_guide)
@@ -330,7 +330,7 @@ class SVApp(QtCore.QObject):
 
     def _connect_data_controller_signals(self) -> None:
         self.data.sig_user_input_required.connect(self.show_metadata_dialog)
-        self.data.sig_new_metadata.connect(self.update_metadata_widgets)
+        self.data.sig_new_metadata.connect(self._bind_metadata)
         self.data.sig_new_data.connect(self._on_sig_new_data)
         self.gui.dock_sections.list_view.pressed.connect(self.data.set_active_section)
         self.data.sig_active_section_changed.connect(self._on_active_section_changed)
@@ -339,7 +339,7 @@ class SVApp(QtCore.QObject):
         sender = self.data
         signal_slot_pairs = [
             (sender.sig_user_input_required, self.show_metadata_dialog),
-            (sender.sig_new_metadata, self.update_metadata_widgets),
+            (sender.sig_new_metadata, self._bind_metadata),
             (sender.sig_new_data, self._on_sig_new_data),
             (sender.sig_active_section_changed, self._on_active_section_changed),
             (self.gui.dock_sections.list_view.pressed, sender.set_active_section),
@@ -442,58 +442,74 @@ class SVApp(QtCore.QObject):
         signal_col = metadata_dict.get("signal_column", None)
         self.data.update_metadata(sampling_rate, signal_col, info_col)
 
+    # --- Metadata widgets -------------------------------------------------------------------------------------------
+    # The import page and the metadata dialog show the same three values. `_bind_metadata` is the only code that
+    # writes `FileMetadata` into them; user edits in either place flow back through `DataController.update_metadata`,
+    # which re-emits `sig_new_metadata`, so both widget sets always agree.
+
+    @property
+    def _signal_column_combos(self) -> tuple[QtWidgets.QComboBox, ...]:
+        return (self.gui.ui.combo_box_signal_column_import_page, self.gui.dialog_meta.combo_box_signal_column)
+
+    @property
+    def _info_column_combos(self) -> tuple[QtWidgets.QComboBox, ...]:
+        return (self.gui.ui.combo_box_info_column_import_page, self.gui.dialog_meta.combo_box_info_column)
+
+    @property
+    def _sampling_rate_spin_boxes(self) -> tuple[QtWidgets.QSpinBox, ...]:
+        return (self.gui.ui.spin_box_sampling_rate_import_page, self.gui.dialog_meta.spin_box_sampling_rate)
+
+    @staticmethod
+    def _set_combo_items(combo: QtWidgets.QComboBox, items: list[str], current: str) -> None:
+        """Replaces the combo box items only when they differ, then selects `current`, without emitting signals."""
+        with QtCore.QSignalBlocker(combo):
+            if [combo.itemText(i) for i in range(combo.count())] != items:
+                combo.clear()
+                combo.addItems(items)
+            combo.setCurrentText(current)
+
     @QtCore.Slot(object)
-    def update_metadata_widgets(self, metadata: FileMetadata) -> None:
+    def _bind_metadata(self, metadata: FileMetadata) -> None:
+        """Pushes `metadata` into every widget that displays it."""
+        for combo in self._signal_column_combos:
+            self._set_combo_items(combo, metadata.valid_columns, metadata.signal_column)
+        for combo in self._info_column_combos:
+            self._set_combo_items(combo, metadata.column_names, metadata.info_column)
+        for spin_box in self._sampling_rate_spin_boxes:
+            with QtCore.QSignalBlocker(spin_box):
+                spin_box.setValue(metadata.sampling_rate)
+
+        dialog = self.gui.dialog_meta
+        dialog.line_edit_file_name.setText(metadata.file_name)
+        dialog.line_edit_file_type.setText(metadata.file_format)
+        dialog.set_requires_input(dialog.spin_box_sampling_rate, "sampling_rate" in metadata.required_fields)
+        dialog.set_requires_input(dialog.combo_box_signal_column, "signal_column" in metadata.required_fields)
+
         self.gui.data_tree_widget_additional_metadata.set_data(metadata.other_info, hide_root=True)
         self.gui.data_tree_widget_additional_metadata.collapseAll()
-        with QtCore.QSignalBlocker(self.gui.ui.spin_box_sampling_rate_import_page):
-            self.gui.ui.spin_box_sampling_rate_import_page.setValue(metadata.sampling_rate)
-        with QtCore.QSignalBlocker(self.gui.ui.combo_box_signal_column_import_page):
-            self.gui.ui.combo_box_signal_column_import_page.setCurrentText(metadata.signal_column)
-        with QtCore.QSignalBlocker(self.gui.ui.combo_box_info_column_import_page):
-            self.gui.ui.combo_box_info_column_import_page.setCurrentText(metadata.info_column)
+
         self.plot.update_time_axis_scale(metadata.sampling_rate)
 
+    def _clear_metadata_widgets(self) -> None:
+        for combo in self._signal_column_combos + self._info_column_combos:
+            with QtCore.QSignalBlocker(combo):
+                combo.clear()
+        for spin_box in self._sampling_rate_spin_boxes:
+            with QtCore.QSignalBlocker(spin_box):
+                spin_box.setValue(0)
+        self.gui.dialog_meta.line_edit_file_name.clear()
+        self.gui.dialog_meta.line_edit_file_type.clear()
+        self.gui.data_tree_widget_additional_metadata.clear()
+
+    def _set_metadata_editable(self, editable: bool) -> None:
+        """Metadata can be changed between opening a file and loading its data, not afterwards."""
+        for widget in self._signal_column_combos + self._info_column_combos + self._sampling_rate_spin_boxes:
+            widget.setEnabled(editable)
+
+    @QtCore.Slot()
     @QtCore.Slot(set)
-    def show_metadata_dialog(self, required_fields: set[str]) -> None:
-        metadata = self.data.metadata
-
-        file_name = metadata.file_name
-        file_type = metadata.file_format
-        info_col = metadata.info_column
-
-        if "sampling_rate" not in required_fields:
-            sampling_rate = metadata.sampling_rate
-            self.gui.dialog_meta.spin_box_sampling_rate.setValue(sampling_rate)
-            self.gui.ui.spin_box_sampling_rate_import_page.setValue(sampling_rate)
-            self.gui.dialog_meta.spin_box_sampling_rate.setProperty("requiresInput", False)
-        else:
-            self.gui.dialog_meta.spin_box_sampling_rate.setProperty("requiresInput", True)
-
-        self.gui.dialog_meta.spin_box_sampling_rate.style().unpolish(self.gui.dialog_meta.spin_box_sampling_rate)
-        self.gui.dialog_meta.spin_box_sampling_rate.style().polish(self.gui.dialog_meta.spin_box_sampling_rate)
-        self.gui.dialog_meta.spin_box_sampling_rate.update()
-
-        if "signal_column" not in required_fields:
-            signal_col = metadata.signal_column
-            self.gui.dialog_meta.combo_box_signal_column.setCurrentText(signal_col)
-            self.gui.ui.combo_box_signal_column_import_page.setCurrentText(signal_col)
-            self.gui.dialog_meta.combo_box_signal_column.setProperty("requiresInput", False)
-        else:
-            self.gui.dialog_meta.combo_box_signal_column.setProperty("requiresInput", True)
-
-        self.gui.dialog_meta.combo_box_signal_column.style().unpolish(self.gui.dialog_meta.combo_box_signal_column)
-        self.gui.dialog_meta.combo_box_signal_column.style().polish(self.gui.dialog_meta.combo_box_signal_column)
-        self.gui.dialog_meta.combo_box_signal_column.update()
-
-        self.gui.dialog_meta.combo_box_info_column.setCurrentText(info_col)
-        self.gui.ui.combo_box_info_column_import_page.setCurrentText(info_col)
-
-        self.gui.dialog_meta.line_edit_file_name.setText(file_name)
-        self.gui.dialog_meta.line_edit_file_type.setText(file_type)
-
-        self.gui.data_tree_widget_additional_metadata.set_data(metadata.other_info, hide_root=True)
-
+    def show_metadata_dialog(self, required_fields: set[str] | None = None) -> None:
+        # The dialog's widgets are kept current by `_bind_metadata`; nothing to fill here.
         self.gui.dialog_meta.open()
 
     @QtCore.Slot()
@@ -511,31 +527,6 @@ class SVApp(QtCore.QObject):
     def update_info_column(self, info_column: str) -> None:
         self.data.update_metadata(info_col=info_column)
         logger.info(f"Info column set to '{info_column}'.")
-
-    def _set_column_models(self) -> None:
-        with QtCore.QSignalBlocker(self.gui.ui.combo_box_signal_column_import_page):
-            self.gui.ui.combo_box_signal_column_import_page.addItems(self.data.metadata.valid_columns)
-            self.gui.ui.combo_box_signal_column_import_page.setCurrentText(self.data.metadata.signal_column)
-        with QtCore.QSignalBlocker(self.gui.ui.combo_box_info_column_import_page):
-            self.gui.ui.combo_box_info_column_import_page.addItems(self.data.metadata.column_names)
-            self.gui.ui.combo_box_info_column_import_page.setCurrentText(self.data.metadata.info_column)
-        with QtCore.QSignalBlocker(self.gui.dialog_meta.combo_box_signal_column):
-            self.gui.dialog_meta.combo_box_signal_column.addItems(self.data.metadata.valid_columns)
-            self.gui.dialog_meta.combo_box_signal_column.setCurrentText(self.data.metadata.signal_column)
-        with QtCore.QSignalBlocker(self.gui.dialog_meta.combo_box_info_column):
-            self.gui.dialog_meta.combo_box_info_column.addItems(self.data.metadata.column_names)
-            self.gui.dialog_meta.combo_box_info_column.setCurrentText(self.data.metadata.info_column)
-
-    def _clear_column_models(self) -> None:
-        with QtCore.QSignalBlocker(self.gui.ui.combo_box_info_column_import_page):
-            self.gui.ui.combo_box_info_column_import_page.clear()
-        with QtCore.QSignalBlocker(self.gui.ui.combo_box_signal_column_import_page):
-            self.gui.ui.combo_box_signal_column_import_page.clear()
-        with QtCore.QSignalBlocker(self.gui.dialog_meta.combo_box_info_column):
-            self.gui.dialog_meta.combo_box_signal_column.clear()
-        with QtCore.QSignalBlocker(self.gui.dialog_meta.combo_box_signal_column):
-            self.gui.dialog_meta.combo_box_info_column.clear()
-        self.gui.data_tree_widget_additional_metadata.clear()
 
     @QtCore.Slot()
     def _on_open_file(self) -> None:
@@ -565,12 +556,11 @@ class SVApp(QtCore.QObject):
         self.gui.ui.btn_close_file.setEnabled(True)
         self.gui.ui.btn_load_data.setEnabled(True)
 
-        self.data.open_file(file_path)
+        self.data.open_file(file_path)  # fills the metadata widgets through sig_new_metadata -> _bind_metadata
         self.gui.ui.table_view_import_data.setModel(self.data.data_model)
         self.gui.ui.table_view_result_peaks.setModel(self.data.result_model_peaks)
         self.gui.ui.table_view_result_rate.setModel(self.data.result_model_rate)
 
-        self._set_column_models()
         self.recent_data_files.add_file(file_path)
         self.gui.switch_to(self.gui.ui.tab_import)
 
@@ -585,13 +575,8 @@ class SVApp(QtCore.QObject):
     @QtCore.Slot()
     def read_data(self) -> None:
         if self.data.has_data:
-            loaded_file = self.data.metadata.file_path
-            self.close_file()
-            self._on_file_opened(loaded_file)
-
-        Config.internal.last_signal_column = self.data.metadata.signal_column
-        Config.internal.last_info_column = self.data.metadata.info_column
-        Config.internal.last_sampling_rate = self.data.metadata.sampling_rate
+            # Reloading the same file: the controller discards its sections itself, the plot has to follow.
+            self.plot.reset()
 
         self.data.load_data()
         self.gui.ui.table_view_import_data.horizontalHeader().setSectionResizeMode(
@@ -599,13 +584,7 @@ class SVApp(QtCore.QObject):
         )
 
         self.gui.dock_sections.setEnabled(True)
-
-        self.gui.ui.spin_box_sampling_rate_import_page.setEnabled(False)
-        self.gui.ui.combo_box_signal_column_import_page.setEnabled(False)
-        self.gui.ui.combo_box_info_column_import_page.setEnabled(False)
-        self.gui.dialog_meta.spin_box_sampling_rate.setEnabled(False)
-        self.gui.dialog_meta.combo_box_signal_column.setEnabled(False)
-        self.gui.dialog_meta.combo_box_info_column.setEnabled(False)
+        self._set_metadata_editable(False)
 
         _val = self.data.metadata.sampling_rate // 2
         self.gui.dock_parameters.ui.ui.peak_localmax_radius.setProperty("defaultValue", _val)
@@ -622,8 +601,7 @@ class SVApp(QtCore.QObject):
         self.gui.ui.table_view_import_data.setModel(None)
         self.gui.ui.table_view_result_peaks.setModel(None)
         self.gui.ui.table_view_result_rate.setModel(None)
-        self.gui.data_tree_widget_additional_metadata.clear()
-        self._clear_column_models()
+        self._clear_metadata_widgets()
         self.gui.dock_sections.list_view.setModel(None)
         self.gui.dock_parameters.setEnabled(False)
         self.gui.dock_sections.setEnabled(False)
@@ -644,12 +622,7 @@ class SVApp(QtCore.QObject):
         self.gui.set_active_section_label("-")
         self.gui.ui.line_edit_active_file.clear()
 
-        self.gui.ui.spin_box_sampling_rate_import_page.setEnabled(True)
-        self.gui.ui.combo_box_signal_column_import_page.setEnabled(True)
-        self.gui.ui.combo_box_info_column_import_page.setEnabled(True)
-        self.gui.dialog_meta.spin_box_sampling_rate.setEnabled(True)
-        self.gui.dialog_meta.combo_box_signal_column.setEnabled(True)
-        self.gui.dialog_meta.combo_box_info_column.setEnabled(True)
+        self._set_metadata_editable(True)
         self.gui.setWindowTitle("SignalViewer")
 
         logger.info("Closed file")

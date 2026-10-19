@@ -1,7 +1,6 @@
 from PySide6 import QtCore, QtWidgets
 
 from signal_viewer.generated.ui_dialog_metadata import Ui_MetadataDialog
-from signal_viewer.sv_config import Config
 
 STYLE_SHEET_SPIN_BOX = """
 QSpinBox[requiresInput="false"] {
@@ -65,16 +64,23 @@ class MetadataDialog(QtWidgets.QDialog, Ui_MetadataDialog):
         self.btn_accept.clicked.connect(self.accept)
         self.btn_reject.clicked.connect(self.reject)
 
+    @staticmethod
+    def set_requires_input(widget: QtWidgets.QWidget, required: bool) -> None:
+        """Toggles the `requiresInput` style property and forces the stylesheet to re-apply."""
+        widget.setProperty("requiresInput", required)
+        style = widget.style()
+        style.unpolish(widget)
+        style.polish(widget)
+        widget.update()
+
     @QtCore.Slot()
     def accept(self) -> None:
+        # Only reports the user's choice. Persisting it is `DataController.load_data`'s job.
         metadata_dict: dict[str, int | str] = {
             "sampling_rate": self.spin_box_sampling_rate.value(),
             "signal_column": self.combo_box_signal_column.currentText(),
             "info_column": self.combo_box_info_column.currentText(),
         }
         self.sig_property_has_changed.emit(metadata_dict)
-        Config.internal.last_signal_column = self.combo_box_signal_column.currentText()
-        Config.internal.last_info_column = self.combo_box_info_column.currentText()
-        Config.internal.last_sampling_rate = self.spin_box_sampling_rate.value()
 
         super().accept()
