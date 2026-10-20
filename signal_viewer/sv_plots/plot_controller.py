@@ -1,7 +1,7 @@
 # pyright: reportOptionalMemberAccess=false
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import numpy.typing as npt
@@ -72,11 +72,10 @@ class PlotController(QtCore.QObject):
         self.pw_main.plotItem.vb.sigResized.connect(self.update_views)
 
     def _setup_plot_items(self) -> None:
-        p_main = self.pw_main.getPlotItem()
-        p_rate = self.pw_rate.getPlotItem()
+        p_main = cast(pg.PlotItem, self.pw_main.getPlotItem())
+        p_rate = cast(pg.PlotItem, self.pw_rate.getPlotItem())
+
         for plt_item in (p_main, p_rate):
-            if plt_item is None:
-                continue
             plt_item.setAxisItems({"top": TimeDeltaAxisItem(orientation="top")})
             plt_item.showGrid(x=False, y=True)
             plt_item.setDownsampling(auto=True)
@@ -88,11 +87,10 @@ class PlotController(QtCore.QObject):
         p_main.showAxis("right")
         p_main.scene().addItem(self.vb_info)
         p_main.getAxis("right").linkToView(self.vb_info)
+        p_main.getAxis("right").setGrid(0)
         self.vb_info.setXLink(p_main)
 
-        # self.pw_main.getPlotItem().getViewBox().enableAutoRange(ViewBox.YAxis, enable=0.99)  # pyright: ignore[reportArgumentType]
         p_main.vb.enableAutoRange(EditingViewBox.YAxis, enable=True)
-        # self.pw_main.getPlotItem().getViewBox().setAutoPan(y=True)
         p_main.vb.setAutoPan(y=True)
 
         p_rate.vb.enableAutoRange(ViewBox.YAxis, enable=True)
@@ -102,7 +100,7 @@ class PlotController(QtCore.QObject):
 
     @QtCore.Slot()
     def update_views(self) -> None:
-        p_main = self.pw_main.plotItem
+        p_main = cast(pg.PlotItem, self.pw_main.plotItem)
         vb_info = self.vb_info
 
         vb_info.setGeometry(p_main.vb.sceneBoundingRect())
@@ -270,10 +268,10 @@ class PlotController(QtCore.QObject):
         if plt_data_item.xData is None or plt_data_item.xData.size == 0:
             return
         len_data = plt_data_item.xData.size
-        self.pw_main.plotItem.vb.setLimits(xMin=-0.25 * len_data, xMax=1.25 * len_data, maxYRange=1e5, minYRange=0.1)
-        self.pw_rate.plotItem.vb.setLimits(xMin=-0.25 * len_data, xMax=1.25 * len_data, maxYRange=1e5, minYRange=0.1)
-        self.pw_main.plotItem.vb.setRange(xRange=(0, len_data), disableAutoRange=False)
-        self.pw_rate.plotItem.vb.setRange(xRange=(0, len_data), disableAutoRange=False)
+        self.pw_main.plotItem.vb.setLimits(xMin=-0.25 * len_data, xMax=1.25 * len_data, maxYRange=1e5, minYRange=0.1)  # pyrefly: ignore[missing-attribute]
+        self.pw_rate.plotItem.vb.setLimits(xMin=-0.25 * len_data, xMax=1.25 * len_data, maxYRange=1e5, minYRange=0.1)  # pyrefly: ignore[missing-attribute]
+        self.pw_main.plotItem.vb.setRange(xRange=(0, len_data), disableAutoRange=False)  # pyrefly: ignore[missing-attribute]
+        self.pw_rate.plotItem.vb.setRange(xRange=(0, len_data), disableAutoRange=False)  # pyrefly: ignore[missing-attribute]
 
     def reset(self) -> None:
         """Resets all plot items, regions, and data items to initial state."""
