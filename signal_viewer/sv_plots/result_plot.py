@@ -198,7 +198,7 @@ def fit_spline_gam(x: npt.NDArray[np.float64], y: npt.NDArray[np.float64]) -> Sp
     coef = _fit_pspline_gamma(basis, y, lam * roughness)
     gram = basis.T @ basis
     edf = float(np.trace(np.linalg.solve(gram + lam * roughness, gram)))
-    return SplineGAMFit(basis=transformer, coef=coef, n_knots=n_knots, lam=lam, edf=edf, n_points=int(x.size))
+    return SplineGAMFit(basis=transformer, coef=coef, n_knots=n_knots, lam=lam, edf=edf, n_points=x.size)
 
 
 RateFit = GLMFit | SplineGAMFit

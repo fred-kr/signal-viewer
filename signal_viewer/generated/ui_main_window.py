@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.11.1
+## Created by: Qt User Interface Compiler version 6.12.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -367,6 +367,19 @@ class Ui_MainWindow(object):
 
         self.tab_widget_result_views = QTabWidget(self.tab_export)
         self.tab_widget_result_views.setObjectName(u"tab_widget_result_views")
+        self.tab_result_mpl_widget = QWidget()
+        self.tab_result_mpl_widget.setObjectName(u"tab_result_mpl_widget")
+        self.verticalLayout = QVBoxLayout(self.tab_result_mpl_widget)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.mpl_widget = MatplotlibWidget(self.tab_result_mpl_widget)
+        self.mpl_widget.setObjectName(u"mpl_widget")
+        sizePolicy.setHeightForWidth(self.mpl_widget.sizePolicy().hasHeightForWidth())
+        self.mpl_widget.setSizePolicy(sizePolicy)
+        self.mpl_widget.setMinimumSize(QSize(500, 0))
+
+        self.verticalLayout.addWidget(self.mpl_widget)
+
+        self.tab_widget_result_views.addTab(self.tab_result_mpl_widget, "")
         self.tab_result_peaks_info = QWidget()
         self.tab_result_peaks_info.setObjectName(u"tab_result_peaks_info")
         self.verticalLayout_2 = QVBoxLayout(self.tab_result_peaks_info)
@@ -393,19 +406,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.addWidget(self.table_view_result_rate)
 
         self.tab_widget_result_views.addTab(self.tab_result_rate_info, "")
-        self.tab_result_mpl_widget = QWidget()
-        self.tab_result_mpl_widget.setObjectName(u"tab_result_mpl_widget")
-        self.verticalLayout = QVBoxLayout(self.tab_result_mpl_widget)
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.mpl_widget = MatplotlibWidget(self.tab_result_mpl_widget)
-        self.mpl_widget.setObjectName(u"mpl_widget")
-        sizePolicy.setHeightForWidth(self.mpl_widget.sizePolicy().hasHeightForWidth())
-        self.mpl_widget.setSizePolicy(sizePolicy)
-        self.mpl_widget.setMinimumSize(QSize(500, 0))
-
-        self.verticalLayout.addWidget(self.mpl_widget)
-
-        self.tab_widget_result_views.addTab(self.tab_result_mpl_widget, "")
         self.tab_result_metadata = QWidget()
         self.tab_result_metadata.setObjectName(u"tab_result_metadata")
         self.tab_result_metadata.setEnabled(False)
@@ -461,6 +461,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
+        self.menubar.setGeometry(QRect(0, 0, 1656, 33))
         self.menubar.setNativeMenuBar(False)
         self.menu_file = QMenu(self.menubar)
         self.menu_file.setObjectName(u"menu_file")
@@ -679,7 +680,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.tabwidget_data_view.setTabText(self.tabwidget_data_view.indexOf(self.tab_data_file), QCoreApplication.translate("MainWindow", u"Data", None))
         self.tabwidget_data_view.setTabText(self.tabwidget_data_view.indexOf(self.tab_annotation_file), QCoreApplication.translate("MainWindow", u"Annotations", None))
-        self.tab_widget_main.setTabText(self.tab_widget_main.indexOf(self.tab_import), QCoreApplication.translate("MainWindow", u"Import && Data", None))
+        self.tab_widget_main.setTabText(self.tab_widget_main.indexOf(self.tab_import), QCoreApplication.translate("MainWindow", u"Import", None))
         self.tab_widget_main.setTabText(self.tab_widget_main.indexOf(self.tab_edit), QCoreApplication.translate("MainWindow", u"View && Edit", None))
 #if QT_CONFIG(tooltip)
         self.btn_export_all_results.setToolTip(QCoreApplication.translate("MainWindow", u"Currently not working", None))
@@ -689,9 +690,9 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(whatsthis)
         self.btn_export_all_results.setText(QCoreApplication.translate("MainWindow", u"Save to HDF5 (detailed)", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-weight:700;\">Section Data and Results</span></p></body></html>", None))
+        self.tab_widget_result_views.setTabText(self.tab_widget_result_views.indexOf(self.tab_result_mpl_widget), QCoreApplication.translate("MainWindow", u"Plot View", None))
         self.tab_widget_result_views.setTabText(self.tab_widget_result_views.indexOf(self.tab_result_peaks_info), QCoreApplication.translate("MainWindow", u"Peak Indices", None))
         self.tab_widget_result_views.setTabText(self.tab_widget_result_views.indexOf(self.tab_result_rate_info), QCoreApplication.translate("MainWindow", u"Calculated Rate / Summary Statistics", None))
-        self.tab_widget_result_views.setTabText(self.tab_widget_result_views.indexOf(self.tab_result_mpl_widget), QCoreApplication.translate("MainWindow", u"Plot View", None))
         self.tab_widget_result_views.setTabText(self.tab_widget_result_views.indexOf(self.tab_result_metadata), QCoreApplication.translate("MainWindow", u"Metadata", None))
 #if QT_CONFIG(tooltip)
         self.tab_widget_result_views.setTabToolTip(self.tab_widget_result_views.indexOf(self.tab_result_metadata), QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Shows the methods and parameters used to produce the current results.</p></body></html>", None))

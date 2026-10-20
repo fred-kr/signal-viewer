@@ -256,8 +256,9 @@ class ParameterInputs(QtWidgets.QWidget):
         sender = self.sender()
         if sender is self.action_peak_reset_inputs:
             current_page = self.ui.stacked_widget_peak.currentWidget()
-            for c in current_page.children():
-                _restore_default(c)
+            if current_page is not None:
+                for c in current_page.children():
+                    _restore_default(c)
         elif sender is self.action_sf_reset_inputs:
             for c in self.sf_widgets + self.std_widgets + [self.ui.sf_pipeline, self.ui.sf_method, self.ui.std_method]:
                 _restore_default(c)

@@ -49,7 +49,7 @@
       </property>
       <widget class="QWidget" name="tab_import">
        <attribute name="title">
-        <string>Import &amp;&amp; Data</string>
+        <string>Import</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,7">
         <item>
@@ -471,6 +471,29 @@
           <property name="currentIndex">
            <number>0</number>
           </property>
+          <widget class="QWidget" name="tab_result_mpl_widget">
+           <attribute name="title">
+            <string>Plot View</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <widget class="MatplotlibWidget" name="mpl_widget" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>500</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
           <widget class="QWidget" name="tab_result_peaks_info">
            <attribute name="title">
             <string>Peak Indices</string>
@@ -507,29 +530,6 @@
               <attribute name="verticalHeaderVisible">
                <bool>false</bool>
               </attribute>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_result_mpl_widget">
-           <attribute name="title">
-            <string>Plot View</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-             <widget class="MatplotlibWidget" name="mpl_widget" native="true">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>500</width>
-                <height>0</height>
-               </size>
-              </property>
              </widget>
             </item>
            </layout>
@@ -604,6 +604,14 @@
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1656</width>
+     <height>33</height>
+    </rect>
+   </property>
    <property name="nativeMenuBar">
     <bool>false</bool>
    </property>

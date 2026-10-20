@@ -83,7 +83,7 @@ class PlotController(QtCore.QObject):
             plt_item.setClipToView(True)
             plt_item.addLegend(colCount=3)
             plt_item.addLegend().anchor(itemPos=(0, 1), parentPos=(0, 1), offset=(5, -5))
-            plt_item.setMouseEnabled(x=True, y=False)  # pyright: ignore[reportAttributeAccessIssue]
+            plt_item.setMouseEnabled(x=True, y=False)
 
         p_main.showAxis("right")
         p_main.scene().addItem(self.vb_info)
