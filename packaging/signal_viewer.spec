@@ -60,14 +60,19 @@ if IS_WIN:
 # imported Qt modules, but a transitive import would silently add hundreds of MB.
 #
 # Not excluded on purpose:
-# - qtconsole/IPython: `pyside_widgets/__init__.py` imports its Jupyter widget eagerly, so the import of
-#   pyside_widgets fails without them. Make that import lazy in pyside-widgets to drop them (~30 MB).
 # - pyarrow: polars' Excel reader (fastexcel) returns data through pyarrow.
-# - PySide6.QtDesigner: imported at module level by pyside_widgets/overlay_widget.py (designer plugin interface).
 excludes = [
     "tkinter",
     "tables",  # optional pandas HDF5 backend, never used here
     "numexpr",  # optional pandas accelerator, never used here
+    # The Jupyter console (View menu, DEV=1 only) lives behind a lazy import in pyside-widgets, so static analysis
+    # does not pull the Jupyter stack in; listing it keeps a stray transitive import from adding ~30 MB.
+    "qtconsole",
+    "IPython",
+    "ipykernel",
+    "jupyter_client",
+    "jupyter_core",
+    "PySide6.QtDesigner",  # only pyside_widgets.plugins (Qt Designer plugins) import it; never at runtime
     "PySide6.QtWebEngineCore",
     "PySide6.QtWebEngineWidgets",
     "PySide6.QtWebEngineQuick",
@@ -105,8 +110,8 @@ a = Analysis(
     noarchive=False,
 )
 # Plugins that PyInstaller's Qt hooks collect wholesale but that nothing here uses. Each drags in extra Qt
-# libraries: the virtual keyboard pulls Qt6Quick and Qt6Qml, and the Designer plugin folder (collected because
-# pyside_widgets imports QtDesigner) contains a web-view plugin that pulls the 200 MB Qt WebEngine.
+# libraries: the virtual keyboard pulls Qt6Quick and Qt6Qml, and the Designer plugin folder (should QtDesigner ever
+# be imported again) contains a web-view plugin that pulls the 200 MB Qt WebEngine.
 _STRAY_QT = (
     "plugins/designer/",
     "plugins/platforminputcontexts/qtvirtualkeyboard",

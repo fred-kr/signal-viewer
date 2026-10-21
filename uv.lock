@@ -1978,6 +1978,7 @@ dev = [
     { name = "pyrefly" },
     { name = "pyright" },
     { name = "pytest" },
+    { name = "qtconsole" },
 ]
 
 [package.metadata]
@@ -2014,6 +2015,7 @@ dev = [
     { name = "pyrefly", specifier = ">=1.4.0" },
     { name = "pyright", specifier = ">=1.1.414" },
     { name = "pytest", specifier = ">=9.1.1" },
+    { name = "qtconsole", specifier = ">=5.7.2" },
 ]
 
 [[package]]
