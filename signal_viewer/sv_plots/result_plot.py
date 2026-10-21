@@ -81,8 +81,9 @@ def fit_glm(x: npt.NDArray[np.float64], y: npt.NDArray[np.float64], model: Resul
     Fits a single-predictor GLM of `y` on `x`. Returns None when the fit is not possible (too few points, no
     spread in `x`, or non-positive responses for the Gamma family).
 
-    Unpenalized, with an intercept. scikit-learn is imported lazily because it is slow to import and only
-    needed here.
+    Unpenalized, with an intercept. The Gamma fit uses the module's own IRLS (`_fit_pspline_gamma` with a
+    zero penalty) rather than scikit-learn's `GammaRegressor`: the latter sizes a thread pool through
+    `joblib.cpu_count()`, which on Windows spawns a subprocess and stalls the GUI for over a second on first use.
     """
     mask = np.isfinite(x) & np.isfinite(y)
     if model == ResultFitModel.LogLinear:
@@ -95,11 +96,9 @@ def fit_glm(x: npt.NDArray[np.float64], y: npt.NDArray[np.float64], model: Resul
         slope, intercept = np.polyfit(x, y, deg=1)
         return GLMFit(model, float(intercept), float(slope), x.size)
 
-    from sklearn.linear_model import GammaRegressor
-
-    reg = GammaRegressor(alpha=0.0, fit_intercept=True, max_iter=1000)
-    reg.fit(x.reshape(-1, 1), y)
-    return GLMFit(model, float(reg.intercept_), float(reg.coef_[0]), x.size)
+    design = np.column_stack([np.ones_like(x), x])
+    intercept, slope = _fit_pspline_gamma(design, y, np.zeros((2, 2)))
+    return GLMFit(model, float(intercept), float(slope), x.size)
 
 
 @attrs.frozen
