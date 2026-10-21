@@ -43,6 +43,8 @@ if IS_WIN:
 # --- hidden imports -------------------------------------------------------------------------------------------
 hiddenimports = [
     *collect_submodules("mne"),  # mne resolves submodules through lazy_loader, invisible to static analysis
+    *collect_submodules("ts2vg"),  # neurokit2's ECG_Emrich_2023 method imports ts2vg inside a try block; its
+    # Cython modules import ts2vg.graph._base at C level, which the analysis cannot see
     "PySide6.QtSvg",  # pulls in the qsvgicon/qsvg plugins needed for the SVG icons compiled into rc_resources
     "sklearn.linear_model",  # imported inside functions in sv_plots/result_plot.py
     "sklearn.model_selection",
