@@ -337,15 +337,6 @@ wheels = [
 ]
 
 [[package]]
-name = "darkdetect"
-version = "0.8.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/45/77/7575be73bf12dee231d0c6e60ce7fb7a7be4fcd58823374fc59a6e48262e/darkdetect-0.8.0.tar.gz", hash = "sha256:b5428e1170263eb5dea44c25dc3895edd75e6f52300986353cd63533fe7df8b1", size = 7681, upload-time = "2022-12-16T14:14:42.113Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f2/f2/728f041460f1b9739b85ee23b45fa5a505962ea11fd85bdbe2a02b021373/darkdetect-0.8.0-py3-none-any.whl", hash = "sha256:a7509ccf517eaad92b31c214f593dbcf138ea8a43b2935406bbd565e15527a85", size = 8955, upload-time = "2022-12-16T14:14:40.92Z" },
-]
-
-[[package]]
 name = "debugpy"
 version = "1.8.20"
 source = { registry = "https://pypi.org/simple" }
@@ -1572,14 +1563,10 @@ dependencies = [
 
 [[package]]
 name = "pyside-widgets"
-version = "0.3.0"
-source = { git = "https://github.com/fred-kr/pyside-widgets.git?branch=main#05b101e8712a6bc2c13b6433d8fc2d11f55d8783" }
+version = "0.4.0"
+source = { git = "https://github.com/fred-kr/pyside-widgets.git?branch=main#c78a88042da05c99a68af6b7643f9116bf7d0729" }
 dependencies = [
-    { name = "darkdetect" },
-    { name = "numpy" },
-    { name = "pyqtgraph" },
     { name = "pyside6" },
-    { name = "qtconsole" },
 ]
 
 [[package]]
