@@ -1,33 +1,72 @@
-# Getting started
+# Signal Viewer
 
-Download [Signal Viewer](https://github.com/fred-kr/signal-viewer/archive/refs/heads/master.zip) and extract the ZIP archive to a folder of your choice.
+A GUI for working with (biological) signal data.
 
-Running *Signal Viewer* requires *uv* to be installed on your system.
+## Download a prebuilt app
 
-## Installation
+Prebuilt packages for Windows and macOS are attached to each release on the
+[Releases page](https://github.com/fred-kr/signal-viewer/releases/latest). They contain everything the app needs;
+no Python or uv installation is required.
 
-**Windows**:
-If you are on a windows machine, you can run the `run_sv_windows.cmd` file located inside the downloaded `signal-viewer-master` folder by double-clicking it and accepting the warning that pops up.
+| File | Platform |
+|---|---|
+| `SignalViewer-<version>-windows-x64.zip` | Windows 10/11, 64-bit |
+| `SignalViewer-<version>-macos-arm64.zip` | macOS 12 or later on Apple Silicon (M1 and newer) |
+| `SignalViewer-<version>-macos-x86_64.zip` | macOS 12 or later on Intel |
 
-The script will first download *uv*, and then use *uv* to install the dependencies required for *Signal Viewer*. This might take a few minutes when running for the first time.
+The packages are not code-signed. Both operating systems warn about this the first time you open the app.
 
-Once everything is installed, the Signal Viewer application should open automatically.
+**Windows**: extract the ZIP to a folder of your choice and double-click `SignalViewer.exe` inside the
+`SignalViewer` folder. Keep the whole folder together; the executable needs the files next to it. When SmartScreen
+shows "Windows protected your PC", click *More info*, then *Run anyway*.
 
-Running the script with *uv* already installed skips the installation and immediately opens *Signal Viewer*.
+**macOS**: extract the ZIP and move `SignalViewer.app` to your Applications folder. On first launch macOS reports
+that the app "cannot be opened because the developer cannot be verified" or that it "is damaged". Open
+*System Settings > Privacy & Security*, scroll to the Security section and click *Open Anyway*, then confirm. This
+is needed once per download. Alternatively, remove the quarantine flag from a terminal:
 
-**macOS/Linux**:
-If you are on a macOS/Linux machine, you will need to download *uv* yourself by following the instructions on their website: [Install *uv*](https://docs.astral.sh/uv/getting-started/installation/)
+```sh
+xattr -dr com.apple.quarantine /Applications/SignalViewer.app
+```
 
-Wait until the installation has finished, then close the terminal window and go to the next step.
+## Run from source
 
-## Run Signal Viewer
+Download [the source ZIP](https://github.com/fred-kr/signal-viewer/archive/refs/heads/master.zip) and extract it
+to a folder of your choice. Running from source requires [uv](https://docs.astral.sh/uv/getting-started/installation/).
 
-**Windows**:
-On windows, just double-click the `run_sv_windows.cmd` file inside the downloaded folder, and the app should start after a few seconds.
+**Windows**: double-click `run_sv_windows.cmd` inside the extracted `signal-viewer-master` folder and accept the
+warning that pops up. The script installs uv if it is missing, installs the dependencies (a few minutes on the
+first run) and starts the app. If nothing happens, open a command prompt in that folder and run `uv run sv`.
 
-If it doesn't, open a command prompt (Press `Windows key + R`, then type `cmd` and hit enter), then navigate to the downloaded `signal-viewer-master` folder by typing `cd C:\path\to\signal-viewer-master` and hitting enter (replace the drive letter and path with the actual path to the downloaded folder).
+**macOS/Linux**: install uv following the instructions linked above, close the terminal, then open a new terminal
+in the extracted folder and run:
 
-Then, type `uv run sv` and press enter. The app should start after a few seconds.
+```sh
+uv run sv
+```
 
-**macOS/Linux**:
-Open a terminal at the downloaded `signal-viewer-master` folder and type `uv run sv`, then press enter. The app should start after a few seconds.
+## Command line flags
+
+| Flag | Effect |
+|---|---|
+| `--debug` | Verbose logging to the terminal and to `debug.log` in the per-user app data folder (Windows: `%LOCALAPPDATA%\QuackTech\SignalViewer - Debug`, macOS: `~/Library/Application Support/QuackTech/SignalViewer - Debug`). |
+| `--no-opengl` | Disable OpenGL rendering of plots. Try this if plots stay blank. |
+| `--reset-settings` | Delete stored settings and start with defaults. |
+| `--version` | Print the version and exit. |
+| `--self-test` | Build the whole GUI off-screen and exit. Used to smoke-test packaged builds. |
+
+## Build the packaged app yourself
+
+Requires the `dev` dependency group (`uv sync --group dev`). From the repo root:
+
+```sh
+uv run pyinstaller packaging/signal_viewer.spec --noconfirm --clean
+```
+
+The result is `dist/SignalViewer/` (and `dist/SignalViewer.app` on macOS). The build definition lives in
+[packaging/signal_viewer.spec](packaging/signal_viewer.spec); the platform icons in `packaging/icons/` are
+generated from `signal_viewer/icons/app_icon.png` by `packaging/make_icons.py`.
+
+Release builds run in GitHub Actions ([.github/workflows/build.yml](.github/workflows/build.yml)) on every tag
+that starts with `v`, and can be started manually from the Actions tab. Each job builds, runs the packaged
+executable with `--self-test`, and uploads a ZIP; a tag build also attaches the ZIPs to the GitHub release.

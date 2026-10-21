@@ -1943,7 +1943,7 @@ wheels = [
 
 [[package]]
 name = "signal-viewer"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "." }
 dependencies = [
     { name = "attrs" },
@@ -1972,6 +1972,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "pillow" },
     { name = "pyinstaller" },
     { name = "pyinstaller-hooks-contrib" },
     { name = "pyrefly" },
@@ -2007,6 +2008,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "pillow", specifier = ">=12.2.0" },
     { name = "pyinstaller", specifier = ">=6.22.3" },
     { name = "pyinstaller-hooks-contrib", specifier = ">=2026.9" },
     { name = "pyrefly", specifier = ">=1.4.0" },
