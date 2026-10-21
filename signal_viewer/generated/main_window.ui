@@ -608,6 +608,10 @@
    </property>
   </action>
   <action name="action_show_settings">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/icons/Settings.svg</normaloff>:/icons/Settings.svg</iconset>
+   </property>
    <property name="text">
     <string>Preferences</string>
    </property>
@@ -855,21 +859,6 @@
    </property>
    <property name="toolTip">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make a section marked as &amp;quot;Done&amp;quot; editable again.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
-   </property>
-  </action>
-  <action name="action_select_channel">
-   <property name="icon">
-    <iconset resource="../resources.qrc">
-     <normaloff>:/icons/selector.svg</normaloff>:/icons/selector.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Select channel</string>
-   </property>
-   <property name="toolTip">
-    <string>Select the channel to use as the data source</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
