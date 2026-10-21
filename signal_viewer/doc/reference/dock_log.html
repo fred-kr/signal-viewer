@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Status Log dock - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Reference &rsaquo; Status Log dock</p>
+
+<h1>Status Log dock</h1>
+
+<p>A running log of what the application did: files opened, channels loaded, settings changed, peaks found, and
+every warning or error. Hidden by default; open it from the View or Help menu. It docks at the bottom of the window
+and can be floated.</p>
+
+<p>Each line reads <code>time | level | message</code>. Levels are DEBUG, INFO, SUCCESS, WARNING, ERROR and CRITICAL.
+Right-click the log for <b>Clear Log</b>.</p>
+
+<h2 id="dialogs"><a name="dialogs"></a>Warnings and errors</h2>
+
+<p>Every message of level WARNING or higher also pops up as a message box, so you never need the log open to be
+told about a problem. The box shows the message; <i>Show Details</i> adds the full text and, for errors raised by
+the code, the traceback that helps when reporting a bug. Typical warnings:</p>
+<ul>
+    <li><i>Select a peak detection method first.</i> Ctrl+F was pressed without a method.</li>
+    <li><i>The currently selected peak detection method finds less than 2 peaks.</i> Change parameters or method.</li>
+    <li><i>Need at least 3 detected peaks to create a result.</i> A section with too few peaks was locked.</li>
+    <li><i>Nothing to export.</i> No section exists yet.</li>
+</ul>
+
+<h2 id="debug"><a name="debug"></a>Debug log file</h2>
+
+<p>Started with <code>--debug</code>, the application additionally writes every message, including DEBUG level, to
+<code>debug.log</code> in the per-user application data folder; see <a href="command_line.html">Command line
+flags</a> for the location. Attach that file when reporting a problem.</p>
+
+</body>
+</html>

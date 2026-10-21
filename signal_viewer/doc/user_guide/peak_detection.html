@@ -1,17 +1,87 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link href="../stylesheet.css" rel="stylesheet" type="text/css" />
-    <title>User Guide - Peak Detection</title>
+<meta charset="utf-8">
+<title>Detecting and editing peaks - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
 </head>
-
 <body>
-    <h2>Peak Detection</h2>
 
-    <p>TODO</p>
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Detecting and editing peaks</p>
 
-    <a href="results.html">View and Export Results</a>
+<h1>Detecting and editing peaks</h1>
+
+<p>Peak detection runs on the processed signal of the active section from the <b>Peak Detection</b> tab of the
+Parameter Inputs dock. Detected peaks appear as yellow dots on the signal plot, and the lower plot immediately shows
+the rate computed from them (see <a href="results.html#rate">Rate calculation</a>). Afterwards you correct single
+peaks directly on the plot.</p>
+
+<h2 id="methods"><a name="methods"></a>Choose a detection method</h2>
+
+<p><b>Detection Method</b> lists every available algorithm; hover an entry for a description. The inputs under
+<b>Method Parameters</b> change with the method, and each has a tooltip with its meaning, unit, default and range
+(full list: <a href="../reference/dock_parameters.html#peak-detection">Parameter Inputs reference</a>). Methods
+without a parameter page run with their published defaults.</p>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Method</th><th>For</th><th>How it works</th></tr>
+    <tr><td>LocalMaxima, LocalMinima</td><td>Any periodic signal</td><td>A sample is a peak when it is the highest (lowest) value within <b>Radius</b> samples on either side; peaks closer than the radius are merged. The radius defaults to half the sampling rate once a file is loaded. Simple and predictable; a good first try on signals the other methods were not made for.</td></tr>
+    <tr><td>PPG_Elgendi</td><td>PPG</td><td>Systolic peak detector of Elgendi et al. (2013): two moving averages over the squared signal mark the beats. Pair with the PPG_Elgendi pipeline.</td></tr>
+    <tr><td>ECG_NeuroKit</td><td>ECG</td><td>The default ECG detector of neurokit2: QRS complexes are found where the smoothed gradient exceeds a moving threshold, the R-peak is the maximum inside each.</td></tr>
+    <tr><td>ECG_Emrich_2023</td><td>ECG</td><td>FastNVG: visibility-graph detector, fast and sample-accurate. Pair with the ECG_Emrich_2023 pipeline.</td></tr>
+    <tr><td>ECG_XQRS</td><td>ECG</td><td>The XQRS detector of the WFDB package, followed by a correction that moves each location to the real extreme within a radius and removes implausible peaks.</td></tr>
+    <tr><td>ECG_Promac</td><td>ECG</td><td>Runs several detectors and keeps the locations most of them agree on. Robust but slow.</td></tr>
+    <tr><td>ECG_Gamboa_2008</td><td>ECG</td><td>Histogram-based amplitude threshold with a gradient search.</td></tr>
+    <tr><td>ECG_PanTompkins_1985, ECG_Hamilton_2002, ECG_Martinez_2004, ECG_Christov_2004, ECG_Nabian_2018, ECG_EngzeeMod_2012, ECG_Manikandan_2012, ECG_Elgendi_2010, ECG_Kalidas_2017, ECG_Rodrigues_2021</td><td>ECG</td><td>Classic and recent R-peak detectors from the literature, as implemented in neurokit2. No parameters.</td></tr>
+</table>
+
+<h2 id="run"><a name="run"></a>Run the detection</h2>
+
+<p>Press <b>Run detection</b>. The detection runs in the background; a busy overlay covers the window until it
+finishes. The result replaces every existing peak of the section, including manual edits. If the method finds fewer
+than two peaks, a warning asks you to change the parameters or the method. <b>Restore Defaults</b> resets the inputs
+of the shown method page; <b>Reset Peaks</b> removes all peaks but keeps the processed signal.</p>
+
+<p>Detection and processing are tied together: a new processing run discards the peaks. Settle the preprocessing
+first, then detect, then correct.</p>
+
+<h2 id="navigate"><a name="navigate"></a>Navigate the plot</h2>
+
+<p>The upper plot shows the processed signal with the peaks, the lower one the rate; both share the time axis along
+the top, which shows elapsed time as <code>h:mm:ss</code> and adapts its unit to the zoom level.</p>
+
+<ul>
+    <li><b>Mouse wheel</b> zooms the time axis around the cursor. <b>Left-drag</b> pans along the time axis.</li>
+    <li><b>Right-drag</b> zooms: left/right changes the time scale around the point where the drag started.</li>
+    <li><b>Scale y-axis</b> (Plot menu) rescales the signal plot to the whole signal again. The y-axis also follows the
+        data automatically while panning.</li>
+    <li><b>Ctrl+left-drag</b> (or middle-drag) draws a selection rectangle for the commands below.</li>
+</ul>
+
+<h2 id="edit"><a name="edit"></a>Edit peaks by hand</h2>
+
+<p>Edits only work on an unlocked, user-created section.</p>
+
+<ul>
+    <li><b>Add a peak:</b> click on the signal curve near the wanted peak. SignalViewer looks for the local extreme
+        within the <i>click radius</i> (Settings &gt; Plot) around the click and marks it. The curve reacts to clicks
+        within the <i>line click width</i> of it. If no extreme is found, a message in the status log says so.</li>
+    <li><b>Remove a peak:</b> click on its dot. Dots highlight when hovered.</li>
+    <li><b>Remove every peak in an area:</b> Ctrl+drag a rectangle over the area, then press <b>Ctrl+D</b>
+        (Plot &gt; Remove Peaks in Selection).</li>
+    <li><b>Detect inside an area:</b> Ctrl+drag a rectangle, then press <b>Ctrl+F</b> (Plot &gt; Find Peaks in
+        Selection). The currently selected detection method runs on that stretch only and the peaks it finds are
+        added to the existing ones. Ten samples at both edges of the selection are skipped to avoid edge
+        artefacts. Useful for a noisy patch where the global run failed.</li>
+</ul>
+
+<p>Every manual edit is remembered: the exported section frame has an <code>is_manual</code> column with
+<code>1</code> for added and <code>-1</code> for removed peaks, and the section summary lists the counts. Adding a
+peak you removed before (or the reverse) cancels the earlier edit.</p>
+
+<p>The rate in the lower plot is recomputed after every edit once the section has more than three peaks.</p>
+
+<p class="nav">Next: <a href="results.html">Results and export</a></p>
+
 </body>
-
 </html>

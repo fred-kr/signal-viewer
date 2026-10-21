@@ -1,3 +1,13 @@
+"""
+`Section`: a contiguous stretch of one channel with its processed signal, peaks and rate.
+
+Every channel starts with a base section covering the whole file; the user creates further sections as slices of
+it. A section holds one polars frame (`data`) with the raw signal, the processed signal, the `is_peak` and
+`is_manual` flags and a running `section_index`; every mutation replaces the frame. Locking a section computes its
+result frames (`peak_data`, `rate_data`) and freezes it. The module-level `compute_*` functions are pure, so the
+workers in `sv_data.workers` can run them on a snapshot of the frame.
+"""
+
 import pprint
 
 # import re
@@ -205,6 +215,13 @@ def compute_rate_data(
 
 @attrs.define
 class ProcessingParameters:
+    """
+    Everything that was done to a section's signal and peaks, kept for the section summary and the export metadata.
+
+    `filter_parameters` grows by one entry per filter run (two for pipelines with a powerline step), so the summary
+    shows the full history when filter stacking is enabled.
+    """
+
     sampling_rate: int = attrs.field()
     processing_pipeline: PreprocessPipeline | None = attrs.field(default=None)
     filter_parameters: list[SignalFilterKwargs] = attrs.field(factory=list)
@@ -214,6 +231,7 @@ class ProcessingParameters:
     rate_computation_method: RateComputationMethod = attrs.field(default=Config.editing.rate_computation_method)
 
     def to_dict(self) -> ProcessingParametersDict:
+        """Plain-dictionary form for the summary tree and the result metadata; enums become their string values."""
         return {
             "sampling_rate": self.sampling_rate,
             "processing_pipeline": str(self.processing_pipeline),
@@ -225,6 +243,7 @@ class ProcessingParameters:
         }
 
     def reset(self, peaks_only: bool = False) -> None:
+        """Forgets the recorded history: only the peak detection part with `peaks_only`, everything otherwise."""
         if peaks_only:
             self.peak_detection_method = None
             self.peak_detection_method_parameters = None
@@ -242,6 +261,13 @@ class ProcessingParameters:
 
 @attrs.define
 class ManualPeakEdits:
+    """
+    Section indices of peaks the user added or removed by hand, so manual edits can be told apart from detected
+    peaks in the export (`is_manual` column).
+
+    Adding a peak that was removed before (or vice versa) cancels the earlier edit instead of recording both.
+    """
+
     added: list[int] = attrs.field(factory=list)
     removed: list[int] = attrs.field(factory=list)
 
@@ -249,10 +275,12 @@ class ManualPeakEdits:
         return f"Added Peaks [{len(self.added)}]: {sequence_repr(self.added)}\nRemoved Peaks [{len(self.removed)}]: {sequence_repr(self.removed)}"
 
     def clear(self) -> None:
+        """Forgets all edits."""
         self.added.clear()
         self.removed.clear()
 
     def new_added(self, value: int | Sequence[int] | pl.Series) -> None:
+        """Records added peaks; an index found in `removed` is taken out of there instead."""
         if isinstance(value, int):
             if value in self.removed:
                 self.removed.remove(value)
@@ -266,6 +294,7 @@ class ManualPeakEdits:
                     self.added.append(v)
 
     def new_removed(self, value: int | Sequence[int] | pl.Series) -> None:
+        """Records removed peaks; an index found in `added` is taken out of there instead."""
         if isinstance(value, int):
             if value in self.added:
                 self.added.remove(value)
@@ -279,13 +308,16 @@ class ManualPeakEdits:
                     self.removed.append(v)
 
     def sort_and_deduplicate(self) -> None:
+        """Normalizes both lists in place: sorted, no duplicates."""
         self.added = sorted(set(self.added))
         self.removed = sorted(set(self.removed))
 
     def get_joined(self) -> list[int]:
+        """Every edited index, added and removed together, sorted."""
         return sorted(set(self.added) | set(self.removed))
 
     def to_dict(self) -> ManualPeakEditsDict:
+        """Normalized lists as a dictionary."""
         self.sort_and_deduplicate()
         return ManualPeakEditsDict(
             added=self.added,
@@ -294,6 +326,13 @@ class ManualPeakEdits:
 
 
 class SectionID(str):
+    """
+    Identifier of a section: `Section_<signal_name>_<row:03>`.
+
+    The number is the row of the section in its channel's `SectionListModel`, so ids are renumbered when a section
+    is deleted (`SectionListModel.refresh_section_ids`). Row 0 is always the base section.
+    """
+
     # def __init__(self, value: str) -> None:
     #     if not re.match(r"^Section_[a-zA-Z0-9]+_[0-9]{3}$", value):
     #         raise ValueError(f"SectionID must be of the form 'Section_<signal_name>_000', got '{value}'")
@@ -301,6 +340,7 @@ class SectionID(str):
 
     @staticmethod
     def default() -> SectionID:
+        """The id a section carries until it is added to a model."""
         return SectionID("Section_DEFAULT_000")
 
     _PREFIX = "Section_"
@@ -321,6 +361,8 @@ class SectionID(str):
 
 @attrs.define
 class SectionMetadata:
+    """Describes a section without its data: name, bounds, sampling rate and processing history."""
+
     signal_name: str = attrs.field()
     section_id: SectionID = attrs.field()
     global_bounds: tuple[int, int] = attrs.field()
@@ -329,6 +371,7 @@ class SectionMetadata:
     rate_computation_method: RateComputationMethod = attrs.field()
 
     def to_dict(self) -> SectionMetadataDict:
+        """Plain-dictionary form (see `SectionMetadataDict`)."""
         return SectionMetadataDict(
             signal_name=self.signal_name,
             section_id=self.section_id,
@@ -353,12 +396,15 @@ class SectionResult:
     is_locked: bool = attrs.field(default=False)
 
     def has_peak_data(self) -> bool:
+        """Whether a peak result frame exists (the section was locked at least once)."""
         return not self.peak_data.is_empty()
 
     def has_rate_data(self) -> bool:
+        """Whether a rate frame exists."""
         return not self.rate_data.is_empty()
 
     def to_dict(self) -> SectionResultDict:
+        """Both frames as structured numpy arrays."""
         return SectionResultDict(
             peak_data=self.peak_data.to_numpy(structured=True),
             rate_data=self.rate_data.to_numpy(structured=True),
@@ -378,6 +424,7 @@ class DetailedSectionResult:
     rate_per_temperature: pl.DataFrame = attrs.field()
 
     def to_dict(self) -> DetailedSectionResultDict:
+        """Everything as plain dictionaries and structured arrays."""
         return DetailedSectionResultDict(
             metadata=self.metadata.to_dict(),
             section_dataframe=self.section_dataframe.to_numpy(structured=True),
@@ -395,6 +442,18 @@ DEFAULT_RATE_PARAMS: RollingRateKwargs = {
 
 
 class Section:
+    """
+    A contiguous stretch of one channel: raw and processed signal, peaks, manual edits and the resulting rate.
+
+    `data` holds one row per sample with `index` (row in the file), `section_index` (row in the section), the raw
+    signal column `signal_name`, the processed copy `processed_signal_name`, `is_peak`, `is_manual` and, when
+    present, the info column. Processing and peak edits replace `data` with a new frame (polars frames are immutable),
+    which is why views are handed the frame again after every change.
+
+    Only `DataController` calls the mutating methods. A locked section refuses changes to its result frames
+    (`rate_data` / `peak_data` setters log a warning and do nothing).
+    """
+
     __slots__ = (
         "_is_filtered",
         "_is_processed",
@@ -472,6 +531,7 @@ class Section:
 
     @property
     def rate_data(self) -> pl.DataFrame:
+        """Rate per window (or per sample) of the current peaks; empty until peaks exist. Frozen while locked."""
         # Polars frames are immutable, so handing out the stored frame is safe without a clone.
         return self._result_data.rate_data
 
@@ -512,6 +572,7 @@ class Section:
 
     @property
     def peak_data(self) -> pl.DataFrame:
+        """One row per peak with the processed value; filled by `update_peak_data` / locking. Frozen while locked."""
         return self._result_data.peak_data
 
     @peak_data.setter
@@ -525,6 +586,7 @@ class Section:
 
     @property
     def global_bounds_df(self) -> pl.DataFrame:
+        """Section number and first / last file row as a one-row frame, for the `Global Bounds` export sheet."""
         return pl.DataFrame(
             {
                 "section_id": [self.section_id.as_num()],
@@ -536,13 +598,16 @@ class Section:
 
     @property
     def is_locked(self) -> bool:
+        """Whether the section's result is final. Locked sections ignore processing and peak changes."""
         return self._result_data.is_locked
 
     def set_locked(self, value: bool) -> None:
+        """Locks or unlocks without touching the result frames."""
         self._result_data.is_locked = value
 
     @property
     def n_filters(self) -> int:
+        """Number of filter runs recorded in the processing history."""
         return len(self._processing_parameters.filter_parameters)
 
     @property
@@ -915,6 +980,10 @@ class Section:
         )
 
     def get_mean_rate_per_temperature(self) -> pl.DataFrame:
+        """
+        Mean, median, standard deviation, minimum and maximum of the rate per 0.1 step of the info column's window
+        mean. One row of nulls when the section has no info column. Needs a rate computed with `full_info=True`.
+        """
         info_col = self.info_name
         if info_col is None:
             return pl.DataFrame(
@@ -954,6 +1023,7 @@ class Section:
         )
 
     def get_metadata(self) -> SectionMetadata:
+        """The section's metadata snapshot (shares the processing history object)."""
         return SectionMetadata(
             signal_name=self.signal_name,
             section_id=self.section_id,
@@ -964,6 +1034,7 @@ class Section:
         )
 
     def get_peak_pos(self) -> pl.DataFrame:
+        """Section index and processed value of every peak, for the plot's scatter."""
         return (
             self.data.lazy()
             .filter(pl.col(IS_PEAK_COL) == 1)
@@ -988,6 +1059,7 @@ class Section:
         self.set_locked(True)
 
     def get_result(self) -> DetailedSectionResult:
+        """Everything about the section in one object; also writes the `is_manual` column into `data`."""
         metadata = self.get_metadata()
         self._add_manual_peak_edits_column()
         section_df = self.data
@@ -1099,6 +1171,7 @@ class Section:
         self._result_data.rate_data = pl.DataFrame()
 
     def get_summary(self) -> SectionSummaryDict:
+        """What the Section Summary dialog shows."""
         return {
             "name": self.section_id.pretty_name(),
             "size": self.data.height,

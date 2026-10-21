@@ -51,145 +51,22 @@
        <attribute name="title">
         <string>Import</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,7">
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3">
         <item>
          <widget class="QWidget" name="container_file_information" native="true">
           <layout class="QGridLayout" name="gridLayout">
-           <item row="1" column="0">
-            <widget class="QPushButton" name="btn_open_file">
-             <property name="whatsThis">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Opens a window allowing you to choose a file to load into the app.&lt;/p&gt;&lt;p&gt;The selected file is searched for available columns or channels of data.&lt;/p&gt;&lt;p&gt;If any are found, their names are made available for selection in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <item row="3" column="1">
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
              </property>
-             <property name="text">
-              <string>Open File...</string>
-             </property>
-             <property name="iconSize">
+             <property name="sizeHint" stdset="0">
               <size>
-               <width>24</width>
-               <height>24</height>
+               <width>40</width>
+               <height>20</height>
               </size>
              </property>
-            </widget>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QLineEdit" name="line_edit_active_file">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="frame">
-              <bool>true</bool>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0" colspan="3">
-            <widget class="QGroupBox" name="grp_box_required_info">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="title">
-              <string>Required Information </string>
-             </property>
-             <layout class="QFormLayout" name="formLayout">
-              <item row="0" column="0">
-               <widget class="QLabel" name="samplingRateLabel">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate of the signal in Hz (samples/second)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="whatsThis">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="frameShape">
-                 <enum>QFrame::Shape::NoFrame</enum>
-                </property>
-                <property name="text">
-                 <string>Sampling Rate</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QSpinBox" name="spin_box_sampling_rate_import_page">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate of the signal values in the file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="whatsThis">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="frame">
-                 <bool>true</bool>
-                </property>
-                <property name="suffix">
-                 <string> Hz</string>
-                </property>
-                <property name="maximum">
-                 <number>10000</number>
-                </property>
-                <property name="value">
-                 <number>0</number>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="signalColumnChannelLabel">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column or channel containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="whatsThis">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column or channel containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Data Channel</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QComboBox" name="combo_box_signal_column_import_page"/>
-              </item>
-              <item row="2" column="0" colspan="2">
-               <widget class="Line" name="line">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="infoColumnChannelLabel">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="whatsThis">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Metadata Channel</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QComboBox" name="combo_box_info_column_import_page"/>
-              </item>
-             </layout>
-            </widget>
+            </spacer>
            </item>
            <item row="3" column="0">
             <widget class="QPushButton" name="btn_close_file">
@@ -222,32 +99,147 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="3" column="2">
-            <widget class="QPushButton" name="btn_load_data">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loads the data from the columns or channels specified in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="whatsThis">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loads the data from the columns or channels specified in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
              </property>
              <property name="text">
-              <string>Load Data</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:700;&quot;&gt;Data Import&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="3">
+            <widget class="QGroupBox" name="grp_box_required_info">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title">
+              <string>Required Information </string>
+             </property>
+             <layout class="QFormLayout" name="formLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="samplingRateLabel">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate of the signal in Hz (samples/second)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;p&gt;Number of samples recorded per second (Hz). It converts sample indices into time and every filter and detector depends on it.&lt;/p&gt;&lt;p&gt;Filled in automatically when the file has a time column or, for EDF, from the header; otherwise enter it here.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#sampling-rate&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
+                </property>
+                <property name="text">
+                 <string>Sampling Rate</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="spin_box_sampling_rate_import_page">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate of the signal values in the file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;p&gt;Number of samples recorded per second (Hz). It converts sample indices into time and every filter and detector depends on it.&lt;/p&gt;&lt;p&gt;Filled in automatically when the file has a time column or, for EDF, from the header; otherwise enter it here.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#sampling-rate&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+                </property>
+                <property name="frame">
+                 <bool>true</bool>
+                </property>
+                <property name="suffix">
+                 <string> Hz</string>
+                </property>
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+                <property name="value">
+                 <number>0</number>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="signalColumnChannelLabel">
+                <property name="toolTip">
+                 <string>The column (channel) of the file holding the signal to analyse</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;p&gt;The column (channel) whose values are the signal. Only numeric columns are offered. This channel is loaded first; every other numeric column can be edited later through the channel switcher on the Graph page.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#channels&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Signal Channel</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="combo_box_signal_column_import_page">
+                <property name="toolTip">
+                 <string>The column (channel) of the file holding the signal to analyse</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;p&gt;The column (channel) whose values are the signal. Only numeric columns are offered. This channel is loaded first; every other numeric column can be edited later through the channel switcher on the Graph page.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#channels&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0" colspan="2">
+               <widget class="Line" name="line">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="infoColumnChannelLabel">
+                <property name="toolTip">
+                 <string>Optional second column (e.g. temperature) shown with the signal and summarised per rate window</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;p&gt;An optional column recorded alongside the signal, such as temperature or oxygen saturation. The rate table gets its mean, standard deviation, minimum and maximum per rate window, and the result plot shows the rate against it.&lt;/p&gt;&lt;p&gt;Choose &amp;lt;No Selection&amp;gt; when there is none.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#channels&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Info Channel</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QComboBox" name="combo_box_info_column_import_page">
+                <property name="toolTip">
+                 <string>Optional second column (e.g. temperature) shown with the signal and summarised per rate window</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;p&gt;An optional column recorded alongside the signal, such as temperature or oxygen saturation. The rate table gets its mean, standard deviation, minimum and maximum per rate window, and the result plot shows the rate against it.&lt;/p&gt;&lt;p&gt;Choose &amp;lt;No Selection&amp;gt; when there is none.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#channels&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="btn_open_file">
+             <property name="toolTip">
+              <string>Choose a data file to open</string>
+             </property>
+             <property name="whatsThis">
+              <string>&lt;p&gt;Opens a file dialog. The chosen file is scanned for its columns (channels) and, where possible, its sampling rate; nothing is loaded yet. Numeric columns appear in the Signal Channel and Info Channel lists.&lt;/p&gt;&lt;p&gt;Supported formats: CSV, TXT, TSV, XLS, XLSX, Feather/Arrow and EDF.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+             </property>
+             <property name="text">
+              <string>Open File...</string>
              </property>
              <property name="iconSize">
               <size>
@@ -297,7 +289,16 @@
                  <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
                 </property>
                 <property name="textElideMode">
-                 <enum>Qt::TextElideMode::ElideMiddle</enum>
+                 <enum>Qt::TextElideMode::ElideLeft</enum>
+                </property>
+                <property name="spacing">
+                 <number>2</number>
+                </property>
+                <property name="gridSize">
+                 <size>
+                  <width>0</width>
+                  <height>16</height>
+                 </size>
                 </property>
                 <property name="selectionRectVisible">
                  <bool>true</bool>
@@ -310,78 +311,115 @@
              </layout>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_2">
+           <item row="3" column="2">
+            <widget class="QPushButton" name="btn_load_data">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>Load the selected signal channel and open the Graph page</string>
+             </property>
+             <property name="whatsThis">
+              <string>&lt;p&gt;Reads the Signal Channel (and the Info Channel) from the file and opens the Graph page with the whole recording as the base section. Other channels are read when you first switch to them.&lt;/p&gt;&lt;p&gt;Disabled while a required field is missing; the missing fields are listed below the form.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#load&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+             </property>
+             <property name="text">
+              <string>Load Data</string>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" colspan="2">
+            <widget class="QLineEdit" name="line_edit_active_file">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:700;&quot;&gt;Data Import&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <property name="toolTip">
+              <string>Name of the open file</string>
              </property>
+             <property name="frame">
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0" colspan="3">
+            <widget class="QScrollArea" name="scrollArea_import">
+             <property name="widgetResizable">
+              <bool>true</bool>
+             </property>
+             <widget class="QWidget" name="scroll_area_import_contents">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>385</width>
+                <height>281</height>
+               </rect>
+              </property>
+             </widget>
             </widget>
            </item>
           </layout>
          </widget>
         </item>
         <item>
-         <widget class="QTabWidget" name="tabwidget_data_view">
+         <widget class="QWidget" name="container_data_view" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="tab_data_file">
-           <attribute name="title">
-            <string>Data</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
-             <widget class="QLabel" name="label_showing_data_table">
-              <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Showing: -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QTableView" name="table_view_import_data">
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A table showing the current section's data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="editTriggers">
-               <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-              </property>
-              <property name="showDropIndicator" stdset="0">
-               <bool>false</bool>
-              </property>
-              <property name="dragDropOverwriteMode">
-               <bool>false</bool>
-              </property>
-              <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-              </property>
-              <property name="cornerButtonEnabled">
-               <bool>false</bool>
-              </property>
-              <attribute name="horizontalHeaderCascadingSectionResizes">
-               <bool>true</bool>
-              </attribute>
-              <attribute name="verticalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="verticalHeaderHighlightSections">
-               <bool>false</bool>
-              </attribute>
-             </widget>
-            </item>
-           </layout>
-          </widget>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QLabel" name="label_showing_data_table">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Showing: -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTableView" name="table_view_import_data">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A table showing the current section's data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+             </property>
+             <property name="showDropIndicator" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="dragDropOverwriteMode">
+              <bool>false</bool>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+             </property>
+             <property name="cornerButtonEnabled">
+              <bool>false</bool>
+             </property>
+             <attribute name="horizontalHeaderCascadingSectionResizes">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderHighlightSections">
+              <bool>false</bool>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
@@ -443,6 +481,9 @@
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
              <widget class="QTableView" name="table_view_result_peaks">
+              <property name="toolTip">
+               <string>One row per detected peak of the active section. Right-click to copy or export.</string>
+              </property>
               <property name="editTriggers">
                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
               </property>
@@ -463,6 +504,9 @@
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
              <widget class="QTableView" name="table_view_result_rate">
+              <property name="toolTip">
+               <string>One row per rate window of the active section, with the info channel statistics. Right-click to copy or export.</string>
+              </property>
               <property name="editTriggers">
                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
               </property>
@@ -496,6 +540,12 @@
         </item>
         <item row="0" column="3">
          <widget class="QPushButton" name="btn_export_to_excel">
+          <property name="toolTip">
+           <string>Export the results of every locked section to an Excel workbook</string>
+          </property>
+          <property name="whatsThis">
+           <string>&lt;p&gt;Writes the results of all sections of every loaded channel to one workbook, or to one workbook per channel. Sheets: r_data (rate per window with the info mean), Detected Peaks, Rate Data, Global Bounds.&lt;/p&gt;&lt;p&gt;Only locked sections have results; you are warned about unlocked ones.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/results.html#export&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+          </property>
           <property name="text">
            <string>Save to Excel</string>
           </property>
@@ -512,6 +562,9 @@
         </item>
         <item row="0" column="1">
          <widget class="QLabel" name="label_showing_section_result">
+          <property name="toolTip">
+           <string>The section whose results are shown</string>
+          </property>
           <property name="frameShape">
            <enum>QFrame::Shape::StyledPanel</enum>
           </property>
@@ -600,6 +653,9 @@
    <property name="toolTip">
     <string>Select a file to open</string>
    </property>
+   <property name="whatsThis">
+    <string>&lt;p&gt;Opens a file dialog. The chosen file is scanned for its columns (channels) and, where possible, its sampling rate; nothing is loaded yet. Numeric columns appear in the Signal Channel and Info Channel lists.&lt;/p&gt;&lt;p&gt;Supported formats: CSV, TXT, TSV, XLS, XLSX, Feather/Arrow and EDF.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+   </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::TextHeuristicRole</enum>
    </property>
@@ -616,7 +672,10 @@
     <string>Preferences</string>
    </property>
    <property name="toolTip">
-    <string>Modify various settings</string>
+    <string>Open the Settings dialog (Ctrl+,)</string>
+   </property>
+   <property name="whatsThis">
+    <string>&lt;p&gt;Plot click tolerances, filter stacking, the rate computation method, table precision and the text file separator. Changes apply when you press OK.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:reference/settings.html&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+,</string>
@@ -636,7 +695,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open a more detailed view of the current file's metadata.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="whatsThis">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shows a dialog window with fields for setting the sampling rate, data source and info source to be used for the current file.&lt;/p&gt;&lt;p&gt;If any additional metadata exists in the file (and if the app is able to read it and parse it into a python dictionary) it will be displayed as a read-only tree structure.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;For EDF files, shows the information from the &lt;a href=&quot;https://mne.tools/stable/generated/mne.Info.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ff8c00;&quot;&gt;Info&lt;/span&gt;&lt;/a&gt; object created by the &lt;a href=&quot;https://mne.tools/stable/index.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ff8c00;&quot;&gt;mne&lt;/span&gt;&lt;/a&gt; library.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;p&gt;Shows a dialog with fields for the sampling rate, the signal channel and the info channel of the open file. The same values are editable on the Import page; they are fixed once the data is loaded.&lt;/p&gt;&lt;p&gt;The second tab shows metadata stored in the file itself, for EDF files the header information read by the mne library.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:reference/dialog_metadata.html&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -651,6 +710,9 @@
    </property>
    <property name="toolTip">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close the current file and reset the app state.&lt;/p&gt;&lt;p&gt;Make sure to export any existing results first, as they will be lost on reset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="whatsThis">
+    <string>&lt;p&gt;Closes the open file and resets the application. Export your results first; sections and results of every channel are discarded.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -668,10 +730,10 @@
     <string>Lock Section</string>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save the current section's data and lock it to prevent further edits.&lt;/p&gt;&lt;p&gt;To view or export the data, go to the &amp;quot;Results&amp;quot; page.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>Compute the result of the active section and lock it against edits</string>
    </property>
    <property name="whatsThis">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save the current section's data and lock it to prevent further edits.&lt;/p&gt;&lt;p&gt;To view or export the data, go to the &amp;quot;Results&amp;quot; page.&lt;/p&gt;&lt;p&gt;To unlock a section, right-click it's name in the section list and select &amp;quot;Unlock Section&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;p&gt;Computes the final peak and rate tables of the active section in the background and locks it so that processing and peaks cannot change any more. Only locked sections appear on the Results page and in the export.&lt;/p&gt;&lt;p&gt;At least three peaks are needed. To edit a locked section again use Unlock Section.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/sections.html#lock&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -689,7 +751,10 @@
     <string>New Section</string>
    </property>
    <property name="toolTip">
-    <string>Create a new section</string>
+    <string>Select a range of the base section to turn into a new section</string>
+   </property>
+   <property name="whatsThis">
+    <string>&lt;p&gt;Available while the base section (Section 000) is active. Shows a draggable region on the plot: move its edges to the wanted range, then press Confirm in the Sections dock, or Cancel.&lt;/p&gt;&lt;p&gt;The region starts right after the previous section with the same length.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/sections.html#create&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -707,7 +772,7 @@
     <string>Automatically scale the y-axis to fit the currently visible data</string>
    </property>
    <property name="whatsThis">
-    <string>Automatically scale the y-axis limits to the currently visible data</string>
+    <string>&lt;p&gt;Rescales the signal plot so that the whole signal is visible after zooming or panning.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/peak_detection.html#navigate&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -724,6 +789,9 @@
    <property name="toolTip">
     <string>Create a new section with the data of the selected region</string>
    </property>
+   <property name="whatsThis">
+    <string>&lt;p&gt;Creates the new section from the selected region and adds it to the Sections list.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/sections.html#create&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+   </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
@@ -738,6 +806,9 @@
    </property>
    <property name="toolTip">
     <string>Cancel the section creation process</string>
+   </property>
+   <property name="whatsThis">
+    <string>&lt;p&gt;Hides the region selector without creating a section.&lt;/p&gt;</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -756,6 +827,9 @@
    <property name="toolTip">
     <string>Shows the current sections as colored regions in the plot</string>
    </property>
+   <property name="whatsThis">
+    <string>&lt;p&gt;Shows every section of the active channel as a coloured region on the plot of the base section. Click a region to make that section active; hover it for its name.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/sections.html#overview&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+   </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
@@ -766,9 +840,6 @@
    </property>
    <property name="toolTip">
     <string>Select an area of the plot by pressing Ctrl and dragging your mouse while holding left-click. Then, press Ctrl+D to remove all peaks inside that area.</string>
-   </property>
-   <property name="statusTip">
-    <string/>
    </property>
    <property name="whatsThis">
     <string>Select an area of the plot by pressing Ctrl and dragging your mouse while holding left-click. Then, press Ctrl+D to remove all peaks inside that area.</string>
@@ -806,7 +877,10 @@
     <string>User Guide</string>
    </property>
    <property name="toolTip">
-    <string>User Guide</string>
+    <string>Open the user guide at the page for the current view (F1)</string>
+   </property>
+   <property name="whatsThis">
+    <string>&lt;p&gt;Opens the bundled user guide. Press F1 anywhere: the page matching the current page (or the parameter dock, when it has focus) opens.&lt;/p&gt;&lt;p&gt;Shift+F1 enters What's This mode: click any control to read what it does.&lt;/p&gt;</string>
    </property>
    <property name="shortcut">
     <string>F1</string>
@@ -819,6 +893,9 @@
    <property name="text">
     <string>About Qt</string>
    </property>
+   <property name="toolTip">
+    <string>Version of the Qt libraries this application runs on</string>
+   </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::AboutQtRole</enum>
    </property>
@@ -828,7 +905,7 @@
     <string>About App</string>
    </property>
    <property name="toolTip">
-    <string>About this Application</string>
+    <string>Version and links of this application</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::AboutRole</enum>
@@ -843,7 +920,10 @@
     <string>Remove Section</string>
    </property>
    <property name="toolTip">
-    <string>Removes the selected section</string>
+    <string>Delete the active section and its results</string>
+   </property>
+   <property name="whatsThis">
+    <string>&lt;p&gt;Deletes the active section together with its peaks and results. Cannot be undone. The base section cannot be removed; sections after the deleted one are renumbered.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/sections.html#remove&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -858,7 +938,10 @@
     <string>Unlock Section</string>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make a section marked as &amp;quot;Done&amp;quot; editable again.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>Make the locked active section editable again</string>
+   </property>
+   <property name="whatsThis">
+    <string>&lt;p&gt;Removes the lock from the active section so that processing and peaks can be changed. The previous result stays until the next change; the Results page and the export only reflect locked sections.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/sections.html#lock&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

@@ -1,16 +1,91 @@
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <link href="../stylesheet.css" rel="stylesheet" type="text/css" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Preprocessing the signal - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
 
-        <title>User Guide - Preprocessing Signals</title>
-    </head>
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Preprocessing the signal</p>
 
-    <body>
-        <h2>Preprocessing Signals</h2>
+<h1>Preprocessing the signal</h1>
 
-        <p>TODO</p>
+<p>Preprocessing removes drift, noise and mains interference before peaks are detected. It happens on the
+<b>Preprocessing</b> tab of the Parameter Inputs dock (right side of the Graph page) and applies to the active
+section only. The raw signal is never changed: processing writes a processed copy, and <b>Reset Signal</b> brings the
+raw signal back at any time.</p>
 
-        <a href="peak_detection.html">Peak Detection</a>
-    </body>
+<p>Every input on the tab has a tooltip with its meaning, unit, default and range; the complete list is in the
+<a href="../reference/dock_parameters.html#preprocessing">Parameter Inputs reference</a>.</p>
+
+<h2 id="pipeline"><a name="pipeline"></a>Pipelines</h2>
+
+<p>A <b>Pipeline</b> is a ready-made cleaning procedure from the neurokit2 library, matched to a signal type and
+usually to a detection method. While a pipeline is selected, the custom filter and standardization inputs are
+disabled. Choose the empty entry to use them instead.</p>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Pipeline</th><th>Signal</th><th>What it applies</th></tr>
+    <tr><td>PPG_Elgendi</td><td>PPG</td><td>Butterworth band-pass 0.5 to 8 Hz, order 3. The default; pair with the PPG_Elgendi detector.</td></tr>
+    <tr><td>ECG_Emrich_2023</td><td>ECG</td><td>Butterworth high-pass 4 Hz, order 2. Pair with the ECG_Emrich_2023 detector.</td></tr>
+    <tr><td>ECG_NeuroKit</td><td>ECG</td><td>Butterworth high-pass 0.5 Hz, order 5, then a 50 Hz powerline filter.</td></tr>
+    <tr><td>ECG_BioSPPy</td><td>ECG</td><td>FIR band-pass 0.67 to 45 Hz, mean removed.</td></tr>
+    <tr><td>ECG_PanTompkins_1985</td><td>ECG</td><td>Butterworth band-pass 5 to 15 Hz, order 1, one direction.</td></tr>
+    <tr><td>ECG_Hamilton_2002</td><td>ECG</td><td>Butterworth band-pass 8 to 16 Hz, order 1, one direction.</td></tr>
+    <tr><td>ECG_Elgendi_2010</td><td>ECG</td><td>Butterworth band-pass 8 to 20 Hz, order 2, one direction.</td></tr>
+    <tr><td>ECG_EngzeeMod_2012</td><td>ECG</td><td>Butterworth band-stop 48 to 52 Hz, order 4, one direction (removes the 50 Hz mains band only).</td></tr>
+</table>
+
+<p>"One direction" filters introduce a small, constant delay of the processed signal against the raw one. The peak
+positions are reported on the processed signal.</p>
+
+<h2 id="filter"><a name="filter"></a>Custom filter</h2>
+
+<p>With no pipeline selected, <b>Filter Method</b> chooses one filter of the neurokit2 library and the <b>Filter
+Parameters</b> group holds its settings. Each method uses a different subset of the parameters; the inputs a method
+does not use are disabled.</p>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Method</th><th>Uses</th><th>Notes</th></tr>
+    <tr><td>Butterworth</td><td>Lower cutoff, Upper cutoff, Order</td><td>Zero-phase (forward and backward). The usual choice for a band-pass.</td></tr>
+    <tr><td>ButterworthLegacy</td><td>Lower cutoff, Upper cutoff, Order</td><td>Same filter in transfer-function form; less stable at high orders. For reproducing old results.</td></tr>
+    <tr><td>ButterworthZI</td><td>Lower cutoff, Upper cutoff, Order</td><td>One direction with matched initial conditions: a phase delay, but no edge artefacts.</td></tr>
+    <tr><td>SavGol</td><td>Order, Window Size</td><td>Savitzky-Golay smoothing; Order is the polynomial degree.</td></tr>
+    <tr><td>FIR</td><td>Lower cutoff, Upper cutoff, Window Size</td><td>Zero-phase FIR band-pass; Window Size is the number of taps. The minimum window size stands for the neurokit2 default.</td></tr>
+    <tr><td>Bessel</td><td>Lower cutoff, Upper cutoff, Order</td><td>Preserves peak shapes better than Butterworth at the same order.</td></tr>
+    <tr><td>Powerline</td><td>Powerline</td><td>Removes mains interference at 50 Hz (Europe) or 60 Hz (North America).</td></tr>
+</table>
+
+<p>A cutoff of 0 means "no cutoff on that side": lower cutoff 0.5 Hz with upper cutoff 0 is a high-pass.</p>
+
+<h2 id="standardization"><a name="standardization"></a>Standardization</h2>
+
+<p><b>Standardization Method</b> rescales the filtered signal so that amplitude thresholds of the detection methods
+behave the same across recordings. It runs after the filter.</p>
+<ul>
+    <li><b>ZScore</b> subtracts the mean and divides by the standard deviation. With <b>Use rolling window</b> both are
+        computed inside a moving window of <b>Window Size</b> samples, which also removes slow drift; the window
+        should span several beats.</li>
+    <li><b>ZScoreRobust</b> subtracts the median and divides by the median absolute deviation, so artefacts influence
+        the scaling far less. It cannot be combined with a rolling window.</li>
+</ul>
+
+<h2 id="apply"><a name="apply"></a>Apply, restore defaults, reset</h2>
+
+<p><b>Apply to Signal</b> runs the selected steps. It always starts from the raw signal: earlier processing of the
+section and all its peaks are discarded first, then the pipeline, or the filter followed by the standardization,
+is applied. The three check marks next to Pipeline, Filter Method and Standardization Method show which steps the
+active section has been through; hover the filter check mark to see how many filter runs are recorded.</p>
+
+<p><b>Restore Defaults</b> puts every input of the tab back to its default value (the pipeline PPG_Elgendi, no
+filter, no standardization) without touching the signal. <b>Reset Signal</b> restores the raw signal of the section
+and removes its peaks.</p>
+
+<p class="note">Processing is not possible on the base section or on a locked section. Detected peaks and manual
+edits do not survive a new processing run: process first, then detect and correct.</p>
+
+<p class="nav">Next: <a href="peak_detection.html">Detecting and editing peaks</a></p>
+
+</body>
 </html>

@@ -1,42 +1,100 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link href="../stylesheet.css" rel="stylesheet" type="text/css" />
-    <title>User Guide - Getting Started</title>
+<meta charset="utf-8">
+<title>Getting started - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
 </head>
-
 <body>
-    <h1>Getting Started</h1>
 
-    <h2>Data Import</h2>
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Getting started</p>
 
-    <h3>File Selection</h3>
+<h1>Getting started</h1>
 
-    <p>
-        Press the <b>Open File</b> button to select a data file to open. Currently supported file types are:
-        <ul>
-            <li>Text files (.csv, .txt, .tsv)</li>
-            <li>Excel files (.xls, .xlsx)</li>
-            <li>Arrow IPC / Feather files (.feather, .ipc, .arrow)</li>
-            <li>EDF files (.edf)</li>
-        </ul>
-        If opening is successful, an attempt is made to automatically determine the sampling rate
-        and signal data source; if this fails, the user will be prompted to manually set these parameters.
-        <br />
-        An additional data source (e.g. temperature or O2-saturation) can be specified in the "Additional Data"
-        field. If specified, this data will be included when computing results and can optionally be displayed
-        alongside the signal data in the main plot window.
-    </p>
+<p>This page takes a recording from a file on disk to the Graph page, where sections are made and peaks are
+detected. Everything happens on the <b>Import</b> page, the first tab of the main window. For installing the
+application see the README that comes with it.</p>
 
-    <h3>Loading Data</h3>
+<h2 id="open"><a name="open"></a>Open a file</h2>
 
-    <p>
-        Once the sampling rate, signal data and (optionally) additional data fields have been specified, press the
-        <b>Load Data</b> button to load the data into the application.
-        <br />
-        If successful, a preview of the data will be displayed to the right of the import section in form of a table.
-    </p>
+<p>Press <b>Open File...</b> (also in the File menu and the toolbar) and choose a file. SignalViewer reads text
+files (<code>.csv</code>, <code>.txt</code>, <code>.tsv</code>), Excel workbooks (<code>.xls</code>,
+<code>.xlsx</code>), Apache Arrow files (<code>.feather</code>, <code>.arrow</code>, <code>.ipc</code>) and EDF
+recordings (<code>.edf</code>). Text and Excel files need one column per channel with the column names in the first
+row. Details are in <a href="../reference/file_formats.html">File formats</a>.</p>
+
+<p>Opening does not load the data yet. The file is scanned for its column names and types and, where possible, for
+its sampling rate. The result fills the <b>Required Information</b> form; the data table on the right stays empty
+until you press Load Data.</p>
+
+<p>Files you opened before are listed under <b>Recent Data Files</b>. Double-click an entry to open it again. Entries
+whose file no longer exists disappear from the list.</p>
+
+<h2 id="sampling-rate"><a name="sampling-rate"></a>Sampling rate</h2>
+
+<p>The sampling rate is the number of samples recorded per second (Hz). It turns sample numbers into time, and every
+filter and detection method depends on it, so the application refuses to load data without it.</p>
+
+<p>SignalViewer fills it in by itself when it can:</p>
+<ul>
+    <li>EDF files carry the sampling rate in their header.</li>
+    <li>Tabular files are searched for a time column: a column whose name contains <code>time</code> or
+        <code>ts</code>, a date-time or duration column, or an integer column whose name does not contain
+        <code>index</code>. The sampling rate is the number of rows in the first second of that column. Floats are
+        read as seconds, integers as microseconds.</li>
+</ul>
+<p>When no single time column is found, the field shows <code>0 Hz</code> and the status line below the form says
+<i>Missing: Sampling rate</i>. Type the rate of your recording into the field.</p>
+
+<h2 id="channels"><a name="channels"></a>Signal channel and info channel</h2>
+
+<p><b>Signal Channel</b> is the column holding the signal to analyse. Only numeric columns are offered; the first one
+is pre-selected, or the column you chose the last time if the file has it too. This channel is loaded first. Every
+other numeric column can be analysed afterwards through the channel switcher on the Graph page, without reopening the
+file (see <a href="sections.html#channels">Channels</a>).</p>
+
+<p><b>Info Channel</b> is an optional second column recorded alongside the signal, typically a temperature or an
+oxygen saturation. Choose <code>&lt;No Selection&gt;</code> when there is none. When one is chosen:</p>
+<ul>
+    <li>the rate table gets the mean, standard deviation, minimum, maximum and variance of the info channel per rate
+        window,</li>
+    <li>the result plot shows the rate against the info channel and fits a model to it,</li>
+    <li>the Excel export includes the info mean per window.</li>
+</ul>
+
+<p class="note">Column names are cleaned for use inside the application: lower case, special characters and spaces
+replaced by underscores, accents removed. Tables and exported files show the cleaned names; the drop-down lists show
+the names as they are in the file. The names <code>index</code>, <code>section_index</code>, <code>is_peak</code>
+and <code>is_manual</code> are reserved and cannot be chosen.</p>
+
+<h2 id="load"><a name="load"></a>Load the data</h2>
+
+<p>Press <b>Load Data</b>. The button is disabled while a required field is missing; the status line under the form
+names the field. Loading reads the signal channel and the info channel from the file and switches to the Graph page,
+where the whole recording appears as the <b>base section</b>, named <i>Section 000</i> followed by the channel name.
+From here, continue with <a href="sections.html">Working with sections</a>.</p>
+
+<p>The data table on the Import page now shows the frame of the active section: <code>index</code> (row in the
+file), <code>section_index</code> (row in the section), the raw signal, its processed copy, <code>is_peak</code>,
+<code>is_manual</code> and the info channel. Hover a header to see the data type, a cell to see its exact value.</p>
+
+<p>Loading the same file again (after changing the sampling rate or the channels, which is possible until the
+first load) discards all sections of the earlier load.</p>
+
+<h2 id="metadata"><a name="metadata"></a>The File Metadata dialog</h2>
+
+<p><b>File &gt; File Metadata</b> opens a dialog with the same three values and, on its second tab, the metadata stored
+in the file itself: for EDF files the header information read by the mne library. The dialog also opens by itself
+right after opening a file that lacks a sampling rate or a usable signal column. Reference:
+<a href="../reference/dialog_metadata.html">File Metadata dialog</a>.</p>
+
+<h2 id="close"><a name="close"></a>Close the file</h2>
+
+<p><b>Close File</b> (button on the Import page, or File menu) discards every channel, section and result and returns
+the application to its start state. Export your results first; see <a href="results.html#export">Export to
+Excel</a>. Opening another file closes the current one in the same way.</p>
+
+<p class="nav">Next: <a href="sections.html">Working with sections</a></p>
+
 </body>
-
 </html>

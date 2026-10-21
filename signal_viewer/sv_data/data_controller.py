@@ -1,3 +1,9 @@
+"""
+`DataController`: owns the open file, its channels and sections, and is the only object that mutates a `Section`.
+
+See the class docstring for the signal contract that the GUI relies on.
+"""
+
 import functools
 from pathlib import Path
 from typing import Any
@@ -246,12 +252,21 @@ class DataController(QtCore.QObject):
 
     @property
     def metadata(self) -> FileMetadata:
+        """
+        Metadata of the open file.
+
+        Raises
+        ------
+        ValueError
+            When no file is open.
+        """
         if self._metadata is None:
             raise ValueError("No data available.")
         return self._metadata
 
     @property
     def rate_params(self) -> RollingRateKwargs:
+        """The rolling-rate parameters every section is created with."""
         return self._rate_params
 
     @QtCore.Slot(dict)
@@ -275,14 +290,17 @@ class DataController(QtCore.QObject):
         self.sig_section_changed.emit(section, SectionChange.RATE)
 
     def get_base_section(self) -> Section:
+        """The base section of the active channel (the whole file)."""
         return self._require_channel().base_section
 
     @property
     def active_section(self) -> Section:
+        """The section being edited. Raises `ValueError` when no file is loaded."""
         return self._require_channel().active_section
 
     @QtCore.Slot(QtCore.QModelIndex)
     def set_active_section(self, model_index: QtCore.QModelIndex) -> None:
+        """Makes the section at `model_index` of the active channel's list model active and emits `sig_active_section_changed`."""
         section = self.sections.data(model_index, QtCore.Qt.ItemDataRole.UserRole)
         if isinstance(section, Section):
             self._require_channel().active_section = section
@@ -291,6 +309,7 @@ class DataController(QtCore.QObject):
 
     @property
     def base_section_index(self) -> QtCore.QModelIndex:
+        """Model index of the base section (always row 0)."""
         return self.sections.index(0)
 
     # --- File handling -----------------------------------------------------------------------------------------------
@@ -301,6 +320,7 @@ class DataController(QtCore.QObject):
         signal_col: str | None = None,
         info_col: str | None = None,
     ) -> None:
+        """Changes one or more of sampling rate, signal column and info column of the open file and re-emits `sig_new_metadata`."""
         if self._metadata is None:
             return
 
@@ -315,32 +335,40 @@ class DataController(QtCore.QObject):
 
     @QtCore.Slot(str)
     def open_file(self, file_path: Path | str) -> None:
+        """
+        Reads the metadata of `file_path` (column names, dtypes, sampling rate when detectable) without loading data.
+
+        Emits `sig_new_metadata` so the widgets fill, then `sig_user_input_required` when a required field (sampling
+        rate, signal column) is still missing. Unsupported formats and missing files are logged as errors.
+        """
         file_path = Path(file_path)
         if not file_path.is_file():
             logger.error(
                 f"Path: {file_path} \n\nNo file exists at the specified path. Please check the path and try again."
             )
-        if file_path.suffix not in InputFileFormat:
-            logger.error(f"Unsupported file format: {file_path.suffix}. Allowed formats: {', '.join(InputFileFormat)}")
+
+        path_suffix = file_path.suffix.lower()
+        if path_suffix not in InputFileFormat:
+            logger.error(f"Unsupported file format: {path_suffix}. Allowed formats: {', '.join(InputFileFormat)}")
 
         other_info: dict[str, Any] = {}
         schema: dict[str, pl.DataType]
 
-        if file_path.suffix == ".edf":
+        if path_suffix == ".edf":
             edf_info = mne.io.read_raw_edf(file_path, preload=False, verbose=False)
             sampling_rate = int(edf_info.info["sfreq"])
             column_names: list[str] = edf_info.ch_names
             schema = {c: pl.Float64() for c in column_names}
             other_info = dict(edf_info.info)
-        elif file_path.suffix in {".feather", ".arrow", ".ipc", ".csv", ".txt", ".tsv"}:
-            lf = self._reader_funcs[file_path.suffix](file_path)
+        elif path_suffix in {".feather", ".arrow", ".ipc", ".csv", ".txt", ".tsv"}:
+            lf = self._reader_funcs[path_suffix](file_path)
             schema = dict(lf.collect_schema())
             column_names = list(schema)
             try:
                 sampling_rate = detect_sampling_rate(lf)
             except Exception:
                 sampling_rate = 0
-        elif file_path.suffix in {".xls", ".xlsx"}:
+        elif path_suffix in {".xls", ".xlsx"}:
             lf = pl.read_excel(file_path).lazy()
             schema = dict(lf.collect_schema())
             column_names = list(schema)
@@ -348,10 +376,10 @@ class DataController(QtCore.QObject):
                 sampling_rate = detect_sampling_rate(lf)
             except Exception:
                 sampling_rate = 0
-        elif file_path.suffix == ".hdf5":
+        elif path_suffix == ".hdf5":
             raise NotImplementedError("Reading HDF5 files is not yet supported.")
         else:
-            raise ValueError(f"Unsupported file format: {file_path.suffix}. Please select a valid file format.")
+            raise ValueError(f"Unsupported file format: {path_suffix}. Please select a valid file format.")
 
         # `FileMetadata.__init__` pre-selects the columns and sampling rate remembered in `Config.internal`.
         metadata = FileMetadata(file_path, column_names, sampling_rate, schema=schema)
@@ -445,6 +473,7 @@ class DataController(QtCore.QObject):
         self._active_channel.sections.add_section(section)
 
     def delete_section(self, idx: QtCore.QModelIndex) -> None:
+        """Removes the section at `idx` from the active channel and makes the base section active."""
         self.sections.remove_section(idx)
         self.set_active_section(self.base_section_index)
 
@@ -467,6 +496,7 @@ class DataController(QtCore.QObject):
 
     @QtCore.Slot()
     def clear_peaks(self) -> None:
+        """Removes every peak of the active section and clears its result frames."""
         section = self.active_section
         section.reset_peaks()
         self.sig_section_changed.emit(section, SectionChange.PEAKS | SectionChange.RATE)
@@ -526,6 +556,7 @@ class DataController(QtCore.QObject):
 
     @QtCore.Slot()
     def unlock_active(self) -> None:
+        """Unlocks the active section so it can be edited again; its result frames stay until the next change."""
         section = self.active_section
         section.set_locked(False)
         self._notify_list_model(section)

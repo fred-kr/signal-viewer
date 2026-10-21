@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'param_inputs.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.11.0
+## Created by: Qt User Interface Compiler version 6.12.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -597,11 +597,11 @@ class Ui_containerParamInputs(object):
         self.label_22.setBuddy(self.peak_ecg_nk_gradthreshweight)
         self.label_23.setBuddy(self.peak_ecg_nk_minlenweight)
         self.label_26.setBuddy(self.peak_ecg_nk_mindelay)
-        self.label_28.setBuddy(self.peak_ecg_nk_smoothwindow)
-        self.label_30.setBuddy(self.peak_ecg_nk_avgwindow)
-        self.label_27.setBuddy(self.peak_ecg_nk_gradthreshweight)
-        self.label_31.setBuddy(self.peak_ecg_nk_avgwindow)
-        self.label_29.setBuddy(self.peak_ecg_nk_gradthreshweight)
+        self.label_28.setBuddy(self.peak_ecg_gamboa_tol)
+        self.label_30.setBuddy(self.peak_ecg_emrich_window_overlap)
+        self.label_27.setBuddy(self.peak_ecg_emrich_window_seconds)
+        self.label_31.setBuddy(self.peak_ecg_promac_threshold)
+        self.label_29.setBuddy(self.peak_ecg_promac_gaussian_sd)
 #endif // QT_CONFIG(shortcut)
 
         self.retranslateUi(containerParamInputs)
@@ -630,18 +630,12 @@ class Ui_containerParamInputs(object):
         self.label_9.setText(QCoreApplication.translate("containerParamInputs", u"Window Size", None))
         self.tab_widget_params.setTabText(self.tab_widget_params.indexOf(self.tab_processing), QCoreApplication.translate("containerParamInputs", u"Preprocessing", None))
         self.detectionMethodLabel.setText(QCoreApplication.translate("containerParamInputs", u"Detection Method", None))
-#if QT_CONFIG(tooltip)
-        self.peak_method.setToolTip("")
-#endif // QT_CONFIG(tooltip)
         self.groupBox_2.setTitle(QCoreApplication.translate("containerParamInputs", u"Method Parameters", None))
         self.label_11.setText(QCoreApplication.translate("containerParamInputs", u"Peak Window", None))
         self.label_12.setText(QCoreApplication.translate("containerParamInputs", u"Beat Window", None))
         self.label_13.setText(QCoreApplication.translate("containerParamInputs", u"Beat Offset", None))
         self.label_14.setText(QCoreApplication.translate("containerParamInputs", u"Minimum Delay", None))
         self.label_15.setText(QCoreApplication.translate("containerParamInputs", u"Radius", None))
-#if QT_CONFIG(whatsthis)
-        self.peak_localmax_radius.setWhatsThis("")
-#endif // QT_CONFIG(whatsthis)
         self.textBrowser.setMarkdown(QCoreApplication.translate("containerParamInputs", u"Defaults to **half the sampling rate** of the signal. If this doesn't produce\n"
 "good results, try out  different values **between a quarter and triple**  the\n"
 "sampling rate, or **using a different preprocessing pipeline** (sometimes **not\n"

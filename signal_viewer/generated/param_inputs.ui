@@ -405,9 +405,6 @@
        </item>
        <item row="2" column="0">
         <widget class="EnumComboBox" name="peak_method">
-         <property name="toolTip">
-          <string/>
-         </property>
         </widget>
        </item>
        <item row="3" column="0">
@@ -479,9 +476,6 @@
               </item>
               <item row="0" column="1">
                <widget class="DecimalSpinBox" name="peak_localmax_radius">
-                <property name="whatsThis">
-                 <string/>
-                </property>
                </widget>
               </item>
               <item row="1" column="0" colspan="2">
@@ -661,7 +655,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  <string>Tolerance</string>
                 </property>
                 <property name="buddy">
-                 <cstring>peak_ecg_nk_smoothwindow</cstring>
+                 <cstring>peak_ecg_gamboa_tol</cstring>
                 </property>
                </widget>
               </item>
@@ -678,7 +672,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  <string>Window Overlap</string>
                 </property>
                 <property name="buddy">
-                 <cstring>peak_ecg_nk_avgwindow</cstring>
+                 <cstring>peak_ecg_emrich_window_overlap</cstring>
                 </property>
                </widget>
               </item>
@@ -691,7 +685,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  <string>Window Seconds</string>
                 </property>
                 <property name="buddy">
-                 <cstring>peak_ecg_nk_gradthreshweight</cstring>
+                 <cstring>peak_ecg_emrich_window_seconds</cstring>
                 </property>
                </widget>
               </item>
@@ -715,7 +709,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  <string>Threshold</string>
                 </property>
                 <property name="buddy">
-                 <cstring>peak_ecg_nk_avgwindow</cstring>
+                 <cstring>peak_ecg_promac_threshold</cstring>
                 </property>
                </widget>
               </item>
@@ -728,7 +722,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                  <string>Gaussian SD</string>
                 </property>
                 <property name="buddy">
-                 <cstring>peak_ecg_nk_gradthreshweight</cstring>
+                 <cstring>peak_ecg_promac_gaussian_sd</cstring>
                 </property>
                </widget>
               </item>

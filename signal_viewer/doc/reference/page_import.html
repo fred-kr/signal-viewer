@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Import page - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Reference &rsaquo; Import page</p>
+
+<h1>Import page</h1>
+
+<p>The first page of the main window: open a file, complete its metadata, load a channel. How-to:
+<a href="../user_guide/getting_started.html">Getting started</a>.</p>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Control</th><th>What it does</th></tr>
+    <tr><td>Open File...</td><td>Opens a file dialog filtered to the <a href="file_formats.html">supported formats</a>. Scans the file for columns and sampling rate; loads nothing yet.</td></tr>
+    <tr><td>File name field</td><td>Read-only. The name of the open file; also shown in the window title.</td></tr>
+    <tr><td>Sampling Rate</td><td>Samples per second (Hz). Detected from a time column or the EDF header when possible; <code>0 Hz</code> means unknown and must be entered. Required.</td></tr>
+    <tr><td>Signal Channel</td><td>The numeric column to analyse first. Required.</td></tr>
+    <tr><td>Info Channel</td><td>Optional numeric column summarised per rate window (temperature, oxygen saturation, ...). <code>&lt;No Selection&gt;</code> for none.</td></tr>
+    <tr><td>Status line</td><td>Below the form. Lists the required fields that are still missing, e.g. <i>Missing: Sampling rate</i>. Empty when loading is possible.</td></tr>
+    <tr><td>Close File</td><td>Ctrl+R. Discards every channel, section and result.</td></tr>
+    <tr><td>Load Data</td><td>Reads the signal and info channel, creates the base section and switches to the Graph page. Disabled while a required field is missing.</td></tr>
+    <tr><td>Recent Data Files</td><td>The last ten files opened, newest first. Double-click to open one. Missing files are removed from the list.</td></tr>
+    <tr><td>Data table</td><td>The frame of the active section after loading: <code>index</code>, <code>section_index</code>, raw signal, processed signal, <code>is_peak</code>, <code>is_manual</code>, info channel. The label above names the section. Hover a header for the data type, a cell for the exact value.</td></tr>
+</table>
+
+<p>Sampling rate and channels can be changed until the data is loaded; afterwards the three fields are disabled.
+Change them in the <a href="dialog_metadata.html">File Metadata dialog</a> before loading, or close and reopen the
+file.</p>
+
+</body>
+</html>

@@ -1,3 +1,9 @@
+"""
+Names of the columns the data layer adds to every section frame, and the combo box sentinel for "no selection".
+
+`RESERVED_COLUMN_NAMES` are refused as signal or info column because they would collide with those added columns.
+"""
+
 COMBO_BOX_NO_SELECTION = "<No Selection>"
 INDEX_COL = "index"
 SECTION_INDEX_COL = "section_index"

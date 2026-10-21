@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
 ################################################################################
 ## Form generated from reading UI file 'dialog_metadata.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.0
+## Created by: Qt User Interface Compiler version 6.12.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -26,7 +24,7 @@ from PySide6.QtWidgets import (
 )
 
 
-class Ui_MetadataDialog(object):
+class Ui_MetadataDialog:
     def setupUi(self, MetadataDialog):
         if not MetadataDialog.objectName():
             MetadataDialog.setObjectName("MetadataDialog")
@@ -154,47 +152,123 @@ class Ui_MetadataDialog(object):
 
     def retranslateUi(self, MetadataDialog):
         MetadataDialog.setWindowTitle(QCoreApplication.translate("MetadataDialog", "File Metadata", None))
+        # if QT_CONFIG(tooltip)
+        self.btn_reject.setToolTip(QCoreApplication.translate("MetadataDialog", "Discard the changes", None))
+        # endif // QT_CONFIG(tooltip)
         self.btn_reject.setText(QCoreApplication.translate("MetadataDialog", "Cancel", None))
+        # if QT_CONFIG(tooltip)
+        self.btn_accept.setToolTip(
+            QCoreApplication.translate("MetadataDialog", "Apply the values to the open file", None)
+        )
+        # endif // QT_CONFIG(tooltip)
         self.btn_accept.setText(QCoreApplication.translate("MetadataDialog", "Save", None))
         self.label_2.setText(QCoreApplication.translate("MetadataDialog", "File Name", None))
-        self.label_4.setText(QCoreApplication.translate("MetadataDialog", "File Type", None))
-        self.label_3.setText(QCoreApplication.translate("MetadataDialog", "Sampling Rate*", None))
-        self.spin_box_sampling_rate.setSpecialValueText(QCoreApplication.translate("MetadataDialog", "<Not set>", None))
-        self.spin_box_sampling_rate.setSuffix(QCoreApplication.translate("MetadataDialog", " Hz", None))
         # if QT_CONFIG(tooltip)
-        self.label_5.setToolTip(
+        self.line_edit_file_name.setToolTip(QCoreApplication.translate("MetadataDialog", "Name of the open file", None))
+        # endif // QT_CONFIG(tooltip)
+        self.label_4.setText(QCoreApplication.translate("MetadataDialog", "File Type", None))
+        # if QT_CONFIG(tooltip)
+        self.line_edit_file_type.setToolTip(
+            QCoreApplication.translate("MetadataDialog", "File extension; it selects the reader", None)
+        )
+        # endif // QT_CONFIG(tooltip)
+        # if QT_CONFIG(whatsthis)
+        self.label_3.setWhatsThis(
             QCoreApplication.translate(
                 "MetadataDialog",
-                "<html><head/><body><p>The column / channel in the file containing the signal values</p></body></html>",
+                '<p>Number of samples recorded per second (Hz). It converts sample indices into time and every filter and detector depends on it.</p><p>Filled in automatically when the file has a time column or, for EDF, from the header; otherwise enter it here.</p><p><a href="help:user_guide/getting_started.html#sampling-rate">Open the user guide</a></p>',
                 None,
             )
         )
+        # endif // QT_CONFIG(whatsthis)
+        # if QT_CONFIG(tooltip)
+        self.label_3.setToolTip(
+            QCoreApplication.translate("MetadataDialog", "Samples per second of the signal (Hz); required", None)
+        )
         # endif // QT_CONFIG(tooltip)
-        self.label_5.setText(QCoreApplication.translate("MetadataDialog", "Data Source*", None))
+        self.label_3.setText(QCoreApplication.translate("MetadataDialog", "Sampling Rate*", None))
+        # if QT_CONFIG(whatsthis)
+        self.spin_box_sampling_rate.setWhatsThis(
+            QCoreApplication.translate(
+                "MetadataDialog",
+                '<p>Number of samples recorded per second (Hz). It converts sample indices into time and every filter and detector depends on it.</p><p>Filled in automatically when the file has a time column or, for EDF, from the header; otherwise enter it here.</p><p><a href="help:user_guide/getting_started.html#sampling-rate">Open the user guide</a></p>',
+                None,
+            )
+        )
+        # endif // QT_CONFIG(whatsthis)
+        # if QT_CONFIG(tooltip)
+        self.spin_box_sampling_rate.setToolTip(
+            QCoreApplication.translate("MetadataDialog", "Samples per second of the signal (Hz); required", None)
+        )
+        # endif // QT_CONFIG(tooltip)
+        self.spin_box_sampling_rate.setSpecialValueText(QCoreApplication.translate("MetadataDialog", "<Not set>", None))
+        self.spin_box_sampling_rate.setSuffix(QCoreApplication.translate("MetadataDialog", " Hz", None))
+        # if QT_CONFIG(whatsthis)
+        self.label_5.setWhatsThis(
+            QCoreApplication.translate(
+                "MetadataDialog",
+                '<p>The column (channel) whose values are the signal. Only numeric columns are offered. This channel is loaded first; every other numeric column can be edited later through the channel switcher on the Graph page.</p><p><a href="help:user_guide/getting_started.html#channels">Open the user guide</a></p>',
+                None,
+            )
+        )
+        # endif // QT_CONFIG(whatsthis)
+        # if QT_CONFIG(tooltip)
+        self.label_5.setToolTip(
+            QCoreApplication.translate(
+                "MetadataDialog", "The column (channel) of the file holding the signal to analyse", None
+            )
+        )
+        # endif // QT_CONFIG(tooltip)
+        self.label_5.setText(QCoreApplication.translate("MetadataDialog", "Signal Channel*", None))
+        # if QT_CONFIG(whatsthis)
+        self.label_6.setWhatsThis(
+            QCoreApplication.translate(
+                "MetadataDialog",
+                '<p>An optional column recorded alongside the signal, such as temperature or oxygen saturation. The rate table gets its mean, standard deviation, minimum and maximum per rate window, and the result plot shows the rate against it.</p><p>Choose &lt;No Selection&gt; when there is none.</p><p><a href="help:user_guide/getting_started.html#channels">Open the user guide</a></p>',
+                None,
+            )
+        )
+        # endif // QT_CONFIG(whatsthis)
         # if QT_CONFIG(tooltip)
         self.label_6.setToolTip(
             QCoreApplication.translate(
                 "MetadataDialog",
-                "<html><head/><body><p>A column / channel in the file containing supplementary data, e.g. temperature or O2-saturation recordings</p></body></html>",
+                "Optional second column (e.g. temperature) shown with the signal and summarised per rate window",
                 None,
             )
         )
         # endif // QT_CONFIG(tooltip)
-        self.label_6.setText(QCoreApplication.translate("MetadataDialog", "Info Source", None))
+        self.label_6.setText(QCoreApplication.translate("MetadataDialog", "Info Channel", None))
+        # if QT_CONFIG(whatsthis)
+        self.combo_box_signal_column.setWhatsThis(
+            QCoreApplication.translate(
+                "MetadataDialog",
+                '<p>The column (channel) whose values are the signal. Only numeric columns are offered. This channel is loaded first; every other numeric column can be edited later through the channel switcher on the Graph page.</p><p><a href="help:user_guide/getting_started.html#channels">Open the user guide</a></p>',
+                None,
+            )
+        )
+        # endif // QT_CONFIG(whatsthis)
         # if QT_CONFIG(tooltip)
         self.combo_box_signal_column.setToolTip(
             QCoreApplication.translate(
-                "MetadataDialog",
-                "<html><head/><body><p>The column / channel in the file containing the signal values</p></body></html>",
-                None,
+                "MetadataDialog", "The column (channel) of the file holding the signal to analyse", None
             )
         )
         # endif // QT_CONFIG(tooltip)
+        # if QT_CONFIG(whatsthis)
+        self.combo_box_info_column.setWhatsThis(
+            QCoreApplication.translate(
+                "MetadataDialog",
+                '<p>An optional column recorded alongside the signal, such as temperature or oxygen saturation. The rate table gets its mean, standard deviation, minimum and maximum per rate window, and the result plot shows the rate against it.</p><p>Choose &lt;No Selection&gt; when there is none.</p><p><a href="help:user_guide/getting_started.html#channels">Open the user guide</a></p>',
+                None,
+            )
+        )
+        # endif // QT_CONFIG(whatsthis)
         # if QT_CONFIG(tooltip)
         self.combo_box_info_column.setToolTip(
             QCoreApplication.translate(
                 "MetadataDialog",
-                "<html><head/><body><p>A column / channel in the file containing supplementary data, e.g. temperature or O2-saturation recordings</p></body></html>",
+                "Optional second column (e.g. temperature) shown with the signal and summarised per rate window",
                 None,
             )
         )

@@ -1,14 +1,95 @@
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title>User Guide - Working with Sections</title>
-    </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Working with sections - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
 
-    <body>
-        <h2>Working with Sections</h2>
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Working with sections</p>
 
-        <p>TODO</p>
+<h1>Working with sections</h1>
 
-        <a href="preprocessing.html">Preprocessing Signals</a>
-    </body>
+<p>A <b>section</b> is a contiguous stretch of one channel. All processing, peak detection and rate calculation
+happens per section, and every section is exported on its own rows. The whole channel is the <b>base section</b>,
+<i>Section 000</i>; the sections you create are slices of it and are numbered 001, 002, ... in the order of
+creation. The base section itself is locked: to process or detect anything, create a section first.</p>
+
+<p>Sections live in the <b>Sections</b> dock on the right of the Graph page, which lists them with a lock icon and
+holds the command bar for everything below. Reference: <a href="../reference/dock_sections.html">Sections dock</a>.</p>
+
+<h2 id="create"><a name="create"></a>Create a section</h2>
+
+<ol>
+    <li>Make the base section active (click <i>Section 000</i> in the list). <b>New Section</b> is only enabled then.</li>
+    <li>Press <b>New Section</b>. A grey region with two draggable edges appears on the plot. When sections exist
+        already, the region starts right after the last one and has the same length; otherwise it covers the first
+        third of the visible range.</li>
+    <li>Drag the edges (or the whole region) to the stretch you want. Zoom and pan the plot as needed; the region
+        cannot leave the recording.</li>
+    <li>Press <b>Confirm</b> in the Sections dock. The new section is added to the list and becomes active.
+        <b>Cancel</b> drops the region instead.</li>
+</ol>
+
+<p>Sections may overlap. Every section gets its own copy of the processing state, peaks and rate, so the same
+stretch can be analysed twice with different settings.</p>
+
+<h2 id="activate"><a name="activate"></a>Switch between sections</h2>
+
+<p>Click a section in the list to make it active. The plot, the data table on the Import page, the Parameter Inputs
+dock and the Results page all show the active section; its name is written above the list and above the result
+views. With the section overview on (below), clicking a coloured region on the plot activates that section as
+well.</p>
+
+<p>The Parameter Inputs dock is only enabled for an unlocked, user-created section. For the base section and for
+locked sections it stays greyed out, and clicks on the plot do not add or remove peaks.</p>
+
+<h2 id="overview"><a name="overview"></a>Section overview</h2>
+
+<p><b>Section Overview</b> (command bar or Plot menu) draws every section as a coloured region on the plot of the base
+section. It is switched on automatically whenever the base section becomes active and is only available there.
+Hover a region to see the section's name, click it to activate the section.</p>
+
+<h2 id="lock"><a name="lock"></a>Lock and unlock a section</h2>
+
+<p>When the peaks of a section are correct, press <b>Lock Section</b>. SignalViewer computes the final peak table and
+the rate per window in the background (the window shows a busy overlay meanwhile) and locks the section: the
+Parameter Inputs dock is disabled for it, clicks on the plot are ignored, and the lock icon in the list closes. Only
+locked sections have results on the <a href="results.html">Results page</a> and in the export.</p>
+
+<p>Locking needs at least three peaks; with fewer an error message explains why nothing happened.</p>
+
+<p><b>Unlock Section</b> makes a locked section editable again. Its previous result is kept until the next processing
+step or peak edit, so unlocking and locking again without changes is harmless. Changing the
+<a href="../reference/settings.html">rate computation method</a> does not touch locked sections either: unlock and
+lock again to recompute them with the new method.</p>
+
+<h2 id="remove"><a name="remove"></a>Remove a section</h2>
+
+<p><b>Remove Section</b> (command bar, or right-click the section in the list) deletes the active section with its
+peaks and results. This cannot be undone. The base section cannot be removed. The sections after the removed one
+are renumbered, so <i>Section 003</i> becomes <i>Section 002</i> when 002 is deleted.</p>
+
+<h2 id="summary"><a name="summary"></a>Section summary</h2>
+
+<p><b>Show Section Summary</b> (command bar or context menu) opens a dialog with the section's name, size in samples,
+sampling rate, first and last row in the file, the number of peaks, and the full processing history: the pipeline
+or filters applied with their parameters, the standardization, the detection method and its parameters, and the
+rate computation method. Hovering a section in the list shows a shorter version of the same as a tooltip.</p>
+
+<h2 id="channels"><a name="channels"></a>Channels</h2>
+
+<p>Every numeric column of the file is a <b>channel</b>. The <b>Channel</b> drop-down in the main toolbar switches the
+channel being edited. The first switch to a channel reads it from the file; afterwards it stays in memory. Each
+channel has its own base section and its own list of sections, and switching back shows them exactly as you left
+them. The channel is part of every section's name, e.g. <i>Section 001 (ECG)</i>.</p>
+
+<p>The Excel export writes the sections of every loaded channel, in one workbook or one per channel; see
+<a href="results.html#export">Export to Excel</a>. If the info channel of the file is itself selected as the channel
+to edit, that channel has no info channel.</p>
+
+<p class="nav">Next: <a href="preprocessing.html">Preprocessing the signal</a></p>
+
+</body>
 </html>

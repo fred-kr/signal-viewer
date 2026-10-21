@@ -25,8 +25,8 @@ IS_WIN = sys.platform == "win32"
 IS_MAC = sys.platform == "darwin"
 
 # --- data files -------------------------------------------------------------------------------------------------
-# The help collection is located at runtime via Path(__file__).parent / "doc" (see sv_site.py), so it has to land
-# at the same relative location inside the bundle.
+# The user guide (plain HTML, shown by sv_help.HelpWindow in a QTextBrowser) is located at runtime via
+# Path(__file__).parent / "doc" (see sv_site.py), so it has to land at the same relative location inside the bundle.
 datas = [
     (str(ROOT / "signal_viewer" / "doc"), "signal_viewer/doc"),
     *collect_data_files("mne"),
@@ -35,10 +35,6 @@ datas = [
 
 # --- extra binaries ---------------------------------------------------------------------------------------------
 binaries = []
-if IS_WIN:
-    # Qt Assistant renders the .qch help collection. It is a single executable on Windows; on macOS it is a nested
-    # .app bundle that complicates signing, so there the app falls back to the system browser (see sv_help.py).
-    binaries.append((str(PYSIDE_DIR / "assistant.exe"), "PySide6"))
 
 # --- hidden imports -------------------------------------------------------------------------------------------
 hiddenimports = [
@@ -50,10 +46,6 @@ hiddenimports = [
     "sklearn.model_selection",
     "sklearn.preprocessing",
 ]
-if IS_WIN:
-    # Qt libraries that assistant.exe links against; importing the Python wrappers makes the hooks collect them
-    # together with the sqlite driver plugin that Qt Help needs.
-    hiddenimports += ["PySide6.QtHelp", "PySide6.QtSql", "PySide6.QtNetwork", "PySide6.QtPrintSupport"]
 
 # --- excludes -------------------------------------------------------------------------------------------------
 # Unused pieces that would otherwise inflate the bundle. The Qt entries are a safety net: PyInstaller only bundles

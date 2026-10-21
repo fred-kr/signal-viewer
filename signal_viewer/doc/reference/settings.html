@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Reference &rsaquo; Settings</p>
+
+<h1>Settings</h1>
+
+<p>Settings &gt; Preferences (Ctrl+,) opens the Settings dialog. Each setting has a reset button that restores its
+default. <b>OK</b> applies the changes, <b>Cancel</b> restores the values from before the dialog opened. Settings are
+stored per user and survive restarts; the <code>--reset-settings</code> <a href="command_line.html">command line
+flag</a> deletes them.</p>
+
+<h2 id="plot"><a name="plot"></a>Plot</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Setting</th><th>Default</th><th>Meaning</th></tr>
+    <tr><td>Line click width</td><td>70 px</td><td>The width in pixels orthogonal to the signal curve that responds to a mouse click. Larger values make the curve easier to hit when adding peaks.</td></tr>
+    <tr><td>Click radius</td><td>20 px</td><td>The radius in pixels around a click that is searched for an extreme point when adding a peak by hand.</td></tr>
+</table>
+
+<h2 id="processing"><a name="processing"></a>Processing</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Setting</th><th>Default</th><th>Meaning</th></tr>
+    <tr><td>Filter stacking</td><td>off</td><td>Whether a filter may be applied to an already filtered signal. In this version <i>Apply to Signal</i> always starts from the raw signal, so the setting has no visible effect.</td></tr>
+    <tr><td>Rate computation method</td><td>RollingWindow</td><td>How the rate is derived from the peaks: <i>RollingWindow</i> counts peaks in a moving window (settings on the Rate Calculation tab), <i>Instantaneous</i> interpolates one value per sample from the peak intervals. Changing it recomputes the rate of every unlocked section; locked sections keep their result.</td></tr>
+</table>
+
+<h2 id="data"><a name="data"></a>Data</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Setting</th><th>Default</th><th>Meaning</th></tr>
+    <tr><td>Float precision</td><td>3</td><td>Number of decimal places shown in the tables. Exported files hold the full values. Changing it refreshes the tables.</td></tr>
+    <tr><td>Text file separator</td><td>Tab</td><td>Character between the fields of a <code>.txt</code> file: Tab, Space, Comma, Semicolon or Pipe. <code>.csv</code> files always use the comma and <code>.tsv</code> files the tab. Takes effect on the next file opened.</td></tr>
+</table>
+
+<p>The application also stores the last used folders, the last chosen sampling rate and channels (pre-selected when
+the next file has the same column), the recent-files list and the window layout. These have no entry in the dialog.</p>
+
+</body>
+</html>

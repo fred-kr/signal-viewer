@@ -45,6 +45,14 @@ in the extracted folder and run:
 uv run sv
 ```
 
+## Documentation
+
+The user guide is bundled with the app. Press **F1** (or Help > User Guide) to open it at the page for the current
+view, or **Shift+F1** and then click any control to read what it does. The guide is plain HTML in
+[signal_viewer/doc/](signal_viewer/doc/) and opens in any web browser; start at
+[index.html](signal_viewer/doc/index.html). Its table of contents and keyword index come from
+[signalviewer.qhp](signal_viewer/doc/signalviewer.qhp); `tests/test_help.py` checks that every page and link exists.
+
 ## Command line flags
 
 | Flag | Effect |

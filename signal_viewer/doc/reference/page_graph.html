@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Graph page - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Reference &rsaquo; Graph page</p>
+
+<h1>Graph page</h1>
+
+<p>The editing page. It shows the active section and is where sections are created, the signal is processed and
+peaks are detected and corrected. The <a href="dock_sections.html">Sections</a> and
+<a href="dock_parameters.html">Parameter Inputs</a> docks appear with it. How-to:
+<a href="../user_guide/sections.html">Working with sections</a>,
+<a href="../user_guide/peak_detection.html">Detecting and editing peaks</a>.</p>
+
+<h2 id="plots"><a name="plots"></a>The two plots</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Element</th><th>Content</th></tr>
+    <tr><td>Signal plot (top)</td><td>The processed signal of the active section (blue line) and its peaks (yellow dots; red cross when hovered). While a section is being created, the grey region selector. With Section Overview on, the sections of the base section as coloured regions.</td></tr>
+    <tr><td>Rate plot (bottom)</td><td>The rate in beats per minute computed from the current peaks with the Rate Calculation settings. Empty until a section has peaks. Shares the time axis with the signal plot.</td></tr>
+    <tr><td>Time axis (top edge)</td><td>Elapsed time since the section start as days, <code>HH:MM</code>, <code>HH:MM:SS</code> or seconds, depending on the zoom level.</td></tr>
+    <tr><td>Legend</td><td>Names the curves: Signal, Peaks, Rate.</td></tr>
+</table>
+
+<h2 id="mouse"><a name="mouse"></a>Mouse and keyboard</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Input</th><th>Effect</th></tr>
+    <tr><td>Mouse wheel</td><td>Zoom the time axis around the cursor.</td></tr>
+    <tr><td>Left-drag on empty plot</td><td>Pan along the time axis. The y-axis follows the visible data.</td></tr>
+    <tr><td>Right-drag</td><td>Zoom the time axis around the point where the drag started.</td></tr>
+    <tr><td>Click on the signal curve</td><td>Add a peak at the nearest extreme within the click radius (unlocked user sections only).</td></tr>
+    <tr><td>Click on a peak dot</td><td>Remove that peak.</td></tr>
+    <tr><td>Ctrl+left-drag, middle-drag</td><td>Draw a selection rectangle.</td></tr>
+    <tr><td>Ctrl+F</td><td>Detect peaks inside the rectangle with the selected method and add them.</td></tr>
+    <tr><td>Ctrl+D</td><td>Remove every peak inside the rectangle.</td></tr>
+    <tr><td>Click on a section region</td><td>Make that section active (Section Overview on, base section active).</td></tr>
+    <tr><td>Drag the region selector</td><td>Move the whole range or one of its edges while creating a section.</td></tr>
+</table>
+
+<p>The click tolerances are settings: <i>Line click width</i> (how far from the curve a click still counts) and
+<i>Click radius</i> (how far around the click the extreme is searched). See <a href="settings.html">Settings</a>.</p>
+
+<h2 id="toolbar"><a name="toolbar"></a>Channel switcher</h2>
+
+<p>The <b>Channel</b> drop-down in the main toolbar lists every numeric column of the file. Selecting one shows that
+channel with its own sections; the first switch reads the channel from the file. Sections of the other channels are
+kept. See <a href="../user_guide/sections.html#channels">Channels</a>.</p>
+
+</body>
+</html>

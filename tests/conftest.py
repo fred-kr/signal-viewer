@@ -5,7 +5,14 @@ Pytest bootstrap.
 name are set, because it stores settings through `QSettings`. Set them here, before any test module imports the
 package. The application name differs from the real one ("SignalViewer") so test runs never read or write the
 user's stored settings.
+
+Widget tests (help window, parameter dock) need a `QApplication`; the `offscreen` platform plugin lets it run
+without a display, on CI included.
 """
+
+import os
+
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6 import QtWidgets
 
@@ -14,11 +21,17 @@ QtWidgets.QApplication.setApplicationName("SignalViewer-Tests")
 
 
 import pytest
-from PySide6 import QtCore
 
 
 @pytest.fixture(scope="session")
-def qapp() -> QtCore.QCoreApplication:
-    """A `QCoreApplication` for tests that need queued signal delivery (worker threads). No display required."""
-    app = QtCore.QCoreApplication.instance()
-    return app if app is not None else QtCore.QCoreApplication([])
+def qapp() -> QtWidgets.QApplication:
+    """
+    The one `QApplication` of the test session (off-screen).
+
+    A `QApplication` is also a `QCoreApplication`, so tests that only need queued signal delivery (worker threads)
+    use the same fixture.
+    """
+    app = QtWidgets.QApplication.instance()
+    if isinstance(app, QtWidgets.QApplication):
+        return app
+    return QtWidgets.QApplication([])

@@ -1,64 +1,139 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Manifest of the bundled user guide. `signal_viewer.sv_help.read_manifest` reads the table of contents and the
+  keyword index from it; nothing compiles it into a .qch any more. `ref` values are paths relative to this folder,
+  optionally with #anchor. `tests/test_help.py` checks that every ref exists.
+-->
 <QtHelpProject version="1.0">
     <namespace>com.quacktech.signalviewer</namespace>
     <virtualFolder>signalviewer</virtualFolder>
     <filterSection>
         <toc>
-            <section title="User Guide" ref="index.html">
-                <section title="Getting Started" ref="user_guide/getting_started.html"/>
-                <section title="Working with Sections" ref="user_guide/sections.html" />
-                <section title="Preprocessing Signals" ref="user_guide/preprocessing.html"/>
-                <section title="Peak Detection" ref="user_guide/peak_detection.html"/>
-                <section title="View and Export Results" ref="user_guide/results.html"/>
+            <section title="SignalViewer User Guide" ref="index.html">
+                <section title="Getting started" ref="user_guide/getting_started.html">
+                    <section title="Open a file" ref="user_guide/getting_started.html#open"/>
+                    <section title="Sampling rate" ref="user_guide/getting_started.html#sampling-rate"/>
+                    <section title="Signal and info channel" ref="user_guide/getting_started.html#channels"/>
+                    <section title="Load the data" ref="user_guide/getting_started.html#load"/>
+                </section>
+                <section title="Working with sections" ref="user_guide/sections.html">
+                    <section title="Create a section" ref="user_guide/sections.html#create"/>
+                    <section title="Switch sections" ref="user_guide/sections.html#activate"/>
+                    <section title="Lock and unlock" ref="user_guide/sections.html#lock"/>
+                    <section title="Channels" ref="user_guide/sections.html#channels"/>
+                </section>
+                <section title="Preprocessing the signal" ref="user_guide/preprocessing.html">
+                    <section title="Pipelines" ref="user_guide/preprocessing.html#pipeline"/>
+                    <section title="Custom filter" ref="user_guide/preprocessing.html#filter"/>
+                    <section title="Standardization" ref="user_guide/preprocessing.html#standardization"/>
+                </section>
+                <section title="Detecting and editing peaks" ref="user_guide/peak_detection.html">
+                    <section title="Detection methods" ref="user_guide/peak_detection.html#methods"/>
+                    <section title="Navigate the plot" ref="user_guide/peak_detection.html#navigate"/>
+                    <section title="Edit peaks by hand" ref="user_guide/peak_detection.html#edit"/>
+                </section>
+                <section title="Results and export" ref="user_guide/results.html">
+                    <section title="Rate calculation" ref="user_guide/results.html#rate"/>
+                    <section title="Result tables" ref="user_guide/results.html#tables"/>
+                    <section title="Result plot" ref="user_guide/results.html#plot"/>
+                    <section title="Export to Excel" ref="user_guide/results.html#export"/>
+                </section>
             </section>
-            <section title="UI Components">
-                <section title="Main Window" ref="ui_components/main_window.html">
-                    <section title="Page: Input Data" ref="ui_components/page_input.html"/>
-                    <section title="Page: View &amp; Edit" ref="ui_components/page_view_edit.html"/>
-                    <section title="Page: Results" ref="ui_components/page_results.html"/>
-                </section>
-                <section title="Dock Windows" ref="ui_components/dock_windows.html">
-                    <section title="Section List" ref="ui_components/section_list.html"/>
-                    <section title="Parameter Inputs" ref="ui_components/parameter_inputs.html"/>
-                    <section title="Log Window" ref="ui_components/log_window.html"/>
-                </section>
-                <section title="Dialog Windows" ref="ui_components/dialog_windows.html">
-                    <section title="File Metadata" ref="ui_components/file_metadata.html"/>
-                    <section title="Settings" ref="ui_components/settings.html"/>
-                </section>
+            <section title="Reference" ref="reference/main_window.html">
+                <section title="Main window, menus and shortcuts" ref="reference/main_window.html"/>
+                <section title="Import page" ref="reference/page_import.html"/>
+                <section title="Graph page" ref="reference/page_graph.html"/>
+                <section title="Results page" ref="reference/page_results.html"/>
+                <section title="Parameter Inputs dock" ref="reference/dock_parameters.html"/>
+                <section title="Sections dock" ref="reference/dock_sections.html"/>
+                <section title="Status Log dock" ref="reference/dock_log.html"/>
+                <section title="File Metadata dialog" ref="reference/dialog_metadata.html"/>
+                <section title="Settings" ref="reference/settings.html"/>
+                <section title="File formats" ref="reference/file_formats.html"/>
+                <section title="Command line flags" ref="reference/command_line.html"/>
             </section>
         </toc>
         <keywords>
-            <keyword name="Open" id="Open" ref="user_guide/getting_started.html"/>
-            <keyword name="Select" id="Select" ref="user_guide/getting_started.html"/>
-            <keyword name="Load" id="Load" ref="user_guide/getting_started.html"/>
-            <keyword name="Import" id="Import" ref="user_guide/getting_started.html"/>
-            <keyword name="Data" id="Data" ref="user_guide/getting_started.html"/>
-            <keyword name="File" id="File" ref="user_guide/getting_started.html"/>
-            <keyword name="Edit" id="Edit" ref="user_guide/sections.html"/>
-            <keyword name="Editing" id="Editing" ref="user_guide/sections.html"/>
-            <keyword name="Section" id="Section" ref="user_guide/sections.html"/>
-            <keyword name="Working" id="Working" ref="user_guide/sections.html"/>
-            <keyword name="Process" id="Process" ref="user_guide/preprocessing.html"/>
-            <keyword name="Signal Filter" id="Signal Filter" ref="user_guide/preprocessing.html"/>
-            <keyword name="Filter" id="Filter" ref="user_guide/preprocessing.html"/>
-            <keyword name="Clean" id="Clean" ref="user_guide/preprocessing.html"/>
-            <keyword name="Peak" id="Peak" ref="user_guide/peak_detection.html"/>
-            <keyword name="Detection" id="Detection" ref="user_guide/peak_detection.html"/>
-            <keyword name="Analysis" id="Analysis" ref="user_guide/peak_detection.html"/>
-            <keyword name="Results" id="Results" ref="user_guide/results.html"/>
-            <keyword name="View" id="View" ref="user_guide/results.html"/>
-            <keyword name="Export" id="Export" ref="user_guide/results.html"/>
-            <keyword name="Save" id="Save" ref="user_guide/results.html"/>
-            <keyword name="Save As" id="Save As" ref="user_guide/results.html"/>
-            <keyword name="UI" id="UI" ref="ui_components/main_window.html"/>
-            <keyword name="Window" id="Window" ref="ui_components/main_window.html"/>
-            <!-- TODO: Add more keywords -->
+            <keyword name="Open file" ref="user_guide/getting_started.html#open"/>
+            <keyword name="Recent files" ref="user_guide/getting_started.html#open"/>
+            <keyword name="Sampling rate" ref="user_guide/getting_started.html#sampling-rate"/>
+            <keyword name="Signal channel" ref="user_guide/getting_started.html#channels"/>
+            <keyword name="Info channel" ref="user_guide/getting_started.html#channels"/>
+            <keyword name="Temperature" ref="user_guide/getting_started.html#channels"/>
+            <keyword name="Load data" ref="user_guide/getting_started.html#load"/>
+            <keyword name="Close file" ref="user_guide/getting_started.html#close"/>
+            <keyword name="File metadata" ref="reference/dialog_metadata.html"/>
+            <keyword name="File formats" ref="reference/file_formats.html"/>
+            <keyword name="CSV" ref="reference/file_formats.html"/>
+            <keyword name="Excel" ref="reference/file_formats.html"/>
+            <keyword name="EDF" ref="reference/file_formats.html"/>
+            <keyword name="Section" ref="user_guide/sections.html"/>
+            <keyword name="Base section" ref="user_guide/sections.html"/>
+            <keyword name="New section" ref="user_guide/sections.html#create"/>
+            <keyword name="Section overview" ref="user_guide/sections.html#overview"/>
+            <keyword name="Lock section" ref="user_guide/sections.html#lock"/>
+            <keyword name="Unlock section" ref="user_guide/sections.html#lock"/>
+            <keyword name="Remove section" ref="user_guide/sections.html#remove"/>
+            <keyword name="Section summary" ref="user_guide/sections.html#summary"/>
+            <keyword name="Channel switcher" ref="user_guide/sections.html#channels"/>
+            <keyword name="Pipeline" ref="user_guide/preprocessing.html#pipeline"/>
+            <keyword name="Filter" ref="user_guide/preprocessing.html#filter"/>
+            <keyword name="Butterworth" ref="user_guide/preprocessing.html#filter"/>
+            <keyword name="Powerline" ref="user_guide/preprocessing.html#filter"/>
+            <keyword name="Standardization" ref="user_guide/preprocessing.html#standardization"/>
+            <keyword name="Z-score" ref="user_guide/preprocessing.html#standardization"/>
+            <keyword name="Reset signal" ref="user_guide/preprocessing.html#apply"/>
+            <keyword name="Peak detection" ref="user_guide/peak_detection.html"/>
+            <keyword name="Detection method" ref="user_guide/peak_detection.html#methods"/>
+            <keyword name="Local maxima" ref="user_guide/peak_detection.html#methods"/>
+            <keyword name="PPG" ref="user_guide/peak_detection.html#methods"/>
+            <keyword name="ECG" ref="user_guide/peak_detection.html#methods"/>
+            <keyword name="XQRS" ref="user_guide/peak_detection.html#methods"/>
+            <keyword name="Zoom" ref="user_guide/peak_detection.html#navigate"/>
+            <keyword name="Pan" ref="user_guide/peak_detection.html#navigate"/>
+            <keyword name="Add peak" ref="user_guide/peak_detection.html#edit"/>
+            <keyword name="Remove peak" ref="user_guide/peak_detection.html#edit"/>
+            <keyword name="Selection" ref="user_guide/peak_detection.html#edit"/>
+            <keyword name="Find peaks in selection" ref="user_guide/peak_detection.html#edit"/>
+            <keyword name="Remove peaks in selection" ref="user_guide/peak_detection.html#edit"/>
+            <keyword name="Manual edits" ref="user_guide/peak_detection.html#edit"/>
+            <keyword name="Rate" ref="user_guide/results.html#rate"/>
+            <keyword name="Rolling window" ref="user_guide/results.html#rate"/>
+            <keyword name="Instantaneous rate" ref="user_guide/results.html#rate"/>
+            <keyword name="Incomplete window" ref="user_guide/results.html#rate"/>
+            <keyword name="Result tables" ref="user_guide/results.html#tables"/>
+            <keyword name="Result plot" ref="user_guide/results.html#plot"/>
+            <keyword name="Fit model" ref="user_guide/results.html#plot"/>
+            <keyword name="GAM" ref="user_guide/results.html#plot"/>
+            <keyword name="Q10" ref="user_guide/results.html#plot"/>
+            <keyword name="Export" ref="user_guide/results.html#export"/>
+            <keyword name="Save to Excel" ref="user_guide/results.html#export"/>
+            <keyword name="group_var" ref="user_guide/results.html#export"/>
+            <keyword name="Copy to clipboard" ref="user_guide/results.html#tables"/>
+            <keyword name="Keyboard shortcuts" ref="reference/main_window.html#shortcuts"/>
+            <keyword name="Menus" ref="reference/main_window.html#menus"/>
+            <keyword name="Toolbars" ref="reference/main_window.html#toolbars"/>
+            <keyword name="What's This" ref="reference/main_window.html#help"/>
+            <keyword name="Parameter Inputs" ref="reference/dock_parameters.html"/>
+            <keyword name="Sections dock" ref="reference/dock_sections.html"/>
+            <keyword name="Status log" ref="reference/dock_log.html"/>
+            <keyword name="Error messages" ref="reference/dock_log.html"/>
+            <keyword name="Settings" ref="reference/settings.html"/>
+            <keyword name="Preferences" ref="reference/settings.html"/>
+            <keyword name="Click radius" ref="reference/settings.html"/>
+            <keyword name="Float precision" ref="reference/settings.html"/>
+            <keyword name="Text file separator" ref="reference/settings.html"/>
+            <keyword name="Rate computation method" ref="reference/settings.html"/>
+            <keyword name="Command line" ref="reference/command_line.html"/>
+            <keyword name="Debug log" ref="reference/command_line.html"/>
+            <keyword name="Reset settings" ref="reference/command_line.html"/>
+            <keyword name="OpenGL" ref="reference/command_line.html"/>
         </keywords>
         <files>
-            <file>user_guide/*.html</file>
-            <file>ui_components/*.html</file>
             <file>*.html</file>
+            <file>*.css</file>
+            <file>user_guide/*.html</file>
+            <file>reference/*.html</file>
             <file>images/*.png</file>
         </files>
     </filterSection>

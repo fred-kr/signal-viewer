@@ -1,3 +1,5 @@
+"""The File Metadata dialog: sampling rate, signal and info channel, and the file's own metadata tree."""
+
 from PySide6 import QtCore, QtWidgets
 
 from signal_viewer.constants import RESERVED_COLUMN_NAMES
@@ -56,6 +58,7 @@ class MetadataDialog(QtWidgets.QDialog, Ui_MetadataDialog):
 
     @QtCore.Slot()
     def accept(self) -> None:
+        """Emits the edited values through `sig_property_has_changed` and closes. Persisting them is `DataController.update_metadata`'s job."""
         # Only reports the user's choice. Persisting it is `DataController.load_data`'s job.
         metadata_dict: dict[str, int | str] = {
             "sampling_rate": self.spin_box_sampling_rate.value(),

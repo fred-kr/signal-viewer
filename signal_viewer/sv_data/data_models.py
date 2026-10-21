@@ -1,3 +1,12 @@
+"""
+Qt item models and the file metadata.
+
+`DataFrameModel` shows a polars frame in a table view, `FileListModel` the recent-files list, `SectionListModel` the
+sections of one channel (and assigns their ids). `FileMetadata` holds what is known about the open file before and
+after loading: columns, sampling rate, the chosen signal and info column, and which required fields are still
+missing.
+"""
+
 import datetime
 from collections.abc import Mapping
 from pathlib import Path
@@ -23,12 +32,21 @@ REQUIRED_FIELD_LABELS = {"sampling_rate": "Sampling rate", "signal_column": "Sig
 
 
 class DataFrameModel(QtCore.QAbstractTableModel):
+    """
+    Read-only table model over a polars frame.
+
+    Floats are shown with `Config.data.float_precision` decimals (read on every `set_df`), integers with thousands
+    separators, durations as `human_readable_timedelta`. The tooltip of a cell is the `repr` of the value, that of
+    a header the column dtype.
+    """
+
     def __init__(self, parent: QtCore.QObject | None = None) -> None:
         super().__init__(parent)
         self.df = pl.DataFrame()
         self._float_precision = Config.data.float_precision
 
     def set_df(self, df: pl.DataFrame) -> None:
+        """Replaces the frame (full model reset) and re-reads the float precision setting."""
         self.beginResetModel()
         self._float_precision = Config.data.float_precision
         self.df = df
@@ -102,6 +120,13 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
 
 class FileListModel(QtCore.QAbstractListModel):
+    """
+    The recent-files list: newest first, at most `max_files` entries, persisted in `Config.internal.recent_files`.
+
+    Files that no longer exist are dropped on construction (`validate_files`). Display text is the shortened path,
+    the tooltip and `UserRole` the full path.
+    """
+
     sig_files_changed = QtCore.Signal()
 
     def __init__(
@@ -152,6 +177,7 @@ class FileListModel(QtCore.QAbstractListModel):
         return str(section + 1)
 
     def add_file(self, file_path: str) -> None:
+        """Moves `file_path` to the top (or inserts it), drops the oldest entry beyond `max_files`. Ignores missing files."""
         if not Path(file_path).is_file():
             return
         parent = QtCore.QModelIndex()
@@ -175,6 +201,7 @@ class FileListModel(QtCore.QAbstractListModel):
         self.sig_files_changed.emit()
 
     def remove_file(self, index: ModelIndex) -> None:
+        """Removes the entry at `index`."""
         row = index.row()
         parent = self.index(0, 0)
         self.beginRemoveRows(parent, row, row)
@@ -184,6 +211,7 @@ class FileListModel(QtCore.QAbstractListModel):
         self.sig_files_changed.emit()
 
     def clear(self) -> None:
+        """Removes every entry."""
         self.beginResetModel()
         self._recent_files.clear()
         self.endResetModel()
@@ -191,6 +219,7 @@ class FileListModel(QtCore.QAbstractListModel):
         self.sig_files_changed.emit()
 
     def set_recent_files(self, recent_files: list[str]) -> None:
+        """Replaces the whole list."""
         self.beginResetModel()
         self._recent_files = recent_files
         self.endResetModel()
@@ -198,19 +227,29 @@ class FileListModel(QtCore.QAbstractListModel):
         self.sig_files_changed.emit()
 
     def get_recent_files(self) -> list[str]:
+        """The paths, newest first."""
         return self._recent_files
 
     def validate_files(self) -> None:
+        """Removes entries whose file no longer exists."""
         for i, file_path in enumerate(self._recent_files):
             if not Path(file_path).is_file():
                 self.remove_file(self.index(i))
 
     @QtCore.Slot()
     def update_config(self) -> None:
+        """Writes the list to `Config.internal.recent_files`; connected to `sig_files_changed`."""
         Config.internal.recent_files = self._recent_files
 
 
 class SectionListModel(QtCore.QAbstractListModel):
+    """
+    The sections of one channel, base section first.
+
+    Owns the section ids: `add_section` names a section after its row, `remove_section` renumbers the rest. The
+    display role is the pretty name, the decoration a lock icon, `UserRole` the `Section` itself.
+    """
+
     def __init__(
         self,
         sections: list[Section] | None = None,
@@ -226,6 +265,7 @@ class SectionListModel(QtCore.QAbstractListModel):
 
     @property
     def editable_sections(self) -> list[Section]:
+        """The user-created sections (everything but the base section), in creation order."""
         return list(self._sections)[1:]
 
     @override
@@ -279,9 +319,11 @@ class SectionListModel(QtCore.QAbstractListModel):
         self.refresh_section_ids()
 
     def get_section(self, index: QtCore.QModelIndex) -> Section | None:
+        """The section at `index`, or `None` for an invalid index."""
         return self._sections[index.row()] if index.isValid() else None
 
     def get_base_section(self) -> Section | None:
+        """Row 0, or `None` when the model is empty."""
         return self._sections[0] if self._sections else None
 
     def index_of(self, section: Section) -> QtCore.QModelIndex:
@@ -298,6 +340,7 @@ class SectionListModel(QtCore.QAbstractListModel):
             self.dataChanged.emit(index, index)
 
     def clear(self) -> None:
+        """Removes every section (full reset)."""
         self.beginResetModel()
         self._sections.clear()
         self.endResetModel()
@@ -320,6 +363,15 @@ class SectionListModel(QtCore.QAbstractListModel):
 
 
 class FileMetadata:
+    """
+    What is known about the open file: its columns and dtypes, the sampling rate, and the user's choice of signal
+    and info column.
+
+    Column names exist in two forms: as in the file (shown in the GUI, stored in `Config.internal`) and cleaned
+    (`name_map`, used inside the data frames). `required_fields` lists what still blocks loading; the setters keep it
+    current.
+    """
+
     __slots__ = (
         "_columns",
         "_info_column",
@@ -392,14 +444,17 @@ class FileMetadata:
 
     @property
     def file_name(self) -> str:
+        """File name with extension."""
         return self.file_info.fileName()
 
     @property
     def file_path(self) -> str:
+        """Canonical absolute path."""
         return self.file_info.canonicalFilePath()
 
     @property
     def file_format(self) -> InputFileFormat:
+        """The extension as `InputFileFormat`."""
         return InputFileFormat(f".{self.file_info.suffix()}")
 
     @property
@@ -432,6 +487,7 @@ class FileMetadata:
 
     @property
     def sampling_rate(self) -> int:
+        """Samples per second; `0` while unknown, which makes it a required field."""
         return self._sampling_rate
 
     @sampling_rate.setter
@@ -444,6 +500,7 @@ class FileMetadata:
 
     @property
     def signal_column(self) -> str:
+        """File column name of the signal. A name that is not a numeric column makes it a required field."""
         return self._signal_column
 
     @signal_column.setter
@@ -457,6 +514,7 @@ class FileMetadata:
 
     @property
     def info_column(self) -> str:
+        """File column name of the info channel, or `COMBO_BOX_NO_SELECTION`. See `info_column_or_none`."""
         return self._info_column
 
     @info_column.setter
@@ -499,6 +557,7 @@ class FileMetadata:
         return "Missing: " + ", ".join(labels)
 
     def to_dict(self) -> MetadataDict:
+        """Plain-dictionary form for the metadata dialog."""
         return {
             "file_path": self.file_path,
             "sampling_rate": self.sampling_rate,

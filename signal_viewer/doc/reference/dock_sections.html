@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sections dock - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Reference &rsaquo; Sections dock</p>
+
+<h1>Sections dock</h1>
+
+<p>Lists the sections of the active channel and holds the section commands. Shown on the Graph page; View &gt;
+Sections brings it back when closed. How-to: <a href="../user_guide/sections.html">Working with sections</a>.</p>
+
+<h2 id="command-bar"><a name="command-bar"></a>Command bar</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Action</th><th>Enabled when</th><th>Effect</th></tr>
+    <tr><td>New Section</td><td>The base section is active</td><td>Shows the region selector on the plot and the Confirm / Cancel buttons.</td></tr>
+    <tr><td>Lock Section</td><td>An unlocked user section is active</td><td>Computes the final result of the section in the background and locks it. Needs at least three peaks.</td></tr>
+    <tr><td>Unlock Section</td><td>A locked user section is active</td><td>Makes the section editable again; its result stays until the next change.</td></tr>
+    <tr><td>Remove Section</td><td>An unlocked user section is active</td><td>Deletes the section with its peaks and results. Cannot be undone. Later sections are renumbered.</td></tr>
+    <tr><td>Show Section Summary</td><td>Always</td><td>Opens a dialog with name, size, sampling rate, bounds, peak count and the processing history of the active section.</td></tr>
+    <tr><td>Section Overview</td><td>The base section is active</td><td>Shows the sections as coloured regions on the plot. Switched on automatically when the base section becomes active.</td></tr>
+</table>
+
+<h2 id="buttons"><a name="buttons"></a>Confirm and Cancel</h2>
+
+<p>Visible only while a new section is being selected. <b>Confirm</b> creates the section from the region selector's
+range and makes it active; <b>Cancel</b> drops the region.</p>
+
+<h2 id="list"><a name="list"></a>Section list</h2>
+
+<ul>
+    <li><b>Active Section</b> above the list names the section being edited.</li>
+    <li>Each entry shows the section's name, <i>Section 000 (CHANNEL)</i>, and a lock icon: closed for locked
+        sections (and the base section), open for editable ones.</li>
+    <li>Click an entry to make it active. Right-click for a context menu with Remove Section and Show Section
+        Summary.</li>
+    <li>Hover an entry for a summary tooltip: size, sampling rate, bounds, peak count and processing history.</li>
+</ul>
+
+</body>
+</html>

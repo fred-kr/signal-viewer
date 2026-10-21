@@ -1,3 +1,12 @@
+"""
+The main window.
+
+`SVGUI` assembles the window from `generated/ui_main_window.py` (three pages: Import, Graph, Results), the dock
+widgets (`SectionsDock`, `InputsDock`, `StatusMessageDock`), toolbars and menus, and owns the small dialogs it shows
+(section summary, error box). It holds no data: every action is wired to `SVApp`, which talks to the
+`DataController`. Window geometry and dock layout are stored in `Config.internal` on close.
+"""
+
 import os
 import traceback
 from typing import TYPE_CHECKING
@@ -23,7 +32,15 @@ if TYPE_CHECKING:
 
 
 class SVGUI(QtWidgets.QMainWindow):
-    sig_export_result = QtCore.Signal(str)
+    """
+    Main window of SignalViewer.
+
+    Widgets defined in Qt Designer are reachable through `self.ui`; widgets created in code (channel switcher,
+    result plot controls, docks) are attributes of the window. `sig_export_result` is the only signal of its own:
+    it carries the export format chosen through the Export actions or the "Save to Excel" button.
+    """
+
+    sig_export_result = QtCore.Signal(str)  # "csv" | "xlsx"
 
     def __init__(self, sv_app: SVApp, version: str = "0.0.0") -> None:
         super().__init__()
@@ -61,6 +78,7 @@ class SVGUI(QtWidgets.QMainWindow):
             self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
 
     def switch_to(self, widget: QtWidgets.QWidget) -> None:
+        """Shows the main page `widget` (one of `ui.tab_import`, `ui.tab_edit`, `ui.tab_export`)."""
         self.ui.tab_widget_main.setCurrentWidget(widget)
 
     def _setup_widgets(self) -> None:
@@ -90,6 +108,7 @@ class SVGUI(QtWidgets.QMainWindow):
         layout = QtWidgets.QVBoxLayout()
         data_tree_widget = SearchableDataTreeWidget()
         data_tree_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        data_tree_widget.setToolTip("Metadata stored in the file itself, e.g. the EDF header. Read-only.")
         layout.addWidget(data_tree_widget)
         self.dialog_meta.container_additional_metadata.setLayout(layout)
         self.data_tree_widget_additional_metadata = data_tree_widget
@@ -116,7 +135,15 @@ class SVGUI(QtWidgets.QMainWindow):
         self.combo_box_result_plot_fit.addItem("Smooth (spline GAM, Gamma log link)", ResultFitModel.Spline)
         self.combo_box_result_plot_fit.addItem("None", ResultFitModel.NoFit)
         self.combo_box_result_plot_fit.setToolTip(
-            "Model fitted to the rate against the info column (window means) in the 'Rate vs. ...' panel."
+            "Model fitted to the rate against the info channel (window means) in the 'Rate vs. ...' panel."
+        )
+        self.combo_box_result_plot_fit.setWhatsThis(
+            "<p>Model fitted to the rate per window against the mean of the info channel in the same window, drawn "
+            "into the scatter panel with its equation.</p>"
+            "<p>Exponential: rate = exp(a + b x), the usual shape of a rate-temperature relation; the title also "
+            "shows Q10 when the info channel is a temperature. Linear: ordinary least squares. Smooth: a penalized "
+            "spline whose smoothness is chosen by cross-validation.</p>"
+            '<p><a href="help:user_guide/results.html#plot">Open the user guide</a></p>'
         )
         scope_row.addSpacing(12)
         scope_row.addWidget(QtWidgets.QLabel("Fit:"))
@@ -168,6 +195,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dock_parameters.setEnabled(False)
 
     def _add_console_dock(self) -> None:
+        """Adds a Jupyter console (View menu) with `sv`, `sv_app` and `sv_gui` in its namespace. `DEV=1` only."""
         try:
             from pyside_widgets import JupyterConsoleWindow
 
@@ -191,14 +219,20 @@ class SVGUI(QtWidgets.QMainWindow):
 
     def _setup_actions(self) -> None:
         self.action_show_section_summary = QtGui.QAction(QtGui.QIcon("://icons/Info"), "Show Section Summary", self)
+        self.action_show_section_summary.setToolTip(
+            "Show size, bounds, peak count and processing history of the active section"
+        )
 
         self.action_toggle_whats_this_mode = QtWidgets.QWhatsThis.createAction(self)
         self.action_toggle_whats_this_mode.setIcon(QtGui.QIcon("://icons/Question"))
+        self.action_toggle_whats_this_mode.setToolTip(
+            "Enter What's This mode (Shift+F1), then click any control to read what it does"
+        )
 
         self.action_export_to_csv = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to CSV")
+        self.action_export_to_csv.setToolTip("Save the result table currently shown (peaks or rate) as a CSV file")
         self.action_export_to_xlsx = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to XLSX")
-
-        # self.ui.action_toggle_auto_scaling.setChecked(False)
+        self.action_export_to_xlsx.setToolTip("Save the results of every section of every channel to Excel")
 
     def _setup_toolbars(self) -> None:
         # Channel switcher. Filled by `SVApp` once a file is loaded; the toolbar itself is only enabled on the edit page.
@@ -208,6 +242,12 @@ class SVGUI(QtWidgets.QMainWindow):
         self.combo_box_channel.setSizeAdjustPolicy(QtWidgets.QComboBox.SizeAdjustPolicy.AdjustToContents)
         self.combo_box_channel.setToolTip(
             "Switch the channel (signal column) being edited. Sections and results of the other channels are kept."
+        )
+        self.combo_box_channel.setWhatsThis(
+            "<p>Every numeric column of the open file is a channel. Switching reads the channel from the file on "
+            "first use and shows its own sections; the sections and results of the other channels stay in memory "
+            "and are all included in the Excel export.</p>"
+            '<p><a href="help:user_guide/sections.html#channels">Open the user guide</a></p>'
         )
         self.combo_box_channel.setEnabled(True)
         self.tb_main = self._setup_toolbar("tb_main", actions=[self.ui.action_open_file, self.ui.action_show_settings])
@@ -243,6 +283,7 @@ class SVGUI(QtWidgets.QMainWindow):
         widgets: list[QtWidgets.QWidget] | None = None,
         movable: bool = False,
     ) -> QtWidgets.QToolBar:
+        """Creates a toolbar named `name` (also its object name, needed for `saveState`) and adds it to the window."""
         tb = QtWidgets.QToolBar(name)
         tb.setIconSize(QtCore.QSize(24, 24))
         tb.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
@@ -258,6 +299,7 @@ class SVGUI(QtWidgets.QMainWindow):
 
     @QtCore.Slot(QtCore.QPoint)
     def show_section_list_context_menu(self, pos: QtCore.QPoint) -> None:
+        """Context menu of the section list: remove the section or show its summary."""
         menu = QtWidgets.QMenu(parent=self.dock_sections.list_view)
         menu.addAction(self.ui.action_remove_section)
         menu.addAction(self.action_show_section_summary)
@@ -282,6 +324,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.menu_export.addActions([self.action_export_to_csv, self.action_export_to_xlsx])
 
     def hide_all_docks(self) -> None:
+        """Hides the status log, parameter and section docks."""
         self.dock_status_log.hide()
         self.dock_parameters.hide()
         self.dock_sections.hide()
@@ -304,6 +347,7 @@ class SVGUI(QtWidgets.QMainWindow):
 
     @QtCore.Slot(QtCore.QPoint)
     def show_result_view_context_menu(self, pos: QtCore.QPoint) -> None:
+        """Context menu of the result tables: copy the table to the clipboard, or export it as CSV / XLSX."""
         current_result_tab = self.ui.tab_widget_result_views.currentIndex()
         if current_result_tab == 0:
             table_view = self.ui.table_view_result_peaks
@@ -317,13 +361,16 @@ class SVGUI(QtWidgets.QMainWindow):
             "Copy to Clipboard",
             triggered=lambda: table_view.model().df.write_clipboard(),
         )
+        action_copy_table.setToolTip("Copy the whole table as tab-separated text")
         menu.addAction(action_copy_table)
         menu.addAction(self.action_export_to_csv)
         menu.addAction(self.action_export_to_xlsx)
         menu.exec(QtGui.QCursor.pos())
 
     def show_section_summary_box(self, summary: SectionSummaryDict) -> None:
+        """Opens a modal dialog showing `summary` (see `Section.get_summary`) as a searchable tree."""
         dlg = QtWidgets.QDialog(self)
+        dlg.setWindowTitle(f"Section Summary: {summary['name']}")
         dlg.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         dlg.setModal(True)
 
@@ -339,27 +386,29 @@ class SVGUI(QtWidgets.QMainWindow):
 
     @QtCore.Slot(int)
     def _on_page_changed(self, index: int) -> None:
+        """Shows the editing docks on the Graph page (index 1) only."""
         self.show_section_confirm_cancel(False)
         if index == 1:
-            # self.tb_main.setEnabled(True)
             self.command_bar_section_list.setEnabled(True)
             self.dock_sections.show()
             self.dock_parameters.show()
         else:
-            # self.tb_main.setEnabled(False)
             self.command_bar_section_list.setEnabled(False)
             self.dock_parameters.hide()
 
     def show_section_confirm_cancel(self, show: bool) -> None:
+        """Shows or hides the Confirm / Cancel buttons of the section dock used while creating a section."""
         self.dock_sections.btn_container.setVisible(show)
 
     def write_settings(self) -> None:
+        """Stores window geometry and dock/toolbar state in `Config.internal` and saves the settings."""
         Config.internal.window_geometry = self.saveGeometry()
         Config.internal.window_state = self.saveState()
 
         qconfig.save()
 
     def read_settings(self) -> None:
+        """Restores window geometry and dock/toolbar state from `Config.internal`."""
         self.restoreGeometry(Config.internal.window_geometry)
         self.restoreState(Config.internal.window_state)
 
@@ -385,6 +434,12 @@ class SVGUI(QtWidgets.QMainWindow):
         record_dict: LogRecordDict,
         threshold: LogLevel = LogLevel.WARNING,
     ) -> None:
+        """
+        Shows a message box for every log record at or above `threshold` (warnings and errors by default).
+
+        Connected to the status log, so `logger.warning(...)` anywhere in the application is enough to inform the
+        user; the traceback, if any, goes into the box's details. With `DEBUG=1` every level pops up.
+        """
         if os.environ.get("DEBUG") == "1":
             threshold = LogLevel.DEBUG
 
@@ -421,6 +476,7 @@ class SVGUI(QtWidgets.QMainWindow):
         dlg.exec()
 
     def set_active_section_label(self, label_text: str) -> None:
+        """Writes the active section's name into the section dock, the Results page and the data table header."""
         self.dock_sections.label_active_section.setText(f"Active Section: {label_text}")
         self.ui.label_showing_section_result.setText(label_text)
         self.ui.label_showing_data_table.setText(f"Showing: {label_text}")

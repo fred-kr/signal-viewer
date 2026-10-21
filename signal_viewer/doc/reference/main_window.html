@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Main window, menus and shortcuts - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Reference &rsaquo; Main window</p>
+
+<h1>Main window, menus and shortcuts</h1>
+
+<p>The main window has three pages in tabs along the top: <a href="page_import.html">Import</a>,
+<a href="page_graph.html">Graph</a> and <a href="page_results.html">Results</a>. Three dock windows can be attached
+to its sides: <a href="dock_sections.html">Sections</a> and <a href="dock_parameters.html">Parameter Inputs</a>,
+which appear on the Graph page, and the <a href="dock_log.html">Status Log</a>, hidden by default. Docks can be
+dragged to another side, floated or closed; the View menu brings them back. The window remembers its size and the
+dock layout between runs.</p>
+
+<p>While a background task runs (peak detection, computing a section result) a translucent overlay covers the
+window and blocks input until the task finishes.</p>
+
+<h2 id="menus"><a name="menus"></a>Menus</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Menu</th><th>Entry</th><th>Effect</th></tr>
+    <tr><td rowspan="3">File</td><td>Open File...</td><td>Choose and open a data file. Closes the open file first.</td></tr>
+    <tr><td>Close File</td><td>Discard everything and return to the start state.</td></tr>
+    <tr><td>File Metadata</td><td>Open the <a href="dialog_metadata.html">File Metadata dialog</a>.</td></tr>
+    <tr><td rowspan="3">View</td><td>Sections</td><td>Show or hide the Sections dock.</td></tr>
+    <tr><td>Status Log</td><td>Show or hide the Status Log dock.</td></tr>
+    <tr><td>Parameter Inputs</td><td>Show or hide the Parameter Inputs dock.</td></tr>
+    <tr><td rowspan="4">Plot</td><td>Remove Peaks in Selection</td><td>Ctrl+D. Remove every peak inside the Ctrl+drag rectangle.</td></tr>
+    <tr><td>Find Peaks in Selection</td><td>Ctrl+F. Run the selected detection method inside the rectangle and add the peaks found.</td></tr>
+    <tr><td>Scale y-axis</td><td>Rescale the signal plot to the whole signal.</td></tr>
+    <tr><td>Section Overview</td><td>Show the sections as coloured regions on the plot of the base section.</td></tr>
+    <tr><td>Settings</td><td>Preferences</td><td>Ctrl+, . Open the <a href="settings.html">Settings dialog</a>.</td></tr>
+    <tr><td rowspan="5">Help</td><td>About App</td><td>Version of SignalViewer and a link to its source code.</td></tr>
+    <tr><td>About Qt</td><td>Version of the Qt libraries.</td></tr>
+    <tr><td>Status Log</td><td>Show or hide the Status Log dock (same as in View).</td></tr>
+    <tr><td>What's This?</td><td>Shift+F1. Enter What's This mode; the next click explains the control it hits.</td></tr>
+    <tr><td>User Guide</td><td>F1. Open this guide at the page for the current view.</td></tr>
+</table>
+
+<h2 id="toolbars"><a name="toolbars"></a>Toolbars</h2>
+
+<ul>
+    <li><b>Main toolbar</b>: Open File..., Preferences, and the <b>Channel</b> drop-down that switches the channel
+        being edited (see <a href="../user_guide/sections.html#channels">Channels</a>).</li>
+    <li><b>Help toolbar</b>: What's This? and User Guide.</li>
+    <li>The <a href="dock_sections.html">Sections dock</a> has its own command bar with the section actions.</li>
+</ul>
+
+<h2 id="shortcuts"><a name="shortcuts"></a>Keyboard shortcuts</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Keys</th><th>Where</th><th>Action</th></tr>
+    <tr><td>F1</td><td>Everywhere</td><td>Open the user guide at the page for the current view.</td></tr>
+    <tr><td>Shift+F1</td><td>Everywhere</td><td>What's This mode.</td></tr>
+    <tr><td>Ctrl+,</td><td>Everywhere</td><td>Preferences.</td></tr>
+    <tr><td>Ctrl+F</td><td>Graph page</td><td>Find Peaks in Selection.</td></tr>
+    <tr><td>Ctrl+D</td><td>Graph page</td><td>Remove Peaks in Selection.</td></tr>
+    <tr><td>Ctrl+R</td><td>Import page</td><td>Close File (the button's shortcut).</td></tr>
+    <tr><td>Ctrl+left-drag, middle-drag</td><td>Signal plot</td><td>Draw the selection rectangle for Ctrl+F / Ctrl+D.</td></tr>
+    <tr><td>Alt+Left, Alt+Right</td><td>User guide window</td><td>Back, Forward.</td></tr>
+</table>
+
+<h2 id="help"><a name="help"></a>Where help appears</h2>
+
+<ul>
+    <li><b>Tooltips</b> appear when the mouse rests on a control. In the Parameter Inputs dock they state meaning,
+        unit, default and range of an input; the drop-down entries have tooltips too.</li>
+    <li><b>What's This</b> (Shift+F1, then click) shows a longer explanation. Most of them end with a link that opens
+        the matching page of this guide.</li>
+    <li><b>F1</b> opens this guide at the page for the Import, Graph or Results page, or at the Parameter Inputs
+        reference when the dock has keyboard focus.</li>
+    <li>Warnings and errors pop up as message boxes and are kept in the <a href="dock_log.html">Status Log</a>.</li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>File Metadata dialog - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Reference &rsaquo; File Metadata dialog</p>
+
+<h1>File Metadata dialog</h1>
+
+<p>Opened by File &gt; File Metadata, and automatically after opening a file whose sampling rate or signal channel
+could not be determined. It edits the same three values as the form on the Import page; both views always show the
+same state.</p>
+
+<h2 id="required"><a name="required"></a>Required Metadata tab</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Field</th><th>Content</th></tr>
+    <tr><td>File Name</td><td>Read-only.</td></tr>
+    <tr><td>File Type</td><td>Read-only. The extension, which selects the reader (see <a href="file_formats.html">File formats</a>).</td></tr>
+    <tr><td>Sampling Rate*</td><td>Samples per second. <code>&lt;Not set&gt;</code> while unknown. Required.</td></tr>
+    <tr><td>Signal Channel*</td><td>The numeric column to analyse first. Required.</td></tr>
+    <tr><td>Info Channel</td><td>Optional column summarised per rate window. <code>&lt;No Selection&gt;</code> for none.</td></tr>
+</table>
+
+<p>While a required field is missing, a line in the form says which (<i>Missing: Sampling rate</i>) and <b>Save</b>
+is disabled. <b>Save</b> applies the values to the open file; <b>Cancel</b> discards the edits. After the data is
+loaded the values are fixed; close and reopen the file to change them.</p>
+
+<h2 id="additional"><a name="additional"></a>Additional Metadata tab</h2>
+
+<p>Metadata stored in the file itself, as a read-only, searchable tree. For EDF files this is the header information
+read by the mne library (channel names, recording date, measurement units, ...). Tabular files have no additional
+metadata.</p>
+
+</body>
+</html>

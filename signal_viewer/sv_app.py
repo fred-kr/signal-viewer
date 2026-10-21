@@ -1,3 +1,12 @@
+"""
+Application controller: the glue between the main window and the data layer.
+
+`SVApp` creates the `SVGUI`, the `DataController`, the two plot controllers and the help controller, and connects
+their signals. It is also the place for everything that needs both a widget and data: opening and loading files,
+the metadata widgets, section creation, export dialogs, and the settings dialog. `start.gui` creates exactly one
+instance.
+"""
+
 import contextlib
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
@@ -9,7 +18,8 @@ import pyside_config as qconfig
 from loguru import logger
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from signal_viewer.enum_defs import SectionChange
+from signal_viewer.enum_defs import InputFileFormat, SectionChange
+from signal_viewer.help_texts import PARAMETER_REFERENCE_PAGE
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_controller import Channel, DataController
 from signal_viewer.sv_data.data_models import FileListModel
@@ -29,7 +39,7 @@ from signal_viewer.type_defs import (
     RollingRateKwargs,
     UpdatePeaksAction,
 )
-from signal_viewer.utils import safe_multi_disconnect
+from signal_viewer.utils import app_version, safe_multi_disconnect
 
 if TYPE_CHECKING:
     from signal_viewer.sv_data.data_models import FileMetadata
@@ -69,6 +79,7 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_open_file.triggered.connect(self._on_open_file)
         self.gui.ui.action_edit_metadata.triggered.connect(self.show_metadata_dialog)
         self.gui.ui.action_about_qt.triggered.connect(QtWidgets.QApplication.aboutQt)
+        self.gui.ui.action_about_app.triggered.connect(self._on_show_about)
         self.gui.ui.action_close_file.triggered.connect(self.close_file)
         self.gui.ui.action_show_user_guide.triggered.connect(self._on_show_user_guide)
 
@@ -133,10 +144,39 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def _on_show_user_guide(self) -> None:
-        self.help.show_page("index.html")
+        """
+        Opens the user guide at the page matching what the user is looking at (F1, Help menu, help toolbar).
+
+        The parameter dock wins when it has keyboard focus; otherwise the active main page decides.
+        """
+        focus = QtWidgets.QApplication.focusWidget()
+        if focus is not None and self.gui.dock_parameters.isAncestorOf(focus):
+            self.help.show_page(PARAMETER_REFERENCE_PAGE)
+            return
+        pages = {
+            self.gui.ui.tab_import: "user_guide/getting_started.html",
+            self.gui.ui.tab_edit: "user_guide/sections.html",
+            self.gui.ui.tab_export: "user_guide/results.html",
+        }
+        self.help.show_page(pages.get(self.gui.ui.tab_widget_main.currentWidget(), "index.html"))
+
+    @QtCore.Slot()
+    def _on_show_about(self) -> None:
+        """Shows the About box: version, purpose, how to reach the user guide, where the source lives."""
+        QtWidgets.QMessageBox.about(
+            self.gui,
+            "About SignalViewer",
+            f"<h3>SignalViewer {app_version()}</h3>"
+            "<p>Peak detection and rate calculation for physiological signals such as ECG and PPG.</p>"
+            "<p>Press <b>F1</b> for the user guide, or <b>Shift+F1</b> and then click a control to read what it "
+            "does.</p>"
+            '<p>Source code and releases: <a href="https://github.com/fred-kr/signal-viewer">'
+            "github.com/fred-kr/signal-viewer</a></p>",
+        )
 
     @QtCore.Slot()
     def _on_show_settings(self) -> None:
+        """Opens the Settings dialog. Changed settings are applied on OK; Cancel restores the snapshot taken before."""
         snapshot = qconfig.create_snapshot()
 
         settings_dlg = qconfig.create_editor(self.gui, exclude=["Internal"])
@@ -146,10 +186,15 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def clear_peaks(self) -> None:
+        """Removes every peak of the active section ("Reset Peaks")."""
         self.data.clear_peaks()
 
     @QtCore.Slot()
     def _on_find_peaks_in_selection(self) -> None:
+        """
+        "Find Peaks in Selection" (Ctrl+F): runs the selected detection method inside the Ctrl+drag rectangle and adds
+        the peaks found to the existing ones. Needs a method selected in the parameter dock.
+        """
         rect = self.plot.get_selection_area()
         if rect is None or self.plot.block_clicks:
             self.plot.remove_selection_rect()
@@ -208,6 +253,7 @@ class SVApp(QtCore.QObject):
         self.gui.dock_parameters.setEnabled(editable)
 
     def update_status_indicators(self) -> None:
+        """Syncs the three status check marks of the preprocessing tab with the processing flags of the active section."""
         self.gui.dock_parameters.ui.ui.status_filter.setChecked(self.data.active_section.is_filtered)
         self.gui.dock_parameters.ui.ui.status_filter.setToolTip(f"Times filtered: {self.data.active_section.n_filters}")
 
@@ -216,14 +262,17 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(object)
     def run_processing(self, request: ProcessingRequest) -> None:
+        """Forwards an "Apply to Signal" request to the controller."""
         self.data.apply_processing(request)
 
     @QtCore.Slot()
     def reset_signal_data(self) -> None:
+        """Forwards "Reset Signal": the raw signal comes back, peaks are dropped."""
         self.data.reset_signal()
 
     @QtCore.Slot(object)
     def run_peak_detection(self, request: PeakDetectionRequest) -> None:
+        """Forwards a "Run detection" request; the controller runs it on a worker thread."""
         self.data.detect_peaks(request)
 
     @QtCore.Slot(object)
@@ -316,6 +365,10 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(bool)
     def _on_create_new_section(self, checked: bool) -> None:
+        """
+        "New Section" toggled on: shows the region selector on the plot, placed right after the previous section with
+        the same length, together with the Confirm / Cancel buttons. Toggled off: hides both.
+        """
         self.gui.show_section_confirm_cancel(checked)
         if not checked:
             self.plot.hide_region_selector()
@@ -331,6 +384,7 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def _on_confirm_section(self) -> None:
+        """Creates a section from the bounds of the region selector and leaves section-creation mode."""
         if self.plot.region_selector is None:
             return
         if not self.plot.region_selector.isVisible():
@@ -343,12 +397,14 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def _on_cancel_section(self) -> None:
+        """Leaves section-creation mode without creating a section."""
         self.plot.hide_region_selector()
         self.gui.show_section_confirm_cancel(False)
         self.gui.ui.action_create_new_section.setChecked(False)
 
     @QtCore.Slot(QtCore.QModelIndex)
     def delete_section(self, index: QtCore.QModelIndex) -> None:
+        """Deletes the section at `index` (never the base section) and makes the base section active."""
         section = self.data.sections.get_section(index)
         if section is None or section is self.data.get_base_section():
             return
@@ -360,6 +416,7 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(QtCore.QModelIndex)
     def show_section_summary(self, index: QtCore.QModelIndex) -> None:
+        """Opens the summary dialog for the section at `index`."""
         s = self.data.sections.get_section(index)
         if s is None:
             return
@@ -368,6 +425,10 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(object)
     def _on_active_section_changed(self, section: Section) -> None:
+        """
+        A section became active: enables the base-section-only actions (New Section, Section Overview), updates the
+        labels and redraws every view from the section.
+        """
         is_base_section = section is self.data.get_base_section()
 
         self.gui.ui.action_create_new_section.setEnabled(is_base_section)
@@ -382,6 +443,7 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(object)
     def _on_sig_section_clicked(self, section: Section) -> None:
+        """A section region was clicked on the plot: makes that section active."""
         index = self.data.sections.index_of(section)
         if not index.isValid():
             return
@@ -390,6 +452,7 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(dict)
     def update_metadata(self, metadata_dict: MetadataDict) -> None:
+        """Applies the values the File Metadata dialog reported (sampling rate, signal and info column)."""
         sampling_rate = metadata_dict.get("sampling_rate", None)
         info_col = metadata_dict.get("info_column", None)
         signal_col = metadata_dict.get("signal_column", None)
@@ -471,33 +534,41 @@ class SVApp(QtCore.QObject):
     @QtCore.Slot()
     @QtCore.Slot(set)
     def show_metadata_dialog(self, required_fields: set[str] | None = None) -> None:
+        """
+        Opens the File Metadata dialog. Also the handler of `sig_user_input_required`, which fires when a freshly opened
+        file lacks a sampling rate or a usable signal column.
+        """
         # The dialog's widgets are kept current by `_bind_metadata`; nothing to fill here.
         self.gui.dialog_meta.open()
 
     @QtCore.Slot()
     def update_sampling_rate(self) -> None:
+        """Pushes the sampling rate entered on the Import page into the metadata."""
         sampling_rate = self.gui.ui.spin_box_sampling_rate_import_page.value()
         self.data.update_metadata(sampling_rate=sampling_rate)
         logger.info(f"Sampling rate set to {sampling_rate} Hz.")
 
     @QtCore.Slot(str)
     def update_signal_column(self, signal_column: str) -> None:
+        """Pushes the signal channel chosen on the Import page into the metadata."""
         self.data.update_metadata(signal_col=signal_column)
         logger.info(f"Signal column set to '{signal_column}'.")
 
     @QtCore.Slot(str)
     def update_info_column(self, info_column: str) -> None:
+        """Pushes the info channel chosen on the Import page into the metadata."""
         self.data.update_metadata(info_col=info_column)
         logger.info(f"Info column set to '{info_column}'.")
 
     @QtCore.Slot()
     def _on_open_file(self) -> None:
+        """ "Open File...": asks for a file, closes the open one and opens the chosen file."""
         default_data_dir = Config.internal.last_input_dir
         file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self.gui,
             "Open File",
             default_data_dir,
-            filter="Supported Files (*.csv *.txt *.tsv *.xls *.xlsx *.feather *.edf)",
+            filter="Supported Files (" + " ".join(f"*{fmt}" for fmt in InputFileFormat) + ")",
         )
         if not file_path:
             logger.info("File selection cancelled by user.")
@@ -509,6 +580,10 @@ class SVApp(QtCore.QObject):
         self._on_file_opened(file_path)
 
     def _on_file_opened(self, file_path: str) -> None:
+        """
+        Opens `file_path`: reads its metadata (not its data), fills the Import page, binds the table models and adds the
+        file to the recent-files list. Loading happens when the user presses "Load Data" (`read_data`).
+        """
         fname = Path(file_path).name
         self.gui.ui.line_edit_active_file.setText(fname)
         self.gui.setWindowTitle(f"SignalViewer - {fname}")
@@ -530,12 +605,17 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot(QtCore.QModelIndex)
     def _open_recent_file(self, index: QtCore.QModelIndex) -> None:
+        """Opens the double-clicked entry of the recent-files list."""
         file_path = self.recent_data_files.data(index, QtCore.Qt.ItemDataRole.UserRole)
         self.close_file()
         self._on_file_opened(file_path)
 
     @QtCore.Slot()
     def read_data(self) -> None:
+        """
+        "Load Data": reads the selected channel, sets the local-extrema radius defaults to half the sampling rate and
+        switches to the Graph page. Loading again discards the sections of an earlier load.
+        """
         if self.data.has_data:
             # Reloading the same file: the controller discards its sections itself, the plot has to follow.
             self.plot.reset()
@@ -554,6 +634,7 @@ class SVApp(QtCore.QObject):
         self.gui.dock_parameters.ui.ui.peak_localmin_radius.setProperty("defaultValue", _val)
         self.gui.dock_parameters.ui.ui.peak_localmax_radius.setValue(_val)
         self.gui.dock_parameters.ui.ui.peak_localmin_radius.setValue(_val)
+        self.gui.dock_parameters.ui.refresh_help_texts()  # the tooltips quote the default
 
         logger.info(f"Read data from file: {self.data.metadata.file_name}")
 
@@ -561,6 +642,10 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def close_file(self) -> None:
+        """
+        Closes the file: clears every view, replaces the `DataController` by a fresh one and puts the window back into
+        its start state. Results that were not exported are lost.
+        """
         self.gui.ui.table_view_import_data.setModel(None)
         self.gui.ui.table_view_result_peaks.setModel(None)
         self.gui.ui.table_view_result_rate.setModel(None)
@@ -615,16 +700,19 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def update_result_views(self) -> None:
+        """Fills the result tables and the result plot from the result frames of the active section."""
         self.data.result_model_peaks.set_df(self.data.active_section.peak_data)
         self.data.result_model_rate.set_df(self.data.active_section.rate_data)
         self.result_plot.set_section(self.data.active_section)
 
     @QtCore.Slot()
     def _lock_section(self) -> None:
+        """ "Lock Section": computes the result of the active section in the background and locks it."""
         self.data.lock_active()
 
     @QtCore.Slot()
     def _unlock_section(self) -> None:
+        """ "Unlock Section": makes the active section editable again."""
         self.data.unlock_active()
 
     # --- Export ------------------------------------------------------------------------------------------------------
@@ -632,6 +720,10 @@ class SVApp(QtCore.QObject):
     @logger.catch()
     @QtCore.Slot(str)
     def export_result(self, format: str) -> None:
+        """
+        Exports results as `format`: `"csv"` writes the result table currently shown, `"xlsx"` every section of every
+        loaded channel (see `_export_xlsx` for the dialogs involved).
+        """
         if format == "csv":
             self._export_csv()
         elif format == "xlsx":

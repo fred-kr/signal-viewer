@@ -1,4 +1,14 @@
+"""
+Entry point: parses the command line, configures logging and Qt, and runs the GUI.
+
+The console scripts `sv` and `signal-viewer` (see `pyproject.toml`) and `main.py` all call `gui`. Imports are
+deferred into the function so that `--version` and argument errors do not pay for loading Qt and the scientific
+stack. The flags are documented in `README.md` and in the user guide (`doc/reference/command_line.html`).
+"""
+
+
 def gui() -> None:
+    """Runs the application until the main window closes. See `README.md` for the command line flags."""
     import multiprocessing
 
     multiprocessing.freeze_support()
@@ -41,7 +51,7 @@ def gui() -> None:
     # application instance.
     QtWidgets.QApplication.setOrganizationName(org_name)
     QtWidgets.QApplication.setApplicationName(app_name)
-    # QtWidgets.QApplication.setStyle("Fusion")
+    QtWidgets.QApplication.setStyle("Fusion")
 
     if args.debug:
         logger.add(sys.stderr, colorize=True, backtrace=True, diagnose=True)

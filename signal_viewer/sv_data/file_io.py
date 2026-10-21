@@ -1,3 +1,9 @@
+"""
+Reading and writing files: sampling rate detection for tabular files, EDF reading through mne, and the Excel export.
+
+Tabular files are otherwise read by polars directly in `DataController._read_frame`.
+"""
+
 import datetime
 from collections.abc import Mapping, Sequence
 from pathlib import Path
@@ -140,6 +146,17 @@ def read_edf(
     stop: int | None = None,
     filter_all_zeros: bool = True,
 ) -> pl.DataFrame:
+    """
+    Reads `data_channel` (and `info_channel`) of an EDF file into a frame with a row index column.
+
+    EDF recordings are padded with zeros to whole data records, so with `filter_all_zeros` the trailing all-zero rows
+    are dropped (rows where either channel is zero when an info channel is given).
+
+    Parameters
+    ----------
+    start, stop : int
+        Sample range to read, as in `mne.io.Raw.get_data`.
+    """
     if info_channel is None:
         info_channel = COMBO_BOX_NO_SELECTION
     raw_edf = mne.io.read_raw_edf(file_path, include=[data_channel, info_channel])

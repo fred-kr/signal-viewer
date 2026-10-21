@@ -1,12 +1,107 @@
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title>User Guide - View and Export Results</title>
-    </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Results and export - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
 
-    <body>
-        <h2>View and Export Results</h2>
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Results and export</p>
 
-        <p>TODO</p>
-    </body>
+<h1>Results and export</h1>
+
+<p>A section has a result once it is <a href="sections.html#lock">locked</a>: a table of its peaks and a table of its
+rate per window, both computed from the final peaks. The <b>Results</b> page shows the result of the active section
+as a plot and as tables, and the export writes the results of every locked section of every channel to Excel.</p>
+
+<h2 id="rate"><a name="rate"></a>Rate calculation</h2>
+
+<p>The rate is derived from the peaks in one of two ways, chosen in <a href="../reference/settings.html">Settings &gt;
+Processing &gt; Rate computation method</a>:</p>
+<ul>
+    <li><b>Rolling window</b> (default): a window of fixed length moves along the section in fixed steps; the peaks in
+        each window are counted and scaled to beats per minute. One rate value per window.</li>
+    <li><b>Instantaneous</b>: one rate value per sample, interpolated from the time between consecutive peaks. Follows
+        every beat, and every missed beat.</li>
+</ul>
+
+<p>The <b>Rate Calculation</b> tab of the Parameter Inputs dock sets the rolling window:</p>
+<ul>
+    <li><b>Window Length</b>: the length of each window in seconds (default 60 s). Longer windows give a smoother rate.</li>
+    <li><b>New window every</b>: the step between window starts in seconds (default 10 s). It determines how many
+        rate rows a section produces.</li>
+    <li><b>Incomplete window handling</b>: what to do with the windows at the end of the section that are shorter
+        than the window length. <i>Drop</i> leaves them out, <i>Approximate</i> scales their peak count up to a full
+        window, <i>RepeatLast</i> repeats the rate of the last complete window.</li>
+</ul>
+<p>These settings apply to every section, and changing them recomputes the rate of the active section at once (the
+lower plot on the Graph page shows it). Locked sections keep the result they were locked with.</p>
+
+<h2 id="tables"><a name="tables"></a>Result tables</h2>
+
+<p><b>Peak Indices</b> has one row per peak: <code>section_index</code> (row within the section), the processed
+signal value, <code>global_index</code> (row within the file) and the value of the info channel at the peak.</p>
+
+<p><b>Calculated Rate / Summary Statistics</b> has one row per rate window: <code>section_index</code> of the window
+start, <code>peaks_in_window</code>, <code>rows_in_window</code>, the mean, standard deviation, minimum, maximum and
+variance of the info channel within the window (columns named after the info channel, e.g.
+<code>temperature_mean</code>), and <code>rate_bpm</code>.</p>
+
+<p>Right-click either table to <b>Copy to Clipboard</b> (tab-separated, pastes into a spreadsheet), <b>Export to
+CSV</b> (the shown table only) or <b>Export to XLSX</b> (all sections, see below). Floats are shown with the number
+of decimals set in Settings &gt; Data; the exported files hold the full values.</p>
+
+<h2 id="plot"><a name="plot"></a>Result plot</h2>
+
+<p><b>Plot View</b> draws, from top to bottom, the rate over time, the info channel over time (when the section has
+one) and the interval between consecutive peaks over time. With an info channel, a fourth panel on the right plots
+every rate window against the mean of the info channel in that window, with the mean rate per 0.1 step of the info
+value drawn as a line.</p>
+
+<ul>
+    <li><b>Show</b> switches between the active section (time since section start) and all locked sections of the
+        channel on the file's time axis, with alternating bands and the section numbers marking the sections.</li>
+    <li><b>Fit</b> fits a model to the rate-versus-info points and writes its equation into the panel title.
+        <i>Exponential</i> (a Gamma GLM with log link, rate = exp(a + b x)) is the usual shape of a rate-temperature
+        relation; when the info channel is a temperature the title also shows <b>Q10</b>, the factor by which the
+        rate changes per 10 degrees. <i>Linear</i> is ordinary least squares. <i>Smooth</i> is a penalized spline
+        whose smoothness is chosen by cross-validation; <b>k</b> sets its number of knots, <i>Auto</i> derives it
+        from the number of points. <i>None</i> draws no model.</li>
+</ul>
+
+<p>The figure is only drawn while the Plot View tab is visible, so switching settings on other tabs costs nothing.
+A fit that is not possible (too few points, no spread in the info values) is reported in the status log and
+skipped.</p>
+
+<h2 id="export"><a name="export"></a>Export to Excel</h2>
+
+<p><b>Save to Excel</b> on the Results page (also <i>Export to XLSX</i> in the table context menu) writes every
+section of every loaded channel. The steps:</p>
+<ol>
+    <li>If any section is not locked, a warning lists them; their rows will be missing or incomplete. Lock them
+        first or continue.</li>
+    <li>With sections on more than one channel you choose <b>One file</b> (all channels in one workbook, with a
+        <code>channel</code> column on every sheet) or <b>One file per channel</b>.</li>
+    <li>You may enter a label for a <code>group_var</code> column, e.g. an animal id or condition, which makes it
+        easy to combine the files of several recordings in R or Python. Leave it empty to add no label.</li>
+    <li>Pick the file name, or the folder for the per-channel files. Per-channel files are named
+        <code>Result_&lt;Channel&gt;_&lt;file&gt;.xlsx</code> and existing ones are only replaced after confirmation.</li>
+</ol>
+
+<p>Every workbook has four sheets:</p>
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Sheet</th><th>Rows</th><th>Columns</th></tr>
+    <tr><td>r_data</td><td>One per rate window of every section</td><td><code>channel</code>, <code>section_id</code>, <code>index</code> (file row of the window start), the info mean, <code>rate_bpm</code>, <code>group_var</code>. Made for statistics software.</td></tr>
+    <tr><td>Detected Peaks</td><td>One per peak</td><td><code>channel</code>, <code>section_id</code>, the Peak Indices table.</td></tr>
+    <tr><td>Rate Data</td><td>One per rate window</td><td><code>channel</code>, <code>section_id</code>, the Calculated Rate table.</td></tr>
+    <tr><td>Global Bounds</td><td>One per section</td><td><code>channel</code>, <code>section_id</code>, <code>global_start</code>, <code>global_end</code>: the first and last file row of the section.</td></tr>
+</table>
+
+<p><code>section_id</code> is the position of the section within its channel, starting at 1. A dialog confirms the
+written paths; the folder is remembered for the next export.</p>
+
+<p class="nav">Back to the <a href="../index.html">start page</a></p>
+
+</body>
 </html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Parameter Inputs dock - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Reference &rsaquo; Parameter Inputs dock</p>
+
+<h1>Parameter Inputs dock</h1>
+
+<p>Every input of the dock, with its unit, default value and range. The dock is shown on the Graph page and is
+enabled for unlocked, user-created sections only. The same texts appear as tooltips in the dock; a default marked
+"at load" is replaced when a file is loaded. How-to: <a href="../user_guide/preprocessing.html">Preprocessing</a>,
+<a href="../user_guide/peak_detection.html">Peak detection</a>, <a href="../user_guide/results.html#rate">Rate
+calculation</a>.</p>
+
+<h2 id="preprocessing"><a name="preprocessing"></a>Preprocessing tab</h2>
+
+<h3>Command bar and status</h3>
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Control</th><th>What it does</th></tr>
+    <tr id="action-sf-run"><td><a name="action-sf-run"></a>Apply to Signal</td><td>Applies the selected processing steps to the raw signal of the active section. Earlier processing and all peaks are discarded first.</td></tr>
+    <tr id="action-sf-reset-inputs"><td><a name="action-sf-reset-inputs"></a>Restore Defaults</td><td>Restores the default values of the pipeline, filter and standardization inputs. Does not touch the signal.</td></tr>
+    <tr id="action-sf-reset-data"><td><a name="action-sf-reset-data"></a>Reset Signal</td><td>Restores the raw signal of the active section. Every processing step and every peak is removed.</td></tr>
+    <tr id="status-pipeline"><td><a name="status-pipeline"></a>Check mark next to Pipeline</td><td>Checked while the signal of the active section was cleaned with a pipeline.</td></tr>
+    <tr id="status-filter"><td><a name="status-filter"></a>Check mark next to Filter Method</td><td>Checked while the signal is filtered. Its tooltip counts the filters applied in turn.</td></tr>
+    <tr id="status-standardization"><td><a name="status-standardization"></a>Check mark next to Standardization Method</td><td>Checked while the signal is standardized.</td></tr>
+</table>
+
+<h3>Inputs</h3>
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Input</th><th>Unit</th><th>Default</th><th>Range</th><th>Meaning</th></tr>
+    <tr id="sf-pipeline"><td><a name="sf-pipeline"></a>Pipeline</td><td></td><td>PPG_Elgendi</td><td>see <a href="../user_guide/preprocessing.html#pipeline">Pipelines</a></td><td>Ready-made cleaning pipeline from neurokit2. Selecting one disables the custom filter and standardization inputs; the empty entry enables them.</td></tr>
+    <tr id="sf-method"><td><a name="sf-method"></a>Filter Method</td><td></td><td>none</td><td>see <a href="../user_guide/preprocessing.html#filter">Custom filter</a></td><td>Filter applied to the raw signal when no pipeline is selected. Inputs the method does not use are disabled.</td></tr>
+    <tr id="sf-lower-cutoff"><td><a name="sf-lower-cutoff"></a>Lower cutoff</td><td>Hz</td><td>0.5</td><td>0 to 100000</td><td>Frequencies below it are removed (high-pass part). 0 means no lower cutoff. Butterworth, Bessel, FIR.</td></tr>
+    <tr id="sf-upper-cutoff"><td><a name="sf-upper-cutoff"></a>Upper cutoff</td><td>Hz</td><td>8.0</td><td>0 to 100000</td><td>Frequencies above it are removed (low-pass part). 0 means no upper cutoff. Butterworth, Bessel, FIR.</td></tr>
+    <tr id="sf-order"><td><a name="sf-order"></a>Order</td><td></td><td>3</td><td>1 to 10</td><td>Filter order; higher orders cut off more sharply but can ring. For Savitzky-Golay the polynomial degree. Butterworth, Bessel, SavGol.</td></tr>
+    <tr id="sf-window-size"><td><a name="sf-window-size"></a>Window Size</td><td>samples</td><td>100</td><td>5 to 1000000</td><td>Window length of the FIR filter (number of taps) and of Savitzky-Golay smoothing. The minimum value stands for the neurokit2 default, about a third of a second of samples. FIR, SavGol.</td></tr>
+    <tr id="sf-powerline"><td><a name="sf-powerline"></a>Powerline</td><td>Hz</td><td>50.0</td><td>0 to 100000</td><td>Mains frequency to remove: 50 Hz in Europe, 60 Hz in North America. Powerline only.</td></tr>
+    <tr id="std-method"><td><a name="std-method"></a>Standardization Method</td><td></td><td>none</td><td>ZScore, ZScoreRobust</td><td>Rescales the filtered signal to zero centre and unit spread. Applied after the filter.</td></tr>
+    <tr id="std-rolling-window"><td><a name="std-rolling-window"></a>Use rolling window</td><td></td><td>off</td><td></td><td>Compute mean and standard deviation inside a moving window instead of over the whole section. Removes slow drift. ZScore only.</td></tr>
+    <tr id="std-window-size"><td><a name="std-window-size"></a>Window Size (standardization)</td><td>samples</td><td>100</td><td>5 to 999999</td><td>Length of the moving window for rolling standardization. Should span several beats.</td></tr>
+</table>
+
+<h2 id="peak-detection"><a name="peak-detection"></a>Peak Detection tab</h2>
+
+<h3>Command bar</h3>
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Control</th><th>What it does</th></tr>
+    <tr id="action-peak-run"><td><a name="action-peak-run"></a>Run detection</td><td>Runs the selected method on the processed signal of the active section, in the background. Existing peaks, including manual edits, are replaced.</td></tr>
+    <tr id="action-peak-reset-inputs"><td><a name="action-peak-reset-inputs"></a>Restore Defaults</td><td>Restores the default parameter values of the selected method.</td></tr>
+    <tr id="action-peak-reset-data"><td><a name="action-peak-reset-data"></a>Reset Peaks</td><td>Removes every peak of the active section. The processed signal is kept.</td></tr>
+</table>
+
+<h3>Method and parameters</h3>
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Input</th><th>Unit</th><th>Default</th><th>Range</th><th>Meaning</th></tr>
+    <tr id="peak-method"><td><a name="peak-method"></a>Detection Method</td><td></td><td>LocalMaxima</td><td>see <a href="../user_guide/peak_detection.html#methods">Detection methods</a></td><td>Algorithm used to find peaks. The inputs below change with the selection. Also used by Find Peaks in Selection (Ctrl+F).</td></tr>
+    <tr><th colspan="5">PPG_Elgendi</th></tr>
+    <tr id="peak-ppg-elgendi-peakwindow"><td><a name="peak-ppg-elgendi-peakwindow"></a>Peak Window</td><td>s</td><td>0.111</td><td>0.05 to 5</td><td>Length of the moving average that smooths the squared signal to bring out systolic peaks. About the duration of one systolic peak.</td></tr>
+    <tr id="peak-ppg-elgendi-beatwindow"><td><a name="peak-ppg-elgendi-beatwindow"></a>Beat Window</td><td>s</td><td>0.667</td><td>0.1 to 5</td><td>Length of the moving average that follows whole beats. About one heartbeat; forms the threshold the peak average has to exceed.</td></tr>
+    <tr id="peak-ppg-elgendi-beatoffset"><td><a name="peak-ppg-elgendi-beatoffset"></a>Beat Offset</td><td></td><td>0.02</td><td>0 to 1</td><td>Fraction of the mean of the squared signal added to the beat average to form the detection threshold. Larger values reject smaller peaks.</td></tr>
+    <tr id="peak-ppg-elgendi-mindelay"><td><a name="peak-ppg-elgendi-mindelay"></a>Minimum Delay</td><td>s</td><td>0.3</td><td>0 to 10</td><td>Minimum time between two peaks; of two closer peaks the later one is dropped. 0.3 s corresponds to 200 beats per minute.</td></tr>
+    <tr><th colspan="5">LocalMaxima, LocalMinima</th></tr>
+    <tr id="peak-localmax-radius"><td><a name="peak-localmax-radius"></a>Radius (maxima)</td><td>samples</td><td>111; half the sampling rate at load</td><td>1 to 10000</td><td>Half-width of the search window. A sample is a peak when it is the highest value within this many samples on either side; peaks closer than the radius are merged. Try a quarter to three times the sampling rate, and detection on the unprocessed signal.</td></tr>
+    <tr id="peak-localmin-radius"><td><a name="peak-localmin-radius"></a>Radius (minima)</td><td>samples</td><td>111; half the sampling rate at load</td><td>1 to 10000</td><td>As above, for the lowest value.</td></tr>
+    <tr><th colspan="5">ECG_XQRS</th></tr>
+    <tr id="peak-xqrs-direction"><td><a name="peak-xqrs-direction"></a>Peak Adjustment</td><td></td><td>Up</td><td>Up, Down, Both, Compare</td><td>Where each QRS location found by XQRS is moved within the search radius: highest sample, lowest sample, largest absolute value, or whichever of the first two fits the recording better.</td></tr>
+    <tr id="peak-xqrs-radius"><td><a name="peak-xqrs-radius"></a>Radius</td><td>samples</td><td>90</td><td>5 to 99999</td><td>Samples searched on either side of every XQRS location for the actual peak.</td></tr>
+    <tr id="peak-xqrs-min-dist"><td><a name="peak-xqrs-min-dist"></a>Min. Distance</td><td>samples</td><td>10</td><td>0 to 100000</td><td>Minimum distance between two peaks. Of two closer peaks the smaller is dropped; peaks far from their neighbours' amplitude are removed as well.</td></tr>
+    <tr><th colspan="5">ECG_NeuroKit</th></tr>
+    <tr id="peak-ecg-nk-smoothwindow"><td><a name="peak-ecg-nk-smoothwindow"></a>Smooth Window</td><td>s</td><td>0.01</td><td>0.01 to 10</td><td>Length of the moving average that smooths the absolute gradient. The neurokit2 default is 0.1 s.</td></tr>
+    <tr id="peak-ecg-nk-avgwindow"><td><a name="peak-ecg-nk-avgwindow"></a>Average Window</td><td>s</td><td>0.75</td><td>0.01 to 10</td><td>Length of the moving average that tracks the local level of the smoothed gradient; the threshold follows it.</td></tr>
+    <tr id="peak-ecg-nk-gradthreshweight"><td><a name="peak-ecg-nk-gradthreshweight"></a>Grad. Thresh. Weight</td><td></td><td>1.5</td><td>0.1 to 10</td><td>Factor applied to the averaged gradient to form the QRS threshold. Larger values demand steeper QRS complexes.</td></tr>
+    <tr id="peak-ecg-nk-minlenweight"><td><a name="peak-ecg-nk-minlenweight"></a>Min. Length Weight</td><td></td><td>0.3</td><td>0.01 to 10</td><td>QRS candidates shorter than this fraction of the mean candidate length are rejected.</td></tr>
+    <tr id="peak-ecg-nk-mindelay"><td><a name="peak-ecg-nk-mindelay"></a>Minimum Delay</td><td>s</td><td>0.3</td><td>0.01 to 10</td><td>Minimum time between two R-peaks. 0.3 s corresponds to 200 beats per minute.</td></tr>
+    <tr><th colspan="5">ECG_Gamboa_2008</th></tr>
+    <tr id="peak-ecg-gamboa-tol"><td><a name="peak-ecg-gamboa-tol"></a>Tolerance</td><td></td><td>0.002</td><td>0.001 to 0.01</td><td>Tolerance of the histogram-based amplitude threshold, as a fraction of the amplitude range.</td></tr>
+    <tr><th colspan="5">ECG_Emrich_2023</th></tr>
+    <tr id="peak-ecg-emrich-window-seconds"><td><a name="peak-ecg-emrich-window-seconds"></a>Window Seconds</td><td>s</td><td>2.0</td><td>1 to 100</td><td>Length of the segments the signal is cut into before each is turned into a visibility graph.</td></tr>
+    <tr id="peak-ecg-emrich-window-overlap"><td><a name="peak-ecg-emrich-window-overlap"></a>Window Overlap</td><td></td><td>0.5</td><td>0.01 to 1</td><td>Overlap of consecutive segments as a fraction of the segment length.</td></tr>
+    <tr id="peak-ecg-emrich-accelerated"><td><a name="peak-ecg-emrich-accelerated"></a>Accelerated</td><td></td><td>on</td><td></td><td>Build the visibility graph from local maxima only (FastNVG). Many times faster, same peaks in practice.</td></tr>
+    <tr><th colspan="5">ECG_Promac</th></tr>
+    <tr id="peak-ecg-promac-threshold"><td><a name="peak-ecg-promac-threshold"></a>Threshold</td><td></td><td>0.33</td><td>0 to 1</td><td>Fraction of the maximum of the summed detector curves a location has to reach to count as a peak.</td></tr>
+    <tr id="peak-ecg-promac-gaussian-sd"><td><a name="peak-ecg-promac-gaussian-sd"></a>Gaussian SD</td><td>ms</td><td>100</td><td>0 to 100000</td><td>Standard deviation of the Gaussian placed on every peak of every detector before the curves are summed.</td></tr>
+</table>
+
+<p>Methods not listed here (ECG_PanTompkins_1985, ECG_Hamilton_2002, ECG_Martinez_2004, ECG_Christov_2004,
+ECG_Nabian_2018, ECG_EngzeeMod_2012, ECG_Manikandan_2012, ECG_Elgendi_2010, ECG_Kalidas_2017, ECG_Rodrigues_2021)
+have no adjustable parameters.</p>
+
+<h2 id="rate-calculation"><a name="rate-calculation"></a>Rate Calculation tab</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Input</th><th>Unit</th><th>Default</th><th>Range</th><th>Meaning</th></tr>
+    <tr id="rate-handle-incomplete"><td><a name="rate-handle-incomplete"></a>Incomplete window handling method</td><td></td><td>Drop</td><td>Drop, Approximate, RepeatLast</td><td>What to do with windows at the end of a section that are shorter than the window length: leave them out, scale their peak count up to a full window, or repeat the rate of the last complete window.</td></tr>
+    <tr id="rate-every"><td><a name="rate-every"></a>New window every</td><td>s</td><td>10</td><td>1 to 600</td><td>Time between the starts of consecutive rate windows. Sets how many rate rows a section produces.</td></tr>
+    <tr id="rate-period"><td><a name="rate-period"></a>Window Length</td><td>s</td><td>60</td><td>1 to 10000</td><td>Length of each rate window. The peaks inside are counted and scaled to beats per minute. Longer windows give a smoother rate.</td></tr>
+</table>
+
+<p>The rate inputs apply to every section at once; the active section's rate is recomputed immediately. Whether
+the rolling window is used at all is the <a href="settings.html">Rate computation method</a> setting.</p>
+
+</body>
+</html>

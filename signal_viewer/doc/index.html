@@ -1,20 +1,73 @@
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title>User Guide</title>
-    </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SignalViewer User Guide</title>
+<link rel="stylesheet" href="stylesheet.css">
+</head>
+<body>
 
-    <body>
-        <h1>SignalViewer</h1>
+<h1>SignalViewer User Guide</h1>
 
-        <p>The SignalViewer application can be used to visualize, explore and analyze (biological) signal data.</p>
+<p>SignalViewer finds the peaks (heartbeats) in a recorded physiological signal such as an ECG or a
+photoplethysmogram (PPG), lets you correct them by hand, and turns them into a rate per time window. It is made for
+lab work where a long recording is cut into sections of interest, each section is cleaned and checked, and the rates
+of all sections are exported to one Excel workbook for analysis elsewhere.</p>
 
-        <!-- <p>
-        <center>
-            <img src="images/data_import.png" />
-        </center>
-    </p> -->
+<h2>The workflow</h2>
 
-        <a href="getting_started.html">Getting Started</a>
-    </body>
+<ol>
+    <li><a href="user_guide/getting_started.html">Open a file and load a channel.</a> Set the sampling rate and pick
+        the signal column; optionally pick an info column such as temperature.</li>
+    <li><a href="user_guide/sections.html">Create a section</a> covering the stretch of the recording you want to
+        analyse. The whole file is the base section; sections are slices of it.</li>
+    <li><a href="user_guide/preprocessing.html">Preprocess the signal</a> of the section with a ready-made pipeline or
+        your own filter.</li>
+    <li><a href="user_guide/peak_detection.html">Detect the peaks</a> with one of the detection methods and fix single
+        peaks by clicking on the plot.</li>
+    <li><a href="user_guide/results.html">Lock the section and export the results.</a> Locking computes the rate per
+        window; the export writes every locked section of every channel.</li>
+</ol>
+
+<h2>Help inside the application</h2>
+
+<ul>
+    <li><b>F1</b> opens this guide at the page for what you are looking at: the Import, Graph or Results page, or the
+        Parameter Inputs dock when it has the keyboard focus.</li>
+    <li><b>Shift+F1</b> (or the question mark button in the toolbar) enters What's This mode. Click any button, field
+        or menu entry to read what it does; most of these texts end with a link into this guide.</li>
+    <li>Hovering an input in the Parameter Inputs dock shows a tooltip with the meaning, unit, default and range of
+        the value. The entries of every drop-down list have tooltips describing the method they stand for.</li>
+</ul>
+
+<h2>Contents</h2>
+
+<h3>User guide</h3>
+<ul>
+    <li><a href="user_guide/getting_started.html">Getting started</a>: open, configure and load a file.</li>
+    <li><a href="user_guide/sections.html">Working with sections</a>: create, switch, lock, remove; channels.</li>
+    <li><a href="user_guide/preprocessing.html">Preprocessing the signal</a>: pipelines, filters, standardization.</li>
+    <li><a href="user_guide/peak_detection.html">Detecting and editing peaks</a>: methods, plot navigation, manual edits.</li>
+    <li><a href="user_guide/results.html">Results and export</a>: rate calculation, tables, plot, Excel export.</li>
+</ul>
+
+<h3>Reference</h3>
+<ul>
+    <li><a href="reference/main_window.html">Main window, menus and keyboard shortcuts</a></li>
+    <li><a href="reference/page_import.html">Import page</a>,
+        <a href="reference/page_graph.html">Graph page</a>,
+        <a href="reference/page_results.html">Results page</a></li>
+    <li><a href="reference/dock_parameters.html">Parameter Inputs dock</a>: every input with unit, default and range</li>
+    <li><a href="reference/dock_sections.html">Sections dock</a>,
+        <a href="reference/dock_log.html">Status Log dock</a>,
+        <a href="reference/dialog_metadata.html">File Metadata dialog</a></li>
+    <li><a href="reference/settings.html">Settings</a></li>
+    <li><a href="reference/file_formats.html">File formats</a>: what can be read, what is written</li>
+    <li><a href="reference/command_line.html">Command line flags</a></li>
+</ul>
+
+<p class="nav">The pages of this guide are plain HTML files in the <code>doc</code> folder of the application and
+open in any web browser (toolbar button <i>Open in browser</i>).</p>
+
+</body>
 </html>

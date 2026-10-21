@@ -1,9 +1,18 @@
+"""
+Small helpers without a better home.
+
+Qt object lookup (`get_app`, `get_gui`), pen/brush/color factories that accept everything pyqtgraph accepts,
+signal disconnection that tolerates unconnected slots, string formatting for the GUI, the package version, and the
+column-name cleaning adapted from pyjanitor that gives every loaded column a safe, lower-case name.
+"""
+
 import datetime
 import enum
 import re
 import sys
 import unicodedata
 from collections.abc import Callable, Sequence
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, Unpack
 
@@ -152,12 +161,21 @@ def get_gui() -> SVGUI:
     return get_app().gui
 
 
+def app_version() -> str:
+    """The installed package version, or `"unknown"` when the metadata is missing (plain checkout without install)."""
+    try:
+        return version("signal-viewer")
+    except PackageNotFoundError:
+        return "unknown"
+
+
 def set_font(
     widget: QtWidgets.QWidget,
     font_size: int = 14,
     weight: QtGui.QFont.Weight = QtGui.QFont.Weight.Normal,
     family: str | None = None,
 ) -> None:
+    """Changes size, weight and (optionally) family of the font of `widget`, in place."""
     font = widget.font()
     font.setPointSize(font_size)
     font.setWeight(weight)
@@ -175,6 +193,13 @@ def find_nearest_extrema[T: IsPlottable](
     cursor_pos: Point | QtCore.QPoint | QtCore.QPointF,
     search_radius: int,
 ) -> tuple[T, T] | None:
+    """
+    Finds the data point near `cursor_pos` that a click most likely meant.
+
+    Only points within `search_radius` (in x units) of the cursor are considered. Of those, the point closest in x
+    is the default; the point closest in y replaces it when it lies closer to the cursor's y. Returns `(x, y)`, or
+    `None` when no point is within the radius.
+    """
     cursor_x, cursor_y = cursor_pos.x(), cursor_pos.y()
     left_idx = np.searchsorted(x_data, cursor_x - search_radius, side="left")
     right_idx = np.searchsorted(x_data, cursor_x + search_radius, side="right")

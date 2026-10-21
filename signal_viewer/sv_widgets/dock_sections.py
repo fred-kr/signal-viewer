@@ -1,9 +1,21 @@
+"""
+The Sections dock: the list of sections of the active channel, its command bar, and the Confirm / Cancel buttons
+shown while a new section is being selected on the plot.
+"""
+
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from signal_viewer.utils import set_font
 
 
 class SectionListView(QtWidgets.QListView):
+    """
+    List view of the sections with a context menu.
+
+    Emits `sig_delete_item` / `sig_show_summary` with the current index when the corresponding actions fire, so the
+    actions can live on the dock's command bar and in the context menu alike.
+    """
+
     sig_delete_item = QtCore.Signal(QtCore.QModelIndex)
     sig_show_summary = QtCore.Signal(QtCore.QModelIndex)
 
@@ -16,6 +28,7 @@ class SectionListView(QtWidgets.QListView):
         self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        """Selects the row under the cursor on right-click too, so the context menu acts on the clicked section."""
         if event.button() == QtCore.Qt.MouseButton.LeftButton or self._select_right_clicked_row:
             super().mousePressEvent(event)
 
@@ -37,6 +50,8 @@ class SectionListView(QtWidgets.QListView):
 
 
 class SectionsWidget(QtWidgets.QWidget):
+    """Contents of the dock: command bar, Confirm / Cancel buttons, active-section label and the list view."""
+
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
 
@@ -69,6 +84,11 @@ class SectionsWidget(QtWidgets.QWidget):
 
 
 class SectionsDock(QtWidgets.QDockWidget):
+    """
+    The Sections dock. Exposes the inner widgets (`list_view`, `command_bar`, `btn_confirm`, `btn_cancel`,
+    `btn_container`, `label_active_section`) as attributes for `SVGUI` and `SVApp` to wire up.
+    """
+
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
         self.setVisible(False)

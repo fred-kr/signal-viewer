@@ -45,11 +45,17 @@ class WorkerSignals(QtCore.QObject):
 
 
 class Worker(QtCore.QRunnable):
+    """
+    Base of the pool runnables. `run` calls `compute` and routes its return value or exception through `signals`,
+    followed by `sig_finished` so the owner can drop its reference.
+    """
+
     def __init__(self) -> None:
         super().__init__()
         self.signals = WorkerSignals()
 
     def compute(self) -> object:
+        """The work; runs on the pool thread. Subclasses return their result object."""
         raise NotImplementedError
 
     @QtCore.Slot()
@@ -66,6 +72,8 @@ class Worker(QtCore.QRunnable):
 
 @attrs.frozen
 class PeakDetectionResult:
+    """What `PeakDetectionWorker` emits: the section and request it was started with, and the peak indices."""
+
     section: Section
     request: PeakDetectionRequest
     peaks: npt.NDArray[np.intp]
@@ -83,12 +91,15 @@ class PeakDetectionWorker(Worker):
         self._sampling_rate = section.sampling_rate
 
     def compute(self) -> PeakDetectionResult:
+        """Runs `find_peaks` on the copied signal."""
         peaks = find_peaks(self._signal, self._sampling_rate, self.request.method, self.request.params)
         return PeakDetectionResult(self.section, self.request, peaks)
 
 
 @attrs.frozen
 class SectionResultData:
+    """What `SectionResultWorker` emits: the section and its final peak and rate frames."""
+
     section: Section
     peak_data: pl.DataFrame
     rate_data: pl.DataFrame
@@ -113,6 +124,7 @@ class SectionResultWorker(Worker):
         self._rate_method = Config.editing.rate_computation_method  # read on the GUI thread
 
     def compute(self) -> SectionResultData:
+        """Computes the peak frame (with global index and info values) and the rate frame with full info statistics."""
         peak_df = compute_peak_data(
             self._data,
             self._processed_signal_name,

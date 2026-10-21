@@ -1,3 +1,10 @@
+"""
+The matplotlib figure of the Results page and the models fitted into it.
+
+`fit_glm` and `fit_spline_gam` are plain functions over numpy arrays; `ResultPlotController` decides what to draw
+(active section or every locked section) and only draws while the figure is visible.
+"""
+
 from __future__ import annotations
 
 import enum
@@ -54,12 +61,15 @@ class ResultFitModel(enum.StrEnum):
 
 @attrs.frozen
 class GLMFit:
+    """A fitted single-predictor GLM (`fit_glm`): `rate = intercept + slope * x`, exponentiated for the Gamma/log-link model."""
+
     model: ResultFitModel
     intercept: float
     slope: float
     n_points: int
 
     def predict(self, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        """Fitted rate at `x`."""
         eta = self.intercept + self.slope * x
         return np.exp(eta) if self.model == ResultFitModel.LogLinear else eta
 
@@ -103,6 +113,8 @@ def fit_glm(x: npt.NDArray[np.float64], y: npt.NDArray[np.float64], model: Resul
 
 @attrs.frozen
 class SplineGAMFit:
+    """A fitted P-spline GAM (`fit_spline_gam`): B-spline basis, penalized coefficients and the fit diagnostics shown in the title."""
+
     basis: SplineTransformer
     coef: npt.NDArray[np.float64]
     n_knots: int
@@ -113,9 +125,11 @@ class SplineGAMFit:
     n_points: int
 
     def predict(self, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        """Fitted rate at `x` (linear extrapolation outside the fitted range)."""
         return np.exp(self.basis.transform(x.reshape(-1, 1)) @ self.coef)
 
     def describe(self, x_name: str) -> list[str]:
+        """Short human-readable lines for the panel title: knots, effective degrees of freedom, penalty, n."""
         k_source = "auto" if self.k_auto else "user"
         return [
             f"P-spline GAM (Gamma, log link), k = {self.n_knots} knots ({k_source}), EDF = {self.edf:.1f}",
@@ -339,10 +353,12 @@ class ResultPlotController(QtCore.QObject):
 
     @property
     def figure(self):
+        """The matplotlib `Figure` of the widget."""
         return self._widget.getFigure()
 
     @property
     def scope(self) -> ResultPlotScope:
+        """Whether the active section or every locked section is drawn."""
         return self._scope
 
     def set_section(self, section: Section | None) -> None:
@@ -352,6 +368,7 @@ class ResultPlotController(QtCore.QObject):
 
     @QtCore.Slot(object)
     def set_scope(self, scope: ResultPlotScope | str) -> None:
+        """Changes the scope and redraws if visible."""
         scope = ResultPlotScope(scope)
         if scope == self._scope:
             return
@@ -360,10 +377,12 @@ class ResultPlotController(QtCore.QObject):
 
     @property
     def fit_model(self) -> ResultFitModel:
+        """The model fitted into the rate-vs-info panel."""
         return self._fit_model
 
     @QtCore.Slot(object)
     def set_fit_model(self, model: ResultFitModel | str) -> None:
+        """Changes the fitted model and redraws if visible."""
         model = ResultFitModel(model)
         if model == self._fit_model:
             return
@@ -377,6 +396,7 @@ class ResultPlotController(QtCore.QObject):
 
     @QtCore.Slot(object)
     def set_spline_k(self, k: int | None) -> None:
+        """Sets the knot count of the spline GAM (`None` = automatic); redraws only while the spline model is selected."""
         k = None if k is None else int(k)
         if k == self._spline_k:
             return
@@ -390,6 +410,7 @@ class ResultPlotController(QtCore.QObject):
         self.refresh()
 
     def clear(self) -> None:
+        """Forgets the section and shows the placeholder text (file closed)."""
         self._section = None
         self._dirty = False
         self._draw_placeholder(_NO_RESULT_TEXT)

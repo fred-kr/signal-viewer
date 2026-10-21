@@ -1,5 +1,14 @@
+"""
+The "Parameter Inputs" dock: preprocessing, peak detection and rate calculation settings.
+
+`ParameterInputs` owns the widgets compiled from `generated/param_inputs.ui`, sets their ranges and defaults, and
+translates button presses into one request object per action (`ProcessingRequest`, `PeakDetectionRequest`,
+`RollingRateKwargs`) that it emits for `SVApp` to forward to the `DataController`. It never touches data itself.
+
+Help texts of every input live in `signal_viewer.help_texts` and are applied at the end of `_setup_widgets`.
+"""
+
 import decimal
-import inspect
 
 from PySide6 import QtCore, QtGui, QtWidgets
 from pyside_widgets import AnimatedToggleSwitch, DecimalSpinBox, ToggleSwitch
@@ -13,6 +22,7 @@ from signal_viewer.enum_defs import (
     WFDBPeakDirection,
 )
 from signal_viewer.generated.ui_param_inputs import Ui_containerParamInputs
+from signal_viewer.help_texts import apply_help_texts, enum_doc
 from signal_viewer.type_defs import (
     PeakDetectionAlgorithmParameters,
     PeakDetectionRequest,
@@ -35,6 +45,7 @@ type SupportsDecimal = int | float | D
 
 
 def _restore_default(w: QtWidgets.QWidget | QtCore.QObject) -> None:
+    """Sets the widget back to its `defaultValue` property: an index for combo boxes, a value or checked state else."""
     if isinstance(w, QtWidgets.QComboBox):
         if default_idx := w.property("defaultValue"):
             w.setCurrentIndex(default_idx)
@@ -61,6 +72,12 @@ def _setup_spinbox(
     correction_mode: DecimalSpinBox.CorrectionMode = DecimalSpinBox.CorrectionMode.CorrectToNearestValue,
     keyboard_tracking: bool = True,
 ) -> None:
+    """
+    Configures a spin box in one call and stores `default` as its `defaultValue` property.
+
+    The property is what `_restore_default` and the help texts (`help_texts.default_and_range`) read, so the value
+    shown in the tooltip is always the one "Restore Defaults" sets.
+    """
     dec_sb.setRange(min, max)
     dec_sb.setSingleStep(step)
     dec_sb.setDecimals(precision)
@@ -70,11 +87,14 @@ def _setup_spinbox(
     _restore_default(dec_sb)
 
 
-def _get_docstring(obj: object) -> str:
-    return inspect.getdoc(obj) or ""
-
-
 class ParameterInputs(QtWidgets.QWidget):
+    """
+    The widget inside `InputsDock`: three tabs (Preprocessing, Peak Detection, Rate Calculation) and their inputs.
+
+    Reading the inputs happens in the `get_*` methods; each returns the typed dictionary the data layer expects.
+    The widget emits one signal per user action with everything the action needs, so `SVApp` never reads widgets.
+    """
+
     # Each user action maps to exactly one signal carrying everything the action needs.
     sig_run_processing = QtCore.Signal(object)  # ProcessingRequest
     sig_reset_data = QtCore.Signal()
@@ -92,10 +112,10 @@ class ParameterInputs(QtWidgets.QWidget):
         self._setup_actions()
         self._setup_widgets()
         self._on_peak_method_changed(0)
-        # self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Minimum)
 
     @property
     def sf_widgets(self) -> list[QtWidgets.QWidget]:
+        """The custom filter parameter inputs, in the order they appear."""
         return [
             self.ui.sf_lower_cutoff,
             self.ui.sf_upper_cutoff,
@@ -106,49 +126,39 @@ class ParameterInputs(QtWidgets.QWidget):
 
     @property
     def std_widgets(self) -> list[QtWidgets.QWidget]:
+        """The standardization parameter inputs."""
         return [
             self.ui.std_rolling_window,
             self.ui.std_window_size,
         ]
 
     def _setup_actions(self) -> None:
-        # Signal Filter
+        # The tooltips of these actions come from `help_texts.HELP_TEXTS`, keyed by attribute name.
         self.action_sf_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Apply to Signal", self)
-        self.action_sf_run.setToolTip("Apply the selected processing steps to the signal.")
         self.action_sf_run.triggered.connect(self.run_processing)
 
         self.action_sf_reset_inputs = QtGui.QAction(QtGui.QIcon("://icons/ArrowReset.svg"), "Restore Defaults", self)
-        self.action_sf_reset_inputs.setToolTip("Restore the default input values for the selected processing steps.")
         self.action_sf_reset_inputs.triggered.connect(self.reset_inputs)
         self.action_sf_reset_data = QtGui.QAction(QtGui.QIcon("://icons/Broom.svg"), "Reset Signal", self)
-        self.action_sf_reset_data.setToolTip(
-            "Reset the signal data. Any applied processing steps and detected peaks will be removed."
-        )
         self.action_sf_reset_data.triggered.connect(self.reset_data)
 
-        # Peak Detection
         self.action_peak_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Run detection", self)
-        self.action_peak_run.setToolTip("Apply the selected peak detection algorithm to the signal.")
         self.action_peak_run.triggered.connect(self.run_peak_detection)
         self.action_peak_reset_inputs = QtGui.QAction(QtGui.QIcon("://icons/ArrowReset.svg"), "Restore Defaults", self)
-        self.action_peak_reset_inputs.setToolTip(
-            "Restore the default input values for the selected peak detection algorithm."
-        )
         self.action_peak_reset_inputs.triggered.connect(self.reset_inputs)
         self.action_peak_reset_data = QtGui.QAction(QtGui.QIcon("://icons/Broom.svg"), "Reset Peaks", self)
-        self.action_peak_reset_data.setToolTip("Remove all peaks, but keep the applied processing steps.")
         self.action_peak_reset_data.triggered.connect(self.clear_peaks)
 
     def _setup_widgets(self) -> None:
         # Signal Filter
         self.ui.sf_pipeline.setAllowNone(True)
-        self.ui.sf_pipeline.set_enum_class(PreprocessPipeline, doc_data=_get_docstring)
+        self.ui.sf_pipeline.set_enum_class(PreprocessPipeline, doc_data=enum_doc)
         self.ui.sf_pipeline.currentIndexChanged.connect(self._on_pipeline_changed)
         self.ui.sf_pipeline.setProperty("defaultValue", 1)
         self.ui.sf_pipeline.set_current_enum(PreprocessPipeline.PPG_Elgendi)
 
         self.ui.sf_method.setAllowNone(True)
-        self.ui.sf_method.set_enum_class(FilterMethod)
+        self.ui.sf_method.set_enum_class(FilterMethod, doc_data=enum_doc)
         self.ui.sf_method.currentIndexChanged.connect(self._on_filter_method_changed)
 
         _setup_spinbox(self.ui.sf_lower_cutoff, 0, 100_000, 0.1, 0.5, 1)
@@ -170,7 +180,7 @@ class ParameterInputs(QtWidgets.QWidget):
 
         # Standardization
         self.ui.std_method.setAllowNone(True)
-        self.ui.std_method.set_enum_class(StandardizationMethod)
+        self.ui.std_method.set_enum_class(StandardizationMethod, doc_data=enum_doc)
         self.ui.std_method.currentIndexChanged.connect(self._on_std_method_changed)
 
         self.ui.std_rolling_window.setChecked(False)
@@ -179,10 +189,10 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.std_window_size, 5, 999_999, 2, 100, 0)
 
         # Peak Detection
-        self.ui.peak_method.set_enum_class(PeakDetectionAlgorithm, doc_data=_get_docstring)
+        self.ui.peak_method.set_enum_class(PeakDetectionAlgorithm, doc_data=enum_doc)
         self.ui.peak_method.currentIndexChanged.connect(self._on_peak_method_changed)
 
-        self.ui.peak_xqrs_direction.set_enum_class(WFDBPeakDirection)
+        self.ui.peak_xqrs_direction.set_enum_class(WFDBPeakDirection, doc_data=enum_doc)
         _setup_spinbox(self.ui.peak_xqrs_radius, 5, 99_999, 1, 90, 0)
         _setup_spinbox(self.ui.peak_xqrs_min_dist, 0, 100_000, 1, 10, 0)
 
@@ -191,11 +201,9 @@ class ParameterInputs(QtWidgets.QWidget):
         _setup_spinbox(self.ui.peak_ppg_elgendi_beatoffset, 0.0, 1.0, 0.01, 0.02, 2)
         _setup_spinbox(self.ui.peak_ppg_elgendi_mindelay, 0.0, 10.0, 0.01, 0.3, 2)
 
+        # The radius defaults are replaced with half the sampling rate once a file is loaded (`SVApp.read_data`).
         _setup_spinbox(self.ui.peak_localmax_radius, 1, 10_000, 10, 111, 0)
-        # _setup_spinbox(self.ui.peak_localmax_min_dist, 0, 1_000_000, 1, 15, 0)
-
         _setup_spinbox(self.ui.peak_localmin_radius, 1, 10_000, 10, 111, 0)
-        # _setup_spinbox(self.ui.peak_localmin_min_dist, 0, 1_000_000, 1, 15, 0)
 
         _setup_spinbox(self.ui.peak_ecg_nk_smoothwindow, 0.01, 10.0, 0.01, 0.01, 2)
         _setup_spinbox(self.ui.peak_ecg_nk_avgwindow, 0.01, 10.0, 0.01, 0.75, 2)
@@ -231,12 +239,19 @@ class ParameterInputs(QtWidgets.QWidget):
         self.ui.peak_command_bar.setLayout(peak_tb_l)
 
         # Rate Calculation
-        self.ui.rate_handle_incomplete.set_enum_class(IncompleteWindowMethod)
+        self.ui.rate_handle_incomplete.set_enum_class(IncompleteWindowMethod, doc_data=enum_doc)
         _setup_spinbox(self.ui.rate_period, 1, 10_000, 1, 60, 0)
         _setup_spinbox(self.ui.rate_every, 1, 600, 1, 10, 0)
         self.ui.rate_period.valueChanged.connect(self._emit_rate_params)
         self.ui.rate_every.valueChanged.connect(self._emit_rate_params)
         self.ui.rate_handle_incomplete.sig_current_enum_changed.connect(self._emit_rate_params)
+
+        # Last: the help texts read the ranges and defaults set above.
+        self.refresh_help_texts()
+
+    def refresh_help_texts(self) -> None:
+        """Re-applies tooltips and What's This texts. Call after a `defaultValue` property was changed."""
+        apply_help_texts(self)
 
     @QtCore.Slot()
     @QtCore.Slot(object)
@@ -245,14 +260,21 @@ class ParameterInputs(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def reset_data(self) -> None:
+        """Asks for the raw signal back ("Reset Signal")."""
         self.sig_reset_data.emit()
 
     @QtCore.Slot()
     def clear_peaks(self) -> None:
+        """Asks for all peaks to be removed ("Reset Peaks")."""
         self.sig_clear_peaks.emit()
 
     @QtCore.Slot()
     def reset_inputs(self) -> None:
+        """
+        Restores the defaults of the tab whose "Restore Defaults" action sent the signal.
+
+        For the peak tab only the inputs of the currently shown method page are reset.
+        """
         sender = self.sender()
         if sender is self.action_peak_reset_inputs:
             current_page = self.ui.stacked_widget_peak.currentWidget()
@@ -269,6 +291,7 @@ class ParameterInputs(QtWidgets.QWidget):
 
     @QtCore.Slot(int)
     def _on_pipeline_changed(self, index: int) -> None:
+        # A pipeline replaces the custom steps (see `ProcessingRequest`), so their inputs are disabled meanwhile.
         pipeline: PreprocessPipeline | None = self.ui.sf_pipeline.current_enum()
         if pipeline is None:
             self.ui.sf_method.setEnabled(True)
@@ -281,39 +304,40 @@ class ParameterInputs(QtWidgets.QWidget):
 
     @QtCore.Slot(int)
     def _on_filter_method_changed(self, index: int) -> None:
+        """
+        Enables the filter parameters the selected method uses, mirroring `neurokit2.signal_filter`.
+
+        The `FilterMethod` member descriptions and the user guide state the same mapping; change all three together.
+        """
         filter_method: FilterMethod | None = self.ui.sf_method.current_enum()
         if filter_method is None:
             for widget in self.sf_widgets:
                 widget.setEnabled(False)
                 _restore_default(widget)
-        elif filter_method in [
+            return
+
+        uses_cutoffs = filter_method in {
             FilterMethod.Butterworth,
             FilterMethod.ButterworthLegacy,
+            FilterMethod.ButterworthZI,
             FilterMethod.Bessel,
-        ]:
-            self.ui.sf_lower_cutoff.setEnabled(True)
-            self.ui.sf_upper_cutoff.setEnabled(True)
-            self.ui.sf_order.setEnabled(True)
-            self.ui.sf_window_size.setEnabled(False)
-            self.ui.sf_powerline.setEnabled(False)
-        elif filter_method == FilterMethod.SavGol:
-            self.ui.sf_lower_cutoff.setEnabled(False)
-            self.ui.sf_upper_cutoff.setEnabled(False)
-            self.ui.sf_order.setEnabled(True)
-            self.ui.sf_window_size.setEnabled(True)
-            self.ui.sf_powerline.setEnabled(False)
-        elif filter_method == FilterMethod.FIR:
-            self.ui.sf_lower_cutoff.setEnabled(True)
-            self.ui.sf_upper_cutoff.setEnabled(True)
-            self.ui.sf_order.setEnabled(False)
-            self.ui.sf_window_size.setEnabled(True)
-            self.ui.sf_powerline.setEnabled(False)
-        elif filter_method == FilterMethod.Powerline:
-            self.ui.sf_lower_cutoff.setEnabled(False)
-            self.ui.sf_upper_cutoff.setEnabled(False)
-            self.ui.sf_order.setEnabled(False)
-            self.ui.sf_window_size.setEnabled(False)
-            self.ui.sf_powerline.setEnabled(True)
+            FilterMethod.FIR,
+        }
+        uses_order = filter_method in {
+            FilterMethod.Butterworth,
+            FilterMethod.ButterworthLegacy,
+            FilterMethod.ButterworthZI,
+            FilterMethod.Bessel,
+            FilterMethod.SavGol,
+        }
+        uses_window = filter_method in {FilterMethod.SavGol, FilterMethod.FIR}
+        uses_powerline = filter_method == FilterMethod.Powerline
+
+        self.ui.sf_lower_cutoff.setEnabled(uses_cutoffs)
+        self.ui.sf_upper_cutoff.setEnabled(uses_cutoffs)
+        self.ui.sf_order.setEnabled(uses_order)
+        self.ui.sf_window_size.setEnabled(uses_window)
+        self.ui.sf_powerline.setEnabled(uses_powerline)
 
     @QtCore.Slot(int)
     def _on_std_method_changed(self, index: int) -> None:
@@ -325,6 +349,7 @@ class ParameterInputs(QtWidgets.QWidget):
         elif std_method == StandardizationMethod.ZScore:
             self.ui.std_rolling_window.setEnabled(True)
         else:
+            # Windowed MAD scaling is not supported (`signal_processing.standardize_signal`).
             self.ui.std_rolling_window.setChecked(False)
             self.ui.std_rolling_window.setEnabled(False)
 
@@ -346,6 +371,12 @@ class ParameterInputs(QtWidgets.QWidget):
         )
 
     def get_filter_params(self, sf_method: FilterMethod) -> SignalFilterKwargs:
+        """
+        The custom filter inputs as keyword arguments for `signal_processing.filter_signal`.
+
+        A window size at the spin box minimum is sent as `"default"`, which lets neurokit2 pick its own window.
+        Cutoffs of 0 are sent as given; `filter_signal` turns them into `None` (no cutoff on that side).
+        """
         window = self.ui.sf_window_size
         if window.value() == window.minimum():
             window_size = "default"
@@ -361,6 +392,7 @@ class ParameterInputs(QtWidgets.QWidget):
         }
 
     def get_std_params(self, std_method: StandardizationMethod) -> SignalStandardizeKwargs:
+        """The standardization inputs as keyword arguments for `Section.standardize_signal`."""
         return {
             "method": std_method,
             "robust": std_method == StandardizationMethod.ZScoreRobust,
@@ -369,12 +401,10 @@ class ParameterInputs(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def run_peak_detection(self) -> None:
-        peak_method: PeakDetectionAlgorithm | None = self.ui.peak_method.current_enum()
-        if peak_method is None:
-            return
-        self.sig_run_peak_detection.emit(
-            PeakDetectionRequest(method=peak_method, params=self.get_peak_detection_params(peak_method))
-        )
+        """Emits a `PeakDetectionRequest` for the selected method; nothing happens when no method is selected."""
+        request = self.get_peak_detection_request()
+        if request is not None:
+            self.sig_run_peak_detection.emit(request)
 
     def get_peak_detection_request(self) -> PeakDetectionRequest | None:
         """The currently selected peak detection method and its parameters, or `None` if no method is selected."""
@@ -385,6 +415,7 @@ class ParameterInputs(QtWidgets.QWidget):
 
     @QtCore.Slot(int)
     def _on_peak_method_changed(self, index: int) -> None:
+        """Shows the parameter page of the selected method; methods without parameters share a placeholder page."""
         peak_method: PeakDetectionAlgorithm | None = self.ui.peak_method.current_enum()
         if peak_method == PeakDetectionAlgorithm.PPG_Elgendi:
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_ppg_elgendi)
@@ -406,6 +437,12 @@ class ParameterInputs(QtWidgets.QWidget):
             self.ui.stacked_widget_peak.setCurrentWidget(self.ui.page_peak_no_params)
 
     def get_peak_detection_params(self, method: PeakDetectionAlgorithm) -> PeakDetectionAlgorithmParameters | None:
+        """
+        The parameter inputs of `method` as the typed dictionary `peak_detection.find_peaks` expects.
+
+        `None` for methods without adjustable parameters. The local-extrema methods use the radius both as search
+        radius and as minimum peak distance.
+        """
         peak_params = None
         if method == PeakDetectionAlgorithm.PPG_Elgendi:
             peak_params = PeaksPPGElgendi(
@@ -462,6 +499,7 @@ class ParameterInputs(QtWidgets.QWidget):
         return peak_params
 
     def get_rate_params(self) -> RollingRateKwargs:
+        """The rate tab inputs as keyword arguments for `section.compute_rate_rolling`."""
         return RollingRateKwargs(
             sec_new_window_every=self.ui.rate_every.intValue(),
             sec_window_length=self.ui.rate_period.intValue(),
@@ -470,12 +508,18 @@ class ParameterInputs(QtWidgets.QWidget):
 
 
 class InputsDock(QtWidgets.QDockWidget):
+    """
+    Dock window holding `ParameterInputs`. Shown on the Graph page only; disabled while the active section is
+    locked or is the base section (`SVApp._update_lock_dependent_states`).
+    """
+
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__("Parameter Inputs", parent=parent)
         self.setObjectName("DockWidgetParameterInputs")
         self.setAllowedAreas(QtCore.Qt.DockWidgetArea.AllDockWidgetAreas)
         self.setWindowIcon(QtGui.QIcon("://icons/Options.svg"))
         self.toggleViewAction().setIcon(QtGui.QIcon("://icons/Options.svg"))
+        self.toggleViewAction().setToolTip("Show or hide the Parameter Inputs dock")
 
         self.ui = ParameterInputs()
         self.setWidget(self.ui)

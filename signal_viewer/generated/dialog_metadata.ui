@@ -42,6 +42,9 @@
    </item>
    <item row="1" column="2">
     <widget class="QPushButton" name="btn_reject">
+     <property name="toolTip">
+      <string>Discard the changes</string>
+     </property>
      <property name="text">
       <string>Cancel</string>
      </property>
@@ -49,6 +52,9 @@
    </item>
    <item row="1" column="1">
     <widget class="QPushButton" name="btn_accept">
+     <property name="toolTip">
+      <string>Apply the values to the open file</string>
+     </property>
      <property name="text">
       <string>Save</string>
      </property>
@@ -76,6 +82,9 @@
           </item>
           <item row="0" column="1">
            <widget class="QLineEdit" name="line_edit_file_name">
+            <property name="toolTip">
+             <string>Name of the open file</string>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -90,6 +99,9 @@
           </item>
           <item row="1" column="1">
            <widget class="QLineEdit" name="line_edit_file_type">
+            <property name="toolTip">
+             <string>File extension; it selects the reader</string>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -97,6 +109,12 @@
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_3">
+            <property name="whatsThis">
+             <string>&lt;p&gt;Number of samples recorded per second (Hz). It converts sample indices into time and every filter and detector depends on it.&lt;/p&gt;&lt;p&gt;Filled in automatically when the file has a time column or, for EDF, from the header; otherwise enter it here.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#sampling-rate&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+            </property>
+            <property name="toolTip">
+             <string>Samples per second of the signal (Hz); required</string>
+            </property>
             <property name="text">
              <string>Sampling Rate*</string>
             </property>
@@ -104,6 +122,12 @@
           </item>
           <item row="2" column="1">
            <widget class="QSpinBox" name="spin_box_sampling_rate">
+            <property name="whatsThis">
+             <string>&lt;p&gt;Number of samples recorded per second (Hz). It converts sample indices into time and every filter and detector depends on it.&lt;/p&gt;&lt;p&gt;Filled in automatically when the file has a time column or, for EDF, from the header; otherwise enter it here.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#sampling-rate&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+            </property>
+            <property name="toolTip">
+             <string>Samples per second of the signal (Hz); required</string>
+            </property>
             <property name="styleSheet">
              <string notr="true"/>
             </property>
@@ -123,28 +147,37 @@
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_5">
+            <property name="whatsThis">
+             <string>&lt;p&gt;The column (channel) whose values are the signal. Only numeric columns are offered. This channel is loaded first; every other numeric column can be edited later through the channel switcher on the Graph page.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#channels&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+            </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column / channel in the file containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>The column (channel) of the file holding the signal to analyse</string>
             </property>
             <property name="text">
-             <string>Data Source*</string>
+             <string>Signal Channel*</string>
             </property>
            </widget>
           </item>
           <item row="5" column="0">
            <widget class="QLabel" name="label_6">
+            <property name="whatsThis">
+             <string>&lt;p&gt;An optional column recorded alongside the signal, such as temperature or oxygen saturation. The rate table gets its mean, standard deviation, minimum and maximum per rate window, and the result plot shows the rate against it.&lt;/p&gt;&lt;p&gt;Choose &amp;lt;No Selection&amp;gt; when there is none.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#channels&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+            </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A column / channel in the file containing supplementary data, e.g. temperature or O2-saturation recordings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>Optional second column (e.g. temperature) shown with the signal and summarised per rate window</string>
             </property>
             <property name="text">
-             <string>Info Source</string>
+             <string>Info Channel</string>
             </property>
            </widget>
           </item>
           <item row="3" column="1">
            <widget class="QComboBox" name="combo_box_signal_column">
+            <property name="whatsThis">
+             <string>&lt;p&gt;The column (channel) whose values are the signal. Only numeric columns are offered. This channel is loaded first; every other numeric column can be edited later through the channel switcher on the Graph page.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#channels&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+            </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column / channel in the file containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>The column (channel) of the file holding the signal to analyse</string>
             </property>
             <property name="mandatoryField" stdset="0">
              <bool>true</bool>
@@ -153,8 +186,11 @@
           </item>
           <item row="5" column="1">
            <widget class="QComboBox" name="combo_box_info_column">
+            <property name="whatsThis">
+             <string>&lt;p&gt;An optional column recorded alongside the signal, such as temperature or oxygen saturation. The rate table gets its mean, standard deviation, minimum and maximum per rate window, and the result plot shows the rate against it.&lt;/p&gt;&lt;p&gt;Choose &amp;lt;No Selection&amp;gt; when there is none.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html#channels&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+            </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A column / channel in the file containing supplementary data, e.g. temperature or O2-saturation recordings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>Optional second column (e.g. temperature) shown with the signal and summarised per rate window</string>
             </property>
            </widget>
           </item>

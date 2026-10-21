@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>File formats - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Reference &rsaquo; File formats</p>
+
+<h1>File formats</h1>
+
+<h2 id="input"><a name="input"></a>Files that can be opened</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Extension</th><th>Format</th><th>Notes</th></tr>
+    <tr><td><code>.csv</code></td><td>Comma-separated text</td><td>The separator is always a comma.</td></tr>
+    <tr><td><code>.txt</code></td><td>Delimited text</td><td>The separator is the <a href="settings.html#data">Text file separator</a> setting (tab by default).</td></tr>
+    <tr><td><code>.tsv</code></td><td>Tab-separated text</td><td></td></tr>
+    <tr><td><code>.xls</code>, <code>.xlsx</code></td><td>Excel workbook</td><td>The first sheet is read.</td></tr>
+    <tr><td><code>.feather</code>, <code>.arrow</code>, <code>.ipc</code></td><td>Apache Arrow IPC</td><td>Fast to open; the natural export format of pandas and polars.</td></tr>
+    <tr><td><code>.edf</code></td><td>European Data Format</td><td>Read with the mne library. Every channel of the recording is offered as a column; the sampling rate comes from the header. Trailing all-zero padding is removed.</td></tr>
+</table>
+
+<h3>Requirements for tabular files</h3>
+<ul>
+    <li>One row per sample, one column per channel, column names in the first row.</li>
+    <li>Only numeric columns can be the signal or info channel. A column with a stray non-numeric value in its first
+        10000 rows is read as text and does not appear in the lists.</li>
+    <li>The column names <code>index</code>, <code>section_index</code>, <code>is_peak</code> and
+        <code>is_manual</code> are reserved.</li>
+</ul>
+
+<h3 id="time-column"><a name="time-column"></a>Sampling rate detection</h3>
+<p>A time column is looked for among: columns whose name contains <code>time</code> or <code>ts</code>, date-time
+and duration columns, and integer columns whose name does not contain <code>index</code>. When exactly one candidate
+exists, the sampling rate is the number of rows whose time lies within the first second. Floats are read as
+seconds, integers as microseconds, date-times as such. With no candidate or several, the rate stays unknown and has
+to be entered.</p>
+
+<h2 id="output"><a name="output"></a>Files that are written</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Export</th><th>Content</th></tr>
+    <tr><td>CSV (table context menu)</td><td>The result table shown (Peak Indices or Calculated Rate) of the active section, comma-separated with a header row.</td></tr>
+    <tr><td>XLSX (Save to Excel)</td><td>Every section of every loaded channel: sheets <code>r_data</code>, <code>Detected Peaks</code>, <code>Rate Data</code>, <code>Global Bounds</code>. Described in <a href="../user_guide/results.html#export">Export to Excel</a>.</td></tr>
+</table>
+
+</body>
+</html>

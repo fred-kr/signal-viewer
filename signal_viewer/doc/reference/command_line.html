@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Command line flags - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Reference &rsaquo; Command line flags</p>
+
+<h1>Command line flags</h1>
+
+<p>The packaged executable (<code>SignalViewer.exe</code>, <code>SignalViewer.app</code>) and the source command
+<code>uv run sv</code> accept the same flags. The README of the project is the primary place for this list.</p>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Flag</th><th>Effect</th></tr>
+    <tr><td><code>--debug</code></td><td>Verbose logging to the terminal and to <code>debug.log</code> in the per-user application data folder: Windows <code>%LOCALAPPDATA%\QuackTech\SignalViewer - Debug</code>, macOS <code>~/Library/Application Support/QuackTech/SignalViewer - Debug</code>. Settings are kept separately from a normal run.</td></tr>
+    <tr><td><code>--no-opengl</code></td><td>Disable OpenGL rendering of the plots. Try this if plots stay blank.</td></tr>
+    <tr><td><code>--reset-settings</code></td><td>Delete the stored settings and start with defaults.</td></tr>
+    <tr><td><code>--version</code></td><td>Print the version and exit.</td></tr>
+    <tr><td><code>--self-test</code></td><td>Build the whole user interface off-screen and exit. Used to smoke-test packaged builds.</td></tr>
+    <tr><td><code>-c</code>, <code>--console</code></td><td>Developer option: adds a Jupyter console to the View menu with the application objects in its namespace. Needs the development dependencies.</td></tr>
+</table>
+
+</body>
+</html>

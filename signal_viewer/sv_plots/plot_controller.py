@@ -1,5 +1,7 @@
 # pyright: reportOptionalMemberAccess=false
 
+"""`PlotController`: the two linked pyqtgraph plots of the Graph page (signal with peaks above, rate below)."""
+
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, cast
 
@@ -210,6 +212,7 @@ class PlotController(QtCore.QObject):
 
     @QtCore.Slot(int)
     def update_time_axis_scale(self, sampling_rate: int) -> None:
+        """Makes the top axes show seconds for `sampling_rate` samples per second. Ignored while the rate is unknown (0)."""
         if sampling_rate == 0:
             return
         for plt_item in (self.pw_main.getPlotItem(), self.pw_rate.getPlotItem()):
@@ -268,6 +271,7 @@ class PlotController(QtCore.QObject):
             self.mark_region(section)
 
     def unbind_section_model(self) -> None:
+        """Disconnects from the bound `SectionListModel`, if any. The regions stay until `clear_regions`."""
         model = self._section_model
         if model is None:
             return
@@ -305,6 +309,7 @@ class PlotController(QtCore.QObject):
 
     @QtCore.Slot(bool)
     def set_regions_visible(self, visible: bool) -> None:
+        """Shows or hides every section region ("Section Overview"); new regions follow the same state."""
         for region in self.regions:
             region.setVisible(visible)
         self._show_regions = visible
@@ -504,6 +509,7 @@ class PlotController(QtCore.QObject):
         self.pw_rate.invalidateScene()
 
     def remove_selection_rect(self) -> None:
+        """Removes the Ctrl+drag selection rectangle and forgets its bounds."""
         vb: EditingViewBox = self.pw_main.plotItem.vb  # type: ignore
         vb.selection_box = None
         vb.mapped_selection_rect = None
@@ -656,6 +662,7 @@ class PlotController(QtCore.QObject):
 
     @QtCore.Slot()
     def fit_y_axis(self) -> None:
+        """Rescales both axes of the main plot to the data ("Scale y-axis")."""
         # TODO: Update implementation so that scaling and panning are independent and correctly communicated to the user
         # enable = 0.99
         # self.pw_main.getPlotItem().getViewBox().enableAutoRange(pg.ViewBox.YAxis, enable=enable)  # type: ignore

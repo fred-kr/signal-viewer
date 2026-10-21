@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Results page - SignalViewer User Guide</title>
+<link rel="stylesheet" href="../stylesheet.css">
+</head>
+<body>
+
+<p class="nav"><a href="../index.html">SignalViewer User Guide</a> &rsaquo; Reference &rsaquo; Results page</p>
+
+<h1>Results page</h1>
+
+<p>Shows the result of the active section (once it is locked) and exports the results of all sections. How-to:
+<a href="../user_guide/results.html">Results and export</a>.</p>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Control</th><th>What it does</th></tr>
+    <tr><td>Section label</td><td>Next to the page title: the section whose results are shown (the active section).</td></tr>
+    <tr><td>Save to Excel</td><td>Exports every section of every loaded channel to one or more workbooks. Same as <i>Export to XLSX</i> in the table context menus.</td></tr>
+    <tr><td>Plot View tab</td><td>The result figure. <b>Show</b> chooses the active section or all locked sections; <b>Fit</b> the model drawn into the rate-versus-info panel (Exponential, Linear, Smooth, None); <b>k</b> the knot count of the Smooth model (Auto = from the data). Details: <a href="../user_guide/results.html#plot">Result plot</a>.</td></tr>
+    <tr><td>Peak Indices tab</td><td>One row per peak: section index, processed signal value, file index, info value. Right-click to copy or export.</td></tr>
+    <tr><td>Calculated Rate / Summary Statistics tab</td><td>One row per rate window: peaks and rows in the window, info channel statistics, rate in bpm. Right-click to copy or export.</td></tr>
+    <tr><td>Metadata tab</td><td>Disabled in this version. The processing parameters of a section are shown by <i>Show Section Summary</i> in the Sections dock and written into the section summary.</td></tr>
+</table>
+
+<h2 id="context-menu"><a name="context-menu"></a>Table context menu</h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Entry</th><th>Effect</th></tr>
+    <tr><td>Copy to Clipboard</td><td>Copies the whole table as tab-separated text, ready to paste into a spreadsheet.</td></tr>
+    <tr><td>Export to CSV</td><td>Writes the shown table of the active section to a CSV file. Default name <code>Result_&lt;Channel&gt;_&lt;file&gt;.csv</code>.</td></tr>
+    <tr><td>Export to XLSX</td><td>Writes every section of every channel; see <a href="../user_guide/results.html#export">Export to Excel</a>.</td></tr>
+</table>
+
+<p>The tables display floats with the number of decimals set in <a href="settings.html">Settings &gt; Data &gt; Float
+precision</a>; exported files hold the full values.</p>
+
+</body>
+</html>

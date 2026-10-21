@@ -52,6 +52,11 @@ def find_extrema(
     direction: Literal["up", "down"],
     min_peak_distance: int | None = None,
 ) -> npt.NDArray[np.intp]:
+    """
+    Local maxima (`direction="up"`) or minima (`"down"`) of `sig`: samples that are the extreme within
+    `search_radius` samples on either side. Extrema closer than `min_peak_distance` (default: the radius) are
+    merged into their midpoint until none are left. Returns the sample indices, sorted.
+    """
     min_peak_distance = min_peak_distance if min_peak_distance is not None else search_radius
     if direction == "up":
         peaks = _find_peaks_local_max(sig, search_radius)
@@ -215,6 +220,17 @@ def find_peaks(
     method: PeakDetectionAlgorithm,
     method_parameters: PeakDetectionAlgorithmParameters | None,
 ) -> npt.NDArray[np.intp]:
+    """
+    Runs the detection `method` with `method_parameters` on `sig` and returns the peak sample indices.
+
+    The dispatcher behind every detection in the application. neurokit2 methods receive their parameters as keyword
+    arguments; methods without a parameter page run with the neurokit2 defaults.
+
+    Raises
+    ------
+    KeyError
+        When `method_parameters` lacks a key the method needs (a `Peaks*` TypedDict was built incompletely).
+    """
     if method == PeakDetectionAlgorithm.LocalMaxima:
         method_parameters = cast(PeaksLocalMaxima, method_parameters)
         return find_extrema(

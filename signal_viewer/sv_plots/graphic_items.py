@@ -1,3 +1,8 @@
+"""
+pyqtgraph items customized for the editing plot: a view box with Ctrl+drag selection, a time axis showing
+h:mm:ss, and a clickable region marking a section.
+"""
+
 import warnings
 from collections import OrderedDict
 from collections.abc import Sequence
@@ -58,6 +63,7 @@ class EditingViewBox(ViewBox):
 
     @property
     def selection_box(self) -> QtWidgets.QGraphicsRectItem:
+        """The translucent rectangle drawn while Ctrl+dragging. Created on first access, hidden by default."""
         if self._selection_box is None:
             selection_box = QtWidgets.QGraphicsRectItem(0, 0, 1, 1)
             pen = make_qpen((100, 255, 100, 255))
@@ -162,6 +168,7 @@ class EditingViewBox(ViewBox):
         self.axHistory = self.axHistory[: self.axHistoryPointer] + [ax]
 
     def updateSelectionBox(self, pos1: Point, pos2: Point) -> None:
+        """Resizes the selection rectangle to span `pos1` and `pos2` (view coordinates) and shows it."""
         rect = QtCore.QRectF(pos1, pos2)
         rect = self.childGroup.mapRectFromParent(rect)
         self.selection_box.setPos(rect.topLeft())
@@ -230,6 +237,12 @@ HM_DT_ZOOM_LEVEL = ZoomLevel(
 
 
 class TimeDeltaAxisItem(DateAxisItem):
+    """
+    Axis showing elapsed time as `d`, `HH:MM`, `HH:MM:SS` or seconds depending on zoom level.
+
+    Values are sample indices; `setScale(1 / sampling_rate)` turns them into seconds (`PlotController.update_time_axis_scale`).
+    """
+
     def __init__(
         self,
         orientation: Literal["left", "right", "top", "bottom"] = "bottom",
@@ -250,6 +263,7 @@ class TimeDeltaAxisItem(DateAxisItem):
         self.autoSIPrefix = False
 
     def tickStrings(self, values: list[float], scale: float, spacing: float) -> list[str]:
+        """Formats the ticks of the active zoom level and updates the axis label with the unit shown."""
         tickSpecs = self.zoomLevel.tickSpecs
         tickSpec = next((s for s in tickSpecs if s.spacing == spacing), None)
         if tickSpec is None:
