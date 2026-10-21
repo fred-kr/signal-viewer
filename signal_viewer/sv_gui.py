@@ -210,7 +210,7 @@ class SVGUI(QtWidgets.QMainWindow):
             "Switch the channel (signal column) being edited. Sections and results of the other channels are kept."
         )
         self.combo_box_channel.setEnabled(True)
-        self.tb_main = self._setup_toolbar("tb_main", actions=[self.action_export_to_xlsx])
+        self.tb_main = self._setup_toolbar("tb_main", actions=[self.ui.action_open_file, self.ui.action_show_settings])
         self.tb_main.addSeparator()
         self.tb_main.addWidget(QtWidgets.QLabel("Channel: "))
         self.tb_main.addWidget(self.combo_box_channel)
