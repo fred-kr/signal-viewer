@@ -1,1 +1,0 @@
-$env:QT_BIN_DIR\qhelpgenerator.exe .\signal_viewer\doc\signalviewer.qhcp -o .\signal_viewer\doc\signalviewer.qhc
