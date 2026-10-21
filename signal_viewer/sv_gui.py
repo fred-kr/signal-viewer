@@ -180,9 +180,7 @@ class SVGUI(QtWidgets.QMainWindow):
         # self.ui.action_toggle_auto_scaling.setChecked(False)
 
     def _setup_toolbars(self) -> None:
-        self.tool_bar_editing = self._setup_toolbar(
-            "tool_bar_editing", [self.ui.action_toggle_auto_scaling, self.ui.action_show_section_overview]
-        )
+        self.tool_bar_editing = self._setup_toolbar("tool_bar_editing", [self.ui.action_toggle_auto_scaling])
         # Channel switcher. Filled by `SVApp` once a file is loaded; the toolbar itself is only enabled on the edit page.
         self.combo_box_channel = QtWidgets.QComboBox()
         self.combo_box_channel.setObjectName("combo_box_channel")
@@ -191,7 +189,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.combo_box_channel.setToolTip(
             "Switch the channel (signal column) being edited. Sections and results of the other channels are kept."
         )
-        self.combo_box_channel.setEnabled(False)
+        self.combo_box_channel.setEnabled(True)
         self.tool_bar_editing.addSeparator()
         self.tool_bar_editing.addWidget(QtWidgets.QLabel("Channel: "))
         self.tool_bar_editing.addWidget(self.combo_box_channel)
@@ -220,7 +218,7 @@ class SVGUI(QtWidgets.QMainWindow):
 
     def _setup_toolbar(self, name: str, actions: list[QtGui.QAction], movable: bool = False) -> QtWidgets.QToolBar:
         tb = QtWidgets.QToolBar(name)
-        tb.setIconSize(QtCore.QSize(16, 16))
+        tb.setIconSize(QtCore.QSize(24, 24))
         tb.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         tb.setObjectName(name)
         tb.setMovable(movable)
@@ -313,12 +311,12 @@ class SVGUI(QtWidgets.QMainWindow):
     def _on_page_changed(self, index: int) -> None:
         self.show_section_confirm_cancel(False)
         if index == 1:
-            self.tool_bar_editing.setEnabled(True)
+            # self.tool_bar_editing.setEnabled(True)
             self.command_bar_section_list.setEnabled(True)
             self.dock_sections.show()
             self.dock_parameters.show()
         else:
-            self.tool_bar_editing.setEnabled(False)
+            # self.tool_bar_editing.setEnabled(False)
             self.command_bar_section_list.setEnabled(False)
             self.dock_parameters.hide()
 
