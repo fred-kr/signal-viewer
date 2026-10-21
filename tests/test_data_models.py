@@ -4,10 +4,12 @@ Tests for `FileMetadata`: column naming, the info-column sentinel boundary, and 
 
 from pathlib import Path
 
+import polars as pl
 import pytest
 
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION
 from signal_viewer.enum_defs import InputFileFormat
+from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_models import FileMetadata
 
 COLUMNS = ["Alpha Sig", "Beta Temp"]
@@ -74,3 +76,72 @@ def test_required_fields_track_sampling_rate(csv_file: Path) -> None:
 
     md.sampling_rate = 0
     assert "sampling_rate" in md.required_fields
+
+
+# --- Numeric-only column choices ---------------------------------------------------------------------------------------
+
+SCHEMA = {
+    "Label": pl.String(),
+    "Alpha Sig": pl.Float64(),
+    "Beta Temp": pl.Float32(),
+    "Count": pl.Int32(),
+    "ok": pl.Boolean(),
+}
+
+
+def test_only_numeric_columns_are_offered(csv_file: Path) -> None:
+    md = FileMetadata(csv_file, list(SCHEMA), sampling_rate=100, schema=SCHEMA)
+
+    assert md.all_columns == list(SCHEMA)
+    assert md.numeric_columns == ["Alpha Sig", "Beta Temp", "Count"]
+    assert md.valid_columns == ["Alpha Sig", "Beta Temp", "Count"]
+    assert md.column_names == [COMBO_BOX_NO_SELECTION, "Alpha Sig", "Beta Temp", "Count"]
+
+
+def test_reserved_names_are_never_offered(csv_file: Path) -> None:
+    md = FileMetadata(csv_file, ["index", "is_peak", "Alpha Sig"], sampling_rate=100)
+
+    assert md.numeric_columns == ["Alpha Sig"]
+
+
+def test_remembered_non_numeric_columns_are_not_preselected(csv_file: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(Config.internal, "last_signal_column", "Label")
+    monkeypatch.setattr(Config.internal, "last_info_column", "Label")
+
+    md = FileMetadata(csv_file, list(SCHEMA), sampling_rate=100, schema=SCHEMA)
+
+    assert md.signal_column == "Alpha Sig", "falls back to the first numeric column"
+    assert "signal_column" not in md.required_fields, "the fallback is a valid default, loading is not blocked"
+    assert md.info_column == COMBO_BOX_NO_SELECTION
+
+
+def test_file_without_numeric_columns_cannot_be_loaded(csv_file: Path) -> None:
+    md = FileMetadata(csv_file, ["Label", "ok"], sampling_rate=100, schema=SCHEMA)
+
+    assert md.numeric_columns == []
+    assert md.signal_column == ""
+    assert "signal_column" in md.required_fields
+    assert md.missing_fields_text() == "Missing: Signal column"
+
+
+def test_signal_column_setter_requires_a_numeric_column(csv_file: Path) -> None:
+    md = FileMetadata(csv_file, list(SCHEMA), sampling_rate=100, schema=SCHEMA)
+
+    md.signal_column = "Label"
+    assert "signal_column" in md.required_fields
+    md.signal_column = "Label"
+    assert md.required_fields.count("signal_column") == 1
+
+    md.signal_column = "Count"
+    assert "signal_column" not in md.required_fields
+
+
+def test_missing_fields_text(csv_file: Path) -> None:
+    md = FileMetadata(csv_file, list(SCHEMA), sampling_rate=0, schema=SCHEMA)
+    md.signal_column = "Label"
+
+    assert md.missing_fields_text() == "Missing: Sampling rate, Signal column"
+
+    md.sampling_rate = 100
+    md.signal_column = "Alpha Sig"
+    assert md.missing_fields_text() == ""

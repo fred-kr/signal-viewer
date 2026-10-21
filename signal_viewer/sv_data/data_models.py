@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any, override
 
@@ -16,6 +17,9 @@ from signal_viewer.utils import _clean_column_names, format_file_path, human_rea
 
 ItemDataRole = QtCore.Qt.ItemDataRole
 type ModelIndex = QtCore.QModelIndex | QtCore.QPersistentModelIndex
+
+# Display names of `FileMetadata.required_fields` entries.
+REQUIRED_FIELD_LABELS = {"sampling_rate": "Sampling rate", "signal_column": "Signal column"}
 
 
 class DataFrameModel(QtCore.QAbstractTableModel):
@@ -320,6 +324,7 @@ class FileMetadata:
         "_columns",
         "_info_column",
         "_sampling_rate",
+        "_schema",
         "_signal_column",
         "file_info",
         "name_map",
@@ -327,7 +332,26 @@ class FileMetadata:
         "required_fields",
     )
 
-    def __init__(self, file_path: Path | str, columns: list[str], sampling_rate: int) -> None:
+    def __init__(
+        self,
+        file_path: Path | str,
+        columns: list[str],
+        sampling_rate: int,
+        schema: Mapping[str, pl.DataType] | None = None,
+    ) -> None:
+        """
+        Parameters
+        ----------
+        file_path
+            Path of the file the metadata describes.
+        columns
+            Every column name in the file, in file order.
+        sampling_rate
+            Detected sampling rate, `0` when unknown (the field is then required).
+        schema
+            Column name to polars dtype. Only numeric columns are offered as signal or info column. Without a schema
+            every non-reserved column counts as numeric.
+        """
         self.required_fields: list[str] = []
         self.file_info = QtCore.QFileInfo(file_path)
         self._sampling_rate = sampling_rate
@@ -335,14 +359,20 @@ class FileMetadata:
             self.required_fields.append("sampling_rate")
 
         self._columns = columns
+        self._schema: dict[str, pl.DataType] = dict(schema) if schema is not None else {}
+
+        numeric = self.numeric_columns
         signal_col = Config.internal.last_signal_column
-        if signal_col not in self._columns or signal_col in RESERVED_COLUMN_NAMES:
-            self.required_fields.append("signal_column")
-            signal_col = self._columns[0]
+        if signal_col not in numeric:
+            # The first numeric column is a valid default the user can change on the import page. Only a file
+            # without any numeric column leaves the field unset, which blocks loading.
+            signal_col = numeric[0] if numeric else ""
+            if not numeric:
+                self.required_fields.append("signal_column")
         self._signal_column = signal_col
 
         info_col = Config.internal.last_info_column
-        if info_col not in self._columns:
+        if info_col not in numeric:
             info_col = COMBO_BOX_NO_SELECTION
         self._info_column = info_col
 
@@ -373,16 +403,32 @@ class FileMetadata:
         return InputFileFormat(f".{self.file_info.suffix()}")
 
     @property
-    def column_names(self) -> list[str]:
-        return [COMBO_BOX_NO_SELECTION] + self._columns
+    def all_columns(self) -> list[str]:
+        """Every column of the file, whatever its dtype."""
+        return list(self._columns)
 
-    @column_names.setter
-    def column_names(self, value: list[str]) -> None:
-        self._columns = value
+    @property
+    def numeric_columns(self) -> list[str]:
+        """
+        The columns that can be a signal or info column: numeric dtype and not a reserved name.
+
+        Without a schema (see `__init__`) every non-reserved column is included.
+        """
+        return [
+            c
+            for c in self._columns
+            if c not in RESERVED_COLUMN_NAMES and (c not in self._schema or self._schema[c].is_numeric())
+        ]
+
+    @property
+    def column_names(self) -> list[str]:
+        """Choices for the info column: the no-selection sentinel followed by the numeric columns."""
+        return [COMBO_BOX_NO_SELECTION] + self.numeric_columns
 
     @property
     def valid_columns(self) -> list[str]:
-        return self._columns
+        """Choices for the signal column: the numeric columns."""
+        return self.numeric_columns
 
     @property
     def sampling_rate(self) -> int:
@@ -402,8 +448,9 @@ class FileMetadata:
 
     @signal_column.setter
     def signal_column(self, value: str) -> None:
-        if value in RESERVED_COLUMN_NAMES:
-            self.required_fields.append("signal_column")
+        if value not in self.numeric_columns:
+            if "signal_column" not in self.required_fields:
+                self.required_fields.append("signal_column")
         elif "signal_column" in self.required_fields:
             self.required_fields.remove("signal_column")
         self._signal_column = value
@@ -433,8 +480,8 @@ class FileMetadata:
         """
         Name of the signal column inside the loaded data frame.
 
-        `signal_column` is the name as it appears in the file and in the combo boxes. `DataController.load_data`
-        renames every column through `name_map`, so the data layer must address columns by this cleaned name.
+        `signal_column` is the name as it appears in the file and in the combo boxes. `DataController` renames every
+        column through `name_map`, so the data layer must address columns by this cleaned name.
         """
         return self.name_map.get(self._signal_column, self._signal_column)
 
@@ -443,6 +490,13 @@ class FileMetadata:
         """Cleaned name of the info column inside the loaded data frame, or `None` when none is selected."""
         info = self.info_column_or_none
         return None if info is None else self.name_map.get(info, info)
+
+    def missing_fields_text(self) -> str:
+        """Human-readable list of the required fields that are still unset, or an empty string."""
+        if not self.required_fields:
+            return ""
+        labels = [REQUIRED_FIELD_LABELS.get(f, f) for f in self.required_fields]
+        return "Missing: " + ", ".join(labels)
 
     def to_dict(self) -> MetadataDict:
         return {

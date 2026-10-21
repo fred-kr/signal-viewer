@@ -1,19 +1,24 @@
 import contextlib
-from collections.abc import Callable
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 import numpy.typing as npt
 import pyside_config as qconfig
 from loguru import logger
-from PySide6 import QtCore, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from signal_viewer.enum_defs import SectionChange
 from signal_viewer.sv_config import Config
-from signal_viewer.sv_data.data_controller import DataController
+from signal_viewer.sv_data.data_controller import Channel, DataController
 from signal_viewer.sv_data.data_models import FileListModel
-from signal_viewer.sv_data.file_io import read_annotation_file, write_xlsx
+from signal_viewer.sv_data.file_io import (
+    per_channel_xlsx_paths,
+    read_annotation_file,
+    write_xlsx,
+    write_xlsx_per_channel,
+)
 from signal_viewer.sv_gui import SVGUI
 from signal_viewer.sv_help import HelpController
 from signal_viewer.sv_plots.plot_controller import PlotController
@@ -81,6 +86,8 @@ class SVApp(QtCore.QObject):
         self.gui.ui.spin_box_sampling_rate_import_page.editingFinished.connect(self.update_sampling_rate)
 
         self.gui.ui.lview_data_files.doubleClicked.connect(self._open_recent_file)
+
+        self.gui.combo_box_channel.currentTextChanged.connect(self._on_channel_combo_changed)
 
         self.gui.sig_export_result.connect(self.export_result)
 
@@ -235,10 +242,47 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def _on_sig_new_data(self) -> None:
-        self.gui.dock_sections.list_view.setModel(self.data.sections)
-        self.gui.dock_sections.list_view.setCurrentIndex(self.data.base_section_index)
-        self.plot.bind_section_model(self.data.sections)
+        """
+        A file was loaded. Fills the channel dropdown; the sections arrive through `sig_channel_changed` right after.
+
+        The controller has no active channel yet at this point, so nothing here may touch `self.data.sections`.
+        """
+        combo = self.gui.combo_box_channel
+        with QtCore.QSignalBlocker(combo):
+            combo.clear()
+            combo.addItems(self.data.channels)
+        combo.setEnabled(True)
         self.plot.update_time_axis_scale(self.data.metadata.sampling_rate)
+
+    @QtCore.Slot(str)
+    def _on_channel_combo_changed(self, file_column: str) -> None:
+        if not file_column or not self.data.has_data:
+            return
+        # The first activation of a channel reads it from the file on this thread.
+        QtWidgets.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.CursorShape.WaitCursor))
+        try:
+            self.data.set_active_channel(file_column)
+        finally:
+            QtWidgets.QApplication.restoreOverrideCursor()
+
+    @QtCore.Slot(object)
+    def _on_channel_changed(self, channel: Channel) -> None:
+        """
+        Binds every section view to the now-active channel.
+
+        The controller emits `sig_active_section_changed` right after this, and `_on_active_section_changed` then
+        redraws the plot, tables, label and action states for the channel's active section.
+        """
+        with QtCore.QSignalBlocker(self.gui.combo_box_channel):
+            self.gui.combo_box_channel.setCurrentText(channel.file_column)
+
+        self._on_cancel_section()  # a half-finished region selection belongs to the previous channel
+
+        self.plot.reset()
+        self.plot.bind_section_model(channel.sections)
+        self.gui.dock_sections.list_view.setModel(channel.sections)
+        self.gui.dock_sections.list_view.setCurrentIndex(self.data.base_section_index)
+        self.result_plot.invalidate()  # its section provider now reads this channel's sections
 
     def _new_data_controller(self) -> None:
         """
@@ -255,6 +299,7 @@ class SVApp(QtCore.QObject):
         self.data.sig_user_input_required.connect(self.show_metadata_dialog)
         self.data.sig_new_metadata.connect(self._bind_metadata)
         self.data.sig_new_data.connect(self._on_sig_new_data)
+        self.data.sig_channel_changed.connect(self._on_channel_changed)
         self.gui.dock_sections.list_view.pressed.connect(self.data.set_active_section)
         self.data.sig_active_section_changed.connect(self._on_active_section_changed)
         self.data.sig_section_changed.connect(self._on_section_changed)
@@ -268,6 +313,7 @@ class SVApp(QtCore.QObject):
             (sender.sig_user_input_required, self.show_metadata_dialog),
             (sender.sig_new_metadata, self._bind_metadata),
             (sender.sig_new_data, self._on_sig_new_data),
+            (sender.sig_channel_changed, self._on_channel_changed),
             (sender.sig_active_section_changed, self._on_active_section_changed),
             (sender.sig_section_changed, self._on_section_changed),
             (sender.sig_task_started, self.gui.overlay_widget.show_overlay),
@@ -398,8 +444,13 @@ class SVApp(QtCore.QObject):
         dialog = self.gui.dialog_meta
         dialog.line_edit_file_name.setText(metadata.file_name)
         dialog.line_edit_file_type.setText(metadata.file_format)
-        dialog.set_requires_input(dialog.spin_box_sampling_rate, "sampling_rate" in metadata.required_fields)
-        dialog.set_requires_input(dialog.combo_box_signal_column, "signal_column" in metadata.required_fields)
+        dialog.validate()  # the combos were filled with signals blocked, so the dialog did not see the change
+
+        # The import page reports the metadata's own view of what is missing and blocks loading until it is complete.
+        missing = metadata.missing_fields_text()
+        self.gui.label_metadata_status.setText(missing)
+        self.gui.ui.btn_load_data.setEnabled(not missing)
+        self.gui.ui.btn_load_data.setToolTip(missing or "")
 
         self.gui.data_tree_widget_additional_metadata.set_data(metadata.other_info, hide_root=True)
         self.gui.data_tree_widget_additional_metadata.collapseAll()
@@ -416,6 +467,10 @@ class SVApp(QtCore.QObject):
         self.gui.dialog_meta.line_edit_file_name.clear()
         self.gui.dialog_meta.line_edit_file_type.clear()
         self.gui.data_tree_widget_additional_metadata.clear()
+        self.gui.label_metadata_status.clear()
+        with QtCore.QSignalBlocker(self.gui.combo_box_channel):
+            self.gui.combo_box_channel.clear()
+        self.gui.combo_box_channel.setEnabled(False)
 
     def _set_metadata_editable(self, editable: bool) -> None:
         """Metadata can be changed between opening a file and loading its data, not afterwards."""
@@ -470,9 +525,9 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_close_file.setEnabled(True)
         self.gui.ui.action_edit_metadata.setEnabled(True)
         self.gui.ui.btn_close_file.setEnabled(True)
-        self.gui.ui.btn_load_data.setEnabled(True)
 
-        self.data.open_file(file_path)  # fills the metadata widgets through sig_new_metadata -> _bind_metadata
+        # Fills the metadata widgets and enables "Load data" through sig_new_metadata -> _bind_metadata.
+        self.data.open_file(file_path)
         self.gui.ui.table_view_import_data.setModel(self.data.active_section_model)  # filled by `load_data`
         self.gui.ui.table_view_result_peaks.setModel(self.data.result_model_peaks)
         self.gui.ui.table_view_result_rate.setModel(self.data.result_model_rate)
@@ -581,18 +636,107 @@ class SVApp(QtCore.QObject):
     def _unlock_section(self) -> None:
         self.data.unlock_active()
 
-    def _confirm_xlsx_export(self) -> bool:
+    # --- Export ------------------------------------------------------------------------------------------------------
+
+    @logger.catch()
+    @QtCore.Slot(str)
+    def export_result(self, format: str) -> None:
+        if format == "csv":
+            self._export_csv()
+        elif format == "xlsx":
+            self._export_xlsx()
+        else:
+            raise NotImplementedError
+
+    def _export_csv(self) -> None:
+        """Writes the result table currently shown (peaks or rate) of the active section."""
+        if self.gui.ui.tab_widget_result_views.currentIndex() == 0:
+            df = self.data.active_section.peak_data
+        elif self.gui.ui.tab_widget_result_views.currentIndex() == 1:
+            df = self.data.active_section.rate_data
+        else:
+            raise NotImplementedError
+
+        default = self._output_dir / f"{self._result_stem(self.data.active_section.signal_name)}.csv"
+        out_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self.gui, "Export CSV", default.as_posix(), filter="CSV files (*.csv)"
+        )
+        if not out_path:
+            return
+        self._remember_output_dir(Path(out_path).parent)
+        df.write_csv(out_path)
+        self._show_saved([Path(out_path)])
+
+    def _export_xlsx(self) -> None:
         """
-        Checks that there is something to export and warns about unlocked sections.
+        Writes the sections of every loaded channel: one workbook, or one workbook per channel.
+
+        The layout question is only asked when more than one channel has sections.
+        """
+        by_channel = self.data.channel_sections()
+        if not self._confirm_xlsx_export(by_channel):
+            return
+        layout = self._ask_xlsx_layout(list(by_channel))
+        if layout is None:
+            return
+
+        text, ok = QtWidgets.QInputDialog.getText(
+            self.gui,
+            "Add grouping column?",
+            "Optional label for a 'group_var' column.<br>Useful when combining results from multiple files,<br>e.g. to perform further analysis in R.",
+        )
+        group_var = text if ok else None
+        stem = Path(self.data.metadata.file_path).stem
+
+        if layout == "single":
+            if len(by_channel) == 1:
+                # Same name as before channels existed: the signal name is part of it.
+                default = self._output_dir / f"{self._result_stem(next(iter(by_channel.values()))[0].signal_name)}.xlsx"
+            else:
+                default = self._output_dir / f"Result_{stem}.xlsx"
+            out_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+                self.gui, "Export XLSX", default.as_posix(), filter="XLSX files (*.xlsx)"
+            )
+            if not out_path:
+                return
+            self._remember_output_dir(Path(out_path).parent)
+            write_xlsx(by_channel, out_path, group_var)
+            self._show_saved([Path(out_path)])
+            return
+
+        directory = QtWidgets.QFileDialog.getExistingDirectory(
+            self.gui, "Export one XLSX per channel", self._output_dir.as_posix()
+        )
+        if not directory:
+            return
+        existing = [p for p in per_channel_xlsx_paths(by_channel, directory, stem).values() if p.exists()]
+        if existing:
+            answer = QtWidgets.QMessageBox.question(
+                self.gui,
+                "Overwrite files?",
+                "These files exist and will be replaced:\n\n" + "\n".join(p.name for p in existing) + "\n\nContinue?",
+            )
+            if answer != QtWidgets.QMessageBox.StandardButton.Yes:
+                return
+        self._remember_output_dir(Path(directory))
+        self._show_saved(write_xlsx_per_channel(by_channel, directory, stem, group_var))
+
+    def _confirm_xlsx_export(self, by_channel: Mapping[str, Sequence[Section]]) -> bool:
+        """
+        Checks that there is something to export and warns about unlocked sections of any channel.
 
         Returns `False` when the export should be aborted.
         """
-        sections = self.data.sections.editable_sections
-        if not sections:
+        if not by_channel:
             logger.warning("Nothing to export. Create at least one section, detect peaks, and lock it first.")
             return False
 
-        unlocked = [s.section_id.pretty_name() for s in sections if not s.is_locked]
+        unlocked = [
+            f"{channel}: {s.section_id.pretty_name()}"
+            for channel, sections in by_channel.items()
+            for s in sections
+            if not s.is_locked
+        ]
         if not unlocked:
             return True
 
@@ -605,46 +749,40 @@ class SVApp(QtCore.QObject):
         )
         return answer == QtWidgets.QMessageBox.StandardButton.Yes
 
-    @logger.catch()
-    @QtCore.Slot(str)
-    def export_result(self, format: str) -> None:
-        if format == "xlsx" and not self._confirm_xlsx_export():
-            return
-
-        dir_path = (
-            Path(Config.internal.last_output_dir)
-            / f"Result_{self.data.active_section.signal_name.title()}_{Path(self.data.metadata.file_path).stem}"
+    def _ask_xlsx_layout(self, channels: Sequence[str]) -> Literal["single", "per_channel"] | None:
+        """One workbook or one per channel; `None` when the user cancels. Not asked for a single channel."""
+        if len(channels) <= 1:
+            return "single"
+        box = QtWidgets.QMessageBox(self.gui)
+        box.setIcon(QtWidgets.QMessageBox.Icon.Question)
+        box.setWindowTitle("Export layout")
+        box.setText(
+            f"Sections exist for {len(channels)} channels:\n\n"
+            + "\n".join(channels)
+            + "\n\nWrite one workbook holding all channels (with a 'channel' column), or one workbook per channel?"
         )
-        out_path, _ = QtWidgets.QFileDialog.getSaveFileName(
-            self.gui,
-            f"Export {format.upper()}",
-            dir_path.as_posix(),
-            filter=f"{format.upper()} files (*.{format})",
-        )
-        if not out_path:
-            return
-        Config.internal.last_output_dir = Path(out_path).parent.resolve().as_posix()
+        btn_single = box.addButton("One file", QtWidgets.QMessageBox.ButtonRole.AcceptRole)
+        btn_per_channel = box.addButton("One file per channel", QtWidgets.QMessageBox.ButtonRole.AcceptRole)
+        box.addButton(QtWidgets.QMessageBox.StandardButton.Cancel)
+        box.setDefaultButton(btn_single)
+        box.exec()
+        clicked = box.clickedButton()
+        if clicked is btn_single:
+            return "single"
+        if clicked is btn_per_channel:
+            return "per_channel"
+        return None
 
-        if format == "csv":
-            if self.gui.ui.tab_widget_result_views.currentIndex() == 0:
-                df = self.data.active_section.peak_data
-            elif self.gui.ui.tab_widget_result_views.currentIndex() == 1:
-                df = self.data.active_section.rate_data
-            else:
-                raise NotImplementedError
+    @property
+    def _output_dir(self) -> Path:
+        return Path(Config.internal.last_output_dir)
 
-            df.write_csv(out_path)
+    @staticmethod
+    def _remember_output_dir(directory: Path) -> None:
+        Config.internal.last_output_dir = directory.resolve().as_posix()
 
-        elif format == "xlsx":
-            text, ok = QtWidgets.QInputDialog.getText(
-                self.gui,
-                "Add grouping column?",
-                "Optional label for a 'group_var' column.<br>Useful when combining results from multiple files,<br>e.g. to perform further analysis in R.",
-            )
-            group_var = text if ok else None
-            write_xlsx(self.data.sections.editable_sections, out_path, group_var)
+    def _result_stem(self, signal_name: str) -> str:
+        return f"Result_{signal_name.title()}_{Path(self.data.metadata.file_path).stem}"
 
-        else:
-            raise NotImplementedError
-
-        QtWidgets.QMessageBox.information(self.gui, "Success!", f"Saved to '{out_path}'")
+    def _show_saved(self, paths: Sequence[Path]) -> None:
+        QtWidgets.QMessageBox.information(self.gui, "Success!", "Saved to:\n\n" + "\n".join(str(p) for p in paths))

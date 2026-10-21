@@ -94,7 +94,6 @@ class Ui_MetadataDialog(object):
         self.spin_box_sampling_rate.setStyleSheet("")
         self.spin_box_sampling_rate.setMaximum(10000)
         self.spin_box_sampling_rate.setProperty("mandatoryField", True)
-        self.spin_box_sampling_rate.setProperty("requiresInput", False)
 
         self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.spin_box_sampling_rate)
 
@@ -111,7 +110,6 @@ class Ui_MetadataDialog(object):
         self.combo_box_signal_column = QComboBox(self.container_form_layout)
         self.combo_box_signal_column.setObjectName("combo_box_signal_column")
         self.combo_box_signal_column.setProperty("mandatoryField", True)
-        self.combo_box_signal_column.setProperty("requiresInput", False)
 
         self.formLayout.setWidget(3, QFormLayout.ItemRole.FieldRole, self.combo_box_signal_column)
 

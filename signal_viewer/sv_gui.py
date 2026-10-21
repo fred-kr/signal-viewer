@@ -7,7 +7,6 @@ from loguru import logger
 from PySide6 import QtCore, QtGui, QtWidgets
 from pyside_widgets import OverlayWidget, ResizableMessageBox, SearchableDataTreeWidget
 
-from signal_viewer.constants import INDEX_COL
 from signal_viewer.enum_defs import LogLevel
 from signal_viewer.generated.ui_main_window import Ui_MainWindow
 from signal_viewer.sv_config import Config
@@ -98,6 +97,12 @@ class SVGUI(QtWidgets.QMainWindow):
         # HDF5 export has no writer yet; hide the button rather than offer a dead action.
         self.ui.btn_export_all_results.setVisible(False)
 
+        # Names the required metadata that is still missing; `SVApp._bind_metadata` keeps it current.
+        self.label_metadata_status = QtWidgets.QLabel()
+        self.label_metadata_status.setObjectName("label_metadata_status")
+        self.label_metadata_status.setWordWrap(True)
+        self.ui.formLayout.addRow(self.label_metadata_status)  # the form of `grp_box_required_info`
+
         self.combo_box_result_plot_scope = QtWidgets.QComboBox()
         self.combo_box_result_plot_scope.addItem("Active section", ResultPlotScope.ActiveSection)
         self.combo_box_result_plot_scope.addItem("All locked sections", ResultPlotScope.AllLockedSections)
@@ -178,6 +183,18 @@ class SVGUI(QtWidgets.QMainWindow):
         self.tool_bar_editing = self._setup_toolbar(
             "tool_bar_editing", [self.ui.action_toggle_auto_scaling, self.ui.action_show_section_overview]
         )
+        # Channel switcher. Filled by `SVApp` once a file is loaded; the toolbar itself is only enabled on the edit page.
+        self.combo_box_channel = QtWidgets.QComboBox()
+        self.combo_box_channel.setObjectName("combo_box_channel")
+        self.combo_box_channel.setMinimumWidth(160)
+        self.combo_box_channel.setSizeAdjustPolicy(QtWidgets.QComboBox.SizeAdjustPolicy.AdjustToContents)
+        self.combo_box_channel.setToolTip(
+            "Switch the channel (signal column) being edited. Sections and results of the other channels are kept."
+        )
+        self.combo_box_channel.setEnabled(False)
+        self.tool_bar_editing.addSeparator()
+        self.tool_bar_editing.addWidget(QtWidgets.QLabel("Channel: "))
+        self.tool_bar_editing.addWidget(self.combo_box_channel)
 
         self.tool_bar_help = self._setup_toolbar(
             "tool_bar_help",
@@ -250,22 +267,12 @@ class SVGUI(QtWidgets.QMainWindow):
 
     def _connect_signals(self) -> None:
         self.ui.tab_widget_main.currentChanged.connect(self._on_page_changed)
-        self.dialog_meta.spin_box_sampling_rate.valueChanged.connect(self._on_dialog_sampling_rate_changed)
-        self.dialog_meta.combo_box_signal_column.currentTextChanged.connect(self._on_dialog_signal_column_changed)
 
         self.dock_status_log.log_text_box.sig_log_message.connect(self.maybe_show_error_dialog)
 
         self.action_export_to_csv.triggered.connect(lambda: self.sig_export_result.emit("csv"))
         self.action_export_to_xlsx.triggered.connect(lambda: self.sig_export_result.emit("xlsx"))
         self.ui.btn_export_to_excel.clicked.connect(lambda: self.sig_export_result.emit("xlsx"))
-
-    @QtCore.Slot(int)
-    def _on_dialog_sampling_rate_changed(self, value: int) -> None:
-        self.dialog_meta.set_requires_input(self.dialog_meta.spin_box_sampling_rate, value <= 0)
-
-    @QtCore.Slot(str)
-    def _on_dialog_signal_column_changed(self, value: str) -> None:
-        self.dialog_meta.set_requires_input(self.dialog_meta.combo_box_signal_column, value == INDEX_COL)
 
     @QtCore.Slot(QtCore.QPoint)
     def show_result_view_context_menu(self, pos: QtCore.QPoint) -> None:

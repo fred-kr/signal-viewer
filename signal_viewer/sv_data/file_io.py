@@ -1,5 +1,5 @@
 import datetime
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -181,36 +181,88 @@ def read_annotation_file(
     )
 
 
-def write_xlsx(sections: Sequence[Section], path: Path | str, group_var: str | None = None) -> None:
-    """
-    Writes the results of `sections` to one workbook with the sheets `r_data`, `Detected Peaks`, `Rate Data` and
-    `Global Bounds`.
+def _prepend_literal(df: pl.DataFrame, name: str, value: str | int, dtype: pl.DataType) -> pl.DataFrame:
+    """A copy of `df` with a constant column `name` in front. The section frames themselves are left untouched."""
+    if df.height == 0:
+        # A literal broadcasts to one row on an empty frame, which would invent a result row.
+        return pl.DataFrame(schema={name: dtype, **df.schema})
+    return df.select(pl.lit(value).cast(dtype).alias(name), pl.all())
 
-    The `section_id` column in the first three sheets is the 1-based position in `sections`. The window step of
-    `r_data` is each section's own `rate_params`. Sections without a result (not locked) contribute no rows; their
-    missing columns are filled with nulls so one unlocked section does not break the export.
+
+def write_xlsx(
+    sections_by_channel: Mapping[str, Sequence[Section]], path: Path | str, group_var: str | None = None
+) -> None:
+    """
+    Writes the results of every channel's sections to one workbook with the sheets `r_data`, `Detected Peaks`,
+    `Rate Data` and `Global Bounds`.
+
+    Every sheet starts with a `channel` column (the key of `sections_by_channel`, i.e. the file's column name).
+    The `section_id` column in the first three sheets is the 1-based position of the section within its channel.
+    The window step of `r_data` is each section's own `rate_params`. Sections without a result (not locked)
+    contribute no rows; their missing columns are filled with nulls so one unlocked section does not break the export.
 
     Raises
     ------
     ValueError
-        If `sections` is empty.
+        If no channel has a section.
     """
-    if not sections:
+    if not any(sections_by_channel.values()):
         raise ValueError("Nothing to export: no sections were given.")
 
-    def numbered(df: pl.DataFrame, i: int) -> pl.DataFrame:
-        if df.height == 0:
-            # A literal broadcasts to one row on an empty frame, which would invent a result row.
-            return pl.DataFrame(schema={"section_id": pl.Int32, **df.schema})
-        return df.insert_column(0, pl.lit(i).cast(pl.Int32).alias("section_id"))
-
-    peak_frames = [numbered(s.peak_data, i) for i, s in enumerate(sections, start=1)]
-    rate_frames = [numbered(s.rate_data, i) for i, s in enumerate(sections, start=1)]
-    bounds_frames = [s.global_bounds_df for s in sections]
-    r_data_frames = [s.get_simple_result(group_var=group_var) for s in sections]
+    peak_frames: list[pl.DataFrame] = []
+    rate_frames: list[pl.DataFrame] = []
+    bounds_frames: list[pl.DataFrame] = []
+    r_data_frames: list[pl.DataFrame] = []
+    for channel, sections in sections_by_channel.items():
+        for i, s in enumerate(sections, start=1):
+            numbered_peaks = _prepend_literal(s.peak_data, "section_id", i, pl.Int32())
+            numbered_rate = _prepend_literal(s.rate_data, "section_id", i, pl.Int32())
+            peak_frames.append(_prepend_literal(numbered_peaks, "channel", channel, pl.String()))
+            rate_frames.append(_prepend_literal(numbered_rate, "channel", channel, pl.String()))
+            bounds_frames.append(_prepend_literal(s.global_bounds_df, "channel", channel, pl.String()))
+            r_data_frames.append(
+                _prepend_literal(s.get_simple_result(group_var=group_var), "channel", channel, pl.String())
+            )
 
     with xlsxwriter.Workbook(path) as wb:
         pl.concat(r_data_frames, how="diagonal_relaxed").write_excel(workbook=wb, worksheet="r_data")
         pl.concat(peak_frames, how="diagonal_relaxed").write_excel(workbook=wb, worksheet="Detected Peaks")
         pl.concat(rate_frames, how="diagonal_relaxed").write_excel(workbook=wb, worksheet="Rate Data")
         pl.concat(bounds_frames, how="diagonal_relaxed").write_excel(workbook=wb, worksheet="Global Bounds")
+
+
+def per_channel_xlsx_paths(
+    sections_by_channel: Mapping[str, Sequence[Section]], directory: Path | str, stem: str
+) -> dict[str, Path]:
+    """
+    The workbook path per channel that `write_xlsx_per_channel` writes: `Result_{Signal}_{stem}.xlsx`, where
+    `Signal` is the channel's cleaned column name (the sections' `signal_name`), which is safe in a file name.
+    """
+    directory = Path(directory)
+    return {
+        channel: directory / f"Result_{sections[0].signal_name.title()}_{stem}.xlsx"
+        for channel, sections in sections_by_channel.items()
+        if sections
+    }
+
+
+def write_xlsx_per_channel(
+    sections_by_channel: Mapping[str, Sequence[Section]],
+    directory: Path | str,
+    stem: str,
+    group_var: str | None = None,
+) -> list[Path]:
+    """
+    Writes one workbook per channel (see `write_xlsx` for the sheets) into `directory` and returns the paths.
+
+    Raises
+    ------
+    ValueError
+        If no channel has a section.
+    """
+    paths = per_channel_xlsx_paths(sections_by_channel, directory, stem)
+    if not paths:
+        raise ValueError("Nothing to export: no sections were given.")
+    for channel, path in paths.items():
+        write_xlsx({channel: sections_by_channel[channel]}, path, group_var)
+    return list(paths.values())

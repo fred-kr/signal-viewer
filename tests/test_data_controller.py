@@ -27,6 +27,7 @@ from signal_viewer.enum_defs import (
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_controller import DataController
 from signal_viewer.sv_data.section import DEFAULT_RATE_PARAMS
+from signal_viewer.sv_data.workers import SectionResultWorker
 from signal_viewer.type_defs import (
     PeakDetectionRequest,
     PeaksLocalMaxima,
@@ -47,13 +48,14 @@ class SyncRunner:
 
 @pytest.fixture
 def csv_file(tmp_path: Path) -> Path:
-    """20 s at 100 Hz with a float `time` column so the sampling rate can be detected."""
+    """20 s at 100 Hz with a float `time` column so the sampling rate can be detected, plus a text column."""
     t = np.arange(N) / FS
     pl.DataFrame(
         {
             "time": t,
             "Alpha Sig": np.sin(2 * np.pi * t),
             "Beta Temp": np.linspace(20.0, 30.0, N),
+            "Label": ["rest"] * (N // 2) + ["active"] * (N - N // 2),
         }
     ).write_csv(tmp_path / "recording.csv")
     return tmp_path / "recording.csv"
@@ -369,3 +371,159 @@ def test_refresh_table_models_keeps_frames(csv_file: Path) -> None:
 
     assert dc.active_section_model.df is before
     assert resets == [True]
+
+
+# --- Channels: one file, several signal columns, each with its own sections -------------------------------------------
+
+
+def _loaded(csv_file: Path) -> DataController:
+    dc = DataController(thread_pool=SyncRunner())
+    dc.open_file(csv_file)
+    dc.update_metadata(signal_col="Alpha Sig", info_col="Beta Temp")
+    dc.load_data()
+    return dc
+
+
+def _count_reads(dc: DataController, monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, str | None]]:
+    reads: list[tuple[str, str | None]] = []
+    original = dc._read_frame
+
+    def counting(signal_col: str, info_col: str | None) -> pl.DataFrame:
+        reads.append((signal_col, info_col))
+        return original(signal_col, info_col)
+
+    monkeypatch.setattr(dc, "_read_frame", counting)
+    return reads
+
+
+def test_load_data_reads_only_the_selected_channel(csv_file: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    dc = DataController(thread_pool=SyncRunner())
+    dc.open_file(csv_file)
+    dc.update_metadata(signal_col="Alpha Sig", info_col="Beta Temp")
+    reads = _count_reads(dc, monkeypatch)
+    order: list[object] = []
+    dc.sig_new_data.connect(lambda: order.append("new_data"))
+    dc.sig_channel_changed.connect(lambda ch: order.append(("channel", ch.file_column)))
+    dc.sig_active_section_changed.connect(lambda s: order.append(("section", s.signal_name)))
+
+    dc.load_data()
+
+    assert dc.channels == ["time", "Alpha Sig", "Beta Temp"], "the text column is not a channel"
+    assert dc.active_channel == "Alpha Sig"
+    assert dc.loaded_channels == ["Alpha Sig"]
+    assert reads == [("Alpha Sig", "Beta Temp")]
+    assert order == ["new_data", ("channel", "Alpha Sig"), ("section", "alpha_sig")], (
+        "listeners fill the channel list on sig_new_data before the first channel is announced"
+    )
+
+
+def test_switching_channels_keeps_sections(csv_file: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    dc = _loaded(csv_file)
+    dc.create_section(0, N - 1)
+    dc.set_active_section(dc.sections.index(1))
+    first = dc.active_section
+    dc.update_peaks("add", sine_peaks())
+    first_model = dc.sections
+    reads = _count_reads(dc, monkeypatch)
+    metadata_emits: list[object] = []
+    dc.sig_new_metadata.connect(metadata_emits.append)
+
+    dc.set_active_channel("Beta Temp")
+
+    assert dc.active_channel == "Beta Temp"
+    assert dc.metadata.signal_column == "Beta Temp" and metadata_emits == [dc.metadata]
+    assert dc.sections is not first_model and dc.sections.rowCount() == 1
+    base = dc.get_base_section()
+    assert base.signal_name == "beta_temp"
+    assert base.info_name is None, "the info column cannot be its own info column"
+    assert dc.base_df.columns == [INDEX_COL, "beta_temp"]
+    assert dc.active_section is base
+    assert dc.active_section_model.df.height == N
+    dc.create_section(100, 299)
+    assert str(dc.sections.editable_sections[0].section_id) == "Section_beta_temp_001"
+
+    dc.set_active_channel("Alpha Sig")
+
+    assert dc.sections is first_model
+    assert dc.sections.editable_sections == [first]
+    assert dc.active_section is first, "a channel remembers its active section"
+    assert first.peaks_local.to_list() == sine_peaks().tolist()
+    assert reads == [("Beta Temp", None)], "a channel is read once, on its first activation"
+    assert dc.loaded_channels == ["Alpha Sig", "Beta Temp"]
+
+
+def test_set_active_channel_ignores_unknown_and_current(csv_file: Path) -> None:
+    dc = _loaded(csv_file)
+    emitted: list[object] = []
+    dc.sig_channel_changed.connect(emitted.append)
+
+    dc.set_active_channel("Label")
+    dc.set_active_channel("Alpha Sig")
+    dc.set_active_channel("does not exist")
+
+    assert emitted == []
+    assert dc.active_channel == "Alpha Sig"
+
+
+def test_rate_params_reach_every_channel(csv_file: Path) -> None:
+    dc = _loaded(csv_file)
+    dc.create_section(0, 199)
+    dc.set_active_channel("Beta Temp")
+    dc.create_section(0, 199)
+    params: RollingRateKwargs = {
+        "sec_new_window_every": 5,
+        "sec_window_length": 30,
+        "incomplete_window_method": IncompleteWindowMethod.Approximate,
+    }
+
+    dc.set_rate_params(params)
+
+    assert len(dc._all_sections()) == 4
+    assert all(s.rate_params == params for s in dc._all_sections())
+
+
+def test_results_reach_sections_of_inactive_channels(csv_file: Path) -> None:
+    dc = _loaded(csv_file)
+    dc.create_section(0, N - 1)
+    dc.set_active_section(dc.sections.index(1))
+    section = dc.active_section
+    model = dc.sections
+    dc.update_peaks("add", sine_peaks())
+    result = SectionResultWorker(section).compute()  # what the thread pool would deliver later
+
+    dc.set_active_channel("Beta Temp")
+    changed: list[int] = []
+    model.dataChanged.connect(lambda tl, br, roles=None: changed.append(tl.row()))
+    emitted: list[tuple[object, SectionChange]] = []
+    dc.sig_section_changed.connect(lambda s, f: emitted.append((s, f)))
+
+    dc._on_section_result(result)
+
+    assert section.is_locked
+    assert changed == [1], "the lock icon of the inactive channel's list is refreshed"
+    assert emitted == [(section, SectionChange.LOCK | SectionChange.RESULT)]
+    assert dc.channel_sections() == {"Alpha Sig": [section]}, "only channels with sections are exported"
+
+
+def test_reload_drops_every_channel(csv_file: Path) -> None:
+    dc = _loaded(csv_file)
+    dc.create_section(0, 199)
+    dc.set_active_channel("Beta Temp")
+    dc.create_section(0, 199)
+
+    dc.load_data()
+
+    assert dc.active_channel == "Beta Temp", "the last active channel is the one loaded"
+    assert dc.loaded_channels == ["Beta Temp"]
+    assert dc.channel_sections() == {}
+
+
+def test_load_data_refuses_incomplete_metadata(csv_file: Path) -> None:
+    dc = DataController()
+    dc.open_file(csv_file)
+    dc.update_metadata(sampling_rate=0, signal_col="Alpha Sig", info_col=COMBO_BOX_NO_SELECTION)
+
+    dc.load_data()
+
+    assert not dc.has_data
+    assert dc.loaded_channels == []

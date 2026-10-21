@@ -77,3 +77,16 @@ def test_index_of_and_notify() -> None:
     model.notify_section_changed(sections[1])
     model.notify_section_changed(make_section(0, 9))  # unknown section: no emission
     assert changed == [1]
+
+
+def test_section_ids_keep_underscored_signal_names() -> None:
+    model = SectionListModel()
+    df = pl.DataFrame({INDEX_COL: np.arange(10, dtype=np.uint32), "alpha_sig": np.zeros(10)})
+    model.add_section(Section(df, "alpha_sig", FS))
+    model.add_section(Section(df, "alpha_sig", FS))
+
+    section_id = model.editable_sections[0].section_id
+    assert str(section_id) == "Section_alpha_sig_001"
+    assert section_id.signal_name == "alpha_sig"
+    assert section_id.pretty_name() == "Section 001 (ALPHA_SIG)"
+    assert section_id.as_num() == 1

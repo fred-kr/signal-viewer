@@ -303,14 +303,20 @@ class SectionID(str):
     def default() -> SectionID:
         return SectionID("Section_DEFAULT_000")
 
+    _PREFIX = "Section_"
+
+    @property
+    def signal_name(self) -> str:
+        """The signal name part of `Section_<signal_name>_000`; the name itself may contain underscores."""
+        return self[len(self._PREFIX) : -4]
+
     def pretty_name(self) -> str:
         """UI friendly name for the section"""
-        sig_name = self.split("_")[1]
-        return f"Section {self[-3:]} ({sig_name.upper()})"
+        return f"Section {self[-3:]} ({self.signal_name.upper()})"
 
     def as_num(self) -> int:
         """Get the section number as an int"""
-        return int(self.split("_")[2])
+        return int(self[-3:])
 
 
 @attrs.define
@@ -548,10 +554,6 @@ class Section:
     def processed_signal(self) -> pl.Series:
         """The processed (filtered, standardized, etc) signal data for the section."""
         return self.data.get_column(self.processed_signal_name)
-
-    @property
-    def info_data(self) -> pl.Series | None:
-        return None if self.info_name is None else self.data.get_column(self.info_name)
 
     @property
     def is_filtered(self) -> bool:

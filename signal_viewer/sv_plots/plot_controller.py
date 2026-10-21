@@ -66,10 +66,6 @@ class PlotController(QtCore.QObject):
         self._gui.ui.plot_container.setLayout(widget_layout)
         self.pw_main = main_plot_widget
         self.pw_rate = rate_plot_widget
-        self.vb_info = ViewBox(name="info_vb")
-
-        self.update_views()
-        self.pw_main.plotItem.vb.sigResized.connect(self.update_views)
 
     def _setup_plot_items(self) -> None:
         p_main = cast(pg.PlotItem, self.pw_main.getPlotItem())
@@ -84,12 +80,6 @@ class PlotController(QtCore.QObject):
             plt_item.addLegend().anchor(itemPos=(0, 1), parentPos=(0, 1), offset=(5, -5))
             plt_item.setMouseEnabled(x=True, y=False)
 
-        p_main.showAxis("right")
-        p_main.scene().addItem(self.vb_info)
-        p_main.getAxis("right").linkToView(self.vb_info)
-        p_main.getAxis("right").setGrid(0)
-        self.vb_info.setXLink(p_main)
-
         p_main.vb.enableAutoRange(EditingViewBox.YAxis, enable=True)
         p_main.vb.setAutoPan(y=True)
 
@@ -98,24 +88,14 @@ class PlotController(QtCore.QObject):
 
         p_main.vb.setXLink("rate_plot")
 
-    @QtCore.Slot()
-    def update_views(self) -> None:
-        p_main = cast(pg.PlotItem, self.pw_main.plotItem)
-        vb_info = self.vb_info
-
-        vb_info.setGeometry(p_main.vb.sceneBoundingRect())
-        vb_info.linkedViewChanged(p_main.vb, vb_info.XAxis)
-
     def _setup_plot_data_items(self) -> None:
         self._setup_signal_curve()
-        self._setup_info_curve()
         self._setup_peak_scatter()
         self._setup_rate_curve()
         self._setup_region_selector()
 
     def _remove_plot_data_items(self) -> None:
         self._remove_signal_curve()
-        self._remove_info_curve()
         self._remove_peak_scatter()
         self._remove_rate_curve()
         self._remove_region_selector()
@@ -143,24 +123,6 @@ class PlotController(QtCore.QObject):
         self.pw_main.removeItem(self.signal_curve)
         self.signal_curve.setParent(None)
         self.signal_curve = None
-
-    def _setup_info_curve(self) -> None:
-        pen = make_qpen(SVGColors.FireBrick, width=1)
-        info = pg.PlotDataItem(
-            pen=pen,
-            skipFiniteCheck=True,
-            autoDownsample=True,
-            name="Info",
-        )
-        self.info_curve = info
-        self.vb_info.addItem(self.info_curve)
-
-    def _remove_info_curve(self) -> None:
-        if self.info_curve is None:
-            return
-        self.vb_info.removeItem(self.info_curve)
-        self.info_curve.setParent(None)
-        self.info_curve = None
 
     def _setup_peak_scatter(self) -> None:
         brush = make_qbrush(SVGColors.GoldenRod)
@@ -489,25 +451,6 @@ class PlotController(QtCore.QObject):
 
         self.signal_curve.setData(y_data)
         self.pw_main.plotItem.vb.menu.autoRange()  # calling autoRange() on the vb menu ignores the region when switching to base section, not sure why but it works
-
-    def set_info_data(self, y_data: npt.ArrayLike, clear: bool = False) -> None:
-        """
-        Sets the values of the info curve.
-
-        Parameters
-        ----------
-        y_data : ArrayLike
-            1D array of info values
-        clear : bool, default False
-            Whether to clear the existing info data before setting, by default False
-        """
-        if self.info_curve is None:
-            return
-        if clear:
-            self.info_curve.clear()
-
-        self.info_curve.setData(y_data)
-        self.pw_main.plotItem.vb.menu.autoRange()
 
     def set_rate_data(self, y_data: npt.ArrayLike, x_data: npt.ArrayLike | None = None, clear: bool = False) -> None:
         """

@@ -71,7 +71,6 @@ def test_section_without_info_column() -> None:
     s = Section(make_df(with_info=False), "sig", FS)
 
     assert s.info_name is None
-    assert s.info_data is None
 
     s.set_peaks(sine_peaks(), update_rate=False)
     s._calc_rate_rolling(sec_new_window_every=10, sec_window_length=60)
