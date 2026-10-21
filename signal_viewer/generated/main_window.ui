@@ -55,8 +55,112 @@
         <item>
          <widget class="QWidget" name="container_file_information" native="true">
           <layout class="QGridLayout" name="gridLayout">
+           <item row="1" column="1" colspan="2">
+            <widget class="QLineEdit" name="line_edit_active_file">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="frame">
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="3">
+            <widget class="QLabel" name="label_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:700;&quot;&gt;Data Import&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="btn_open_file">
+             <property name="whatsThis">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Opens a window allowing you to choose a file to load into the app.&lt;/p&gt;&lt;p&gt;The selected file is searched for available columns or channels of data.&lt;/p&gt;&lt;p&gt;If any are found, their names are made available for selection in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Open File</string>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QPushButton" name="btn_close_file">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close the current file and reset the app state.&lt;/p&gt;&lt;p&gt;Make sure to export any existing results first, as they will be lost on reset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="whatsThis">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close the current file and reset the app state.&lt;/p&gt;&lt;p&gt;Make sure to export any existing results first, as they will be lost on reset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Close File</string>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+R</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QPushButton" name="btn_load_data">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loads the data from the columns or channels specified in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="whatsThis">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loads the data from the columns or channels specified in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Load Data</string>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+            </widget>
+           </item>
            <item row="4" column="0" colspan="3">
             <widget class="QWidget" name="container_recent_files" native="true">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>534</height>
+              </size>
+             </property>
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <property name="leftMargin">
                <number>3</number>
@@ -99,68 +203,7 @@
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QLabel" name="label_5">
-                <property name="text">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:700;&quot;&gt;Recent Annotation Files&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QListView" name="lview_annotation_files">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double-click on a filename to open it&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="showDropIndicator" stdset="0">
-                 <bool>false</bool>
-                </property>
-                <property name="selectionBehavior">
-                 <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-                </property>
-                <property name="textElideMode">
-                 <enum>Qt::TextElideMode::ElideMiddle</enum>
-                </property>
-                <property name="selectionRectVisible">
-                 <bool>true</bool>
-                </property>
-                <property name="itemAlignment">
-                 <set>Qt::AlignmentFlag::AlignLeading</set>
-                </property>
-               </widget>
-              </item>
              </layout>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QPushButton" name="btn_open_file">
-             <property name="whatsThis">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Opens a window allowing you to choose a file to load into the app.&lt;/p&gt;&lt;p&gt;The selected file is searched for available columns or channels of data.&lt;/p&gt;&lt;p&gt;If any are found, their names are made available for selection in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Open File</string>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QLineEdit" name="line_edit_active_file">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="frame">
-              <bool>true</bool>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
             </widget>
            </item>
            <item row="2" column="0" colspan="3">
@@ -264,72 +307,6 @@
              </layout>
             </widget>
            </item>
-           <item row="0" column="0" colspan="3">
-            <widget class="QLabel" name="label_2">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:700;&quot;&gt;Data Import&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QPushButton" name="btn_close_file">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close the current file and reset the app state.&lt;/p&gt;&lt;p&gt;Make sure to export any existing results first, as they will be lost on reset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="whatsThis">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close the current file and reset the app state.&lt;/p&gt;&lt;p&gt;Make sure to export any existing results first, as they will be lost on reset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Close File</string>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="shortcut">
-              <string>Ctrl+R</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="QPushButton" name="btn_load_data">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loads the data from the columns or channels specified in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="whatsThis">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loads the data from the columns or channels specified in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Load Data</string>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-            </widget>
-           </item>
            <item row="3" column="1">
             <spacer name="horizontalSpacer">
              <property name="orientation">
@@ -402,29 +379,13 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_annotation_file">
-           <attribute name="title">
-            <string>Annotations</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_5">
-            <item row="0" column="0">
-             <widget class="QComboBox" name="cb_section_start_text"/>
-            </item>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="cb_section_stop_text"/>
-            </item>
-            <item row="1" column="0" colspan="2">
-             <widget class="TableWidget" name="table_annotations"/>
-            </item>
-           </layout>
-          </widget>
          </widget>
         </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab_edit">
        <attribute name="title">
-        <string>View &amp;&amp; Edit</string>
+        <string>Graph</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
@@ -434,31 +395,9 @@
       </widget>
       <widget class="QWidget" name="tab_export">
        <attribute name="title">
-        <string>Results &amp;&amp; Export</string>
+        <string>Results</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3" columnstretch="3,2,1,1">
-        <item row="0" column="3">
-         <widget class="QPushButton" name="btn_export_all_results">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="toolTip">
-           <string>Currently not working</string>
-          </property>
-          <property name="whatsThis">
-           <string>Currently not working</string>
-          </property>
-          <property name="text">
-           <string>Save to HDF5 (detailed)</string>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>24</width>
-            <height>24</height>
-           </size>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_4">
           <property name="text">
@@ -552,20 +491,7 @@
           </widget>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="label_showing_section_result">
-          <property name="frameShape">
-           <enum>QFrame::Shape::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Shadow::Sunken</enum>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
+        <item row="0" column="3">
          <widget class="QPushButton" name="btn_export_to_excel">
           <property name="text">
            <string>Save to Excel</string>
@@ -581,20 +507,17 @@
           </property>
          </widget>
         </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_opengl">
-       <attribute name="title">
-        <string>OpenGL</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0">
-         <widget class="QWidget" name="widget" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_5">
-           <item>
-            <widget class="QOpenGLWidget" name="openGLWidget"/>
-           </item>
-          </layout>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_showing_section_result">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Shadow::Sunken</enum>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
          </widget>
         </item>
        </layout>
@@ -620,7 +543,6 @@
      <string>File</string>
     </property>
     <addaction name="action_open_file"/>
-    <addaction name="action_open_annotation_file"/>
     <addaction name="action_close_file"/>
     <addaction name="separator"/>
     <addaction name="action_edit_metadata"/>
@@ -663,8 +585,14 @@
   </widget>
   <widget class="QStatusBar" name="status_bar"/>
   <action name="action_open_file">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentOpen"/>
+   </property>
    <property name="text">
     <string>Open File</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::TextHeuristicRole</enum>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -923,12 +851,19 @@
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
-  <action name="action_open_annotation_file">
-   <property name="text">
-    <string>Open Annotation File</string>
+  <action name="action_select_channel">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/icons/selector.svg</normaloff>:/icons/selector.svg</iconset>
    </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
+   <property name="text">
+    <string>Select channel</string>
+   </property>
+   <property name="toolTip">
+    <string>Select the channel to use as the data source</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>
@@ -938,11 +873,6 @@
    <extends>QWidget</extends>
    <header>pyqtgraph.widgets.MatplotlibWidget</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header>pyqtgraph</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -956,8 +886,6 @@
   <tabstop>table_view_result_peaks</tabstop>
   <tabstop>table_view_result_rate</tabstop>
   <tabstop>tree_view_result_metadata</tabstop>
-  <tabstop>btn_export_to_excel</tabstop>
-  <tabstop>btn_export_all_results</tabstop>
   <tabstop>tab_widget_result_views</tabstop>
  </tabstops>
  <resources>

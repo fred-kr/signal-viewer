@@ -150,12 +150,6 @@ class InternalConfig:
             "description": "List of recently opened files.",
         },
     )
-    recent_annotation_files: list[str] = attrs.field(
-        factory=list,
-        metadata={
-            "description": "List of recently opened annotation files.",
-        },
-    )
     last_signal_column: str = attrs.field(
         default="",
         metadata={

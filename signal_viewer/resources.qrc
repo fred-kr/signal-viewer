@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file>icons/selector.svg</file>
     <file>icons/Beaker.svg</file>
     <file>icons/BeakerEdit.svg</file>
     <file>icons/ClipboardPulse.svg</file>

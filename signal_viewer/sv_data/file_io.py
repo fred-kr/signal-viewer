@@ -1,7 +1,7 @@
 import datetime
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal
 
 import mne.io
 import polars as pl
@@ -165,20 +165,6 @@ def read_edf(
             # Then remove that many rows from the end of the column
 
     return out.with_row_index(offset=start)
-
-
-def read_annotation_file(
-    file_path: Path,
-    sampling_rate: int,
-) -> list[dict[str, Any]]:
-    return (
-        pl.read_csv(file_path)
-        .with_columns(
-            (pl.col("start") * sampling_rate).cast(pl.Int32).alias("start_index"),
-            (pl.col("stop") * sampling_rate).cast(pl.Int32).alias("stop_index"),
-        )
-        .to_dicts()
-    )
 
 
 def _prepend_literal(df: pl.DataFrame, name: str, value: str | int, dtype: pl.DataType) -> pl.DataFrame:

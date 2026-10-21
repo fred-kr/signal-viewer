@@ -94,9 +94,6 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dialog_meta.container_additional_metadata.setLayout(layout)
         self.data_tree_widget_additional_metadata = data_tree_widget
 
-        # HDF5 export has no writer yet; hide the button rather than offer a dead action.
-        self.ui.btn_export_all_results.setVisible(False)
-
         # Names the required metadata that is still missing; `SVApp._bind_metadata` keeps it current.
         self.label_metadata_status = QtWidgets.QLabel()
         self.label_metadata_status.setObjectName("label_metadata_status")
@@ -180,7 +177,6 @@ class SVGUI(QtWidgets.QMainWindow):
         # self.ui.action_toggle_auto_scaling.setChecked(False)
 
     def _setup_toolbars(self) -> None:
-        self.tool_bar_editing = self._setup_toolbar("tool_bar_editing", [self.ui.action_toggle_auto_scaling])
         # Channel switcher. Filled by `SVApp` once a file is loaded; the toolbar itself is only enabled on the edit page.
         self.combo_box_channel = QtWidgets.QComboBox()
         self.combo_box_channel.setObjectName("combo_box_channel")
@@ -190,6 +186,7 @@ class SVGUI(QtWidgets.QMainWindow):
             "Switch the channel (signal column) being edited. Sections and results of the other channels are kept."
         )
         self.combo_box_channel.setEnabled(True)
+        self.tool_bar_editing = self._setup_toolbar("tool_bar_editing", [self.ui.action_toggle_auto_scaling])
         self.tool_bar_editing.addSeparator()
         self.tool_bar_editing.addWidget(QtWidgets.QLabel("Channel: "))
         self.tool_bar_editing.addWidget(self.combo_box_channel)

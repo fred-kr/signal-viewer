@@ -15,7 +15,6 @@ from signal_viewer.sv_data.data_controller import Channel, DataController
 from signal_viewer.sv_data.data_models import FileListModel
 from signal_viewer.sv_data.file_io import (
     per_channel_xlsx_paths,
-    read_annotation_file,
     write_xlsx,
     write_xlsx_per_channel,
 )
@@ -63,19 +62,15 @@ class SVApp(QtCore.QObject):
         self.recent_data_files = FileListModel(Config.internal.recent_files, parent=self)
         self.gui.ui.lview_data_files.setModel(self.recent_data_files)
 
-        self.recent_annotations_files = FileListModel(Config.internal.recent_annotation_files, parent=self)
-        self.gui.ui.lview_annotation_files.setModel(self.recent_annotations_files)
-
         self._connect_signals()
 
     def _connect_signals(self) -> None:
         self.gui.ui.action_show_settings.triggered.connect(self._on_show_settings)
         self.gui.ui.action_open_file.triggered.connect(self._on_open_file)
-        self.gui.ui.action_open_annotation_file.triggered.connect(self._load_annotations)
         self.gui.ui.action_edit_metadata.triggered.connect(self.show_metadata_dialog)
         self.gui.ui.action_about_qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self.gui.ui.action_close_file.triggered.connect(self.close_file)
-        # self.gui.ui.action_show_user_guide.triggered.connect(self._on_show_user_guide)
+        self.gui.ui.action_show_user_guide.triggered.connect(self._on_show_user_guide)
 
         self.gui.dialog_meta.sig_property_has_changed.connect(self.update_metadata)
 
@@ -131,18 +126,8 @@ class SVApp(QtCore.QObject):
     #### Event handlers ==========
 
     @QtCore.Slot()
-    def _load_annotations(self) -> None:
-        file, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self.gui, "Open Annotation File", "", filter="Annotation Files (*.csv)"
-        )
-        if not file:
-            return
-        self.gui.ui.table_annotations.setData(read_annotation_file(Path(file), self.data.active_section.sampling_rate))
-        self.recent_annotations_files.add_file(file)
-
-    # @QtCore.Slot()
-    # def _on_show_user_guide(self) -> None:
-    #     self.help.show_page("index.html")
+    def _on_show_user_guide(self) -> None:
+        self.help.show_page("index.html")
 
     @QtCore.Slot()
     def _on_show_settings(self) -> None:
