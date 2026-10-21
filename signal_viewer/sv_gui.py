@@ -235,7 +235,7 @@ class SVGUI(QtWidgets.QMainWindow):
         self.action_export_to_xlsx.setToolTip("Save the results of every section of every channel to Excel")
 
     def _setup_toolbars(self) -> None:
-        # Channel switcher. Filled by `SVApp` once a file is loaded; the toolbar itself is only enabled on the edit page.
+        # Channel switcher. Filled by `SVApp` once a file is loaded
         self.combo_box_channel = QtWidgets.QComboBox()
         self.combo_box_channel.setObjectName("combo_box_channel")
         self.combo_box_channel.setMinimumWidth(160)
@@ -250,14 +250,18 @@ class SVGUI(QtWidgets.QMainWindow):
             '<p><a href="help:user_guide/sections.html#channels">Open the user guide</a></p>'
         )
         self.combo_box_channel.setEnabled(True)
-        self.tb_main = self._setup_toolbar("tb_main", actions=[self.ui.action_open_file, self.ui.action_show_settings])
+        self.tb_main = self._setup_toolbar(
+            "tb_main",
+            actions=[
+                self.ui.action_open_file,
+                self.ui.action_show_settings,
+                self.action_toggle_whats_this_mode,
+                self.ui.action_show_user_guide,
+            ],
+        )
         self.tb_main.addSeparator()
         self.tb_main.addWidget(QtWidgets.QLabel("Channel: "))
         self.tb_main.addWidget(self.combo_box_channel)
-
-        self.tool_bar_help = self._setup_toolbar(
-            "tool_bar_help", [self.action_toggle_whats_this_mode, self.ui.action_show_user_guide]
-        )
 
         self.dock_sections.command_bar.addActions(
             [
@@ -285,7 +289,7 @@ class SVGUI(QtWidgets.QMainWindow):
     ) -> QtWidgets.QToolBar:
         """Creates a toolbar named `name` (also its object name, needed for `saveState`) and adds it to the window."""
         tb = QtWidgets.QToolBar(name)
-        tb.setIconSize(QtCore.QSize(24, 24))
+        tb.setIconSize(QtCore.QSize(16, 16))
         tb.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         tb.setObjectName(name)
         tb.setMovable(movable)
