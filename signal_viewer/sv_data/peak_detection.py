@@ -4,7 +4,6 @@ Various functions for detecting peaks in (bio)signal data.
 Most of the functions are adapted from the NeuroKit2 package, with improved type annotations and where necessary
 modified to fit the needs of this application.
 """
-# pyright: reportUnknownVariableType=false, reportUnknownArgumentType=false
 
 from collections.abc import Callable
 from typing import Literal, cast

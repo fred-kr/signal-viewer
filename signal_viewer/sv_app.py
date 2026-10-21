@@ -122,8 +122,14 @@ class SVApp(QtCore.QObject):
         self.gui.combo_box_result_plot_fit.currentIndexChanged.connect(
             lambda: self.result_plot.set_fit_model(self.gui.combo_box_result_plot_fit.currentData())
         )
+        self.gui.spin_box_result_plot_spline_k.valueChanged.connect(self._on_spline_k_changed)
 
     #### Event handlers ==========
+
+    @QtCore.Slot(int)
+    def _on_spline_k_changed(self, value: int) -> None:
+        spin_box = self.gui.spin_box_result_plot_spline_k
+        self.result_plot.set_spline_k(None if value == spin_box.minimum() else value)
 
     @QtCore.Slot()
     def _on_show_user_guide(self) -> None:

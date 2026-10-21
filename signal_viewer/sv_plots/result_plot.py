@@ -93,13 +93,13 @@ def fit_glm(x: npt.NDArray[np.float64], y: npt.NDArray[np.float64], model: Resul
 
     if model == ResultFitModel.Linear:
         slope, intercept = np.polyfit(x, y, deg=1)
-        return GLMFit(model, float(intercept), float(slope), int(x.size))
+        return GLMFit(model, float(intercept), float(slope), x.size)
 
     from sklearn.linear_model import GammaRegressor
 
     reg = GammaRegressor(alpha=0.0, fit_intercept=True, max_iter=1000)
     reg.fit(x.reshape(-1, 1), y)
-    return GLMFit(model, float(reg.intercept_), float(reg.coef_[0]), int(x.size))
+    return GLMFit(model, float(reg.intercept_), float(reg.coef_[0]), x.size)
 
 
 @attrs.frozen
@@ -107,6 +107,8 @@ class SplineGAMFit:
     basis: SplineTransformer
     coef: npt.NDArray[np.float64]
     n_knots: int
+    k_auto: bool
+    """Whether `n_knots` was derived from the sample size rather than given by the caller."""
     lam: float
     edf: float
     n_points: int
@@ -115,14 +117,19 @@ class SplineGAMFit:
         return np.exp(self.basis.transform(x.reshape(-1, 1)) @ self.coef)
 
     def describe(self, x_name: str) -> list[str]:
+        k_source = "auto" if self.k_auto else "user"
         return [
-            f"P-spline GAM (Gamma, log link), {self.n_knots} knots, EDF = {self.edf:.1f}",
+            f"P-spline GAM (Gamma, log link), k = {self.n_knots} knots ({k_source}), EDF = {self.edf:.1f}",
             f"2nd-order difference penalty, λ = {self.lam:.3g} by 5-fold CV  (n = {self.n_points})",
         ]
 
 
 _SPLINE_LAMBDAS = np.logspace(-3, 5, 17)
 _SPLINE_MIN_POINTS = 20
+SPLINE_K_MIN = 4
+"""Smallest knot count that leaves the cubic P-spline a non-trivial penalized part (n_knots + 2 coefficients)."""
+SPLINE_K_MAX = 50
+"""Upper bound for a user-chosen knot count; beyond this the basis is far richer than any window-mean data set."""
 
 
 def _gamma_deviance(y: npt.NDArray[np.float64], mu: npt.NDArray[np.float64]) -> float:
@@ -157,12 +164,17 @@ def _fit_pspline_gamma(
     return coef
 
 
-def fit_spline_gam(x: npt.NDArray[np.float64], y: npt.NDArray[np.float64]) -> SplineGAMFit | None:
+def fit_spline_gam(x: npt.NDArray[np.float64], y: npt.NDArray[np.float64], k: int | None = None) -> SplineGAMFit | None:
     """
     Fits a one-smooth GAM as a P-spline (Eilers & Marx): a Gamma GLM with log link on a rich cubic B-spline
     basis of `x`, with a second-order difference penalty on the coefficients. The penalty weight is chosen from
     `_SPLINE_LAMBDAS` by 5-fold cross-validated Gamma deviance, so the smoothness adapts to the data; as the
     weight grows the fit tends to the log-linear GLM.
+
+    `k` is the basis dimension (mgcv's `k`): the number of knots of the B-spline basis, giving `k + 2`
+    coefficients. With `k=None` it is derived from the sample size (one knot per ten points, 6 to 20). An
+    explicit `k` is clamped to `[SPLINE_K_MIN, SPLINE_K_MAX]`. Because the penalty controls the effective
+    smoothness, `k` mostly sets an upper bound on the wiggliness the fit can reach.
 
     Returns None with fewer than `_SPLINE_MIN_POINTS` usable points or no spread in `x`.
     """
@@ -175,7 +187,10 @@ def fit_spline_gam(x: npt.NDArray[np.float64], y: npt.NDArray[np.float64]) -> Sp
     from sklearn.preprocessing import SplineTransformer
 
     # A deliberately rich basis; the penalty, not the knot count, controls smoothness.
-    n_knots = int(np.clip(x.size // 10, 6, 20))
+    if k is None:
+        n_knots = int(np.clip(x.size // 10, 6, 20))
+    else:
+        n_knots = int(np.clip(k, SPLINE_K_MIN, SPLINE_K_MAX))
     transformer = SplineTransformer(
         n_knots=n_knots, degree=3, knots="uniform", include_bias=True, extrapolation="linear"
     )
@@ -198,18 +213,29 @@ def fit_spline_gam(x: npt.NDArray[np.float64], y: npt.NDArray[np.float64]) -> Sp
     coef = _fit_pspline_gamma(basis, y, lam * roughness)
     gram = basis.T @ basis
     edf = float(np.trace(np.linalg.solve(gram + lam * roughness, gram)))
-    return SplineGAMFit(basis=transformer, coef=coef, n_knots=n_knots, lam=lam, edf=edf, n_points=x.size)
+    return SplineGAMFit(
+        basis=transformer, coef=coef, n_knots=n_knots, k_auto=k is None, lam=lam, edf=edf, n_points=x.size
+    )
 
 
 RateFit = GLMFit | SplineGAMFit
 
 
-def fit_rate_model(x: npt.NDArray[np.float64], y: npt.NDArray[np.float64], model: ResultFitModel) -> RateFit | None:
-    """Dispatches to the fit for `model`; None for `NoFit` and whenever the chosen fit is not possible."""
+def fit_rate_model(
+    x: npt.NDArray[np.float64],
+    y: npt.NDArray[np.float64],
+    model: ResultFitModel,
+    spline_k: int | None = None,
+) -> RateFit | None:
+    """
+    Dispatches to the fit for `model`; None for `NoFit` and whenever the chosen fit is not possible.
+
+    `spline_k` is the knot count for the spline GAM (None = derived from the sample size); other models ignore it.
+    """
     if model == ResultFitModel.NoFit:
         return None
     if model == ResultFitModel.Spline:
-        return fit_spline_gam(x, y)
+        return fit_spline_gam(x, y, k=spline_k)
     return fit_glm(x, y, model)
 
 
@@ -308,6 +334,7 @@ class ResultPlotController(QtCore.QObject):
         self._section: Section | None = None
         self._scope = ResultPlotScope.ActiveSection
         self._fit_model = ResultFitModel.LogLinear
+        self._spline_k: int | None = None
         self._dirty = False
         self._draw_placeholder(_NO_RESULT_TEXT)
 
@@ -343,6 +370,20 @@ class ResultPlotController(QtCore.QObject):
             return
         self._fit_model = model
         self.invalidate()
+
+    @property
+    def spline_k(self) -> int | None:
+        """Knot count of the spline GAM; None lets the fit derive it from the sample size."""
+        return self._spline_k
+
+    @QtCore.Slot(object)
+    def set_spline_k(self, k: int | None) -> None:
+        k = None if k is None else int(k)
+        if k == self._spline_k:
+            return
+        self._spline_k = k
+        if self._fit_model == ResultFitModel.Spline:
+            self.invalidate()
 
     def invalidate(self) -> None:
         """Mark the figure stale (e.g. after a section was locked, unlocked or deleted) and redraw if visible."""
@@ -494,7 +535,7 @@ class ResultPlotController(QtCore.QObject):
                 )
             scatter_title = f"Rate vs. {info_name}"
             if self._fit_model != ResultFitModel.NoFit:
-                fit = fit_rate_model(info_all, rate_all, self._fit_model)
+                fit = fit_rate_model(info_all, rate_all, self._fit_model, spline_k=self._spline_k)
                 if fit is None:
                     logger.warning(f"Not enough usable points to fit a {self._fit_model.name} model.")
                 else:

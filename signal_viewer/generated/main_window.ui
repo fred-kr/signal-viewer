@@ -55,6 +55,22 @@
         <item>
          <widget class="QWidget" name="container_file_information" native="true">
           <layout class="QGridLayout" name="gridLayout">
+           <item row="1" column="0">
+            <widget class="QPushButton" name="btn_open_file">
+             <property name="whatsThis">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Opens a window allowing you to choose a file to load into the app.&lt;/p&gt;&lt;p&gt;The selected file is searched for available columns or channels of data.&lt;/p&gt;&lt;p&gt;If any are found, their names are made available for selection in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Open File...</string>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="1" colspan="2">
             <widget class="QLineEdit" name="line_edit_active_file">
              <property name="sizePolicy">
@@ -71,33 +87,108 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="0" colspan="3">
-            <widget class="QLabel" name="label_2">
+           <item row="2" column="0" colspan="3">
+            <widget class="QGroupBox" name="grp_box_required_info">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:700;&quot;&gt;Data Import&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <property name="title">
+              <string>Required Information </string>
              </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QPushButton" name="btn_open_file">
-             <property name="whatsThis">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Opens a window allowing you to choose a file to load into the app.&lt;/p&gt;&lt;p&gt;The selected file is searched for available columns or channels of data.&lt;/p&gt;&lt;p&gt;If any are found, their names are made available for selection in the &amp;quot;Signal Data&amp;quot; and &amp;quot;Additional Data&amp;quot; fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Open File</string>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
+             <layout class="QFormLayout" name="formLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="samplingRateLabel">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate of the signal in Hz (samples/second)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
+                </property>
+                <property name="text">
+                 <string>Sampling Rate</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="spin_box_sampling_rate_import_page">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate of the signal values in the file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="frame">
+                 <bool>true</bool>
+                </property>
+                <property name="suffix">
+                 <string> Hz</string>
+                </property>
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+                <property name="value">
+                 <number>0</number>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="signalColumnChannelLabel">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column or channel containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column or channel containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Data Channel</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="combo_box_signal_column_import_page"/>
+              </item>
+              <item row="2" column="0" colspan="2">
+               <widget class="Line" name="line">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="infoColumnChannelLabel">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Metadata Channel</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QComboBox" name="combo_box_info_column_import_page"/>
+              </item>
+             </layout>
             </widget>
            </item>
            <item row="3" column="0">
@@ -130,6 +221,19 @@
               <string>Ctrl+R</string>
              </property>
             </widget>
+           </item>
+           <item row="3" column="1">
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
            <item row="3" column="2">
             <widget class="QPushButton" name="btn_load_data">
@@ -206,119 +310,18 @@
              </layout>
             </widget>
            </item>
-           <item row="2" column="0" colspan="3">
-            <widget class="QGroupBox" name="grp_box_required_info">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_2">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="title">
-              <string>Required Information </string>
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:700;&quot;&gt;Data Import&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
-             <layout class="QFormLayout" name="formLayout">
-              <item row="0" column="0">
-               <widget class="QLabel" name="samplingRateLabel">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate of the signal in Hz (samples/second)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="whatsThis">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="frameShape">
-                 <enum>QFrame::Shape::NoFrame</enum>
-                </property>
-                <property name="text">
-                 <string>Sampling Rate</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QSpinBox" name="spin_box_sampling_rate_import_page">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate of the signal values in the file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="whatsThis">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The sampling rate, measured in Hertz (Hz), defines the number of data points captured per second. For instance, a sampling rate of 1000 Hz means that 1000 data points are recorded every second.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="suffix">
-                 <string> Hz</string>
-                </property>
-                <property name="maximum">
-                 <number>10000</number>
-                </property>
-                <property name="value">
-                 <number>0</number>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="signalColumnChannelLabel">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column or channel containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="whatsThis">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The column or channel containing the signal values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Signal Data</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0" colspan="2">
-               <widget class="Line" name="line">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="infoColumnChannelLabel">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="whatsThis">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An optional column or channel of data recorded alongside the signal with information that should be shown while editing and which should be included in the results (e.g. temperature, oxygen saturation, etc)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Additional Data</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QComboBox" name="combo_box_signal_column_import_page"/>
-              </item>
-              <item row="5" column="1">
-               <widget class="QComboBox" name="combo_box_info_column_import_page"/>
-              </item>
-             </layout>
             </widget>
-           </item>
-           <item row="3" column="1">
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
           </layout>
          </widget>
@@ -589,7 +592,13 @@
     <iconset theme="QIcon::ThemeIcon::DocumentOpen"/>
    </property>
    <property name="text">
-    <string>Open File</string>
+    <string>Open File...</string>
+   </property>
+   <property name="iconText">
+    <string>Open File...</string>
+   </property>
+   <property name="toolTip">
+    <string>Select a file to open</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::TextHeuristicRole</enum>
@@ -876,7 +885,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>btn_open_file</tabstop>
   <tabstop>line_edit_active_file</tabstop>
   <tabstop>spin_box_sampling_rate_import_page</tabstop>
   <tabstop>combo_box_signal_column_import_page</tabstop>

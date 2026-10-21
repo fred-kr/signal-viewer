@@ -10,7 +10,7 @@ from pyside_widgets import OverlayWidget, ResizableMessageBox, SearchableDataTre
 from signal_viewer.enum_defs import LogLevel
 from signal_viewer.generated.ui_main_window import Ui_MainWindow
 from signal_viewer.sv_config import Config
-from signal_viewer.sv_plots.result_plot import ResultFitModel, ResultPlotScope
+from signal_viewer.sv_plots.result_plot import SPLINE_K_MAX, SPLINE_K_MIN, ResultFitModel, ResultPlotScope
 from signal_viewer.sv_widgets.dlg_metadata import MetadataDialog
 from signal_viewer.sv_widgets.dock_log_window import StatusMessageDock
 from signal_viewer.sv_widgets.dock_param_inputs import InputsDock
@@ -121,10 +121,34 @@ class SVGUI(QtWidgets.QMainWindow):
         scope_row.addSpacing(12)
         scope_row.addWidget(QtWidgets.QLabel("Fit:"))
         scope_row.addWidget(self.combo_box_result_plot_fit)
+
+        # Basis dimension of the spline GAM. The minimum shows as "Auto" and stands for "derive from the data";
+        # `SVApp` maps it to None. Only meaningful while the spline model is selected.
+        self.spin_box_result_plot_spline_k = QtWidgets.QSpinBox()
+        self.spin_box_result_plot_spline_k.setRange(SPLINE_K_MIN - 1, SPLINE_K_MAX)
+        self.spin_box_result_plot_spline_k.setSpecialValueText("Auto")
+        self.spin_box_result_plot_spline_k.setValue(self.spin_box_result_plot_spline_k.minimum())
+        self.spin_box_result_plot_spline_k.setToolTip(
+            "Basis dimension k of the spline GAM: the number of knots of the B-spline basis. "
+            "'Auto' uses one knot per ten points (6 to 20). The cross-validated penalty still controls the "
+            "smoothness, so k mainly caps how wiggly the fit can get."
+        )
+        label_spline_k = QtWidgets.QLabel("k:")
+        label_spline_k.setToolTip(self.spin_box_result_plot_spline_k.toolTip())
+        scope_row.addSpacing(12)
+        scope_row.addWidget(label_spline_k)
+        scope_row.addWidget(self.spin_box_result_plot_spline_k)
+        self._sync_spline_k_enabled()
+        self.combo_box_result_plot_fit.currentIndexChanged.connect(self._sync_spline_k_enabled)
         scope_row.addStretch()
         self.ui.verticalLayout.insertLayout(0, scope_row)  # the layout of `tab_result_mpl_widget`
 
         self.ui.tab_widget_main.setCurrentIndex(0)
+
+    @QtCore.Slot()
+    def _sync_spline_k_enabled(self) -> None:
+        is_spline = self.combo_box_result_plot_fit.currentData() == ResultFitModel.Spline
+        self.spin_box_result_plot_spline_k.setEnabled(is_spline)
 
     def _setup_docks(self) -> None:
         dwa = QtCore.Qt.DockWidgetArea
@@ -186,14 +210,13 @@ class SVGUI(QtWidgets.QMainWindow):
             "Switch the channel (signal column) being edited. Sections and results of the other channels are kept."
         )
         self.combo_box_channel.setEnabled(True)
-        self.tool_bar_editing = self._setup_toolbar("tool_bar_editing", [self.ui.action_toggle_auto_scaling])
-        self.tool_bar_editing.addSeparator()
-        self.tool_bar_editing.addWidget(QtWidgets.QLabel("Channel: "))
-        self.tool_bar_editing.addWidget(self.combo_box_channel)
+        self.tb_main = self._setup_toolbar("tb_main", actions=[self.action_export_to_xlsx])
+        self.tb_main.addSeparator()
+        self.tb_main.addWidget(QtWidgets.QLabel("Channel: "))
+        self.tb_main.addWidget(self.combo_box_channel)
 
         self.tool_bar_help = self._setup_toolbar(
-            "tool_bar_help",
-            [self.action_toggle_whats_this_mode],  # self.ui.action_show_user_guide
+            "tool_bar_help", [self.action_toggle_whats_this_mode, self.ui.action_show_user_guide]
         )
 
         self.dock_sections.command_bar.addActions(
@@ -213,13 +236,23 @@ class SVGUI(QtWidgets.QMainWindow):
         self.action_show_section_summary.triggered.connect(self.dock_sections.list_view.emit_sig_show_summary)
         self.dock_sections.list_view.customContextMenuRequested.connect(self.show_section_list_context_menu)
 
-    def _setup_toolbar(self, name: str, actions: list[QtGui.QAction], movable: bool = False) -> QtWidgets.QToolBar:
+    def _setup_toolbar(
+        self,
+        name: str,
+        actions: list[QtGui.QAction] | None = None,
+        widgets: list[QtWidgets.QWidget] | None = None,
+        movable: bool = False,
+    ) -> QtWidgets.QToolBar:
         tb = QtWidgets.QToolBar(name)
         tb.setIconSize(QtCore.QSize(24, 24))
         tb.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         tb.setObjectName(name)
         tb.setMovable(movable)
-        tb.addActions(actions)
+        if actions is not None:
+            tb.addActions(actions)
+        if widgets is not None:
+            for w in widgets:
+                tb.addWidget(w)
         self.addToolBar(tb)
         return tb
 
@@ -243,7 +276,7 @@ class SVGUI(QtWidgets.QMainWindow):
 
         self.ui.menu_help.addSeparator()
         self.ui.menu_help.addAction(self.dock_status_log.toggleViewAction())
-        self.ui.menu_help.addAction(self.action_toggle_whats_this_mode)  # self.ui.action_show_user_guide,
+        self.ui.menu_help.addActions([self.action_toggle_whats_this_mode, self.ui.action_show_user_guide])
 
         self.menu_export = QtWidgets.QMenu()
         self.menu_export.addActions([self.action_export_to_csv, self.action_export_to_xlsx])
@@ -308,12 +341,12 @@ class SVGUI(QtWidgets.QMainWindow):
     def _on_page_changed(self, index: int) -> None:
         self.show_section_confirm_cancel(False)
         if index == 1:
-            # self.tool_bar_editing.setEnabled(True)
+            # self.tb_main.setEnabled(True)
             self.command_bar_section_list.setEnabled(True)
             self.dock_sections.show()
             self.dock_parameters.show()
         else:
-            # self.tool_bar_editing.setEnabled(False)
+            # self.tb_main.setEnabled(False)
             self.command_bar_section_list.setEnabled(False)
             self.dock_parameters.hide()
 
