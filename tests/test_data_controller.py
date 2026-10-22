@@ -19,6 +19,7 @@ from PySide6 import QtCore
 from signal_viewer.constants import COMBO_BOX_NO_SELECTION, INDEX_COL
 from signal_viewer.enum_defs import (
     IncompleteWindowMethod,
+    InputFileFormat,
     PeakDetectionAlgorithm,
     PreprocessPipeline,
     RateComputationMethod,
@@ -95,6 +96,35 @@ def test_load_data_keeps_metadata_and_uses_cleaned_names(csv_file: Path) -> None
     assert base.info_name == "beta_temp"
     assert base.sampling_rate == FS
     assert base.is_locked
+
+
+@pytest.mark.parametrize("name", ["recording.CSV", "recording.Csv"])
+def test_open_and_load_ignore_extension_case(csv_file: Path, name: str) -> None:
+    path = csv_file.with_name(name)
+    csv_file.rename(path)
+    dc = DataController()
+
+    dc.open_file(path)
+    dc.update_metadata(signal_col="Alpha Sig", info_col="Beta Temp")
+    dc.load_data()
+
+    assert dc.metadata.file_format == InputFileFormat.CSV
+    assert dc.has_data
+    assert dc.base_df.height == N
+
+
+@pytest.mark.parametrize("suffix", [".feather", ".ARROW", ".Ipc"])
+def test_open_and_load_arrow_ipc_variants(csv_file: Path, suffix: str) -> None:
+    path = csv_file.with_suffix(suffix)
+    pl.read_csv(csv_file).write_ipc(path)
+    dc = DataController()
+
+    dc.open_file(path)
+    dc.update_metadata(signal_col="Alpha Sig", info_col="Beta Temp")
+    dc.load_data()
+
+    assert dc.metadata.file_format == InputFileFormat(suffix.lower())
+    assert dc.base_df.height == N
 
 
 def test_load_data_without_info_column(csv_file: Path) -> None:

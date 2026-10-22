@@ -413,7 +413,7 @@ class DataController(QtCore.QObject):
             df = pl.read_csv(file_path, columns=columns, separator=separator, row_index_name=INDEX_COL)
         elif suffix == ".tsv":
             df = pl.read_csv(file_path, columns=columns, separator=TextFileSeparator.Tab, row_index_name=INDEX_COL)
-        elif suffix == ".feather":
+        elif suffix in {".feather", ".arrow", ".ipc"}:
             df = pl.read_ipc(file_path, columns=columns, row_index_name=INDEX_COL)
         elif suffix == ".edf":
             df = read_edf(Path(file_path), signal_col, info_col)

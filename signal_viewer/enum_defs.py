@@ -63,9 +63,19 @@ class InputFileFormat(DocumentedStrEnum):
     """
     File extensions the Open File dialog accepts. `DataController` picks the reader by this extension.
 
-    Text and Excel files need a column per channel; the first row holds the column names. The sampling rate is read
-    from a time column when one is found (`file_io.detect_sampling_rate`), otherwise the user enters it.
+    Lookup by value ignores case, so `InputFileFormat(".CSV")` is `InputFileFormat.CSV`. Text and Excel files need a
+    column per channel; the first row holds the column names. The sampling rate is read from a time column when one
+    is found (`file_io.detect_sampling_rate`), otherwise the user enters it.
     """
+
+    @classmethod
+    def _missing_(cls, value: object) -> Self | None:
+        if isinstance(value, str):
+            lowered = value.lower()
+            for member in cls:
+                if member.value == lowered:
+                    return member
+        return None
 
     CSV = (".csv", "Comma-separated text. The separator is always a comma.")
     TXT = (".txt", "Delimited text. The separator is the 'Text file separator' setting (tab by default).")

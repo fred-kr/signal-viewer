@@ -454,8 +454,8 @@ class FileMetadata:
 
     @property
     def file_format(self) -> InputFileFormat:
-        """The extension as `InputFileFormat`."""
-        return InputFileFormat(f".{self.file_info.suffix()}")
+        """The extension as `InputFileFormat`, whatever its case in the file name (`.CSV` is `InputFileFormat.CSV`)."""
+        return InputFileFormat(f".{self.file_info.suffix().lower()}")
 
     @property
     def all_columns(self) -> list[str]:

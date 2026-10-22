@@ -34,13 +34,15 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "pillow>=12.2.0",
+    "pillow>=13.0.0",
     "pyinstaller>=6.22.3",
     "pyinstaller-hooks-contrib>=2026.9",
     "pyrefly>=1.4.0",
     "pyright>=1.1.414",
     "pytest>=9.1.1",
     "qtconsole>=5.7.2",  # Jupyter console in the View menu when DEV=1 (pyside-widgets no longer requires it)
+    "scipy-stubs>=1.18.1.1",
+
 ]
 
 [project.scripts]

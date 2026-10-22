@@ -31,6 +31,26 @@ def test_file_properties(csv_file: Path) -> None:
     assert md.column_names == [COMBO_BOX_NO_SELECTION, *COLUMNS]
 
 
+@pytest.mark.parametrize("name", ["recording.CSV", "recording.Csv", "recording.XLSX", "recording.Feather"])
+def test_file_format_ignores_extension_case(tmp_path: Path, name: str) -> None:
+    path = tmp_path / name
+    path.write_text("Alpha Sig,Beta Temp\n1,2\n", encoding="utf-8")
+    md = FileMetadata(path, COLUMNS, sampling_rate=100)
+
+    assert md.file_format == InputFileFormat(path.suffix.lower())
+
+
+@pytest.mark.parametrize("fmt", list(InputFileFormat))
+def test_input_file_format_lookup_ignores_case(fmt: InputFileFormat) -> None:
+    assert InputFileFormat(fmt.value.upper()) is fmt
+    assert InputFileFormat(fmt.value.title()) is fmt
+
+
+def test_input_file_format_rejects_unknown_extension() -> None:
+    with pytest.raises(ValueError):
+        InputFileFormat(".hdf5")
+
+
 def test_info_column_or_none_hides_the_sentinel(csv_file: Path) -> None:
     md = FileMetadata(csv_file, COLUMNS, sampling_rate=100)
 
