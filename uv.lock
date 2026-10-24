@@ -2036,7 +2036,7 @@ requires-dist = [
     { name = "scikit-learn", specifier = ">=1.9.1" },
     { name = "scipy", specifier = ">=1.18.1" },
     { name = "tables", specifier = ">=3.11.1" },
-    { name = "ts2vg", specifier = ">=1.2.4" },
+    { name = "ts2vg", specifier = ">=1.2.5" },
     { name = "wfdb", specifier = ">=4.3.1" },
 ]
 
@@ -2170,19 +2170,25 @@ wheels = [
 
 [[package]]
 name = "ts2vg"
-version = "1.2.4"
+version = "1.2.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a9/6a/7a09c2d9cd693323ea5416bfc4ae86bfcdd9e42ecf91f1a1c5e8e7a1c78a/ts2vg-1.2.4.tar.gz", hash = "sha256:cf5531c6d565246d6a61621cecf8bc528cdf6a45ce579ab454efe8f5c64672e0", size = 774964, upload-time = "2024-07-13T14:40:07.265Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/97/a1/d4046892c7673a87e1401324ac6ff2d852ac33e69ea0adb2d3e8e6e2cb5c/ts2vg-1.2.5.tar.gz", hash = "sha256:79bbe5bafea973dce533ecb4df1fd11cd6b6f5556758eaa50d2a4d267a01d754", size = 878471, upload-time = "2026-10-22T20:24:36.199Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4d/db/f4b12aaa3f7ba85cd2121ea15b8cd6a60394ece1a0ae10302599c4975bc8/ts2vg-1.2.4-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:7e22df94a4478ee1b266ae1766525d9fdcfb64cefb32b9fecede99340a44d006", size = 1207769, upload-time = "2025-10-19T11:15:41.109Z" },
-    { url = "https://files.pythonhosted.org/packages/bc/cb/b99e60c55cb4cfa7bb59a10597369b243cc01d3522c2dc96be5c855c59d2/ts2vg-1.2.4-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:57f8a391beccf86a493e173cff2e08ad4abd2cfd3e5a9e8e66b55f593880580f", size = 1181231, upload-time = "2025-10-19T11:15:42.897Z" },
-    { url = "https://files.pythonhosted.org/packages/ba/1d/067c04c375f8d0e7fd2c8415a6b9b2b183a8aa14e36d202dcffd41cb65b0/ts2vg-1.2.4-cp314-cp314-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:78b5bbe0f4a27baa3da08a9cf5b44052eb9e5cc5eadc2a73cffe80f9e092f5a3", size = 3374677, upload-time = "2025-10-19T11:15:44.178Z" },
-    { url = "https://files.pythonhosted.org/packages/67/b4/58b59227edea311184aa77fe325abb9a12a60e67eba15587396184af911b/ts2vg-1.2.4-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:439fda254daafad20c309d07593deaf16395c6763a70809a67b43ae2dc93c24b", size = 4400608, upload-time = "2025-10-19T11:15:45.728Z" },
-    { url = "https://files.pythonhosted.org/packages/53/9c/a59d77fa17b5035a2c437064d51e5cf83a8f7559fcbc70b712a57d0e0482/ts2vg-1.2.4-cp314-cp314-win32.whl", hash = "sha256:653e6eeebca58e8c1688c92653a2182d91348802d528ec7c43f0d8e2868a709e", size = 1106620, upload-time = "2025-10-19T11:15:47.306Z" },
-    { url = "https://files.pythonhosted.org/packages/06/fe/3e7826a906f90c0a364658f6eb19db8a5fe3b59c84dc8ccc309525adf5b1/ts2vg-1.2.4-cp314-cp314-win_amd64.whl", hash = "sha256:7dfa49a3e87f79da8009cbafcfd75c1958dcae950f71f9a270b52d7081fbacce", size = 1166535, upload-time = "2025-10-19T11:15:48.416Z" },
+    { url = "https://files.pythonhosted.org/packages/ea/ab/79286d9ca906c223c7e63d563ab6e1258238e3d967e619acafeb4aee0dba/ts2vg-1.2.5-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:4bd9328aca71bbbf8832119e4df3d3bed477a70e0a4b965c1dd2d3a7078295e1", size = 1309888, upload-time = "2026-10-22T20:24:12.711Z" },
+    { url = "https://files.pythonhosted.org/packages/02/08/60aab2e18db489000878f2aca5dc9c8c109896a774b71cf1013abc142402/ts2vg-1.2.5-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:2713c80f88788ca93f3edf140746d402473ff9836c821ff68f0f72386f5d3bfa", size = 1317368, upload-time = "2026-10-22T20:24:13.748Z" },
+    { url = "https://files.pythonhosted.org/packages/d1/b8/b4d62f801fbf15c8d37b78854a1301f018d8b9faed04a13056aa19dc1e4c/ts2vg-1.2.5-cp314-cp314-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e6f515d69782a2468335ca42bb57d9e94b6253b54733bce8ca94f3ac484b7c57", size = 3604817, upload-time = "2026-10-22T20:24:14.905Z" },
+    { url = "https://files.pythonhosted.org/packages/19/8d/5ebb002576c2e3c0ce46d95af696b516fa8f64ea72399b498f8645a04fd3/ts2vg-1.2.5-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:23f8bafdf8bfbdaa82056294f217635d56cc6836eeb8ca08bf1aa7dd1ff8d183", size = 4628916, upload-time = "2026-10-22T20:24:16.166Z" },
+    { url = "https://files.pythonhosted.org/packages/44/6d/5d304de96ec1af80345244b008632d760ecf6f325c1a66d9d44fb92108a9/ts2vg-1.2.5-cp314-cp314-win32.whl", hash = "sha256:c0e820e54eb4d1a7bfff0ed3f6940eec44d4ba33889eb54b9940fe6ae5a266a7", size = 1393121, upload-time = "2026-10-22T20:24:17.521Z" },
+    { url = "https://files.pythonhosted.org/packages/88/0c/9eff949a9a3ac2482c4aec6c8e8686025feebeacb91599993bc5282f0b29/ts2vg-1.2.5-cp314-cp314-win_amd64.whl", hash = "sha256:011ba9abe72320337e15b06188d31e871488ad2bef32e8d3201e3a786c130f58", size = 1444108, upload-time = "2026-10-22T20:24:19.119Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/38/213dc07e8c3f2db43c1c92010363c05067eea5cbfededbc12790448a72d9/ts2vg-1.2.5-cp315-cp315-macosx_10_15_x86_64.whl", hash = "sha256:7a307d0d2b55e6628c2c87f82c106201d490d37882e19eea7083ebba9a0bb692", size = 1309917, upload-time = "2026-10-22T20:24:20.399Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/37/e09662d41f849b6ef6d67bfeb0dec72769da60f4505151b5e303370b832e/ts2vg-1.2.5-cp315-cp315-macosx_11_0_arm64.whl", hash = "sha256:8100da4126289fe973768ae261aac24ee05cb46eb96bbe4dc97f9e156d1c56c0", size = 1317234, upload-time = "2026-10-22T20:24:21.567Z" },
+    { url = "https://files.pythonhosted.org/packages/fa/02/26f33944af002ff397de2891364364b0448168b71c007bd2f74425e00c80/ts2vg-1.2.5-cp315-cp315-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a83c707a78a312b973351fef7d29e018675f00c1ef303657ac282b421a367498", size = 3622573, upload-time = "2026-10-22T20:24:23.181Z" },
+    { url = "https://files.pythonhosted.org/packages/70/f0/481cb5a9967f31ece7bc6b33a69ef91244b97be5e8d9b53640ea959be158/ts2vg-1.2.5-cp315-cp315-musllinux_1_2_x86_64.whl", hash = "sha256:6de381df2bb6d4de9888cf181b526bd446f0698d3152661ced0ef9478c92fd5e", size = 4645956, upload-time = "2026-10-22T20:24:24.779Z" },
+    { url = "https://files.pythonhosted.org/packages/68/24/7e7f9506e7d6957906201cd49113ed87d2305222b055051c1f6c6697cc5f/ts2vg-1.2.5-cp315-cp315-win32.whl", hash = "sha256:d361fa3aa1e8a80011b509e939ea8f3ea33383a94824b4c228a01cf4e4f19202", size = 1393167, upload-time = "2026-10-22T20:24:26.121Z" },
+    { url = "https://files.pythonhosted.org/packages/9b/9c/1f05d0a5abf37aeb76406983b820c8605959fa0ea0a0e5499d2f9e691f04/ts2vg-1.2.5-cp315-cp315-win_amd64.whl", hash = "sha256:70f527d871b5fe0a327d96861d08a085d19eb3abc4d07f43b5a82748f18d3503", size = 1443702, upload-time = "2026-10-22T20:24:27.349Z" },
 ]
 
 [[package]]
