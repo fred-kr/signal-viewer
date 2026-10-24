@@ -75,6 +75,7 @@ class SVApp(QtCore.QObject):
         self._connect_signals()
 
     def _connect_signals(self) -> None:
+        qconfig.signals().sig_value_changed.connect(self._on_setting_changed)
         self.gui.ui.action_show_settings.triggered.connect(self._on_show_settings)
         self.gui.ui.action_open_file.triggered.connect(self._on_open_file)
         self.gui.ui.action_edit_metadata.triggered.connect(self.show_metadata_dialog)
@@ -176,13 +177,8 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def _on_show_settings(self) -> None:
-        """Opens the Settings dialog. Changed settings are applied on OK; Cancel restores the snapshot taken before."""
-        snapshot = qconfig.create_snapshot()
-
-        settings_dlg = qconfig.create_editor(self.gui, exclude=["Internal"])
-        settings_dlg.accepted.connect(lambda: self.apply_settings(snapshot))
-        settings_dlg.rejected.connect(lambda: qconfig.restore_snapshot(snapshot))
-        settings_dlg.open()
+        """Opens the Settings dialog. OK applies the edits (each one reaches `_on_setting_changed`), Cancel drops them."""
+        qconfig.create_editor(self.gui).open()
 
     @QtCore.Slot()
     def clear_peaks(self) -> None:
@@ -676,26 +672,22 @@ class SVApp(QtCore.QObject):
 
         logger.info("Closed file")
 
-    def apply_settings(self, previous: dict[str, Any]) -> None:
+    @QtCore.Slot(str, str, object)
+    def _on_setting_changed(self, group: str, key: str, value: object) -> None:
         """
-        Applies the settings that changed since `previous` (a `qconfig.create_snapshot()` taken before the dialog).
+        Reacts to a changed setting (`pyside_config.signals().sig_value_changed`), whether from the Settings dialog
+        or from an assignment in code.
 
         Only settings that are read once and cached need handling here; the rest are read from `Config` on use.
+        Writes to the hidden "Internal" group (remembered directories, window geometry) are ignored.
         """
-        current = qconfig.create_snapshot()
-        changed = {
-            (group, key)
-            for group, values in current.items()
-            for key, value in values.items()
-            if previous.get(group, {}).get(key) != value
-        }
-        if not changed:
+        if type(qconfig.get_config(group)).__hidden__:
             return
-        logger.info("Settings changed: " + ", ".join(f"{group}.{key}" for group, key in sorted(changed)))
+        logger.info(f"Setting changed: {group}.{key} = {value!r}")
 
-        if ("Processing", "rate_computation_method") in changed:
+        if (group, key) == ("Processing", "rate_computation_method"):
             self.data.recompute_rate_all()
-        if ("Data", "float_precision") in changed:
+        elif (group, key) == ("Data", "float_precision"):
             self.data.refresh_table_models()
 
     @QtCore.Slot()
