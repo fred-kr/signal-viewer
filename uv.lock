@@ -2137,8 +2137,8 @@ wheels = [
 
 [[package]]
 name = "pyside-config"
-version = "0.2.0"
-source = { git = "https://github.com/fred-kr/pyside-config?branch=main#411f7d68413339eb5042d6775d70428096258bdf" }
+version = "0.2.1"
+source = { git = "https://github.com/fred-kr/pyside-config?branch=main#2a7250877fa3a1aaa4ce83874e0b1925489b916e" }
 dependencies = [
     { name = "attrs" },
     { name = "pyside-widgets" },
@@ -2147,8 +2147,8 @@ dependencies = [
 
 [[package]]
 name = "pyside-widgets"
-version = "0.4.1"
-source = { git = "https://github.com/fred-kr/pyside-widgets.git?branch=main#0fb43709625ffccae95658b96defd99030af7ee1" }
+version = "0.5.0"
+source = { git = "https://github.com/fred-kr/pyside-widgets.git?branch=main#565f87d4c56ae749331407e3e19eb160699d3c32" }
 dependencies = [
     { name = "pyside6" },
 ]

@@ -254,7 +254,7 @@ class SVGUI(QtWidgets.QMainWindow):
             "tb_main",
             actions=[
                 self.ui.action_open_file,
-                self.ui.action_show_settings,
+                # self.ui.action_show_settings,
                 self.action_toggle_whats_this_mode,
                 self.ui.action_show_user_guide,
             ],
