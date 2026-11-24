@@ -34,9 +34,8 @@ from signal_viewer.sv_plots.plot_controller import PlotController
 from signal_viewer.sv_plots.result_plot import ResultPlotController
 from signal_viewer.type_defs import (
     MetadataDict,
-    PeakDetectionRequest,
-    ProcessingRequest,
     RollingRateKwargs,
+    RunRequest,
     UpdatePeaksAction,
 )
 from signal_viewer.utils import app_version, safe_multi_disconnect
@@ -113,9 +112,8 @@ class SVApp(QtCore.QObject):
 
         # GUI -> controller. These go through thin `SVApp` slots rather than straight to `self.data`, because the
         # controller is replaced on `close_file` and the widgets' connections must survive that.
-        self.gui.dock_parameters.ui.sig_run_processing.connect(self.run_processing)
+        self.gui.dock_parameters.ui.sig_run.connect(self.run_analysis)
         self.gui.dock_parameters.ui.sig_reset_data.connect(self.reset_signal_data)
-        self.gui.dock_parameters.ui.sig_run_peak_detection.connect(self.run_peak_detection)
         self.gui.dock_parameters.ui.sig_clear_peaks.connect(self.clear_peaks)
         self.gui.dock_parameters.ui.sig_rate_params_changed.connect(self._on_rate_params_changed)
 
@@ -182,14 +180,14 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def clear_peaks(self) -> None:
-        """Removes every peak of the active section ("Reset Peaks")."""
+        """Removes every peak of the active section ("Clear Peaks")."""
         self.data.clear_peaks()
 
     @QtCore.Slot()
     def _on_find_peaks_in_selection(self) -> None:
         """
         "Find Peaks in Selection" (Ctrl+F): runs the selected detection method inside the Ctrl+drag rectangle and adds
-        the peaks found to the existing ones. Needs a method selected in the parameter dock.
+        the peaks found to the existing ones. Uses the method selected in the parameters dialog.
         """
         rect = self.plot.get_selection_area()
         if rect is None or self.plot.block_clicks:
@@ -227,8 +225,6 @@ class SVApp(QtCore.QObject):
 
         self.plot.refresh_section(section, flags)
 
-        if SectionChange.SIGNAL in flags:
-            self.update_status_indicators()
         if flags & (SectionChange.SIGNAL | SectionChange.PEAKS):
             # `Section` reassigns `data` on every change, so the table model has to be handed the new frame.
             self.data.active_section_model.set_df(section.data)
@@ -248,28 +244,15 @@ class SVApp(QtCore.QObject):
         self.gui.ui.action_unlock_section.setEnabled(not is_base and section.is_locked)
         self.gui.dock_parameters.setEnabled(editable)
 
-    def update_status_indicators(self) -> None:
-        """Syncs the three status check marks of the preprocessing tab with the processing flags of the active section."""
-        self.gui.dock_parameters.ui.ui.status_filter.setChecked(self.data.active_section.is_filtered)
-        self.gui.dock_parameters.ui.ui.status_filter.setToolTip(f"Times filtered: {self.data.active_section.n_filters}")
-
-        self.gui.dock_parameters.ui.ui.status_pipeline.setChecked(self.data.active_section.is_processed)
-        self.gui.dock_parameters.ui.ui.status_standardization.setChecked(self.data.active_section.is_standardized)
-
     @QtCore.Slot(object)
-    def run_processing(self, request: ProcessingRequest) -> None:
-        """Forwards an "Apply to Signal" request to the controller."""
-        self.data.apply_processing(request)
+    def run_analysis(self, request: RunRequest) -> None:
+        """Forwards a "Run" request: the controller processes the signal, then detects peaks on a worker thread."""
+        self.data.process_and_detect(request)
 
     @QtCore.Slot()
     def reset_signal_data(self) -> None:
         """Forwards "Reset Signal": the raw signal comes back, peaks are dropped."""
         self.data.reset_signal()
-
-    @QtCore.Slot(object)
-    def run_peak_detection(self, request: PeakDetectionRequest) -> None:
-        """Forwards a "Run detection" request; the controller runs it on a worker thread."""
-        self.data.detect_peaks(request)
 
     @QtCore.Slot(object)
     def _on_task_failed(self, exc: Exception) -> None:
@@ -625,12 +608,7 @@ class SVApp(QtCore.QObject):
         self.gui.dock_sections.setEnabled(True)
         self._set_metadata_editable(False)
 
-        _val = self.data.metadata.sampling_rate // 2
-        self.gui.dock_parameters.ui.ui.peak_localmax_radius.setProperty("defaultValue", _val)
-        self.gui.dock_parameters.ui.ui.peak_localmin_radius.setProperty("defaultValue", _val)
-        self.gui.dock_parameters.ui.ui.peak_localmax_radius.setValue(_val)
-        self.gui.dock_parameters.ui.ui.peak_localmin_radius.setValue(_val)
-        self.gui.dock_parameters.ui.refresh_help_texts()  # the tooltips quote the default
+        self.gui.dock_parameters.ui.set_default_search_radius(self.data.metadata.sampling_rate // 2)
 
         logger.info(f"Read data from file: {self.data.metadata.file_name}")
 

@@ -27,13 +27,14 @@ from signal_viewer.enum_defs import (
 )
 from signal_viewer.sv_config import Config
 from signal_viewer.sv_data.data_controller import DataController
-from signal_viewer.sv_data.section import DEFAULT_RATE_PARAMS
+from signal_viewer.sv_data.section import DEFAULT_RATE_PARAMS, Section
 from signal_viewer.sv_data.workers import SectionResultWorker
 from signal_viewer.type_defs import (
     PeakDetectionRequest,
     PeaksLocalMaxima,
     ProcessingRequest,
     RollingRateKwargs,
+    RunRequest,
 )
 
 FS = 100
@@ -262,6 +263,77 @@ def test_peak_edits_emit_peaks_and_rate(csv_file: Path) -> None:
     assert section.peaks_local.to_list() == [1025, 1125, 1225, 1325, 1425]
     assert emitted[-1] == (section, SectionChange.PEAKS | SectionChange.RATE)
     assert len(emitted) == 4, "exactly one emission per mutation"
+
+
+def _run_request() -> RunRequest:
+    return RunRequest(
+        processing=ProcessingRequest(pipeline=PreprocessPipeline.PPG_Elgendi),
+        detection=PeakDetectionRequest(
+            PeakDetectionAlgorithm.LocalMaxima, PeaksLocalMaxima(search_radius=40, min_distance=40)
+        ),
+    )
+
+
+def test_process_and_detect_processes_then_detects(csv_file: Path) -> None:
+    dc, emitted = _loaded_with_section(csv_file)
+    section = dc.active_section
+    dc.update_peaks("add", np.array([3]))  # an earlier peak that the run has to replace
+    emitted.clear()
+
+    dc.process_and_detect(_run_request())
+
+    assert section.is_processed
+    assert not section.processed_signal.equals(section.raw_signal)
+    peaks = section.peaks_local.to_list()
+    assert 3 not in peaks
+    assert len(peaks) == len(sine_peaks()), "one peak per second of the 1 Hz sine, found on the processed signal"
+    assert section.get_summary()["processing_parameters"]["peak_detection_method"] == PeakDetectionAlgorithm.LocalMaxima
+    assert emitted == [
+        (section, SectionChange.SIGNAL | SectionChange.PEAKS | SectionChange.RATE),
+        (section, SectionChange.PEAKS | SectionChange.RATE),
+    ]
+
+
+def test_process_and_detect_without_detection_only_processes(csv_file: Path) -> None:
+    dc, emitted = _loaded_with_section(csv_file)
+    section = dc.active_section
+
+    dc.process_and_detect(RunRequest(processing=ProcessingRequest(pipeline=PreprocessPipeline.PPG_Elgendi)))
+
+    assert section.is_processed
+    assert section.peaks_local.is_empty()
+    assert emitted == [(section, SectionChange.SIGNAL | SectionChange.PEAKS | SectionChange.RATE)]
+
+
+def test_process_and_detect_skips_detection_when_processing_fails(
+    csv_file: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    dc, emitted = _loaded_with_section(csv_file)
+    tasks: list[str] = []
+    dc.sig_task_started.connect(tasks.append)
+
+    def fail(_section: Section, _request: ProcessingRequest) -> None:
+        raise ValueError("filter failed")
+
+    monkeypatch.setattr(Section, "apply_processing", fail)  # `Section` has slots, so the class is patched
+
+    with pytest.raises(ValueError, match="filter failed"):
+        dc.process_and_detect(_run_request())
+
+    assert tasks == [], "no detection worker was started"
+    assert emitted == []
+
+
+def test_process_and_detect_leaves_a_locked_section_alone(csv_file: Path) -> None:
+    dc, emitted = _loaded_with_section(csv_file)
+    section = dc.active_section
+    section.set_locked(True)
+
+    dc.process_and_detect(_run_request())
+
+    assert emitted == []
+    assert not section.is_processed
+    assert section.peaks_local.is_empty()
 
 
 def test_lock_and_unlock(csv_file: Path) -> None:

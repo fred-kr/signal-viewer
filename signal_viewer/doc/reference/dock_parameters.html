@@ -11,54 +11,63 @@
 
 <h1>Parameter Inputs dock</h1>
 
-<p>Every input of the dock, with its unit, default value and range. The dock is shown on the Graph page and is
-enabled for unlocked, user-created sections only. The same texts appear as tooltips in the dock; a default marked
-"at load" is replaced when a file is loaded. How-to: <a href="../user_guide/preprocessing.html">Preprocessing</a>,
+<p>Every control of the dock and of the parameters dialog it opens, with unit, default value and range. The dock
+is shown on the Graph page and is enabled for unlocked, user-created sections only. The same texts appear as
+tooltips; a default marked "at load" is replaced when a file is loaded. How-to:
+<a href="../user_guide/preprocessing.html">Preprocessing</a>,
 <a href="../user_guide/peak_detection.html">Peak detection</a>, <a href="../user_guide/results.html#rate">Rate
 calculation</a>.</p>
 
-<h2 id="preprocessing"><a name="preprocessing"></a>Preprocessing tab</h2>
+<h2 id="dock"><a name="dock"></a>The dock</h2>
 
-<h3>Command bar and status</h3>
+<p>The dock holds a command bar and the pipeline dropdown. All other inputs are in the
+<a href="#dialog">parameters dialog</a>.</p>
+
 <table border="1" cellspacing="0" cellpadding="5">
     <tr><th>Control</th><th>What it does</th></tr>
-    <tr id="action-sf-run"><td><a name="action-sf-run"></a>Apply to Signal</td><td>Applies the selected processing steps to the raw signal of the active section. Earlier processing and all peaks are discarded first.</td></tr>
-    <tr id="action-sf-reset-inputs"><td><a name="action-sf-reset-inputs"></a>Restore Defaults</td><td>Restores the default values of the pipeline, filter and standardization inputs. Does not touch the signal.</td></tr>
-    <tr id="action-sf-reset-data"><td><a name="action-sf-reset-data"></a>Reset Signal</td><td>Restores the raw signal of the active section. Every processing step and every peak is removed.</td></tr>
-    <tr id="status-pipeline"><td><a name="status-pipeline"></a>Check mark next to Pipeline</td><td>Checked while the signal of the active section was cleaned with a pipeline.</td></tr>
-    <tr id="status-filter"><td><a name="status-filter"></a>Check mark next to Filter Method</td><td>Checked while the signal is filtered. Its tooltip counts the filters applied in turn.</td></tr>
-    <tr id="status-standardization"><td><a name="status-standardization"></a>Check mark next to Standardization Method</td><td>Checked while the signal is standardized.</td></tr>
+    <tr id="action-run"><td><a name="action-run"></a>Run</td><td>Processes the raw signal of the active section with the selected pipeline (or the custom steps), then detects peaks with the selected detection method, in the background. Earlier processing and all peaks, including manual edits, are discarded first.</td></tr>
+    <tr id="action-peak-settings"><td><a name="action-peak-settings"></a>Peak Settings</td><td>Opens the parameters dialog on the Peak detection tab. While a pipeline is selected, the Preprocessing tab of the dialog is locked.</td></tr>
+    <tr id="action-clear-peaks"><td><a name="action-clear-peaks"></a>Clear Peaks</td><td>Removes every peak of the active section. The processed signal is kept.</td></tr>
+    <tr id="action-reset-data"><td><a name="action-reset-data"></a>Reset Signal</td><td>Restores the raw signal of the active section. Every processing step and every peak is removed.</td></tr>
+    <tr id="pipeline"><td><a name="pipeline"></a>Pipeline</td><td>Ready-made cleaning pipeline from neurokit2, or <i>Custom</i>. Default: PPG_Elgendi. Selecting a pipeline also selects the detection method made for it (see <a href="../user_guide/preprocessing.html#pipeline">Pipelines</a>). <i>Custom</i> applies the filter and standardization of the Preprocessing tab instead.</td></tr>
+    <tr id="toolButton"><td><a name="toolButton"></a>Edit button (next to Pipeline)</td><td>Opens the parameters dialog on the Preprocessing tab. Enabled while <i>Custom</i> is selected.</td></tr>
 </table>
 
-<h3>Inputs</h3>
+<h2 id="dialog"><a name="dialog"></a>The parameters dialog</h2>
+
+<p>The dialog has three tabs and four buttons. It blocks the main window while it is open; the plot behind it
+still updates after <b>Run</b>.</p>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr><th>Button</th><th>What it does</th></tr>
+    <tr id="btn-run"><td><a name="btn-run"></a>Run</td><td>Keeps the edits and runs processing and peak detection, like Run in the dock. The dialog stays open. Pressing Enter in an input does the same.</td></tr>
+    <tr><td>OK</td><td>Keeps the edits and closes the dialog. Nothing is run.</td></tr>
+    <tr><td>Cancel</td><td>Closes the dialog and puts every input back to its value at the time the dialog was opened, or at the last Run.</td></tr>
+    <tr id="btn-restore-defaults"><td><a name="btn-restore-defaults"></a>Restore Defaults</td><td>Restores the default values of the inputs on the visible tab; on the Peak detection tab those of the shown method. Does not touch the signal or the peaks.</td></tr>
+</table>
+
+<h3 id="preprocessing"><a name="preprocessing"></a>Preprocessing tab</h3>
+
+<p>Used while <i>Custom</i> is selected as pipeline. Locked while a pipeline is selected; the values are kept.</p>
+
 <table border="1" cellspacing="0" cellpadding="5">
     <tr><th>Input</th><th>Unit</th><th>Default</th><th>Range</th><th>Meaning</th></tr>
-    <tr id="sf-pipeline"><td><a name="sf-pipeline"></a>Pipeline</td><td></td><td>PPG_Elgendi</td><td>see <a href="../user_guide/preprocessing.html#pipeline">Pipelines</a></td><td>Ready-made cleaning pipeline from neurokit2. Selecting one disables the custom filter and standardization inputs; the empty entry enables them.</td></tr>
-    <tr id="sf-method"><td><a name="sf-method"></a>Filter Method</td><td></td><td>none</td><td>see <a href="../user_guide/preprocessing.html#filter">Custom filter</a></td><td>Filter applied to the raw signal when no pipeline is selected. Inputs the method does not use are disabled.</td></tr>
+    <tr id="sf-method"><td><a name="sf-method"></a>Method (Filter Parameters)</td><td></td><td>none</td><td>see <a href="../user_guide/preprocessing.html#filter">Custom filter</a></td><td>Filter applied to the raw signal. Inputs the method does not use are disabled.</td></tr>
     <tr id="sf-lower-cutoff"><td><a name="sf-lower-cutoff"></a>Lower cutoff</td><td>Hz</td><td>0.5</td><td>0 to 100000</td><td>Frequencies below it are removed (high-pass part). 0 means no lower cutoff. Butterworth, Bessel, FIR.</td></tr>
     <tr id="sf-upper-cutoff"><td><a name="sf-upper-cutoff"></a>Upper cutoff</td><td>Hz</td><td>8.0</td><td>0 to 100000</td><td>Frequencies above it are removed (low-pass part). 0 means no upper cutoff. Butterworth, Bessel, FIR.</td></tr>
     <tr id="sf-order"><td><a name="sf-order"></a>Order</td><td></td><td>3</td><td>1 to 10</td><td>Filter order; higher orders cut off more sharply but can ring. For Savitzky-Golay the polynomial degree. Butterworth, Bessel, SavGol.</td></tr>
     <tr id="sf-window-size"><td><a name="sf-window-size"></a>Window Size</td><td>samples</td><td>100</td><td>5 to 1000000</td><td>Window length of the FIR filter (number of taps) and of Savitzky-Golay smoothing. The minimum value stands for the neurokit2 default, about a third of a second of samples. FIR, SavGol.</td></tr>
     <tr id="sf-powerline"><td><a name="sf-powerline"></a>Powerline</td><td>Hz</td><td>50.0</td><td>0 to 100000</td><td>Mains frequency to remove: 50 Hz in Europe, 60 Hz in North America. Powerline only.</td></tr>
-    <tr id="std-method"><td><a name="std-method"></a>Standardization Method</td><td></td><td>none</td><td>ZScore, ZScoreRobust</td><td>Rescales the filtered signal to zero centre and unit spread. Applied after the filter.</td></tr>
-    <tr id="std-rolling-window"><td><a name="std-rolling-window"></a>Use rolling window</td><td></td><td>off</td><td></td><td>Compute mean and standard deviation inside a moving window instead of over the whole section. Removes slow drift. ZScore only.</td></tr>
+    <tr id="std-method"><td><a name="std-method"></a>Method (Standardization Parameters)</td><td></td><td>none</td><td>ZScore, ZScoreRobust</td><td>Rescales the filtered signal to zero centre and unit spread. Applied after the filter.</td></tr>
+    <tr id="std-rolling-window"><td><a name="std-rolling-window"></a>Rolling Window</td><td></td><td>off</td><td></td><td>Compute mean and standard deviation inside a moving window instead of over the whole section. Removes slow drift. ZScore only.</td></tr>
     <tr id="std-window-size"><td><a name="std-window-size"></a>Window Size (standardization)</td><td>samples</td><td>100</td><td>5 to 999999</td><td>Length of the moving window for rolling standardization. Should span several beats.</td></tr>
 </table>
 
-<h2 id="peak-detection"><a name="peak-detection"></a>Peak Detection tab</h2>
+<h3 id="peak-detection"><a name="peak-detection"></a>Peak detection tab</h3>
 
-<h3>Command bar</h3>
-<table border="1" cellspacing="0" cellpadding="5">
-    <tr><th>Control</th><th>What it does</th></tr>
-    <tr id="action-peak-run"><td><a name="action-peak-run"></a>Run detection</td><td>Runs the selected method on the processed signal of the active section, in the background. Existing peaks, including manual edits, are replaced.</td></tr>
-    <tr id="action-peak-reset-inputs"><td><a name="action-peak-reset-inputs"></a>Restore Defaults</td><td>Restores the default parameter values of the selected method.</td></tr>
-    <tr id="action-peak-reset-data"><td><a name="action-peak-reset-data"></a>Reset Peaks</td><td>Removes every peak of the active section. The processed signal is kept.</td></tr>
-</table>
-
-<h3>Method and parameters</h3>
 <table border="1" cellspacing="0" cellpadding="5">
     <tr><th>Input</th><th>Unit</th><th>Default</th><th>Range</th><th>Meaning</th></tr>
-    <tr id="peak-method"><td><a name="peak-method"></a>Detection Method</td><td></td><td>LocalMaxima</td><td>see <a href="../user_guide/peak_detection.html#methods">Detection methods</a></td><td>Algorithm used to find peaks. The inputs below change with the selection. Also used by Find Peaks in Selection (Ctrl+F).</td></tr>
+    <tr id="peak-method"><td><a name="peak-method"></a>Detection Method</td><td></td><td>PPG_Elgendi; set by the pipeline</td><td>see <a href="../user_guide/peak_detection.html#methods">Detection methods</a></td><td>Algorithm used to find peaks. The inputs below change with the selection. Selecting a pipeline in the dock sets the method made for it; another one can be chosen here afterwards. Also used by Find Peaks in Selection (Ctrl+F).</td></tr>
     <tr><th colspan="5">PPG_Elgendi</th></tr>
     <tr id="peak-ppg-elgendi-peakwindow"><td><a name="peak-ppg-elgendi-peakwindow"></a>Peak Window</td><td>s</td><td>0.111</td><td>0.05 to 5</td><td>Length of the moving average that smooths the squared signal to bring out systolic peaks. About the duration of one systolic peak.</td></tr>
     <tr id="peak-ppg-elgendi-beatwindow"><td><a name="peak-ppg-elgendi-beatwindow"></a>Beat Window</td><td>s</td><td>0.667</td><td>0.1 to 5</td><td>Length of the moving average that follows whole beats. About one heartbeat; forms the threshold the peak average has to exceed.</td></tr>
@@ -92,7 +101,7 @@ calculation</a>.</p>
 ECG_Nabian_2018, ECG_EngzeeMod_2012, ECG_Manikandan_2012, ECG_Elgendi_2010, ECG_Kalidas_2017, ECG_Rodrigues_2021)
 have no adjustable parameters.</p>
 
-<h2 id="rate-calculation"><a name="rate-calculation"></a>Rate Calculation tab</h2>
+<h3 id="rate-calculation"><a name="rate-calculation"></a>Rate calculation tab</h3>
 
 <table border="1" cellspacing="0" cellpadding="5">
     <tr><th>Input</th><th>Unit</th><th>Default</th><th>Range</th><th>Meaning</th></tr>
@@ -101,8 +110,9 @@ have no adjustable parameters.</p>
     <tr id="rate-period"><td><a name="rate-period"></a>Window Length</td><td>s</td><td>60</td><td>1 to 10000</td><td>Length of each rate window. The peaks inside are counted and scaled to beats per minute. Longer windows give a smoother rate.</td></tr>
 </table>
 
-<p>The rate inputs apply to every section at once; the active section's rate is recomputed immediately. Whether
-the rolling window is used at all is the <a href="settings.html">Rate computation method</a> setting.</p>
+<p>The rate inputs apply to every section at once. The active section's rate is recomputed as soon as an input
+changes, without Run; Cancel takes the change back. Whether the rolling window is used at all is the
+<a href="settings.html">Rate computation method</a> setting.</p>
 
 </body>
 </html>

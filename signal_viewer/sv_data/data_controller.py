@@ -30,7 +30,13 @@ from signal_viewer.sv_data.workers import (
     Worker,
     WorkerRunner,
 )
-from signal_viewer.type_defs import PeakDetectionRequest, ProcessingRequest, RollingRateKwargs, UpdatePeaksAction
+from signal_viewer.type_defs import (
+    PeakDetectionRequest,
+    ProcessingRequest,
+    RollingRateKwargs,
+    RunRequest,
+    UpdatePeaksAction,
+)
 
 # Rows polars inspects to infer the dtype of each text-file column. The default (100) turns a numeric column into
 # `String` when one of the first rows holds a stray non-numeric value, which would hide it from the channel list.
@@ -479,7 +485,8 @@ class DataController(QtCore.QObject):
     # --- Active-section mutations ------------------------------------------------------------------------------------
     # Each method below is the single entry point for one kind of change. It mutates the active section and emits
     # `sig_section_changed` once with the flags describing what changed. `detect_peaks` and `lock_active` compute on
-    # the thread pool and apply the result in `_on_peaks_detected` / `_on_section_result`.
+    # the thread pool and apply the result in `_on_peaks_detected` / `_on_section_result`. `process_and_detect` chains
+    # two of them (processing, then detection), so it leads to two emissions.
 
     @QtCore.Slot(object)
     def apply_processing(self, request: ProcessingRequest) -> None:
@@ -487,6 +494,23 @@ class DataController(QtCore.QObject):
         section = self.active_section
         section.apply_processing(request)
         self.sig_section_changed.emit(section, SectionChange.SIGNAL | SectionChange.PEAKS | SectionChange.RATE)
+
+    @QtCore.Slot(object)
+    def process_and_detect(self, request: RunRequest) -> None:
+        """
+        Applies `request.processing` to the active section, then starts `request.detection` on the result.
+
+        The processing runs on the calling thread and emits `sig_section_changed` before the detection worker is
+        created, so the worker copies the freshly processed signal. An exception while processing propagates and no
+        detection starts. A locked section is left alone.
+        """
+        section = self.active_section
+        if section.is_locked:
+            logger.warning("The active section is locked. Unlock it before processing the signal or detecting peaks.")
+            return
+        self.apply_processing(request.processing)
+        if request.detection is not None:
+            self.detect_peaks(request.detection)
 
     @QtCore.Slot()
     def reset_signal(self) -> None:

@@ -1,11 +1,11 @@
 """
-User-facing help texts of the parameter dock, and the code that puts them on the widgets.
+User-facing help texts of the parameter dock and its parameters dialog, and the code that puts them on the widgets.
 
-Every input of `ParameterInputs` has one entry in `HELP_TEXTS`, keyed by the widget's object name in
-`generated/param_inputs.ui` (or the attribute name of a command-bar action). `apply_help_texts` turns an entry into
-the widget's tooltip and What's This text, repeats both on the widget's label, appends the default value and range
-read from the spin box itself (so the numbers cannot drift from the code in `ParameterInputs._setup_widgets`), and
-shows the unit as the spin box suffix.
+Every input of `ParameterInputs` and of its `ParameterDialog` has one entry in `HELP_TEXTS`, keyed by the widget's
+object name in `generated/param_inputs_new.ui` or `generated/dialog_param_inputs.ui` (or the attribute name of a
+command-bar action or dialog button). `apply_help_texts` turns an entry into the widget's tooltip and What's This
+text, repeats both on the widget's label, appends the default value and range read from the spin box itself (so the
+numbers cannot drift from the code in `ParameterDialog._setup_widgets`), and shows the unit as the spin box suffix.
 
 The reference page `doc/reference/dock_parameters.html` describes the same inputs in the same words. Its row
 anchors are the keys of `HELP_TEXTS` with `-` in place of `_`; the "Open the user guide" link that ends every What's
@@ -76,32 +76,43 @@ _RADIUS = (
 )
 
 HELP_TEXTS: dict[str, HelpText] = {
-    # --- Preprocessing tab ---------------------------------------------------------------------------------------
-    "action_sf_run": HelpText(
-        "Apply the selected processing steps to the raw signal of the active section. Earlier processing and all "
-        "peaks are discarded first."
+    # --- Dock ----------------------------------------------------------------------------------------------------
+    "action_run": HelpText(
+        "Process the raw signal of the active section with the selected pipeline (or the custom steps), then detect "
+        "peaks with the selected detection method. Earlier processing and all peaks, including manual edits, are "
+        "discarded first."
     ),
-    "action_sf_reset_inputs": HelpText(
-        "Restore the default values of the pipeline, filter and standardization inputs."
+    "action_peak_settings": HelpText(
+        "Open the parameters dialog on the Peak detection tab to change the detection method or its parameters. "
+        "While a pipeline is selected the Preprocessing tab of the dialog is locked."
     ),
-    "action_sf_reset_data": HelpText(
+    "action_clear_peaks": HelpText("Remove every peak of the active section. The processed signal is kept."),
+    "action_reset_data": HelpText(
         "Restore the raw signal of the active section. Every processing step and every peak is removed."
     ),
-    "status_pipeline": HelpText("Checked while the signal of the active section was cleaned with a pipeline."),
-    "status_filter": HelpText(
-        "Checked while the signal of the active section is filtered. The tooltip counts the filters applied in turn."
-    ),
-    "status_standardization": HelpText("Checked while the signal of the active section is standardized."),
-    "sf_pipeline": HelpText(
+    "pipeline": HelpText(
         "Ready-made cleaning pipeline from neurokit2. The tooltip of each entry names the filters it applies. "
-        "Selecting a pipeline disables the custom filter and standardization inputs below; choose the empty entry "
-        "to use them.",
-        label="label",
+        "Selecting a pipeline also selects the peak detection method made for it, so Run gives a result in one "
+        "step. 'Custom' uses the filter and standardization of the parameters dialog instead.",
+        label="label_8",
     ),
+    "toolButton": HelpText(
+        "Open the parameters dialog to set up the custom filter and standardization. Enabled while 'Custom' is "
+        "selected as pipeline; use Peak Settings to change detection parameters for a pipeline."
+    ),
+    # --- Parameters dialog: buttons --------------------------------------------------------------------------------
+    "btn_run": HelpText(
+        "Keep the edits and run processing and peak detection right away. The dialog stays open, so a parameter "
+        "can be adjusted and tried again. Pressing Enter in an input does the same."
+    ),
+    "btn_restore_defaults": HelpText(
+        "Restore the default values of the inputs on the visible tab; on the Peak detection tab those of the shown "
+        "method. Does not touch the signal or the peaks."
+    ),
+    # --- Parameters dialog: Preprocessing tab ----------------------------------------------------------------------
     "sf_method": HelpText(
-        "Filter applied to the raw signal when no pipeline is selected. Each method uses a different subset of the "
-        "filter parameters; inputs the method does not use are disabled.",
-        label="label_2",
+        "Filter applied to the raw signal when 'Custom' is selected as pipeline. Each method uses a different "
+        "subset of the filter parameters; inputs the method does not use are disabled."
     ),
     "sf_lower_cutoff": HelpText(
         "Lower cutoff frequency. Frequencies below it are removed (the high-pass part of a band-pass). 0 means no "
@@ -131,8 +142,7 @@ HELP_TEXTS: dict[str, HelpText] = {
     ),
     "std_method": HelpText(
         "Rescales the filtered signal to zero centre and unit spread, which makes the amplitude thresholds of the "
-        "peak detectors comparable between recordings. Applied after the filter.",
-        label="label_8",
+        "peak detectors comparable between recordings. Applied after the filter."
     ),
     "std_rolling_window": HelpText(
         "Compute the mean and standard deviation inside a moving window instead of over the whole section. Removes "
@@ -143,16 +153,11 @@ HELP_TEXTS: dict[str, HelpText] = {
         "samples is a good start.",
         unit="samples",
     ),
-    # --- Peak detection tab --------------------------------------------------------------------------------------
-    "action_peak_run": HelpText(
-        "Run the selected detection method on the processed signal of the active section. Existing peaks, including "
-        "manual edits, are replaced."
-    ),
-    "action_peak_reset_inputs": HelpText("Restore the default parameter values of the selected detection method."),
-    "action_peak_reset_data": HelpText("Remove every peak of the active section. The processed signal is kept."),
+    # --- Parameters dialog: Peak detection tab ---------------------------------------------------------------------
     "peak_method": HelpText(
         "Algorithm used to find peaks in the processed signal. The tooltip of each entry describes the method; the "
-        "inputs below change with the selection. The same method is used by Find Peaks in Selection (Ctrl+F).",
+        "inputs below change with the selection. Selecting a pipeline in the dock sets the method made for it; "
+        "another one can be chosen here afterwards. The same method is used by Find Peaks in Selection (Ctrl+F).",
         label="detectionMethodLabel",
     ),
     "peak_ppg_elgendi_peakwindow": HelpText(
@@ -233,7 +238,7 @@ HELP_TEXTS: dict[str, HelpText] = {
         "Wider Gaussians let detectors agree on peaks that lie a little apart.",
         unit="ms",
     ),
-    # --- Rate calculation tab ------------------------------------------------------------------------------------
+    # --- Parameters dialog: Rate calculation tab -------------------------------------------------------------------
     "rate_handle_incomplete": HelpText(
         "What to do with the windows at the end of a section that are shorter than the window length: drop them, "
         "scale their peak count up to a full window, or repeat the rate of the last complete window.",
@@ -302,9 +307,23 @@ def whats_this_html(text: HelpText, trailer: str, anchor: str) -> str:
     return html
 
 
+def find_help_target(inputs: ParameterInputs, name: str) -> object | None:
+    """
+    The widget, action or button `name` refers to, or `None`.
+
+    Looked up on the dialog form, the dock form, the dialog and the dock, in that order: the forms hold the widgets by
+    object name, the two classes hold the actions and buttons created in code.
+    """
+    for owner in (inputs.dialog.ui, inputs.ui, inputs.dialog, inputs):
+        target = getattr(owner, name, None)
+        if target is not None:
+            return target
+    return None
+
+
 def _label_for(inputs: ParameterInputs, widget: QtWidgets.QWidget, label_name: str) -> QtWidgets.QLabel | None:
     if label_name:
-        label = getattr(inputs.ui, label_name, None)
+        label = find_help_target(inputs, label_name)
         return label if isinstance(label, QtWidgets.QLabel) else None
     parent = widget.parentWidget()
     layout = parent.layout() if parent is not None else None
@@ -336,24 +355,24 @@ def _bind_enum_tooltip(combo: EnumComboBox, base_html: str) -> None:
 
 def apply_help_texts(inputs: ParameterInputs) -> None:
     """
-    Sets tooltip, What's This and unit suffix on every input of `inputs` from `HELP_TEXTS`.
+    Sets tooltip, What's This and unit suffix on every input of `inputs` and its dialog from `HELP_TEXTS`.
 
     Call after the spin box ranges and `defaultValue` properties are set, and again whenever a default changes
-    (`SVApp.read_data` does, for the local-extrema radius). Idempotent.
+    (`ParameterInputs.set_default_search_radius` does, for the local-extrema radius). Idempotent.
 
     Raises
     ------
     AttributeError
-        If a key of `HELP_TEXTS` names nothing on `inputs.ui` or `inputs`.
+        If a key of `HELP_TEXTS` names nothing `find_help_target` can find.
     TypeError
         If it names something that is neither a `QWidget` nor a `QAction`.
     """
     for name, text in HELP_TEXTS.items():
-        target = getattr(inputs.ui, name, None)
+        target = find_help_target(inputs, name)
         if target is None:
-            target = getattr(inputs, name, None)
-        if target is None:
-            raise AttributeError(f"HELP_TEXTS names '{name}', which is not a widget or action of ParameterInputs")
+            raise AttributeError(
+                f"HELP_TEXTS names '{name}', which is not a widget, action or button of ParameterInputs or its dialog"
+            )
         anchor = anchor_for(name)
 
         if isinstance(target, QtGui.QAction):

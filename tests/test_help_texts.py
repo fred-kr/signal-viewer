@@ -1,6 +1,6 @@
 """
-Tests for the help texts of the parameter dock and the documented enums: every input has a tooltip and a What's
-This text, every `HELP_TEXTS` entry names a real widget and has a row on the reference page, the default/range
+Tests for the help texts of the parameter dock, its parameters dialog and the documented enums: every input has a
+tooltip and a What's This text, every `HELP_TEXTS` entry names a real widget and has a row on the reference page, the default/range
 trailer quotes the widget, and every `DocumentedStrEnum` member describes itself.
 """
 
@@ -14,7 +14,7 @@ from pyside_widgets import DecimalSpinBox, EnumComboBox
 
 from signal_viewer import enum_defs
 from signal_viewer.enum_defs import DocumentedStrEnum, PeakDetectionAlgorithm
-from signal_viewer.help_texts import HELP_TEXTS, PARAMETER_REFERENCE_PAGE, anchor_for, enum_doc
+from signal_viewer.help_texts import HELP_TEXTS, PARAMETER_REFERENCE_PAGE, anchor_for, enum_doc, find_help_target
 from signal_viewer.sv_site import DOCDIR
 from signal_viewer.sv_widgets.dock_param_inputs import ParameterInputs
 
@@ -27,6 +27,7 @@ def inputs(qapp: QtWidgets.QApplication) -> ParameterInputs:
 
 
 def input_widgets(inputs: ParameterInputs) -> list[QtWidgets.QWidget]:
+    # The dialog is a child of the dock widget, so its inputs are found as well.
     return [w for w in inputs.findChildren(QtWidgets.QWidget) if isinstance(w, INPUT_TYPES)]
 
 
@@ -41,7 +42,7 @@ def test_every_input_has_a_help_text(inputs: ParameterInputs) -> None:
 
 
 def test_every_help_text_names_a_widget_or_action(inputs: ParameterInputs) -> None:
-    unknown = [key for key in HELP_TEXTS if not (hasattr(inputs.ui, key) or hasattr(inputs, key))]
+    unknown = [key for key in HELP_TEXTS if find_help_target(inputs, key) is None]
     assert not unknown
 
 
@@ -57,7 +58,7 @@ def test_whats_this_links_into_the_user_guide(inputs: ParameterInputs) -> None:
 
 
 def test_spin_box_tooltip_quotes_default_range_and_unit(inputs: ParameterInputs) -> None:
-    spin = inputs.ui.sf_lower_cutoff
+    spin = inputs.dialog.ui.sf_lower_cutoff
     assert "Default 0.5 Hz" in spin.toolTip()
     assert "range 0.0 to 100000.0 Hz" in spin.toolTip()
     assert spin.suffix() == " Hz"
@@ -65,24 +66,33 @@ def test_spin_box_tooltip_quotes_default_range_and_unit(inputs: ParameterInputs)
 
 
 def test_sentinel_minimum_is_explained(inputs: ParameterInputs) -> None:
-    assert "minimum value stands for" in inputs.ui.sf_window_size.toolTip()
+    assert "minimum value stands for" in inputs.dialog.ui.sf_window_size.toolTip()
 
 
 def test_label_shares_the_tooltip(inputs: ParameterInputs) -> None:
-    parent = inputs.ui.sf_lower_cutoff.parentWidget()
+    spin = inputs.dialog.ui.sf_lower_cutoff
+    parent = spin.parentWidget()
     assert parent is not None
     layout = parent.layout()
     assert isinstance(layout, QtWidgets.QFormLayout)
-    label = layout.labelForField(inputs.ui.sf_lower_cutoff)
+    label = layout.labelForField(spin)
     assert label is not None
-    assert label.toolTip() == inputs.ui.sf_lower_cutoff.toolTip()
+    assert label.toolTip() == spin.toolTip()
     # Explicit label name in `HelpText`; the combo box itself appends the description of the selected member.
-    assert inputs.ui.sf_pipeline.toolTip().startswith(inputs.ui.label.toolTip())
-    assert inputs.ui.sf_pipeline.toolTip() != inputs.ui.label.toolTip()
+    assert inputs.ui.pipeline.toolTip().startswith(inputs.ui.label_8.toolTip())
+    assert inputs.ui.pipeline.toolTip() != inputs.ui.label_8.toolTip()
+
+
+def test_method_labels_carry_their_own_tooltip(inputs: ParameterInputs) -> None:
+    # Both "Method" labels sit in form layouts; neither may pick up the text of the other combo box.
+    ui = inputs.dialog.ui
+    assert ui.sf_method.toolTip().startswith(ui.label.toolTip())
+    assert ui.std_method.toolTip().startswith(ui.label_2.toolTip())
+    assert ui.label.toolTip() != ui.label_2.toolTip()
 
 
 def test_combo_box_tooltip_follows_selection(inputs: ParameterInputs) -> None:
-    combo = inputs.ui.peak_method
+    combo = inputs.dialog.ui.peak_method
     combo.set_current_enum(PeakDetectionAlgorithm.ECG_XQRS)
     assert enum_doc(PeakDetectionAlgorithm.ECG_XQRS) in combo.toolTip()
     combo.set_current_enum(PeakDetectionAlgorithm.LocalMaxima)
@@ -97,19 +107,19 @@ def test_refresh_is_idempotent(inputs: ParameterInputs) -> None:
 
 
 def test_refresh_picks_up_a_changed_default(inputs: ParameterInputs) -> None:
-    spin = inputs.ui.peak_localmax_radius
+    spin = inputs.dialog.ui.peak_localmax_radius
     spin.setProperty("defaultValue", 250)
     inputs.refresh_help_texts()
     assert "Default 250 samples" in spin.toolTip()
 
 
 def test_butterworth_zi_enables_cutoffs_and_order(inputs: ParameterInputs) -> None:
-    inputs.ui.sf_pipeline.set_current_enum(None)
-    inputs.ui.sf_method.set_current_enum(enum_defs.FilterMethod.ButterworthZI)
-    assert inputs.ui.sf_lower_cutoff.isEnabled()
-    assert inputs.ui.sf_order.isEnabled()
-    assert not inputs.ui.sf_window_size.isEnabled()
-    assert not inputs.ui.sf_powerline.isEnabled()
+    ui = inputs.dialog.ui
+    ui.sf_method.set_current_enum(enum_defs.FilterMethod.ButterworthZI)
+    assert ui.sf_lower_cutoff.isEnabled()
+    assert ui.sf_order.isEnabled()
+    assert not ui.sf_window_size.isEnabled()
+    assert not ui.sf_powerline.isEnabled()
 
 
 def documented_enums() -> list[type[DocumentedStrEnum]]:

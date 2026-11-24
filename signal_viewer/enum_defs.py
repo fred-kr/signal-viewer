@@ -44,7 +44,7 @@ class RateComputationMethod(DocumentedStrEnum):
         """
         Peaks are counted inside a window of fixed length that moves along the section, and the count is scaled to
         beats per minute. Window length, step and the handling of the last, shorter windows are set on the
-        'Rate Calculation' tab. Smoother than the instantaneous rate; the default.
+        'Rate calculation' tab of the parameters dialog. Smoother than the instantaneous rate; the default.
         """,
     )
 
@@ -98,8 +98,8 @@ class FilterMethod(DocumentedStrEnum):
     """
     Filters of `neurokit2.signal_filter`, selectable as a custom preprocessing step.
 
-    Which inputs a method uses is decided in `ParameterInputs._on_filter_method_changed`; the descriptions below
-    name the same inputs so the dock and the user guide agree.
+    Which inputs a method uses is decided in `ParameterDialog._on_filter_method_changed`; the descriptions below
+    name the same inputs so the dialog and the user guide agree.
     """
 
     Butterworth = (
@@ -159,14 +159,15 @@ class PreprocessPipeline(DocumentedStrEnum):
     """
     Ready-made cleaning pipelines, implemented in `sv_data.signal_processing.apply_cleaning_pipeline`.
 
-    Selecting a pipeline disables the custom filter and standardization inputs. The descriptions state the filters a
-    pipeline applies, so a user can reproduce it with the custom inputs.
+    Selecting a pipeline in the dock also selects the peak detector it was made for (`PIPELINE_PEAK_METHODS`) and
+    locks the custom filter and standardization inputs. The descriptions state the filters a pipeline applies, so a
+    user can reproduce it with the custom inputs.
     """
 
     PPG_Elgendi = (
         "ppg_elgendi",
         """
-        PPG: Butterworth band-pass 0.5 to 8 Hz, order 3 (Elgendi et al. 2013). The default; pair it with the
+        PPG: Butterworth band-pass 0.5 to 8 Hz, order 3 (Elgendi et al. 2013). The default; selects the
         'PPG_Elgendi' peak detector.
         """,
     )
@@ -174,7 +175,7 @@ class PreprocessPipeline(DocumentedStrEnum):
         "vg",
         """
         ECG: Butterworth high-pass 4 Hz, order 2. The preprocessing of the visibility-graph R-peak detector
-        (Emrich et al. 2023); pair it with the 'ECG_Emrich_2023' detector.
+        (Emrich et al. 2023); selects the 'ECG_Emrich_2023' detector.
         """,
     )
     ECG_NeuroKit = (
@@ -236,8 +237,8 @@ class PeakDetectionAlgorithm(DocumentedStrEnum):
     Peak detection algorithms, dispatched in `sv_data.peak_detection.find_peaks`.
 
     The two local-extrema methods work on any signal; 'PPG_Elgendi' is for photoplethysmograms; the rest are ECG
-    R-peak detectors from neurokit2 (and XQRS from the WFDB package). Methods without a parameter page in the dock
-    run with their published defaults.
+    R-peak detectors from neurokit2 (and XQRS from the WFDB package). Methods without a parameter page in the
+    parameters dialog run with their published defaults.
     """
 
     LocalMaxima = (
@@ -323,6 +324,24 @@ class PeakDetectionAlgorithm(DocumentedStrEnum):
         Gutiérrez-Rivas et al. (2015). No parameters.
         """,
     )
+
+
+PIPELINE_PEAK_METHODS: dict[PreprocessPipeline, PeakDetectionAlgorithm] = {
+    PreprocessPipeline.PPG_Elgendi: PeakDetectionAlgorithm.PPG_Elgendi,
+    PreprocessPipeline.ECG_Emrich_2023: PeakDetectionAlgorithm.ECG_Emrich_2023,
+    PreprocessPipeline.ECG_NeuroKit: PeakDetectionAlgorithm.ECG_NeuroKit,
+    # BioSPPy has no detector of its own here; its ECG chain segments with Hamilton (2002).
+    PreprocessPipeline.ECG_BioSPPy: PeakDetectionAlgorithm.ECG_Hamilton_2002,
+    PreprocessPipeline.ECG_PanTompkins_1985: PeakDetectionAlgorithm.ECG_PanTompkins_1985,
+    PreprocessPipeline.ECG_Hamilton_2002: PeakDetectionAlgorithm.ECG_Hamilton_2002,
+    PreprocessPipeline.ECG_Elgendi_2010: PeakDetectionAlgorithm.ECG_Elgendi_2010,
+    PreprocessPipeline.ECG_EngzeeMod_2012: PeakDetectionAlgorithm.ECG_EngzeeMod_2012,
+}
+"""
+The peak detector each pipeline was published with. Selecting a pipeline in the dock selects this detector
+(`ParameterInputs._on_pipeline_changed`); the user may still pick another one in the parameters dialog.
+`tests/test_param_inputs.py` fails when a pipeline has no entry.
+"""
 
 
 class WFDBPeakDirection(DocumentedStrEnum):

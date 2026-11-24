@@ -1,8 +1,8 @@
 """
 Typed dictionaries and request objects passed between the GUI, `DataController` and the data layer.
 
-The `Peaks*` dictionaries are the keyword arguments of one peak detection method each; `ParameterInputs` builds
-them from the dock and `peak_detection.find_peaks` unpacks them. Units are stated in each class docstring because a
+The `Peaks*` dictionaries are the keyword arguments of one peak detection method each; `ParameterDialog` builds
+them from its inputs and `peak_detection.find_peaks` unpacks them. Units are stated in each class docstring because a
 `TypedDict` body may hold annotations only.
 """
 
@@ -265,9 +265,9 @@ class RollingRateKwargs(TypedDict, total=False):
 @attrs.frozen
 class ProcessingRequest:
     """
-    What the "Apply to Signal" button asks for, as one object.
+    The processing half of a `RunRequest`, as one object.
 
-    A `pipeline` takes precedence over `filter` and `standardize`, mirroring the parameter dock, which disables the
+    A `pipeline` takes precedence over `filter` and `standardize`, mirroring the parameter dock, which locks the
     custom inputs while a pipeline is selected. All three `None` means "reset the signal".
     """
 
@@ -278,7 +278,20 @@ class ProcessingRequest:
 
 @attrs.frozen
 class PeakDetectionRequest:
-    """What the "Run detection" button asks for."""
+    """The detection half of a `RunRequest`; also what "Find Peaks in Selection" runs on a stretch of the signal."""
 
     method: PeakDetectionAlgorithm
     params: PeakDetectionAlgorithmParameters | None = None
+
+
+@attrs.frozen
+class RunRequest:
+    """
+    What the "Run" button asks for: process the signal, then detect peaks on the result.
+
+    Both halves travel together so `DataController.process_and_detect` can skip the detection when the processing
+    fails. `detection` is `None` when no detection method is selected; the signal is then processed only.
+    """
+
+    processing: ProcessingRequest
+    detection: PeakDetectionRequest | None = None
