@@ -119,6 +119,6 @@
     <file alias="icons/Wrench.svg">icons/light/Wrench.svg</file>
     <file alias="icons/ZoomIn.svg">icons/light/ZoomIn.svg</file>
     <file alias="icons/ZoomOut.svg">icons/light/ZoomOut.svg</file>
-    <file>icons/app_icon.png</file>
+    <file alias="icons/app_icon.ico">icons/app_icon/windows/signal-viewer.ico</file>
   </qresource>
 </RCC>

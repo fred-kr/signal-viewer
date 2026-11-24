@@ -72,8 +72,9 @@ uv run pyinstaller packaging/signal_viewer.spec --noconfirm --clean
 ```
 
 The result is `dist/SignalViewer/` (and `dist/SignalViewer.app` on macOS). The build definition lives in
-[packaging/signal_viewer.spec](packaging/signal_viewer.spec); the platform icons in `packaging/icons/` are
-generated from `signal_viewer/icons/app_icon.png` by `packaging/make_icons.py`.
+[packaging/signal_viewer.spec](packaging/signal_viewer.spec). It takes the executable icon from
+`signal_viewer/icons/app_icon/` (`windows/signal-viewer.ico`, `macos/SignalViewer.icns`). The Windows `.ico` is
+also the window icon of the running app, compiled into `signal_viewer/generated/rc_resources.py`.
 
 Release builds run in GitHub Actions ([.github/workflows/build.yml](.github/workflows/build.yml)) on every tag
 that starts with `v`, and can be started manually from the Actions tab. Each job builds, runs the packaged

@@ -19,7 +19,11 @@ from PyInstaller.utils.hooks import collect_data_files, collect_submodules, copy
 ROOT = Path(SPECPATH).parent  # SPECPATH is injected by PyInstaller: the directory holding this file
 VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
 PYSIDE_DIR = Path(PySide6.__file__).parent
-ICON_DIR = ROOT / "packaging" / "icons"
+# The platform icon files are built by `scripts/app_icon/build.py`. The Windows `.ico` is also compiled into
+# `rc_resources` as the window icon, so there is one copy of each file in the repo.
+ICON_DIR = ROOT / "signal_viewer" / "icons" / "app_icon"
+ICON_WIN = ICON_DIR / "windows" / "signal-viewer.ico"
+ICON_MAC = ICON_DIR / "macos" / "SignalViewer.icns"
 
 IS_WIN = sys.platform == "win32"
 IS_MAC = sys.platform == "darwin"
@@ -156,7 +160,7 @@ exe = EXE(
     strip=False,
     upx=False,
     console=False,  # GUI app: no console window on Windows. Diagnostics go to --debug's log file.
-    icon=str(ICON_DIR / ("app_icon.ico" if IS_WIN else "app_icon.icns")),
+    icon=str(ICON_WIN if IS_WIN else ICON_MAC),
 )
 
 coll = COLLECT(
@@ -172,7 +176,7 @@ if IS_MAC:
     app = BUNDLE(
         coll,
         name="SignalViewer.app",
-        icon=str(ICON_DIR / "app_icon.icns"),
+        icon=str(ICON_MAC),
         bundle_identifier="com.quacktech.signalviewer",
         version=VERSION,
         info_plist={
