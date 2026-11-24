@@ -273,7 +273,7 @@
               <item>
                <widget class="QLabel" name="label_3">
                 <property name="text">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:700;&quot;&gt;Recent Data Files&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:700;&quot;&gt;Recent Files&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                </widget>
               </item>
@@ -353,11 +353,11 @@
             </widget>
            </item>
            <item row="5" column="0" colspan="3">
-            <widget class="QScrollArea" name="scrollArea_import">
+            <widget class="QScrollArea" name="scrollArea_infotext">
              <property name="widgetResizable">
               <bool>true</bool>
              </property>
-             <widget class="QWidget" name="scroll_area_import_contents">
+             <widget class="QWidget" name="container_infotext">
               <property name="geometry">
                <rect>
                 <x>0</x>
@@ -384,7 +384,7 @@
            <item>
             <widget class="QLabel" name="label_showing_data_table">
              <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Showing: -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Showing: -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
@@ -600,13 +600,8 @@
     </property>
     <addaction name="action_open_file"/>
     <addaction name="action_close_file"/>
-    <addaction name="separator"/>
     <addaction name="action_edit_metadata"/>
-   </widget>
-   <widget class="QMenu" name="menu_settings">
-    <property name="title">
-     <string>Settings</string>
-    </property>
+    <addaction name="separator"/>
     <addaction name="action_show_settings"/>
    </widget>
    <widget class="QMenu" name="menu_view">
@@ -636,13 +631,13 @@
    <addaction name="menu_file"/>
    <addaction name="menu_view"/>
    <addaction name="menu_plot"/>
-   <addaction name="menu_settings"/>
    <addaction name="menu_help"/>
   </widget>
   <widget class="QStatusBar" name="status_bar"/>
   <action name="action_open_file">
    <property name="icon">
-    <iconset theme="QIcon::ThemeIcon::DocumentOpen"/>
+    <iconset theme="FolderOpen" resource="../icon_themes.qrc">
+     <normaloff>:/icon-themes/light/scalable/FolderOpen.svg</normaloff>:/icon-themes/light/scalable/FolderOpen.svg</iconset>
    </property>
    <property name="text">
     <string>Open File...</string>
@@ -655,6 +650,9 @@
    </property>
    <property name="whatsThis">
     <string>&lt;p&gt;Opens a file dialog. The chosen file is scanned for its columns (channels) and, where possible, its sampling rate; nothing is loaded yet. Numeric columns appear in the Signal Channel and Info Channel lists.&lt;/p&gt;&lt;p&gt;Supported formats: CSV, TXT, TSV, XLS, XLSX, Feather/Arrow and EDF.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::TextHeuristicRole</enum>
@@ -705,6 +703,10 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset theme="DocumentDismiss" resource="../icon_themes.qrc">
+     <normaloff>:/icon-themes/light/scalable/DocumentDismiss.svg</normaloff>:/icon-themes/light/scalable/DocumentDismiss.svg</iconset>
+   </property>
    <property name="text">
     <string>Close File</string>
    </property>
@@ -713,12 +715,6 @@
    </property>
    <property name="whatsThis">
     <string>&lt;p&gt;Closes the open file and resets the application. Export your results first; sections and results of every channel are discarded.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;help:user_guide/getting_started.html&quot;&gt;Open the user guide&lt;/a&gt;&lt;/p&gt;</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
    </property>
   </action>
   <action name="action_mark_section_done">
@@ -970,6 +966,7 @@
  </tabstops>
  <resources>
   <include location="../resources.qrc"/>
+  <include location="../icon_themes.qrc"/>
  </resources>
  <connections>
   <connection>

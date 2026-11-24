@@ -26,6 +26,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QForm
 
 from pyqtgraph.widgets.MatplotlibWidget import MatplotlibWidget
 from . import rc_resources
+from . import rc_icon_themes
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -37,7 +38,13 @@ class Ui_MainWindow(object):
         MainWindow.setDockOptions(QMainWindow.DockOption.AllowNestedDocks|QMainWindow.DockOption.AllowTabbedDocks|QMainWindow.DockOption.AnimatedDocks|QMainWindow.DockOption.VerticalTabs)
         self.action_open_file = QAction(MainWindow)
         self.action_open_file.setObjectName(u"action_open_file")
-        icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.DocumentOpen))
+        icon = QIcon()
+        iconThemeName = u"FolderOpen"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon = QIcon.fromTheme(iconThemeName)
+        else:
+            icon.addFile(u":/icon-themes/light/scalable/FolderOpen.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
         self.action_open_file.setIcon(icon)
         self.action_open_file.setMenuRole(QAction.MenuRole.TextHeuristicRole)
         self.action_open_file.setIconVisibleInMenu(True)
@@ -59,63 +66,69 @@ class Ui_MainWindow(object):
         self.action_close_file = QAction(MainWindow)
         self.action_close_file.setObjectName(u"action_close_file")
         self.action_close_file.setEnabled(False)
-        self.action_close_file.setMenuRole(QAction.MenuRole.NoRole)
-        self.action_close_file.setIconVisibleInMenu(False)
-        self.action_mark_section_done = QAction(MainWindow)
-        self.action_mark_section_done.setObjectName(u"action_mark_section_done")
         icon2 = QIcon()
-        iconThemeName = u"CheckmarkCircle"
+        iconThemeName = u"DocumentDismiss"
         if QIcon.hasThemeIcon(iconThemeName):
             icon2 = QIcon.fromTheme(iconThemeName)
         else:
-            icon2.addFile(u"://icons/CheckmarkCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            icon2.addFile(u":/icon-themes/light/scalable/DocumentDismiss.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
 
-        self.action_mark_section_done.setIcon(icon2)
+        self.action_close_file.setIcon(icon2)
+        self.action_mark_section_done = QAction(MainWindow)
+        self.action_mark_section_done.setObjectName(u"action_mark_section_done")
+        icon3 = QIcon()
+        iconThemeName = u"CheckmarkCircle"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon3 = QIcon.fromTheme(iconThemeName)
+        else:
+            icon3.addFile(u"://icons/CheckmarkCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
+        self.action_mark_section_done.setIcon(icon3)
         self.action_mark_section_done.setMenuRole(QAction.MenuRole.NoRole)
         self.action_create_new_section = QAction(MainWindow)
         self.action_create_new_section.setObjectName(u"action_create_new_section")
         self.action_create_new_section.setCheckable(True)
-        icon3 = QIcon()
-        iconThemeName = u"AddCircle"
-        if QIcon.hasThemeIcon(iconThemeName):
-            icon3 = QIcon.fromTheme(iconThemeName)
-        else:
-            icon3.addFile(u"://icons/AddCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-
-        self.action_create_new_section.setIcon(icon3)
-        self.action_create_new_section.setMenuRole(QAction.MenuRole.NoRole)
-        self.action_toggle_auto_scaling = QAction(MainWindow)
-        self.action_toggle_auto_scaling.setObjectName(u"action_toggle_auto_scaling")
         icon4 = QIcon()
-        iconThemeName = u"AutoFitHeight"
+        iconThemeName = u"AddCircle"
         if QIcon.hasThemeIcon(iconThemeName):
             icon4 = QIcon.fromTheme(iconThemeName)
         else:
-            icon4.addFile(u"://icons/AutoFitHeight.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            icon4.addFile(u"://icons/AddCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
 
-        self.action_toggle_auto_scaling.setIcon(icon4)
-        self.action_toggle_auto_scaling.setMenuRole(QAction.MenuRole.NoRole)
-        self.action_confirm_section = QAction(MainWindow)
-        self.action_confirm_section.setObjectName(u"action_confirm_section")
+        self.action_create_new_section.setIcon(icon4)
+        self.action_create_new_section.setMenuRole(QAction.MenuRole.NoRole)
+        self.action_toggle_auto_scaling = QAction(MainWindow)
+        self.action_toggle_auto_scaling.setObjectName(u"action_toggle_auto_scaling")
         icon5 = QIcon()
-        iconThemeName = u"Checkmark"
+        iconThemeName = u"AutoFitHeight"
         if QIcon.hasThemeIcon(iconThemeName):
             icon5 = QIcon.fromTheme(iconThemeName)
         else:
-            icon5.addFile(u"://icons/Checkmark.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            icon5.addFile(u"://icons/AutoFitHeight.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
 
-        self.action_confirm_section.setIcon(icon5)
-        self.action_confirm_section.setMenuRole(QAction.MenuRole.NoRole)
-        self.action_cancel_section = QAction(MainWindow)
-        self.action_cancel_section.setObjectName(u"action_cancel_section")
+        self.action_toggle_auto_scaling.setIcon(icon5)
+        self.action_toggle_auto_scaling.setMenuRole(QAction.MenuRole.NoRole)
+        self.action_confirm_section = QAction(MainWindow)
+        self.action_confirm_section.setObjectName(u"action_confirm_section")
         icon6 = QIcon()
-        iconThemeName = u"Dismiss"
+        iconThemeName = u"Checkmark"
         if QIcon.hasThemeIcon(iconThemeName):
             icon6 = QIcon.fromTheme(iconThemeName)
         else:
-            icon6.addFile(u"://icons/Dismiss.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            icon6.addFile(u"://icons/Checkmark.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
 
-        self.action_cancel_section.setIcon(icon6)
+        self.action_confirm_section.setIcon(icon6)
+        self.action_confirm_section.setMenuRole(QAction.MenuRole.NoRole)
+        self.action_cancel_section = QAction(MainWindow)
+        self.action_cancel_section.setObjectName(u"action_cancel_section")
+        icon7 = QIcon()
+        iconThemeName = u"Dismiss"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon7 = QIcon.fromTheme(iconThemeName)
+        else:
+            icon7.addFile(u"://icons/Dismiss.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
+        self.action_cancel_section.setIcon(icon7)
         self.action_cancel_section.setMenuRole(QAction.MenuRole.NoRole)
         self.action_show_section_overview = QAction(MainWindow)
         self.action_show_section_overview.setObjectName(u"action_show_section_overview")
@@ -130,14 +143,14 @@ class Ui_MainWindow(object):
         self.action_find_peaks_in_selection.setMenuRole(QAction.MenuRole.ApplicationSpecificRole)
         self.action_show_user_guide = QAction(MainWindow)
         self.action_show_user_guide.setObjectName(u"action_show_user_guide")
-        icon7 = QIcon()
+        icon8 = QIcon()
         iconThemeName = u"BookQuestionMark"
         if QIcon.hasThemeIcon(iconThemeName):
-            icon7 = QIcon.fromTheme(iconThemeName)
+            icon8 = QIcon.fromTheme(iconThemeName)
         else:
-            icon7.addFile(u"://icons/BookQuestionMark.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            icon8.addFile(u"://icons/BookQuestionMark.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
 
-        self.action_show_user_guide.setIcon(icon7)
+        self.action_show_user_guide.setIcon(icon8)
         self.action_show_user_guide.setMenuRole(QAction.MenuRole.NoRole)
         self.action_about_qt = QAction(MainWindow)
         self.action_about_qt.setObjectName(u"action_about_qt")
@@ -147,25 +160,25 @@ class Ui_MainWindow(object):
         self.action_about_app.setMenuRole(QAction.MenuRole.AboutRole)
         self.action_remove_section = QAction(MainWindow)
         self.action_remove_section.setObjectName(u"action_remove_section")
-        icon8 = QIcon()
-        iconThemeName = u"SubtractCircle"
-        if QIcon.hasThemeIcon(iconThemeName):
-            icon8 = QIcon.fromTheme(iconThemeName)
-        else:
-            icon8.addFile(u"://icons/SubtractCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-
-        self.action_remove_section.setIcon(icon8)
-        self.action_remove_section.setMenuRole(QAction.MenuRole.NoRole)
-        self.action_unlock_section = QAction(MainWindow)
-        self.action_unlock_section.setObjectName(u"action_unlock_section")
         icon9 = QIcon()
-        iconThemeName = u"LockOpen"
+        iconThemeName = u"SubtractCircle"
         if QIcon.hasThemeIcon(iconThemeName):
             icon9 = QIcon.fromTheme(iconThemeName)
         else:
-            icon9.addFile(u"://icons/LockOpen.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            icon9.addFile(u"://icons/SubtractCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
 
-        self.action_unlock_section.setIcon(icon9)
+        self.action_remove_section.setIcon(icon9)
+        self.action_remove_section.setMenuRole(QAction.MenuRole.NoRole)
+        self.action_unlock_section = QAction(MainWindow)
+        self.action_unlock_section.setObjectName(u"action_unlock_section")
+        icon10 = QIcon()
+        iconThemeName = u"LockOpen"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon10 = QIcon.fromTheme(iconThemeName)
+        else:
+            icon10.addFile(u"://icons/LockOpen.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
+        self.action_unlock_section.setIcon(icon10)
         self.action_unlock_section.setMenuRole(QAction.MenuRole.NoRole)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -318,15 +331,15 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.line_edit_active_file, 1, 1, 1, 2)
 
-        self.scrollArea_import = QScrollArea(self.container_file_information)
-        self.scrollArea_import.setObjectName(u"scrollArea_import")
-        self.scrollArea_import.setWidgetResizable(True)
-        self.scroll_area_import_contents = QWidget()
-        self.scroll_area_import_contents.setObjectName(u"scroll_area_import_contents")
-        self.scroll_area_import_contents.setGeometry(QRect(0, 0, 385, 281))
-        self.scrollArea_import.setWidget(self.scroll_area_import_contents)
+        self.scrollArea_infotext = QScrollArea(self.container_file_information)
+        self.scrollArea_infotext.setObjectName(u"scrollArea_infotext")
+        self.scrollArea_infotext.setWidgetResizable(True)
+        self.container_infotext = QWidget()
+        self.container_infotext.setObjectName(u"container_infotext")
+        self.container_infotext.setGeometry(QRect(0, 0, 385, 281))
+        self.scrollArea_infotext.setWidget(self.container_infotext)
 
-        self.gridLayout.addWidget(self.scrollArea_import, 5, 0, 1, 3)
+        self.gridLayout.addWidget(self.scrollArea_infotext, 5, 0, 1, 3)
 
 
         self.horizontalLayout.addWidget(self.container_file_information)
@@ -463,8 +476,6 @@ class Ui_MainWindow(object):
         self.menubar.setNativeMenuBar(False)
         self.menu_file = QMenu(self.menubar)
         self.menu_file.setObjectName(u"menu_file")
-        self.menu_settings = QMenu(self.menubar)
-        self.menu_settings.setObjectName(u"menu_settings")
         self.menu_view = QMenu(self.menubar)
         self.menu_view.setObjectName(u"menu_view")
         self.menu_plot = QMenu(self.menubar)
@@ -489,13 +500,12 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menu_file.menuAction())
         self.menubar.addAction(self.menu_view.menuAction())
         self.menubar.addAction(self.menu_plot.menuAction())
-        self.menubar.addAction(self.menu_settings.menuAction())
         self.menubar.addAction(self.menu_help.menuAction())
         self.menu_file.addAction(self.action_open_file)
         self.menu_file.addAction(self.action_close_file)
-        self.menu_file.addSeparator()
         self.menu_file.addAction(self.action_edit_metadata)
-        self.menu_settings.addAction(self.action_show_settings)
+        self.menu_file.addSeparator()
+        self.menu_file.addAction(self.action_show_settings)
         self.menu_plot.addAction(self.action_remove_peaks_in_selection)
         self.menu_plot.addAction(self.action_find_peaks_in_selection)
         self.menu_plot.addAction(self.action_toggle_auto_scaling)
@@ -523,6 +533,9 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(whatsthis)
         self.action_open_file.setWhatsThis(QCoreApplication.translate("MainWindow", u"<p>Opens a file dialog. The chosen file is scanned for its columns (channels) and, where possible, its sampling rate; nothing is loaded yet. Numeric columns appear in the Signal Channel and Info Channel lists.</p><p>Supported formats: CSV, TXT, TSV, XLS, XLSX, Feather/Arrow and EDF.</p><p><a href=\"help:user_guide/getting_started.html\">Open the user guide</a></p>", None))
 #endif // QT_CONFIG(whatsthis)
+#if QT_CONFIG(shortcut)
+        self.action_open_file.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+O", None))
+#endif // QT_CONFIG(shortcut)
         self.action_show_settings.setText(QCoreApplication.translate("MainWindow", u"Preferences", None))
 #if QT_CONFIG(tooltip)
         self.action_show_settings.setToolTip(QCoreApplication.translate("MainWindow", u"Open the Settings dialog (Ctrl+,)", None))
@@ -700,7 +713,7 @@ class Ui_MainWindow(object):
         self.btn_open_file.setWhatsThis(QCoreApplication.translate("MainWindow", u"<p>Opens a file dialog. The chosen file is scanned for its columns (channels) and, where possible, its sampling rate; nothing is loaded yet. Numeric columns appear in the Signal Channel and Info Channel lists.</p><p>Supported formats: CSV, TXT, TSV, XLS, XLSX, Feather/Arrow and EDF.</p><p><a href=\"help:user_guide/getting_started.html\">Open the user guide</a></p>", None))
 #endif // QT_CONFIG(whatsthis)
         self.btn_open_file.setText(QCoreApplication.translate("MainWindow", u"Open File...", None))
-        self.label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:10pt; font-weight:700;\">Recent Data Files</span></p></body></html>", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:10pt; font-weight:700;\">Recent Files</span></p></body></html>", None))
 #if QT_CONFIG(tooltip)
         self.lview_data_files.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Double-click on a filename to open it</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
@@ -714,7 +727,7 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(tooltip)
         self.line_edit_active_file.setToolTip(QCoreApplication.translate("MainWindow", u"Name of the open file", None))
 #endif // QT_CONFIG(tooltip)
-        self.label_showing_data_table.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Showing: -</p></body></html>", None))
+        self.label_showing_data_table.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt;\">Showing: -</span></p></body></html>", None))
 #if QT_CONFIG(tooltip)
         self.table_view_import_data.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>A table showing the current section's data</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
@@ -747,7 +760,6 @@ class Ui_MainWindow(object):
         self.label_showing_section_result.setText("")
         self.tab_widget_main.setTabText(self.tab_widget_main.indexOf(self.tab_export), QCoreApplication.translate("MainWindow", u"Results", None))
         self.menu_file.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
-        self.menu_settings.setTitle(QCoreApplication.translate("MainWindow", u"Settings", None))
         self.menu_view.setTitle(QCoreApplication.translate("MainWindow", u"View", None))
         self.menu_plot.setTitle(QCoreApplication.translate("MainWindow", u"Plot", None))
         self.menu_help.setTitle(QCoreApplication.translate("MainWindow", u"Help", None))
