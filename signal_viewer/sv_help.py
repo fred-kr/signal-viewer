@@ -92,7 +92,7 @@ class HelpWindow(QtWidgets.QMainWindow):
         super().__init__(parent)
         self.setObjectName("HelpWindow")
         self.setWindowTitle("SignalViewer User Guide")
-        self.setWindowIcon(QtGui.QIcon("://icons/BookQuestionMark.svg"))
+        self.setWindowIcon(QtGui.QIcon.fromTheme("BookQuestionMark"))
         self._doc_dir = doc_dir
         self._items_by_page: dict[str, QtWidgets.QTreeWidgetItem] = {}
 
@@ -166,7 +166,7 @@ class HelpWindow(QtWidgets.QMainWindow):
         self.action_home.setToolTip("Open the start page of the user guide")
         self.action_home.triggered.connect(lambda: self.show_page(HOME_PAGE))
 
-        self.action_open_in_browser = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Open in browser", self)
+        self.action_open_in_browser = QtGui.QAction(QtGui.QIcon.fromTheme("ArrowExportLtr"), "Open in browser", self)
         self.action_open_in_browser.setToolTip("Open the current page in the system web browser")
         self.action_open_in_browser.triggered.connect(self.open_current_in_browser)
 

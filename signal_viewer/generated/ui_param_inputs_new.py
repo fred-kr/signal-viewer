@@ -61,7 +61,12 @@ class Ui_processingInputs(object):
         self.toolButton = QToolButton(processingInputs)
         self.toolButton.setObjectName(u"toolButton")
         icon = QIcon()
-        icon.addFile(u":/icons/EditSettings.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        iconThemeName = u"EditSettings"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon = QIcon.fromTheme(iconThemeName)
+        else:
+            icon.addFile(u":/icons/EditSettings.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
         self.toolButton.setIcon(icon)
 
         self.horizontalLayout.addWidget(self.toolButton)

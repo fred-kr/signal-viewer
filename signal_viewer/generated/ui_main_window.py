@@ -44,7 +44,12 @@ class Ui_MainWindow(object):
         self.action_show_settings = QAction(MainWindow)
         self.action_show_settings.setObjectName(u"action_show_settings")
         icon1 = QIcon()
-        icon1.addFile(u":/icons/Settings.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        iconThemeName = u"Settings"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon1 = QIcon.fromTheme(iconThemeName)
+        else:
+            icon1.addFile(u":/icons/Settings.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
         self.action_show_settings.setIcon(icon1)
         self.action_show_settings.setMenuRole(QAction.MenuRole.PreferencesRole)
         self.action_edit_metadata = QAction(MainWindow)
@@ -59,32 +64,57 @@ class Ui_MainWindow(object):
         self.action_mark_section_done = QAction(MainWindow)
         self.action_mark_section_done.setObjectName(u"action_mark_section_done")
         icon2 = QIcon()
-        icon2.addFile(u"://icons/CheckmarkCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        iconThemeName = u"CheckmarkCircle"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon2 = QIcon.fromTheme(iconThemeName)
+        else:
+            icon2.addFile(u"://icons/CheckmarkCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
         self.action_mark_section_done.setIcon(icon2)
         self.action_mark_section_done.setMenuRole(QAction.MenuRole.NoRole)
         self.action_create_new_section = QAction(MainWindow)
         self.action_create_new_section.setObjectName(u"action_create_new_section")
         self.action_create_new_section.setCheckable(True)
         icon3 = QIcon()
-        icon3.addFile(u"://icons/AddCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        iconThemeName = u"AddCircle"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon3 = QIcon.fromTheme(iconThemeName)
+        else:
+            icon3.addFile(u"://icons/AddCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
         self.action_create_new_section.setIcon(icon3)
         self.action_create_new_section.setMenuRole(QAction.MenuRole.NoRole)
         self.action_toggle_auto_scaling = QAction(MainWindow)
         self.action_toggle_auto_scaling.setObjectName(u"action_toggle_auto_scaling")
         icon4 = QIcon()
-        icon4.addFile(u"://icons/AutoFitHeight.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        iconThemeName = u"AutoFitHeight"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon4 = QIcon.fromTheme(iconThemeName)
+        else:
+            icon4.addFile(u"://icons/AutoFitHeight.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
         self.action_toggle_auto_scaling.setIcon(icon4)
         self.action_toggle_auto_scaling.setMenuRole(QAction.MenuRole.NoRole)
         self.action_confirm_section = QAction(MainWindow)
         self.action_confirm_section.setObjectName(u"action_confirm_section")
         icon5 = QIcon()
-        icon5.addFile(u"://icons/Checkmark.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        iconThemeName = u"Checkmark"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon5 = QIcon.fromTheme(iconThemeName)
+        else:
+            icon5.addFile(u"://icons/Checkmark.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
         self.action_confirm_section.setIcon(icon5)
         self.action_confirm_section.setMenuRole(QAction.MenuRole.NoRole)
         self.action_cancel_section = QAction(MainWindow)
         self.action_cancel_section.setObjectName(u"action_cancel_section")
         icon6 = QIcon()
-        icon6.addFile(u"://icons/Dismiss.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        iconThemeName = u"Dismiss"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon6 = QIcon.fromTheme(iconThemeName)
+        else:
+            icon6.addFile(u"://icons/Dismiss.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
         self.action_cancel_section.setIcon(icon6)
         self.action_cancel_section.setMenuRole(QAction.MenuRole.NoRole)
         self.action_show_section_overview = QAction(MainWindow)
@@ -101,7 +131,12 @@ class Ui_MainWindow(object):
         self.action_show_user_guide = QAction(MainWindow)
         self.action_show_user_guide.setObjectName(u"action_show_user_guide")
         icon7 = QIcon()
-        icon7.addFile(u"://icons/BookQuestionMark.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        iconThemeName = u"BookQuestionMark"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon7 = QIcon.fromTheme(iconThemeName)
+        else:
+            icon7.addFile(u"://icons/BookQuestionMark.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
         self.action_show_user_guide.setIcon(icon7)
         self.action_show_user_guide.setMenuRole(QAction.MenuRole.NoRole)
         self.action_about_qt = QAction(MainWindow)
@@ -113,13 +148,23 @@ class Ui_MainWindow(object):
         self.action_remove_section = QAction(MainWindow)
         self.action_remove_section.setObjectName(u"action_remove_section")
         icon8 = QIcon()
-        icon8.addFile(u"://icons/SubtractCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        iconThemeName = u"SubtractCircle"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon8 = QIcon.fromTheme(iconThemeName)
+        else:
+            icon8.addFile(u"://icons/SubtractCircle.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
         self.action_remove_section.setIcon(icon8)
         self.action_remove_section.setMenuRole(QAction.MenuRole.NoRole)
         self.action_unlock_section = QAction(MainWindow)
         self.action_unlock_section.setObjectName(u"action_unlock_section")
         icon9 = QIcon()
-        icon9.addFile(u"://icons/LockOpen.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        iconThemeName = u"LockOpen"
+        if QIcon.hasThemeIcon(iconThemeName):
+            icon9 = QIcon.fromTheme(iconThemeName)
+        else:
+            icon9.addFile(u"://icons/LockOpen.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+
         self.action_unlock_section.setIcon(icon9)
         self.action_unlock_section.setMenuRole(QAction.MenuRole.NoRole)
         self.centralwidget = QWidget(MainWindow)

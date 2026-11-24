@@ -61,7 +61,7 @@
         <string>...</string>
        </property>
        <property name="icon">
-        <iconset resource="../resources.qrc">
+        <iconset theme="EditSettings" resource="../resources.qrc">
          <normaloff>:/icons/EditSettings.svg</normaloff>:/icons/EditSettings.svg</iconset>
        </property>
       </widget>

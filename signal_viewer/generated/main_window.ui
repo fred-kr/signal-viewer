@@ -665,7 +665,7 @@
   </action>
   <action name="action_show_settings">
    <property name="icon">
-    <iconset resource="../resources.qrc">
+    <iconset theme="Settings" resource="../resources.qrc">
      <normaloff>:/icons/Settings.svg</normaloff>:/icons/Settings.svg</iconset>
    </property>
    <property name="text">
@@ -723,7 +723,7 @@
   </action>
   <action name="action_mark_section_done">
    <property name="icon">
-    <iconset>
+    <iconset theme="CheckmarkCircle">
      <normaloff>://icons/CheckmarkCircle.svg</normaloff>://icons/CheckmarkCircle.svg</iconset>
    </property>
    <property name="text">
@@ -744,7 +744,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset theme="AddCircle">
      <normaloff>://icons/AddCircle.svg</normaloff>://icons/AddCircle.svg</iconset>
    </property>
    <property name="text">
@@ -762,7 +762,7 @@
   </action>
   <action name="action_toggle_auto_scaling">
    <property name="icon">
-    <iconset>
+    <iconset theme="AutoFitHeight">
      <normaloff>://icons/AutoFitHeight.svg</normaloff>://icons/AutoFitHeight.svg</iconset>
    </property>
    <property name="text">
@@ -780,7 +780,7 @@
   </action>
   <action name="action_confirm_section">
    <property name="icon">
-    <iconset>
+    <iconset theme="Checkmark">
      <normaloff>://icons/Checkmark.svg</normaloff>://icons/Checkmark.svg</iconset>
    </property>
    <property name="text">
@@ -798,7 +798,7 @@
   </action>
   <action name="action_cancel_section">
    <property name="icon">
-    <iconset>
+    <iconset theme="Dismiss">
      <normaloff>://icons/Dismiss.svg</normaloff>://icons/Dismiss.svg</iconset>
    </property>
    <property name="text">
@@ -870,7 +870,7 @@
   </action>
   <action name="action_show_user_guide">
    <property name="icon">
-    <iconset>
+    <iconset theme="BookQuestionMark">
      <normaloff>://icons/BookQuestionMark.svg</normaloff>://icons/BookQuestionMark.svg</iconset>
    </property>
    <property name="text">
@@ -913,7 +913,7 @@
   </action>
   <action name="action_remove_section">
    <property name="icon">
-    <iconset>
+    <iconset theme="SubtractCircle">
      <normaloff>://icons/SubtractCircle.svg</normaloff>://icons/SubtractCircle.svg</iconset>
    </property>
    <property name="text">
@@ -931,7 +931,7 @@
   </action>
   <action name="action_unlock_section">
    <property name="icon">
-    <iconset>
+    <iconset theme="LockOpen">
      <normaloff>://icons/LockOpen.svg</normaloff>://icons/LockOpen.svg</iconset>
    </property>
    <property name="text">

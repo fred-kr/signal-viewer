@@ -218,20 +218,20 @@ class SVGUI(QtWidgets.QMainWindow):
         self.console_window = console_window
 
     def _setup_actions(self) -> None:
-        self.action_show_section_summary = QtGui.QAction(QtGui.QIcon("://icons/Info"), "Show Section Summary", self)
+        self.action_show_section_summary = QtGui.QAction(QtGui.QIcon.fromTheme("Info"), "Show Section Summary", self)
         self.action_show_section_summary.setToolTip(
             "Show size, bounds, peak count and processing history of the active section"
         )
 
         self.action_toggle_whats_this_mode = QtWidgets.QWhatsThis.createAction(self)
-        self.action_toggle_whats_this_mode.setIcon(QtGui.QIcon("://icons/Question"))
+        self.action_toggle_whats_this_mode.setIcon(QtGui.QIcon.fromTheme("Question"))
         self.action_toggle_whats_this_mode.setToolTip(
             "Enter What's This mode (Shift+F1), then click any control to read what it does"
         )
 
-        self.action_export_to_csv = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to CSV")
+        self.action_export_to_csv = QtGui.QAction(QtGui.QIcon.fromTheme("ArrowExportLtr"), "Export to CSV")
         self.action_export_to_csv.setToolTip("Save the result table currently shown (peaks or rate) as a CSV file")
-        self.action_export_to_xlsx = QtGui.QAction(QtGui.QIcon("://icons/ArrowExportLtr"), "Export to XLSX")
+        self.action_export_to_xlsx = QtGui.QAction(QtGui.QIcon.fromTheme("ArrowExportLtr"), "Export to XLSX")
         self.action_export_to_xlsx.setToolTip("Save the results of every section of every channel to Excel")
 
     def _setup_toolbars(self) -> None:
@@ -361,7 +361,7 @@ class SVGUI(QtWidgets.QMainWindow):
             return
         menu = QtWidgets.QMenu(parent=table_view)
         action_copy_table = QtGui.QAction(
-            QtGui.QIcon("://icons/Copy"),
+            QtGui.QIcon.fromTheme("Copy"),
             "Copy to Clipboard",
             triggered=lambda: table_view.model().df.write_clipboard(),
         )

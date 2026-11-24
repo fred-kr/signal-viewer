@@ -158,7 +158,7 @@ class ParameterDialog(QtWidgets.QDialog):
         button_box = self.ui.buttonBox
         # Created here because a button box in Designer holds standard buttons only, and none of them is "Run".
         self.btn_run = button_box.addButton("Run", QtWidgets.QDialogButtonBox.ButtonRole.ApplyRole)
-        self.btn_run.setIcon(QtGui.QIcon("://icons/Play.svg"))
+        self.btn_run.setIcon(QtGui.QIcon.fromTheme("Play"))
         self.btn_run.setDefault(True)
         self.btn_run.clicked.connect(self._on_run_clicked)
 

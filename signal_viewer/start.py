@@ -45,7 +45,7 @@ def gui() -> None:
 
     app_name = "SignalViewer - Debug" if args.debug else "SignalViewer"
     org_name = "QuackTech"
-    from PySide6 import QtCore, QtWidgets
+    from PySide6 import QtCore, QtGui, QtWidgets
 
     # Set before anything that depends on QStandardPaths or QSettings. The static setters work without an
     # application instance.
@@ -98,6 +98,24 @@ def gui() -> None:
     from signal_viewer.sv_app import SVApp
 
     app = QtWidgets.QApplication(sys.argv)
+
+    import signal_viewer.generated.rc_icon_themes  # noqa: F401  registers :/icon-themes
+
+    def apply_icon_theme(scheme: QtCore.Qt.ColorScheme | None = None) -> None:
+        """Selects the icon theme that contrasts with the current color scheme and repaints every widget."""
+        if scheme is None:
+            scheme = QtGui.QGuiApplication.styleHints().colorScheme()
+        if scheme == QtCore.Qt.ColorScheme.Unknown:  # platform doesn't report one: judge by the palette
+            dark = QtGui.QGuiApplication.palette().color(QtGui.QPalette.ColorRole.Window).lightness() < 128
+        else:
+            dark = scheme == QtCore.Qt.ColorScheme.Dark
+        QtGui.QIcon.setThemeName("dark" if dark else "light")
+        for widget in QtWidgets.QApplication.allWidgets():
+            widget.update()
+
+    QtGui.QIcon.setThemeSearchPaths([":/icon-themes", *QtGui.QIcon.themeSearchPaths()])
+    apply_icon_theme()
+    app.styleHints().colorSchemeChanged.connect(apply_icon_theme)
 
     sv_app = SVApp()
     sv_app.gui.show()

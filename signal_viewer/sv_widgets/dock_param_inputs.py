@@ -59,16 +59,16 @@ class ParameterInputs(QtWidgets.QWidget):
 
     def _setup_actions(self) -> None:
         # The tooltips of these actions come from `help_texts.HELP_TEXTS`, keyed by attribute name.
-        self.action_run = QtGui.QAction(QtGui.QIcon("://icons/Play.svg"), "Run", self)
+        self.action_run = QtGui.QAction(QtGui.QIcon.fromTheme("Play"), "Run", self)
         self.action_run.triggered.connect(self.run)
 
-        self.action_peak_settings = QtGui.QAction(QtGui.QIcon("://icons/Options.svg"), "Peak Settings", self)
+        self.action_peak_settings = QtGui.QAction(QtGui.QIcon.fromTheme("Options"), "Peak Settings", self)
         self.action_peak_settings.triggered.connect(self.edit_peak_settings)
 
-        self.action_clear_peaks = QtGui.QAction(QtGui.QIcon("://icons/Eraser.svg"), "Clear Peaks", self)
+        self.action_clear_peaks = QtGui.QAction(QtGui.QIcon.fromTheme("Eraser"), "Clear Peaks", self)
         self.action_clear_peaks.triggered.connect(self.clear_peaks)
 
-        self.action_reset_data = QtGui.QAction(QtGui.QIcon("://icons/Broom.svg"), "Reset Signal", self)
+        self.action_reset_data = QtGui.QAction(QtGui.QIcon.fromTheme("Broom"), "Reset Signal", self)
         self.action_reset_data.triggered.connect(self.reset_data)
 
         self.ui.cb_processing.addActions(
@@ -170,8 +170,8 @@ class InputsDock(QtWidgets.QDockWidget):
         super().__init__("Parameter Inputs", parent=parent)
         self.setObjectName("DockWidgetParameterInputs")
         self.setAllowedAreas(QtCore.Qt.DockWidgetArea.AllDockWidgetAreas)
-        self.setWindowIcon(QtGui.QIcon("://icons/Options.svg"))
-        self.toggleViewAction().setIcon(QtGui.QIcon("://icons/Options.svg"))
+        self.setWindowIcon(QtGui.QIcon.fromTheme("Options"))
+        self.toggleViewAction().setIcon(QtGui.QIcon.fromTheme("Options"))
         self.toggleViewAction().setToolTip("Show or hide the Parameter Inputs dock")
 
         self.ui = ParameterInputs()

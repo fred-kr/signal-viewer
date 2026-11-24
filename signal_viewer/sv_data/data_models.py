@@ -295,7 +295,7 @@ class SectionListModel(QtCore.QAbstractListModel):
         elif role == ItemDataRole.ToolTipRole:
             return repr(section)
         elif role == ItemDataRole.DecorationRole:
-            return QtGui.QIcon(":icons/LockClosed.svg") if section.is_locked else QtGui.QIcon(":icons/LockOpen.svg")
+            return QtGui.QIcon.fromTheme("LockClosed") if section.is_locked else QtGui.QIcon.fromTheme("LockOpen")
         return None
 
     @staticmethod
