@@ -175,8 +175,14 @@ class SVApp(QtCore.QObject):
 
     @QtCore.Slot()
     def _on_show_settings(self) -> None:
-        """Opens the Settings dialog. OK applies the edits (each one reaches `_on_setting_changed`), Cancel drops them."""
-        qconfig.create_editor(self.gui).open()
+        """
+        Opens the Settings dialog. OK and Apply assign the edits (each one reaches `_on_setting_changed`), Cancel
+        drops them.
+        """
+        dialog = qconfig.SettingsDialog(self.gui)
+        dialog.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        dialog.resize(800, 600)
+        dialog.open()
 
     @QtCore.Slot()
     def clear_peaks(self) -> None:
@@ -659,7 +665,7 @@ class SVApp(QtCore.QObject):
         Only settings that are read once and cached need handling here; the rest are read from `Config` on use.
         Writes to the hidden "Internal" group (remembered directories, window geometry) are ignored.
         """
-        if type(qconfig.get_config(group)).__hidden__:
+        if qconfig.group_info(group).hidden:
             return
         logger.info(f"Setting changed: {group}.{key} = {value!r}")
 

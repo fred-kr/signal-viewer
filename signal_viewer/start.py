@@ -71,7 +71,7 @@ def gui() -> None:
         try:
             import pyside_config
 
-            pyside_config.clean()
+            pyside_config.clear_store()
             logger.success("Cleanup successful, app will use default settings.")
         except ImportError:
             logger.error("Error importing pyside_config module. Unable to reset settings.")

@@ -1,8 +1,9 @@
 """
 Persistent settings, declared as `pyside_config` groups.
 
-Each group is an `attrs` class decorated with `@qconfig.config`. A field's `editor` says how the Settings dialog
-edits it; its `description` is shown under the editor and repeated in the user guide (`doc/reference/settings.html`).
+Each group is an `attrs` class decorated with `@qconfig.config`. A field's `editor` is a callable returning the widget
+the Settings dialog edits it with; its `label` and `description` are shown next to the editor and repeated in the user
+guide (`doc/reference/settings.html`).
 Values are stored through `QSettings` under the organization/application name set in `start.py` and coerced back to
 the declared types on load; `--reset-settings` clears them. The "Internal" group is declared `hidden=True`: it is
 stored but has no tab in the dialog.
@@ -16,8 +17,7 @@ from typing import NamedTuple
 
 import pyside_config as qconfig
 from PySide6 import QtCore, QtWidgets
-from pyside_config import EditorWidgetInfo, config_field
-from pyside_config.helpers import make_spin_box_info
+from pyside_config import config_field
 from pyside_widgets import AnimatedToggleSwitch, EnumComboBox
 
 from signal_viewer.enum_defs import RateComputationMethod, TextFileSeparator
@@ -34,22 +34,20 @@ def _enum_combo_box[T: RateComputationMethod | TextFileSeparator](enum_class: ty
     return combo
 
 
-@qconfig.config(group_name="Plot")
+@qconfig.config(group="Plot")
 class PlotConfig:
     """Settings of the editing plot on the Graph page."""
 
     line_click_width: int = config_field(
         default=70,
-        editor=make_spin_box_info(
-            "Line click width", widget_factory=QtWidgets.QSpinBox, minimum=3, maximum=1_000, suffix=" px", hasFrame=True
-        ),
+        label="Line click width",
+        editor=lambda: QtWidgets.QSpinBox(minimum=3, maximum=1_000, suffix=" px"),
         description="The width in pixels orthogonal to the curve that will respond to a mouse click.",
     )
     click_radius: int = config_field(
         default=20,
-        editor=make_spin_box_info(
-            "Click radius", widget_factory=QtWidgets.QSpinBox, minimum=0, maximum=1_000, suffix=" px", hasFrame=True
-        ),
+        label="Click radius",
+        editor=lambda: QtWidgets.QSpinBox(minimum=0, maximum=1_000, suffix=" px"),
         description=(
             "The radius in pixels around a click that will be searched for an extreme point when\n"
             "manually adding peaks / valleys."
@@ -60,18 +58,20 @@ class PlotConfig:
 plot = qconfig.get_config(PlotConfig)
 
 
-@qconfig.config(group_name="Processing")
+@qconfig.config(group="Processing")
 class EditingConfig:
     """Settings that change how sections are processed."""
 
     filter_stacking: bool = config_field(
         default=False,
-        editor=EditorWidgetInfo("Filter stacking", AnimatedToggleSwitch),
+        label="Filter stacking",
+        editor=AnimatedToggleSwitch,
         description="Whether to allow applying multiple filters to the same data.",
     )
     rate_computation_method: RateComputationMethod = config_field(
         default=RateComputationMethod.RollingWindow,
-        editor=EditorWidgetInfo("Rate computation method", functools.partial(_enum_combo_box, RateComputationMethod)),
+        label="Rate computation method",
+        editor=functools.partial(_enum_combo_box, RateComputationMethod),
         description="How to compute the signal rate from the detected peaks.",
     )
 
@@ -79,20 +79,20 @@ class EditingConfig:
 editing = qconfig.get_config(EditingConfig)
 
 
-@qconfig.config(group_name="Data")
+@qconfig.config(group="Data")
 class DataConfig:
     """Settings for reading files and displaying their values."""
 
     float_precision: int = config_field(
         default=3,
-        editor=make_spin_box_info(
-            "Float precision", widget_factory=QtWidgets.QSpinBox, minimum=0, maximum=10, hasFrame=True
-        ),
+        label="Float precision",
+        editor=lambda: QtWidgets.QSpinBox(minimum=0, maximum=10),
         description="Amount of decimal places to display when displaying data in tables.",
     )
     text_file_separator: TextFileSeparator = config_field(
         default=TextFileSeparator.Tab,
-        editor=EditorWidgetInfo("Text file separator", functools.partial(_enum_combo_box, TextFileSeparator)),
+        label="Text file separator",
+        editor=functools.partial(_enum_combo_box, TextFileSeparator),
         description="Character used to separate fields when reading from a text (.txt) file.",
     )
 
@@ -100,7 +100,7 @@ class DataConfig:
 data = qconfig.get_config(DataConfig)
 
 
-@qconfig.config(group_name="Internal", hidden=True)
+@qconfig.config(group="Internal", hidden=True)
 class InternalConfig:
     """State the application remembers between runs. Not shown in the Settings dialog."""
 

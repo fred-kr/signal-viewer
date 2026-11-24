@@ -405,11 +405,11 @@ class SVGUI(QtWidgets.QMainWindow):
         self.dock_sections.btn_container.setVisible(show)
 
     def write_settings(self) -> None:
-        """Stores window geometry and dock/toolbar state in `Config.internal` and saves the settings."""
+        """Stores window geometry and dock/toolbar state in `Config.internal` and flushes the settings to disk."""
         Config.internal.window_geometry = self.saveGeometry()
         Config.internal.window_state = self.saveState()
 
-        qconfig.save()
+        qconfig.sync()
 
     def read_settings(self) -> None:
         """Restores window geometry and dock/toolbar state from `Config.internal`."""

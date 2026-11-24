@@ -30,7 +30,7 @@ def page_sections() -> dict[str, set[str]]:
 def declared_sections() -> dict[str, set[str]]:
     sections: dict[str, set[str]] = {}
     for field in qconfig.iter_fields(include_hidden=False):
-        if field.label is not None:
+        if field.has_editor:
             sections.setdefault(field.group, set()).add(field.label)
     return sections
 

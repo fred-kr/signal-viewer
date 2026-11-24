@@ -1,8 +1,8 @@
 """
 Pytest bootstrap.
 
-`signal_viewer.sv_config` declares its `pyside_config` groups at import time, which needs a `QSettings` store.
-Before any test module imports the package, point `pyside_config` at an INI file in a fresh temporary directory, so
+`signal_viewer.sv_config` declares its `pyside_config` groups and reads their values at import time, which needs a
+`QSettings` store. Before any test module imports the package, point `pyside_config` at an INI file in a fresh temporary directory, so
 test runs never read or write the user's stored settings. The organization and application name are set as well
 (for `QStandardPaths`); the application name differs from the real one ("SignalViewer") as a second safeguard.
 
