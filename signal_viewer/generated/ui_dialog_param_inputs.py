@@ -505,7 +505,7 @@ class Ui_paramDialog(object):
         self.buttonBox = QDialogButtonBox(paramDialog)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok|QDialogButtonBox.StandardButton.RestoreDefaults)
 
         self.gridLayout_3.addWidget(self.buttonBox, 1, 0, 1, 1)
 
@@ -522,7 +522,7 @@ class Ui_paramDialog(object):
     # setupUi
 
     def retranslateUi(self, paramDialog):
-        paramDialog.setWindowTitle(QCoreApplication.translate("paramDialog", u"Dialog", None))
+        paramDialog.setWindowTitle(QCoreApplication.translate("paramDialog", u"Processing Parameters", None))
         self.sf_groupBox.setTitle(QCoreApplication.translate("paramDialog", u"Filter Parameters", None))
         self.label.setText(QCoreApplication.translate("paramDialog", u"Method", None))
         self.label_3.setText(QCoreApplication.translate("paramDialog", u"Lower cutoff", None))
@@ -586,7 +586,7 @@ class Ui_paramDialog(object):
         self.label_32.setText(QCoreApplication.translate("paramDialog", u"Selected method doesn't have any adjustable parameters.", None))
         self.tab_widget_params.setTabText(self.tab_widget_params.indexOf(self.tab_peak), QCoreApplication.translate("paramDialog", u"Peak detection", None))
         self.label_35.setText(QCoreApplication.translate("paramDialog", u"Incomplete window handling method", None))
-        self.groupBox.setTitle(QCoreApplication.translate("paramDialog", u"GroupBox", None))
+        self.groupBox.setTitle(QCoreApplication.translate("paramDialog", u"Rolling window", None))
         self.label_34.setText(QCoreApplication.translate("paramDialog", u"New window every", None))
         self.label_33.setText(QCoreApplication.translate("paramDialog", u"Window Length", None))
         self.tab_widget_params.setTabText(self.tab_widget_params.indexOf(self.tab_rate), QCoreApplication.translate("paramDialog", u"Rate calculation", None))

@@ -48,7 +48,6 @@ class ParameterInputs(QtWidgets.QWidget):
         super().__init__(parent)
         self.ui = Ui_processingInputs()
         self.ui.setupUi(self)
-        self.ui.verticalLayout.addStretch(1)  # keeps the two rows at the top of a tall dock
 
         # A child, so it is disabled together with the dock and found by `findChildren` (help text tests).
         self.dialog = ParameterDialog(self)

@@ -9,22 +9,22 @@ authors = [
 ]
 dependencies = [
     "attrs>=26.1.0",
-    "loguru>=0.7.3",
+    "loguru>=0.8.0",
     "matplotlib>=3.11.2",
     "mne>=1.13.2",
     "numexpr>=2.14.2",
-    "numpy>=2.5.4",
-    "polars[excel]>=2.0.0",
-    "pyarrow>=26.0.0",
+    "numpy>=2.5.5",
+    "polars[excel]>=2.1.0",
+    "pyarrow>=26.0.1",
     "pyopengl>=3.1.10",
     "pyopengl-accelerate>=3.1.10",
     "pyside6>=6.12.0",
     "pywavelets>=1.10.0",
     "scipy>=1.18.1",
     "tables>=3.11.1",
-    "wfdb>=4.3.1",
+    "wfdb>=5.2.0",
     "scikit-learn>=1.9.1",
-    "neurokit2>=0.2.13",
+    "neurokit2>=0.3.0",
     "pyqtgraph",
     "pyside-widgets",
     "pyside-config",
@@ -36,11 +36,11 @@ dependencies = [
 dev = [
     "pillow>=13.0.0",
     "pyinstaller>=6.22.3",
-    "pyinstaller-hooks-contrib>=2026.9",
-    "pyrefly>=1.4.0",
+    "pyinstaller-hooks-contrib>=2026.10",
+    "pyrefly>=1.5.0",
     "pyright>=1.1.414",
-    "pytest>=9.1.1",
-    "qtconsole>=5.7.2",  # Jupyter console in the View menu when DEV=1 (pyside-widgets no longer requires it)
+    "pytest>=9.2.0",
+    "qtconsole>=5.7.2",  # Jupyter console in the View menu when DEV=1
     "scipy-stubs>=1.18.1.1",
 
 ]

@@ -119,9 +119,6 @@ class ParameterDialog(QtWidgets.QDialog):
         super().__init__(parent)
         self.ui = Ui_paramDialog()
         self.ui.setupUi(self)
-        # The form still carries Designer's placeholders for these two.
-        self.setWindowTitle("Processing Parameters")
-        self.ui.groupBox.setTitle("Rolling window")
 
         self._snapshot: _Snapshot | None = None
 
@@ -159,12 +156,13 @@ class ParameterDialog(QtWidgets.QDialog):
     def _setup_buttons(self) -> None:
         # The tooltips of these buttons come from `help_texts.HELP_TEXTS`, keyed by attribute name.
         button_box = self.ui.buttonBox
+        # Created here because a button box in Designer holds standard buttons only, and none of them is "Run".
         self.btn_run = button_box.addButton("Run", QtWidgets.QDialogButtonBox.ButtonRole.ApplyRole)
         self.btn_run.setIcon(QtGui.QIcon("://icons/Play.svg"))
         self.btn_run.setDefault(True)
         self.btn_run.clicked.connect(self._on_run_clicked)
 
-        self.btn_restore_defaults = button_box.addButton(QtWidgets.QDialogButtonBox.StandardButton.RestoreDefaults)
+        self.btn_restore_defaults = button_box.button(QtWidgets.QDialogButtonBox.StandardButton.RestoreDefaults)
         self.btn_restore_defaults.clicked.connect(self.restore_defaults)
 
     def _setup_widgets(self) -> None:
