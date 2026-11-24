@@ -1,58 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>processingInputs</class>
+ <widget class="QWidget" name="processingInputs">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>315</width>
-    <height>478</height>
+    <width>280</width>
+    <height>76</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="SettingCard" name="settingCard">
-     <property name="styleSheet">
-      <string notr="true">QLabel {
-    font: 14px 'Segoe UI', 'Microsoft YaHei', 'PingFang SC';
-    padding: 0;
-    border: none;
-    background-color: transparent;
-}
-
-QLabel#textLabel {
-    font: 11px 'Segoe UI', 'Microsoft YaHei', 'PingFang SC';
-    padding: 0;
-}
-                    </string>
-     </property>
-     <property name="title" stdset="0">
-      <string>Pipeline</string>
-     </property>
-     <property name="description" stdset="0">
-      <string/>
-     </property>
-     <property name="icon" stdset="0">
-      <iconset>
-       <normaloff>../../icons/ArrowReset.svg</normaloff>../../icons/ArrowReset.svg</iconset>
-     </property>
-     <property name="reset_shown" stdset="0">
-      <bool>true</bool>
-     </property>
-     <property name="icon_size" stdset="0">
-      <size>
-       <width>16</width>
-       <height>16</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="CommandBar" name="commandBar">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="CommandBar" name="cb_processing">
      <property name="fill" stdset="0">
       <bool>true</bool>
      </property>
@@ -61,203 +24,56 @@ QLabel#textLabel {
      </property>
     </widget>
    </item>
-   <item row="2" column="0" alignment="Qt::AlignmentFlag::AlignTop">
-    <widget class="QFrame" name="frame">
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QGroupBox" name="groupBox_2">
-        <property name="title">
-         <string>Filter Parameters</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
-        </property>
-        <property name="flat">
-         <bool>false</bool>
-        </property>
-        <layout class="QFormLayout" name="formLayout_2">
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Lower cutoff</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="DecimalSpinBox" name="sf_lower_cutoff"/>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Upper cutoff</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="DecimalSpinBox" name="sf_upper_cutoff"/>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Order</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="DecimalSpinBox" name="sf_order"/>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Window Size</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="DecimalSpinBox" name="sf_window_size"/>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>Powerline</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="DecimalSpinBox" name="sf_powerline"/>
-         </item>
-         <item row="0" column="1">
-          <widget class="EnumComboBox" name="sf_method">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Method</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QGroupBox" name="groupBox_3">
-        <property name="title">
-         <string>Standardization Parameters</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
-        </property>
-        <layout class="QFormLayout" name="formLayout_3">
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_10">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Use rolling window</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QCheckBox" name="std_rolling_window">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_9">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Window Size</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="DecimalSpinBox" name="std_window_size">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="EnumComboBox" name="std_method">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Method</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </widget>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label_8">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Pipeline</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="EnumComboBox" name="pipeline">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources.qrc">
+         <normaloff>:/icons/EditSettings.svg</normaloff>:/icons/EditSettings.svg</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>DecimalSpinBox</class>
-   <extends>QAbstractSpinBox</extends>
-   <header>pyside_widgets</header>
-  </customwidget>
-  <customwidget>
    <class>EnumComboBox</class>
    <extends>QComboBox</extends>
-   <header>pyside_widgets</header>
-  </customwidget>
-  <customwidget>
-   <class>SettingCard</class>
-   <extends>QFrame</extends>
    <header>pyside_widgets</header>
   </customwidget>
   <customwidget>
@@ -266,6 +82,8 @@ QLabel#textLabel {
    <header>pyside_widgets</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
