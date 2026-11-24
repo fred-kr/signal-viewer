@@ -460,7 +460,6 @@ class DataController(QtCore.QObject):
         if self._active_channel is None:
             return
         base = self._active_channel.base_section
-        start, stop = int(start), int(stop)
         # `index` is the row number, so the row offset equals the index value; a slice is a zero-copy view.
         data = self.base_df.slice(start, stop - start + 1)
         section = Section(

@@ -80,6 +80,7 @@ class PlotController(QtCore.QObject):
             plt_item.setClipToView(True)
             plt_item.addLegend(colCount=3)
             plt_item.addLegend().anchor(itemPos=(0, 1), parentPos=(0, 1), offset=(5, -5))
+            # pyrefly: ignore[missing-attribute]
             plt_item.setMouseEnabled(x=True, y=False)
 
         p_main.vb.enableAutoRange(EditingViewBox.YAxis, enable=True)
@@ -241,10 +242,14 @@ class PlotController(QtCore.QObject):
     def reset(self) -> None:
         """Resets all plot items, regions, and data items to initial state."""
         self.pw_main.clear()
+        # pyrefly: ignore[missing-attribute]
         if self.pw_main.plotItem.legend:
+            # pyrefly: ignore[missing-attribute]
             self.pw_main.plotItem.legend.clear()
         self.pw_rate.clear()
+        # pyrefly: ignore[missing-attribute]
         if self.pw_rate.plotItem.legend:
+            # pyrefly: ignore[missing-attribute]
             self.pw_rate.plotItem.legend.clear()
 
         self.unbind_section_model()
@@ -403,15 +408,8 @@ class PlotController(QtCore.QObject):
         self.pw_main.addItem(marked_region)
 
     def get_region_bounds(self) -> tuple[int, int]:
-        """
-        Returns the current bounds of the region selector.
-
-        Returns
-        -------
-        tuple[float, float]
-            The min and max boundaries of the region selector.
-        """
-        x1, x2 = int(self.region_selector.getRegion()[0]), int(self.region_selector.getRegion()[1])  # pyright: ignore[reportArgumentType]
+        """Returns the current bounds of the region selector."""
+        x1, x2 = int(self.region_selector.getRegion()[0]), int(self.region_selector.getRegion()[1])
         return x1, x2
 
     def refresh_section(self, section: Section, flags: SectionChange) -> None:
