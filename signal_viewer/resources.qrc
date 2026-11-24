@@ -1,124 +1,124 @@
 <RCC>
   <qresource prefix="/">
-    <file>icons/selector.svg</file>
-    <file>icons/Beaker.svg</file>
-    <file>icons/BeakerEdit.svg</file>
-    <file>icons/ClipboardPulse.svg</file>
-    <file>icons/DocumentCatchUp.svg</file>
-    <file>icons/HeartPulse.svg</file>
-    <file>icons/LockShield.svg</file>
-    <file>icons/Microscope.svg</file>
-    <file>icons/Whiteboard.svg</file>
-    <file>icons/Add.svg</file>
-    <file>icons/AddCircle.svg</file>
-    <file>icons/AddSquare.svg</file>
-    <file>icons/ArrowAutofitHeight.svg</file>
-    <file>icons/ArrowAutofitHeightDotted.svg</file>
-    <file>icons/ArrowExportLtr.svg</file>
-    <file>icons/ArrowExportUp.svg</file>
-    <file>icons/ArrowImport.svg</file>
-    <file>icons/ArrowLeft.svg</file>
-    <file>icons/ArrowNext.svg</file>
-    <file>icons/ArrowPrevious.svg</file>
-    <file>icons/ArrowReset.svg</file>
-    <file>icons/ArrowRight.svg</file>
-    <file>icons/ArrowSync.svg</file>
-    <file>icons/AutoFitHeight.svg</file>
-    <file>icons/BookInformation.svg</file>
-    <file>icons/BookQuestionMark.svg</file>
-    <file>icons/BookSearch.svg</file>
-    <file>icons/Broom.svg</file>
-    <file>icons/Bug.svg</file>
-    <file>icons/CaretLeft.svg</file>
-    <file>icons/CaretRight.svg</file>
-    <file>icons/CheckboxChecked.svg</file>
-    <file>icons/CheckboxIndeterminate.svg</file>
-    <file>icons/CheckboxUnchecked.svg</file>
-    <file>icons/CheckboxWarning.svg</file>
-    <file>icons/Checkmark.svg</file>
-    <file>icons/CheckmarkCircle.svg</file>
-    <file>icons/CheckmarkSquare.svg</file>
-    <file>icons/ChevronCircleDown.svg</file>
-    <file>icons/ChevronCircleRight.svg</file>
-    <file>icons/ChevronDown.svg</file>
-    <file>icons/ChevronLeft.svg</file>
-    <file>icons/ChevronRight.svg</file>
-    <file>icons/ChevronUp.svg</file>
-    <file>icons/Circle.svg</file>
-    <file>icons/CircleEdit.svg</file>
-    <file>icons/CircleHalfFill.svg</file>
-    <file>icons/CircleLine.svg</file>
-    <file>icons/Code.svg</file>
-    <file>icons/Color.svg</file>
-    <file>icons/ConvertToTable.svg</file>
-    <file>icons/Copy.svg</file>
-    <file>icons/DataArea.svg</file>
-    <file>icons/DataHistogram.svg</file>
-    <file>icons/DataScatter.svg</file>
-    <file>icons/Delete.svg</file>
-    <file>icons/DeleteDismiss.svg</file>
-    <file>icons/DesktopPulse.svg</file>
-    <file>icons/Dismiss.svg</file>
-    <file>icons/DismissCircle.svg</file>
-    <file>icons/DismissSquare.svg</file>
-    <file>icons/DocumentArrowLeft.svg</file>
-    <file>icons/DocumentArrowRight.svg</file>
-    <file>icons/DocumentBulletListClock.svg</file>
-    <file>icons/DocumentDismiss.svg</file>
-    <file>icons/DocumentEndnote.svg</file>
-    <file>icons/DocumentToolbox.svg</file>
-    <file>icons/Edit.svg</file>
-    <file>icons/EditOff.svg</file>
-    <file>icons/EditSettings.svg</file>
-    <file>icons/Eraser.svg</file>
-    <file>icons/ErrorCircle.svg</file>
-    <file>icons/EyeHide.svg</file>
-    <file>icons/EyeShow.svg</file>
-    <file>icons/FolderOpen.svg</file>
-    <file>icons/History.svg</file>
-    <file>icons/Important.svg</file>
-    <file>icons/Info.svg</file>
-    <file>icons/Lasso.svg</file>
-    <file>icons/LightbulbCircle.svg</file>
-    <file>icons/List.svg</file>
-    <file>icons/LockClosed.svg</file>
-    <file>icons/LockOpen.svg</file>
-    <file>icons/MoreHorizontal.svg</file>
-    <file>icons/MoreVertical.svg</file>
-    <file>icons/Navigation.svg</file>
-    <file>icons/New.svg</file>
-    <file>icons/Options.svg</file>
-    <file>icons/PageFit.svg</file>
-    <file>icons/Play.svg</file>
-    <file>icons/PlayCircle.svg</file>
-    <file>icons/Prohibited.svg</file>
-    <file>icons/Pulse.svg</file>
-    <file>icons/Question.svg</file>
-    <file>icons/QuestionCircle.svg</file>
-    <file>icons/RectangleLandscape.svg</file>
-    <file>icons/Save.svg</file>
-    <file>icons/SaveArrowRight.svg</file>
-    <file>icons/SaveEdit.svg</file>
-    <file>icons/ScanObject.svg</file>
-    <file>icons/Search.svg</file>
-    <file>icons/SearchSquare.svg</file>
-    <file>icons/SearchVisual.svg</file>
-    <file>icons/SelectObject.svg</file>
-    <file>icons/Send.svg</file>
-    <file>icons/Settings.svg</file>
-    <file>icons/Status.svg</file>
-    <file>icons/Subtract.svg</file>
-    <file>icons/SubtractCircle.svg</file>
-    <file>icons/SubtractSquare.svg</file>
-    <file>icons/TabDesktopArrowClockwise.svg</file>
-    <file>icons/Table.svg</file>
-    <file>icons/Temperature.svg</file>
-    <file>icons/Toolbox.svg</file>
-    <file>icons/Warning.svg</file>
-    <file>icons/WindowDevTools.svg</file>
-    <file>icons/Wrench.svg</file>
-    <file>icons/ZoomIn.svg</file>
-    <file>icons/ZoomOut.svg</file>
+    <file alias="icons/selector.svg">icons/light/selector.svg</file>
+    <file alias="icons/Beaker.svg">icons/light/Beaker.svg</file>
+    <file alias="icons/BeakerEdit.svg">icons/light/BeakerEdit.svg</file>
+    <file alias="icons/ClipboardPulse.svg">icons/light/ClipboardPulse.svg</file>
+    <file alias="icons/DocumentCatchUp.svg">icons/light/DocumentCatchUp.svg</file>
+    <file alias="icons/HeartPulse.svg">icons/light/HeartPulse.svg</file>
+    <file alias="icons/LockShield.svg">icons/light/LockShield.svg</file>
+    <file alias="icons/Microscope.svg">icons/light/Microscope.svg</file>
+    <file alias="icons/Whiteboard.svg">icons/light/Whiteboard.svg</file>
+    <file alias="icons/Add.svg">icons/light/Add.svg</file>
+    <file alias="icons/AddCircle.svg">icons/light/AddCircle.svg</file>
+    <file alias="icons/AddSquare.svg">icons/light/AddSquare.svg</file>
+    <file alias="icons/ArrowAutofitHeight.svg">icons/light/ArrowAutofitHeight.svg</file>
+    <file alias="icons/ArrowAutofitHeightDotted.svg">icons/light/ArrowAutofitHeightDotted.svg</file>
+    <file alias="icons/ArrowExportLtr.svg">icons/light/ArrowExportLtr.svg</file>
+    <file alias="icons/ArrowExportUp.svg">icons/light/ArrowExportUp.svg</file>
+    <file alias="icons/ArrowImport.svg">icons/light/ArrowImport.svg</file>
+    <file alias="icons/ArrowLeft.svg">icons/light/ArrowLeft.svg</file>
+    <file alias="icons/ArrowNext.svg">icons/light/ArrowNext.svg</file>
+    <file alias="icons/ArrowPrevious.svg">icons/light/ArrowPrevious.svg</file>
+    <file alias="icons/ArrowReset.svg">icons/light/ArrowReset.svg</file>
+    <file alias="icons/ArrowRight.svg">icons/light/ArrowRight.svg</file>
+    <file alias="icons/ArrowSync.svg">icons/light/ArrowSync.svg</file>
+    <file alias="icons/AutoFitHeight.svg">icons/light/AutoFitHeight.svg</file>
+    <file alias="icons/BookInformation.svg">icons/light/BookInformation.svg</file>
+    <file alias="icons/BookQuestionMark.svg">icons/light/BookQuestionMark.svg</file>
+    <file alias="icons/BookSearch.svg">icons/light/BookSearch.svg</file>
+    <file alias="icons/Broom.svg">icons/light/Broom.svg</file>
+    <file alias="icons/Bug.svg">icons/light/Bug.svg</file>
+    <file alias="icons/CaretLeft.svg">icons/light/CaretLeft.svg</file>
+    <file alias="icons/CaretRight.svg">icons/light/CaretRight.svg</file>
+    <file alias="icons/CheckboxChecked.svg">icons/light/CheckboxChecked.svg</file>
+    <file alias="icons/CheckboxIndeterminate.svg">icons/light/CheckboxIndeterminate.svg</file>
+    <file alias="icons/CheckboxUnchecked.svg">icons/light/CheckboxUnchecked.svg</file>
+    <file alias="icons/CheckboxWarning.svg">icons/light/CheckboxWarning.svg</file>
+    <file alias="icons/Checkmark.svg">icons/light/Checkmark.svg</file>
+    <file alias="icons/CheckmarkCircle.svg">icons/light/CheckmarkCircle.svg</file>
+    <file alias="icons/CheckmarkSquare.svg">icons/light/CheckmarkSquare.svg</file>
+    <file alias="icons/ChevronCircleDown.svg">icons/light/ChevronCircleDown.svg</file>
+    <file alias="icons/ChevronCircleRight.svg">icons/light/ChevronCircleRight.svg</file>
+    <file alias="icons/ChevronDown.svg">icons/light/ChevronDown.svg</file>
+    <file alias="icons/ChevronLeft.svg">icons/light/ChevronLeft.svg</file>
+    <file alias="icons/ChevronRight.svg">icons/light/ChevronRight.svg</file>
+    <file alias="icons/ChevronUp.svg">icons/light/ChevronUp.svg</file>
+    <file alias="icons/Circle.svg">icons/light/Circle.svg</file>
+    <file alias="icons/CircleEdit.svg">icons/light/CircleEdit.svg</file>
+    <file alias="icons/CircleHalfFill.svg">icons/light/CircleHalfFill.svg</file>
+    <file alias="icons/CircleLine.svg">icons/light/CircleLine.svg</file>
+    <file alias="icons/Code.svg">icons/light/Code.svg</file>
+    <file alias="icons/Color.svg">icons/light/Color.svg</file>
+    <file alias="icons/ConvertToTable.svg">icons/light/ConvertToTable.svg</file>
+    <file alias="icons/Copy.svg">icons/light/Copy.svg</file>
+    <file alias="icons/DataArea.svg">icons/light/DataArea.svg</file>
+    <file alias="icons/DataHistogram.svg">icons/light/DataHistogram.svg</file>
+    <file alias="icons/DataScatter.svg">icons/light/DataScatter.svg</file>
+    <file alias="icons/Delete.svg">icons/light/Delete.svg</file>
+    <file alias="icons/DeleteDismiss.svg">icons/light/DeleteDismiss.svg</file>
+    <file alias="icons/DesktopPulse.svg">icons/light/DesktopPulse.svg</file>
+    <file alias="icons/Dismiss.svg">icons/light/Dismiss.svg</file>
+    <file alias="icons/DismissCircle.svg">icons/light/DismissCircle.svg</file>
+    <file alias="icons/DismissSquare.svg">icons/light/DismissSquare.svg</file>
+    <file alias="icons/DocumentArrowLeft.svg">icons/light/DocumentArrowLeft.svg</file>
+    <file alias="icons/DocumentArrowRight.svg">icons/light/DocumentArrowRight.svg</file>
+    <file alias="icons/DocumentBulletListClock.svg">icons/light/DocumentBulletListClock.svg</file>
+    <file alias="icons/DocumentDismiss.svg">icons/light/DocumentDismiss.svg</file>
+    <file alias="icons/DocumentEndnote.svg">icons/light/DocumentEndnote.svg</file>
+    <file alias="icons/DocumentToolbox.svg">icons/light/DocumentToolbox.svg</file>
+    <file alias="icons/Edit.svg">icons/light/Edit.svg</file>
+    <file alias="icons/EditOff.svg">icons/light/EditOff.svg</file>
+    <file alias="icons/EditSettings.svg">icons/light/EditSettings.svg</file>
+    <file alias="icons/Eraser.svg">icons/light/Eraser.svg</file>
+    <file alias="icons/ErrorCircle.svg">icons/light/ErrorCircle.svg</file>
+    <file alias="icons/EyeHide.svg">icons/light/EyeHide.svg</file>
+    <file alias="icons/EyeShow.svg">icons/light/EyeShow.svg</file>
+    <file alias="icons/FolderOpen.svg">icons/light/FolderOpen.svg</file>
+    <file alias="icons/History.svg">icons/light/History.svg</file>
+    <file alias="icons/Important.svg">icons/light/Important.svg</file>
+    <file alias="icons/Info.svg">icons/light/Info.svg</file>
+    <file alias="icons/Lasso.svg">icons/light/Lasso.svg</file>
+    <file alias="icons/LightbulbCircle.svg">icons/light/LightbulbCircle.svg</file>
+    <file alias="icons/List.svg">icons/light/List.svg</file>
+    <file alias="icons/LockClosed.svg">icons/light/LockClosed.svg</file>
+    <file alias="icons/LockOpen.svg">icons/light/LockOpen.svg</file>
+    <file alias="icons/MoreHorizontal.svg">icons/light/MoreHorizontal.svg</file>
+    <file alias="icons/MoreVertical.svg">icons/light/MoreVertical.svg</file>
+    <file alias="icons/Navigation.svg">icons/light/Navigation.svg</file>
+    <file alias="icons/New.svg">icons/light/New.svg</file>
+    <file alias="icons/Options.svg">icons/light/Options.svg</file>
+    <file alias="icons/PageFit.svg">icons/light/PageFit.svg</file>
+    <file alias="icons/Play.svg">icons/light/Play.svg</file>
+    <file alias="icons/PlayCircle.svg">icons/light/PlayCircle.svg</file>
+    <file alias="icons/Prohibited.svg">icons/light/Prohibited.svg</file>
+    <file alias="icons/Pulse.svg">icons/light/Pulse.svg</file>
+    <file alias="icons/Question.svg">icons/light/Question.svg</file>
+    <file alias="icons/QuestionCircle.svg">icons/light/QuestionCircle.svg</file>
+    <file alias="icons/RectangleLandscape.svg">icons/light/RectangleLandscape.svg</file>
+    <file alias="icons/Save.svg">icons/light/Save.svg</file>
+    <file alias="icons/SaveArrowRight.svg">icons/light/SaveArrowRight.svg</file>
+    <file alias="icons/SaveEdit.svg">icons/light/SaveEdit.svg</file>
+    <file alias="icons/ScanObject.svg">icons/light/ScanObject.svg</file>
+    <file alias="icons/Search.svg">icons/light/Search.svg</file>
+    <file alias="icons/SearchSquare.svg">icons/light/SearchSquare.svg</file>
+    <file alias="icons/SearchVisual.svg">icons/light/SearchVisual.svg</file>
+    <file alias="icons/SelectObject.svg">icons/light/SelectObject.svg</file>
+    <file alias="icons/Send.svg">icons/light/Send.svg</file>
+    <file alias="icons/Settings.svg">icons/light/Settings.svg</file>
+    <file alias="icons/Status.svg">icons/light/Status.svg</file>
+    <file alias="icons/Subtract.svg">icons/light/Subtract.svg</file>
+    <file alias="icons/SubtractCircle.svg">icons/light/SubtractCircle.svg</file>
+    <file alias="icons/SubtractSquare.svg">icons/light/SubtractSquare.svg</file>
+    <file alias="icons/TabDesktopArrowClockwise.svg">icons/light/TabDesktopArrowClockwise.svg</file>
+    <file alias="icons/Table.svg">icons/light/Table.svg</file>
+    <file alias="icons/Temperature.svg">icons/light/Temperature.svg</file>
+    <file alias="icons/Toolbox.svg">icons/light/Toolbox.svg</file>
+    <file alias="icons/Warning.svg">icons/light/Warning.svg</file>
+    <file alias="icons/WindowDevTools.svg">icons/light/WindowDevTools.svg</file>
+    <file alias="icons/Wrench.svg">icons/light/Wrench.svg</file>
+    <file alias="icons/ZoomIn.svg">icons/light/ZoomIn.svg</file>
+    <file alias="icons/ZoomOut.svg">icons/light/ZoomOut.svg</file>
     <file>icons/app_icon.png</file>
   </qresource>
 </RCC>

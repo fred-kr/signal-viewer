@@ -102,12 +102,12 @@ class ParameterDialog(QtWidgets.QDialog):
     """
     Three tabs of inputs (Preprocessing, Peak detection, Rate calculation) behind four buttons.
 
-    - **Run** keeps the edits and emits `sig_run_requested`; the dialog stays open, so a parameter can be tuned
-      against the plot behind it. It is the default button: Enter in an input runs instead of closing.
+    - **Run** keeps the edits and emits `sig_run_requested`; the dialog stays open, so a parameter can be tuned against
+    the plot behind it. It is the default button: Enter in an input runs instead of closing.
     - **OK** keeps the edits and closes without running.
     - **Cancel** (and closing the window) puts every input back to its value at the last `open_tab` or Run.
     - **Restore Defaults** resets the inputs of the visible tab; on the Peak detection tab only those of the shown
-      method.
+    method.
 
     Reading the inputs happens in the `get_*` methods; each returns what the data layer expects.
     """
